@@ -8,9 +8,9 @@ BEGIN_PROLOG
 # they can be redefined 
 # see example of redefining GEN_ID in Stntuple/test/read_reco_stnmaker.fcl
 #------------------------------------------------------------------------------
-TIME_OFFSET_MAPS : { inputs : [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap" ] }
-GEN_ID           : "unknown"     # by default, store all particles
-
+TIME_OFFSET_MAPS    : { inputs : [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap" ] }
+GEN_ID              : "unknown"                                   # by default, store all particles
+STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
 
 StntupleModuleFclDefaults : {
     interactiveMode : 0
@@ -46,14 +46,14 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     makeGenp             : 1
     makeHelices          : 0
     makePid              : 1
-    makeSimp             : 1  # 0: dont write; 1:save all; 2:save primary only
+    makeSimp             : 1  # 0: dont write
     makeStepPointMC      : 1
     makeStrawData        : 0
     makeTracks           : 1
     makeTrackStrawHits   : 0
     makeTrackSeeds       : 0
     makeTimeClusters     : 0
-    makeTrigger          : 0
+    makeTrigger          : 1
     
     KalDiag              : { @table::KalDiagDirect    }
     DoubletAmbigResolver : { @table::TrkReco.DoubletAmbigResolver }
@@ -72,10 +72,18 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # module is running upstream, simply copies its output
 # 'spmc' stands for 'StepPointMC'
 #------------------------------------------------------------------------------
-    strawHitsCollTag     : "makeSH"
+    strawHitCollTag      : "makeSH"
     strawDigiMCCollTag   : "compressDigiMCs"                     # was "makeSD"
+#------------------------------------------------------------------------------
+# TSimpBlock initialization parameters
+# vdHitsCollTag is used by TStnTrackBlock and TSimpBlock, hits on virtual detectors 
+# are stored in SpmcBlockVDet block, so all three have to be consistent
+#------------------------------------------------------------------------------
     simpCollTag          : "compressDigiMCs"                     # was "g4run" before
-    vdHitsCollTag        : "compressDigiMCs:virtualdetector"     # was "g4run" before
+    vdHitsCollTag        : @local::STN_VDHITS_COLL_TAG           # was "g4run" before
+    simpMinEnergy        : 0.0                                   # MeV , by default, store all
+    simpMaxZ             : 11800.0                               # mm  , by default, do no store calorimeter SimParticles
+
     genpCollTag          : "compressDigiMCs"                     # save signal-only: "generate" 
     genId                : @local::GEN_ID                        # by default, store all
     
@@ -102,14 +110,13 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     trkExtrapol          : TrkExtrapol
     trkCalMatch          : CaloMatching
 
-    minTActive           : 0.     # ns
-    minECrystal          : 1.0    # MeV
-    minSimpEnergy        : 0.0    # MeV , by default, store all
+    minTActive           : 0.       # ns
+    minECrystal          : 1.0      # MeV
 #------------------------------------------------------------------------------
 # this is the default for Stage1 simulation
 #------------------------------------------------------------------------------
     spmcBlockName        : [ "SpmcBlockVDet"                  , "SpmcBlock"             ]
-    spmcCollTag          : [ "compressDigiMCs:virtualdetector", "muonBeamFilter:mubeam" ]
+    spmcCollTag          : [ @local::STN_VDHITS_COLL_TAG      , "muonBeamFilter:mubeam" ]
     statusG4Tag          : [ "g4run"                          , "g4run"                 ]
 #------------------------------------------------------------------------------
 # filtering
@@ -182,6 +189,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
 #------------------------------------------------------------------------------
 Stntuple : {
     producers : {}  # empty table
+
+    analyzers : {}  # empty table
 
     filters : {
 	InitStntuple : { module_type:InitStntuple
@@ -424,7 +433,7 @@ Stntuple : {
 	    makeStepPointMC            : 1
 
 	    timeClusterBlockName       : [ ""                    , "TimeClusterBlockTpr", "TimeClusterBlockCpr" ]
-	    timeClusterCollTag         : [ ""                    , "TimeClusterFindere" , "CalTimePeakFinder"   ]
+  	    timeClusterCollTag         : [ ""                    , "TimeClusterFinderDe", "CalTimePeakFinder"   ]
 	    helixBlockName             : [ "HelixBlock"          , "HelixBlockTpr"      , "HelixBlockCpr"       ]
 	    helixCollTag               : [ "MHFinderDe"          , "MHFinderTprDe"      , "MHFinderCprDe"       ]
 
@@ -474,6 +483,40 @@ Stntuple : {
 	    pidBlockName               : [ ""                    , "PidBlock"           ]
 	    pidCollTag                 : [       ""              , "AvikPIDNew"         ]
 	}
+
+	StntupleMakerDeDmu : { @table::StntupleMakerTemplate 
+	    makePid                    : 0
+	    makeTrackSeeds             : 1
+	    makeTimeClusters           : 1
+	    makeHelices                : 1
+	    makeStepPointMC            : 1
+
+	    timeClusterBlockName       : [ "TimeClusterBlockDe"  , "TimeClusterBlockDmu"]
+  	    timeClusterCollTag         : [ "MHFinderDe"          , "MHFinderDmu"        ]
+# there should be one-to-one mapping between track seed and helix blocks
+	    helixBlockName             : [ "HelixBlock"          , "HelixBlockDmu"      ]
+	    helixCollTag               : [ "MHFinderDe"          , "MHFinderDmu"        ]
+
+	    trackSeedBlockName         : [ "TrackSeedBlock"      , "TrackSeedBlockDmu"  ]
+	    trackSeedCollTag           : [ "KSFDeMH"             , "KSFDmuMH"           ]
+
+	    trackBlockName             : [ "TrackBlockPar"       , "TrackBlockDar"      , "TrackBlockParDmu"     , "TrackBlockDarDmu"     ]
+	    trackCollTag               : [ "KFFDeMHPar"          , "KFFDeMHDar"         , "KFFDmuMHPar"          , "KFFDmuMHDar"          ]
+	    trackTsBlockName           : [ "TrackSeedBlock"      , "TrackSeedBlock"     , "TrackSeedBlockDmu"    , "TrackSeedBlockDmu"    ]
+	    trackTsCollTag             : [ "KSFDeMH"             , "KSFDeMH"            , "KSFDmuMH"             , "KSFDmuMH"             ]
+
+	    tciCollTag                 : [ "TciDeMHPar"          , "TciDeMHDar"         , "TciDmuMHPar"          , "TciDmuMHDar"          ]
+	    tcmCollTag                 : [ "TcmDeMHPar"          , "TcmDeMHDar"         , "TcmDmuMHPar"          , "TcmDmuMHDar"          ]
+	    trkQualCollTag             : [ "TrkQualDeMHPar"      , "TrkQualDeMHDar"     , "TrkQualDmuMHPar"      , "TrkQualDmuMHDar"      ]
+	    trackSHBlockName           : [ "TrackHitBlockPar"    , "TrackHitBlockDar"   , "TrackHitBlockParDmu"  , "TrackHitBlockDarDmu"  ]
+	    pidBlockName               : [ ""                    , "PidBlock"           , ""                     , "PidBlockDmu"          ]
+	    pidCollTag                 : [ ""                    , "AvikPIDNew"         , ""                     , "AvikPIDNewDmu"        ]
+
+	    spmcBlockName              : [ "SpmcBlockVDet"                   ]
+	    spmcCollTag                : [ "compressDigiMCs:virtualdetector" ]
+	    statusG4Tag                : [ "g4run"                           ]
+	}
+
 #------------------------------------------------------------------------------
 # trigger studies
 #------------------------------------------------------------------------------
@@ -528,7 +571,7 @@ Stntuple : {
 #------------------------------------------------------------------------------
 	StntupleMaker4 : { @table::StntupleMakerTemplate 
 	    trackBlockName         : [ "TrackBlockDem"           , "TrackBlockDmm"           , "TrackBlockUep"           , "TrackBlockUmp"            ]
-	    trackSHBlockName       : [ "TrackHitBlockDem"        , "TrackHitBlockDmm"        , "TrackHitBlockUep"        , "TrackHitBlockUmp"         ] 
+	    trackSHBlockName       : [ "TrackHitBlockDem"        , "TrackHitBlockDmm"        , "TrackHitBlockUep"        , "TrackHitBlockUmp"         ]
 	    trackCollTag           : [ "MergePatRecDem"          , "MergePatRecDmm"          , "MergePatRecUep"          , "MergePatRecUmp"           ]
 	    tciCollTag             : [ "TrackCaloIntersectionDem", "TrackCaloIntersectionDmm", "TrackCaloIntersectionUep", "TrackCaloIntersectionUmp" ]
 	    tcmCollTag             : [ "TrackCaloMatchingDem"    , "TrackCaloMatchingDmm"    , "TrackCaloMatchingUep"    , "TrackCaloMatchingUmp"     ]
@@ -607,6 +650,6 @@ Stntuple.stnmaker_trig    : [ InitStntuple, StntupleMakerTrig,                  
 #------------------------------------------------------------------------------
 Stntuple.stnmaker_De      : [ InitStntuple, StntupleMakerDe  ,                  FillStntuple ]
 Stntuple.stnmaker_Dmu     : [ InitStntuple, StntupleMakerDmu ,                  FillStntuple ]
-Stntuple.stnmaker_De_Dmu  : [ InitStntuple, StntupleMakerDe, StntupleMakerDmu , FillStntuple ]
+Stntuple.stnmaker_De_Dmu  : [ InitStntuple, StntupleMakerDeDmu,                 FillStntuple ]
 
 END_PROLOG

@@ -2015,73 +2015,73 @@ void TAnaDump::printTrkToCaloExtrapolCollection(const char* ModuleLabel,
 
 //-----------------------------------------------------------------------------
 void TAnaDump::printStrawHit(const mu2e::StrawHit* Hit, const mu2e::StrawGasStep* Step, const char* Opt, int IHit, int Flags) {
-    TString opt = Opt;
-    opt.ToLower();
+  TString opt = Opt;
+  opt.ToLower();
 
-    if ((opt == "") || (opt.Index("banner") >= 0)) {
-      printf("-----------------------------------------------------------------------------------");
-      printf("------------------------------------------------------------\n");
-      printf("    I   SID    Flags  Plane   Panel  Layer   Straw     Time          dt       eDep ");
-      printf("           PDG       PDG(M)   Generator      SimpID      p  \n");
-      printf("-----------------------------------------------------------------------------------");
-      printf("------------------------------------------------------------\n");
-    }
-
-    if (opt == "banner") return;
-
-    mu2e::GeomHandle<mu2e::Tracker> ttH;
-    const mu2e::Tracker* tracker = ttH.get();
-
-    const mu2e::Straw* straw = &tracker->getStraw(Hit->strawId());
-
-    const mu2e::SimParticle* sim(0);
-    
-    int      pdg_id(-1), mother_pdg_id(-1), generator_id(-1), simp_id(-1);
-    double   mc_mom(-1.);
-
-    mu2e::GenId gen_id;
-
-    if (Step) {
-      art::Ptr<mu2e::SimParticle> const& simptr = Step->simParticle(); 
-      art::Ptr<mu2e::SimParticle> mother = simptr;
-
-      while(mother->hasParent()) mother = mother->parent();
-
-      sim = mother.operator ->();
-
-      pdg_id        = simptr->pdgId();
-      mother_pdg_id = sim->pdgId();
-
-      if (simptr->fromGenerator()) generator_id = simptr->genParticle()->generatorId().id();
-      else                         generator_id = -1;
-
-      simp_id       = simptr->id().asInt();
-      mc_mom        = Step->momvec().mag();
-    }
-    
-    if ((opt == "") || (opt == "data")) {
-      if (IHit  >= 0) printf("%5i " ,IHit);
-      else            printf("    ");
-
-      printf("%5i",Hit->strawId().asUint16());
-
-      if (Flags >= 0) printf(" %08x",Flags);
-      else            printf("        ");
-      printf("  %5i  %5i   %5i   %5i   %8.3f   %8.3f   %9.6f   %10i   %10i  %10i  %10i %8.3f\n",
-	     straw->id().getPlane(),
-	     straw->id().getPanel(),
-	     straw->id().getLayer(),
-	     straw->id().getStraw(),
-	     Hit->time(),
-	     Hit->dt(),
-	     Hit->energyDep(),
-	     pdg_id,
-	     mother_pdg_id,
-	     generator_id,
-	     simp_id,
-	     mc_mom);
-    }
+  if ((opt == "") || (opt.Index("banner") >= 0)) {
+    printf("-----------------------------------------------------------------------------------");
+    printf("------------------------------------------------------------\n");
+    printf("    I   SID    Flags  Plane   Panel  Layer   Straw     Time          dt       eDep ");
+    printf("           PDG       PDG(M)   Generator      SimpID      p  \n");
+    printf("-----------------------------------------------------------------------------------");
+    printf("------------------------------------------------------------\n");
   }
+
+  if (opt == "banner") return;
+
+  mu2e::GeomHandle<mu2e::Tracker> ttH;
+  const mu2e::Tracker* tracker = ttH.get();
+
+  const mu2e::Straw* straw = &tracker->getStraw(Hit->strawId());
+
+  const mu2e::SimParticle* sim(0);
+    
+  int      pdg_id(-1), mother_pdg_id(-1), generator_id(-1), simp_id(-1);
+  double   mc_mom(-1.);
+
+  mu2e::GenId gen_id;
+
+  if (Step) {
+    art::Ptr<mu2e::SimParticle> const& simptr = Step->simParticle(); 
+    art::Ptr<mu2e::SimParticle> mother = simptr;
+    
+    while(mother->hasParent()) mother = mother->parent();
+      
+    sim = mother.operator ->();
+
+    pdg_id        = simptr->pdgId();
+    mother_pdg_id = sim->pdgId();
+
+    if (simptr->fromGenerator()) generator_id = simptr->genParticle()->generatorId().id();
+    else                         generator_id = -1;
+
+    simp_id       = simptr->id().asInt();
+    mc_mom        = Step->momvec().mag();
+  }
+    
+  if ((opt == "") || (opt == "data")) {
+    if (IHit  >= 0) printf("%5i " ,IHit);
+    else            printf("    ");
+    
+    printf("%5i",Hit->strawId().asUint16());
+
+    if (Flags >= 0) printf(" %08x",Flags);
+    else            printf("        ");
+    printf("  %5i  %5i   %5i   %5i   %8.3f   %8.3f   %9.6f   %10i   %10i  %10i  %10i %8.3f\n",
+	   straw->id().getPlane(),
+	   straw->id().getPanel(),
+	   straw->id().getLayer(),
+	   straw->id().getStraw(),
+	   Hit->time(),
+	   Hit->dt(),
+	   Hit->energyDep(),
+	   pdg_id,
+	   mother_pdg_id,
+	   generator_id,
+	   simp_id,
+	   mc_mom);
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -2159,59 +2159,41 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
     }
   }
 
-
 //-----------------------------------------------------------------------------
-void TAnaDump::printStrawHitCollection(const char* ModuleLabel, 
-				       const char* ProductName,
-				       const char* ProcessName,
+void TAnaDump::printStrawHitCollection(const char* StrawHitCollTag   , 
+				       const char* StrawDigiMCCollTag, 
 				       double TMin, double TMax) {
 
   const char* oname = "TAnaDump::printStrawHitCollection";
 
-  art::Handle<mu2e::StrawHitCollection> shcHandle;
+  art::Handle<mu2e::StrawHitCollection> shcH;
   const mu2e::StrawHitCollection*       shc;
 
-  // art::Handle<mu2e::StrawHitFlagCollection> shflagH;
-  // const mu2e::StrawHitFlagCollection*       shfcol;
-  
-
-  art::Handle<mu2e::ComboHitCollection> chcHandle;
-  const mu2e::ComboHitCollection*       chcol;
+  art::Handle<mu2e::ComboHitCollection> chcH;
+  const mu2e::ComboHitCollection*       chc;
 //-----------------------------------------------------------------------------
 // get straw hits
 //-----------------------------------------------------------------------------
-  if (ProductName[0] != 0) {
-    art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
-			    art::ProcessNameSelector(ProcessName)         && 
-			    art::ModuleLabelSelector(ModuleLabel)            );
-    fEvent->get(selector, shcHandle);
-    fEvent->get(selector, chcHandle);
-  }
-  else {
-    art::Selector  selector(art::ProcessNameSelector(ProcessName)         && 
-			    art::ModuleLabelSelector(ModuleLabel)            );
-    fEvent->get(selector, shcHandle);
-    fEvent->get(selector, chcHandle);
-  }
-
-  if (shcHandle.isValid()) shc = shcHandle.product();
+  bool ok = fEvent->getByLabel(StrawHitCollTag, shcH);
+  if (ok) shc = shcH.product();
   else {
     printf(">>> ERROR in %s: Straw Hit Collection by \"%s\" doesn't exist. Bail Out.\n",
-	   oname,ModuleLabel);
+	   oname,StrawHitCollTag);
     return;
   }
-//-----------------------------------------------------------------------------
-// get straw hit flags (half-hack)
-//-----------------------------------------------------------------------------
 
-  if (chcHandle.isValid()) chcol = chcHandle.product();
+  ok = fEvent->getByLabel(StrawHitCollTag, chcH);
+  if (ok) chc = chcH.product();
   else {
-    printf(">>> ERROR in %s: ComboHit Collection by \"%s\" doesn't exist. Bail Out.\n",
- 	   oname,ModuleLabel);
+    printf(">>> ERROR in %s: ComboHitCollection \"%s\" doesn't exist. Bail Out.\n",
+	   oname,StrawHitCollTag);
     return;
   }
 
-  _mcdigis = &fEvent->getByLabel<mu2e::StrawDigiMCCollection>(fStrawDigiMCCollTag.Data());
+  const char* sdmcc_tag = StrawDigiMCCollTag;
+  if (sdmcc_tag == nullptr) sdmcc_tag = fStrawDigiMCCollTag.Data();
+
+  _mcdigis = &fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmcc_tag);
   if (_mcdigis == nullptr) {
     printf(">>> ERROR in %s: failed to locate StrawDigiMCCollection with tag=%s, BAIL OUT.\n",
 	   oname,fStrawDigiMCCollTag.Data());
@@ -2221,11 +2203,15 @@ void TAnaDump::printStrawHitCollection(const char* ModuleLabel,
   int nhits = shc->size();
 
   const mu2e::StrawGasStep* step (nullptr);
-  const mu2e::StrawHit*     hit  (nullptr);
   int                       flags;
   int                       banner_printed(0);
   for (int i=0; i<nhits; i++) {
-    const mu2e::StrawDigiMC* mcdigi = &_mcdigis->at(i);
+    const mu2e::StrawHit* hit = &shc->at(i);
+
+    vector<StrawDigiIndex> shids;
+    chc->fillStrawDigiIndices(*(fEvent),i,shids);
+
+    const mu2e::StrawDigiMC* mcdigi = &_mcdigis->at(shids[0]);
 
     if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
       step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
@@ -2233,10 +2219,8 @@ void TAnaDump::printStrawHitCollection(const char* ModuleLabel,
     else {
       step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
     }
-
-    hit   = &shc->at(i);
 					// assuming it doesn't move beyond 32 bits
-    flags = *((int*) &chcol->at(i).flag());
+    flags = *((int*) &chc->at(i).flag());
     if (banner_printed == 0) {
       printStrawHit(hit,step,"banner");
       banner_printed = 1;
@@ -2248,15 +2232,149 @@ void TAnaDump::printStrawHitCollection(const char* ModuleLabel,
  
 }
 
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void TAnaDump::printStrawGasStep(const mu2e::StrawGasStep* Step, const char* Opt, int IStep) {
+  
+  TString opt = Opt;
+  opt.ToLower();
 
+  if ((opt == "") || (opt.Index("banner") >= 0)) {
+    printf("-----------------------------------------------------------------");
+    printf("------------------------------------------------------------\n");
+    printf("    I   SID    Stype  EIon   PathLen   Width   Time  PDG  PDG(M)  GenID  SimID   Start   End  Mom");
+    printf("    SimpID      p  \n");
+    printf("-----------------------------------------------------------------");
+    printf("------------------------------------------------------------\n");
+  }
+
+  if (opt == "banner") return;
+
+  mu2e::GeomHandle<mu2e::Tracker> ttH;
+  const mu2e::Tracker* tracker = ttH.get();
+
+  const mu2e::Straw* straw = &tracker->getStraw(Step->strawId());
+
+  const mu2e::SimParticle* sim(0);
+    
+  int      pdg_id(-1), mother_pdg_id(-1), generator_id(-1), simp_id(-1);
+  double   mc_mom(-1.);
+
+  mu2e::GenId gen_id;
+
+  art::Ptr<mu2e::SimParticle> const& simptr = Step->simParticle(); 
+  art::Ptr<mu2e::SimParticle> mother = simptr;
+    
+  while(mother->hasParent()) mother = mother->parent();
+      
+  sim = mother.operator ->();
+
+  pdg_id        = simptr->pdgId();
+  mother_pdg_id = sim->pdgId();
+
+  if (simptr->fromGenerator()) generator_id = simptr->genParticle()->generatorId().id();
+  else                         generator_id = -1;
+
+  simp_id       = simptr->id().asInt();
+  mc_mom        = Step->momvec().mag();
+    
+  if ((opt == "") || (opt == "data")) {
+    if (IStep  >= 0) printf("%5i " ,IStep);
+    else             printf("    ");
+    
+    printf("%5i",Step->strawId().asUint16());
+
+    printf("  %5i  %5i   %5i   %5i   %5i",
+	   straw->id().getPlane(),
+	   straw->id().getPanel(),
+	   straw->id().getLayer(),
+	   straw->id().getStraw(),
+	   (int) Step->stepType()._stype);
+
+    printf(" %8.3f  %8.3f %8.3f  %9.3f %10i  %10i  %10i  %10i",
+	   Step->ionizingEdep(),
+	   Step->stepLength(),
+	   Step->width(),
+	   Step->time(),
+	   pdg_id,
+	   mother_pdg_id,
+	   generator_id,
+	   simp_id);
+
+    printf(" %8.3f   %8.3f   %9.6f  %8.3f   %8.3f   %9.6f   %8.3f\n",
+	   Step->startPosition().x(),
+	   Step->startPosition().y(),
+	   Step->startPosition().z(),
+	   Step->endPosition().x(),
+	   Step->endPosition().y(),
+	   Step->endPosition().z(),
+	   mc_mom);
+  }
+} 
 
 //-----------------------------------------------------------------------------
 // FlagBgrHitsCollName = 'StrawHits' or 'ComboHits'. Very unfortunate choice!
 //-----------------------------------------------------------------------------
+void TAnaDump::printStrawGasStepCollection(const char* CollTag, 
+					   double      TMin   , 
+					   double      TMax)  {
+
+  //  const char* oname = "TAnaDump::printStrawGasStepCollection";
+//-----------------------------------------------------------------------------
+// get straw hits
+//-----------------------------------------------------------------------------
+  art::Handle<mu2e::StrawGasStepCollection> sgscH;
+  const mu2e::StrawGasStepCollection* sgsc(nullptr);
+  fEvent->getByLabel(CollTag,sgscH);
+
+  if (sgscH.isValid()) sgsc = sgscH.product();
+  else {
+    printf("ERROR: cant find StrawHitCollection tag=%s, print available, EXIT\n",CollTag);
+    vector<art::Handle<mu2e::StrawGasStepCollection>> vcoll;
+
+    art::Selector  selector(art::ProductInstanceNameSelector(""));
+    fEvent->getMany(selector,vcoll);
+
+    for (auto it = vcoll.begin(); it != vcoll.end(); it++) {
+      const art::Handle<mu2e::StrawGasStepCollection>*  handle = it.operator -> ();
+      if (handle->isValid()) {
+	const art::Provenance* prov = handle->provenance();
+	
+	printf("moduleLabel: %-20s, productInstanceName: %-20s, processName:= %-30s\n" ,
+	       prov->moduleLabel().data(),
+	       prov->productInstanceName().data(),
+	       prov->processName().data()
+	       );
+      }
+    }
+    return;
+  }
+
+  int banner_printed(0);
+
+  int nhits = sgsc->size();
+  for (int i=0; i<nhits; i++) {
+    const mu2e::StrawGasStep* step = &sgsc->at(i);
+
+    if (banner_printed == 0) {
+      printStrawGasStep(step, "banner");
+      banner_printed = 1;
+    }
+    if ((step->time() >= TMin) && (step->time() <= TMax)) {
+      printStrawGasStep(step, "data", i);
+    }
+  }
+ 
+}
+
+
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
 void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   , 
-				       const char* FlagBgrHitsCollTag,
 				       const char* StrawDigiMCCollTag,
-				       const char* ProcessName       ,
 				       double TMin, double TMax) {
 
   //  const char* oname = "TAnaDump::printComboHitCollection";
@@ -2270,35 +2388,6 @@ void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   ,
   if (shcH.isValid()) shc = shcH.product();
   else {
     printf("ERROR: cant find StrawHitCollection tag=%s, EXIT\n",StrawHitCollTag);
-    return;
-  }
-
-  art::Handle<mu2e::StrawHitFlagCollection> shfcH;
-  const mu2e::StrawHitFlagCollection*       shfcol(nullptr);
-  fEvent->getByLabel<mu2e::StrawHitFlagCollection>(FlagBgrHitsCollTag,shfcH);
-  if (shfcH.isValid()) shfcol = shfcH.product();
-  else {
-    printf("ERROR: cant find StrawHitFlagCollection tag=%s, avalable collections are:\n",FlagBgrHitsCollTag);
-
-    vector<art::Handle<mu2e::StrawHitFlagCollection>> list;
-    const art::Provenance*                            prov;
-    const art::Handle<mu2e::StrawHitFlagCollection>*  handle;
-
-    art::Selector  selector(art::ProductInstanceNameSelector(""));
-    fEvent->getMany(selector,list);
-
-    for (auto it = list.begin(); it != list.end(); it++) {
-      handle = it.operator -> ();
-      if (handle->isValid()) {
-	prov = handle->provenance();
-	
-	printf("moduleLabel: %-20s, productInstanceName: %-20s, processName:= %-30s\n" ,
-	       prov->moduleLabel().data(),
-	       prov->productInstanceName().data(),
-	       prov->processName().data()
-	       );
-      }
-    }
     return;
   }
 
@@ -2326,7 +2415,6 @@ void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   ,
     vector<StrawDigiIndex> shids;
     shc->fillStrawDigiIndices(*(fEvent),ish,shids);
 
-
     const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(shids[0]);
     const mu2e::StrawGasStep* step (nullptr);
 
@@ -2336,8 +2424,8 @@ void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   ,
     else {
       step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
     }
-					// assuming it doesn't move beyond 32 bits
-    flags = *((int*) &shfcol->at(i));
+
+    flags = *((int*) &hit->flag());
     if (banner_printed == 0) {
       printComboHit(hit, step, "banner");
       banner_printed = 1;
@@ -2680,79 +2768,6 @@ void TAnaDump::printStepPointMCCollection(const char* ModuleLabel,
 //   }
  
 // }
-
-//-----------------------------------------------------------------------------
-void TAnaDump::printStrawHitPosition(const mu2e::StrawHitPosition* Hit, const char* Opt) {
-  TString opt = Opt;
-  
-  if ((opt == "") || (opt == "banner")) {
-    printf("---------------------------------------------------------------------------\n");
-    printf("  STIndex     X        Y        Z        Wdist     Pres     RRes      Flag \n");
-    printf("---------------------------------------------------------------------------\n");
-  }
-
-  int flag = *((int*) &Hit->flag());
-
-  double wres = Hit->posRes(mu2e::StrawHitPosition::wire);
-  if (wres > 999.) wres = 999.;
-
-  double rres = Hit->posRes(mu2e::StrawHitPosition::trans);
-  if (rres > 999.) rres = 999.;
-
-  if ((opt == "") || (opt == "data")) {
-
-    printf("   %6i %8.3f %8.3f %9.3f %8.3f  %7.2f  %7.2f  0x%08x\n",
-	   -1,//Hit->stereoHitIndex(),
-	   Hit->pos().x(),
-	   Hit->pos().y(),
-	   Hit->pos().z(),
-	   Hit->wireDist(),
-	   wres,
-	   rres,
-	   flag);
-  }
-}
-
-
-//-----------------------------------------------------------------------------
-void TAnaDump::printStrawHitPositionCollection(const char* ModuleLabel, 
-					       const char* ProductName,
-					       const char* ProcessName) {
-
-  // art::Handle<mu2e::ComboHitCollection>   spcHandle;
-  // const mu2e::ComboHitCollection*         spc;
-
-  // if (ProductName[0] != 0) {
-  //   art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
-  // 			    art::ProcessNameSelector(ProcessName)         && 
-  // 			    art::ModuleLabelSelector(ModuleLabel)            );
-  //   fEvent->get(selector, spcHandle);
-  // }
-  // else {
-  //   art::Selector  selector(art::ProcessNameSelector(ProcessName)         && 
-  // 			    art::ModuleLabelSelector(ModuleLabel)            );
-  //   fEvent->get(selector, spcHandle);
-  // }
-
-  // spc = spcHandle.product();
-
-  // int nhits = spc->size();
-
-  // const mu2e::ComboHit* pos;
-
-
-  // int banner_printed = 0;
-  // for (int i=0; i<nhits; i++) {
-  //   pos = &spc->at(i);
-  //   if (banner_printed == 0) {
-  //     printStrawHitPosition(pos, "banner");
-  //     banner_printed = 1;
-  //   }
-  //   printStrawHitPosition(pos,"data");
-  // }
- 
-}
-
 
 //-----------------------------------------------------------------------------
 void TAnaDump::printTrackClusterMatch(const mu2e::TrackClusterMatch* Tcm, const char* Opt) {

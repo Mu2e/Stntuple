@@ -232,7 +232,7 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 
   char   cmbh_module_label[100], cmbh_description[100];
   char   sdmc_module_label[100], sdmc_description[100];
-  char   stmc_module_label[100], stmc_description[100];
+  //  char   stmc_module_label[100], stmc_description[100];
   char   calo_module_label[100], calo_description[100];
   char   pidp_module_label[100], pidp_description[100];
   char   spmc_module_label[100], spmc_description[100];
@@ -288,8 +288,8 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
   data->GetModuleLabel("mu2e::ComboHitCollection",cmbh_module_label);
   data->GetDescription("mu2e::ComboHitCollection",cmbh_description );
   
-  data->GetModuleLabel("mu2e::PtrStepPointMCVectorCollection",stmc_module_label);
-  data->GetDescription("mu2e::PtrStepPointMCVectorCollection",stmc_description );
+  // data->GetModuleLabel("mu2e::PtrStepPointMCVectorCollection",stmc_module_label);
+  // data->GetDescription("mu2e::PtrStepPointMCVectorCollection",stmc_description );
 
   data->GetModuleLabel("mu2e::StrawDigiMCCollection",sdmc_module_label);
   data->GetDescription("mu2e::StrawDigiMCCollection",sdmc_description );
@@ -330,11 +330,11 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
   }
 
 
-  art::Handle<mu2e::PtrStepPointMCVectorCollection> mcptrHandle;
-  if (stmc_module_label[0] != 0) {
-    if (stmc_description[0] == 0) AnEvent->getByLabel(stmc_module_label,mcptrHandle);
-    else                       AnEvent->getByLabel(stmc_module_label,stmc_description, mcptrHandle);
-  }
+  // art::Handle<mu2e::PtrStepPointMCVectorCollection> mcptrHandle;
+  // if (stmc_module_label[0] != 0) {
+  //   if (stmc_description[0] == 0) AnEvent->getByLabel(stmc_module_label,mcptrHandle);
+  //   else                       AnEvent->getByLabel(stmc_module_label,stmc_description, mcptrHandle);
+  // }
 
   art::Handle<mu2e::ComboHitCollection> shHandle;
   if (cmbh_module_label[0] != 0) {
@@ -381,20 +381,11 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
     bc = (const mu2e::Calorimeter*) h.get();
   }
 
-
-  // int xxx(0);
-
   for (int itrk=0; itrk<ntrk; itrk++) {
     track          = data->NewTrack();
     art::Handle<mu2e::KalRepCollection> handle;
     art::Ptr<KalRep> const& ptr = list_of_kreps->at(itrk);
     AnEvent->get(ptr.id(), handle);
-    // fhicl::ParameterSet const& pset = handle.provenance()->parameterSet();
-    // string module_type = pset.get<std::string>("module_type");
-    // if      (module_type == "CalTrkFit"  ) xxx =  1;
-    // else if (module_type == "KalFinalFit") xxx =  0;
-    // else                                   xxx = -1;
-
 //-----------------------------------------------------------------------------
 // track-only-based particle ID, initialization ahs already happened in the constructor
 //-----------------------------------------------------------------------------
@@ -413,10 +404,6 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
     if (list_of_algs) {
       alg_id = &list_of_algs->at(itrk);
       mask   = alg_id->BestID() | (alg_id->AlgMask() << 16);
-
-      // if (xxx != alg_id->BestID()) { 
-      // 	printf (" *** InitTrackBlock ERROR: we are in alg_id trouble: xxx = %2i best = %i\n",xxx,alg_id->BestID());
-      // }
     }
 
     track->fAlgorithmID = mask;
@@ -440,18 +427,6 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 	last = hit;
       }
     }
-
-    // if (dynamic_cast<const mu2e::TrkStrawHit*> (first) == nullptr) { 
-    //   printf("ERROR in StntupleInitTrackBlock for Event: %8i : first hit is not a mu2e::TrkStrawHit, test fltLen*\n",ev_number);
-    //   double len = first->fltLen();
-    //   printf("first->fltLen() = %10.3f\n",len);
-    // }
-
-    // if (dynamic_cast<const mu2e::TrkStrawHit*> (last ) == nullptr) { 
-    //   printf("ERROR in StntupleInitTrackBlock for Event: %8i : last  hit is not a mu2e::TrkStrawHit, test fltLen*\n",ev_number);
-    //   double len = last->fltLen();
-    //   printf("last->fltLen() = %10.3f\n",len);
-    // }
 
     if (first) h1_fltlen = first->fltLen();
     if (last ) hn_fltlen = last->fltLen();
@@ -1097,8 +1072,9 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 
       // the following includes the (Calibrated) light-propagation time delay.  It should eventually be put in the reconstruction FIXME!
       // This velocity should come from conditions FIXME!
-      vtch->fTime         = tch->hitT0().t0();			// extrapolated track time, not corrected by _dtOffset
-      vtch->fEnergy       = cl->energyDep(); // cluster energy
+
+      vtch->fTime         = tch->hitT0().t0();          // extrapolated track time, not corrected by _dtOffset
+      vtch->fEnergy       = cl->energyDep();            // cluster energy
       vtch->fXTrk         = pos.x();
       vtch->fYTrk         = pos.y();
       vtch->fZTrk         = pos.z();
@@ -1108,17 +1084,17 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
       vtch->fXCl          = cpos.x();			// cluster coordinates
       vtch->fYCl          = cpos.y();
       vtch->fZCl          = cpos.z();
-      // vtch->fDx           = -9999.;			// TRK-CL
-      // vtch->fDy           = -9999.;			// TRK-CL
-      // vtch->fDz           = -9999.;
-      vtch->fDt           = tch->hitT0().t0() - (tch->time() + std::min((float)200.0,std::max((float)0.0,(float)tch->hitLen()))*0.005 + tch->timeOffset());			// TRK-CL , _corrected_ by _dTOffset (!)
+      vtch->fDx           = vtch->fXTrk - vtch->fXCl;	// TRK-CL
+      vtch->fDy           = vtch->fYTrk - vtch->fYCl;	// TRK-CL
+      vtch->fDz           = vtch->fZTrk - vtch->fZCl;	// TRK-CL
+      vtch->fDt           = tch->hitT0().t0() - tch->time();
       // vtch->fDu           = -9999.;			// ** added in V6
       // vtch->fDv           = -9999.;			// ** added in V6
       // vtch->fChi2Match    = -9999.;		// track-cluster match chi&^2 (coord)
       // vtch->fChi2Time     = -9999.;		// track-cluster match chi&^2 (time)
       vtch->fPath         = tch->hitLen();			// track path in the disk
-      // vtch->fIntDepth     = -9999.;             // ** added in V6 :assumed interaction depth
-      vtch->fDr           = tch->poca().doca();                   // ** added in V10: DR(cluster-track), signed
+      vtch->fIntDepth     = -9999.;                     // ** added in V6 :assumed interaction depth
+      vtch->fDr           = tch->poca().doca();         // distance of closest approach
       // vtch->fSInt         = -9999.;                 // ** added in V10: interaction length, calculated
       vtch->fCluster      = cl;
       //    vtch->fExtrk        = NULL;

@@ -64,9 +64,14 @@ int StntupleInitGenpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
   AnEvent->getByLabel(geeT,geeH);
 
-  if (geeH.isValid()) genp_block->fGenEnergy = geeH->momentum().e();
-  else                genp_block->fGenEnergy = -1.;
+  if (geeH.isValid())   genp_block->fGenEnergy = geeH->momentum().e();
+  else {
+    art::Handle<mu2e::GenParticleCollection> geecH; //newer versions input GenParticleCollection
 
+    AnEvent->getByLabel(geeT,geecH);
+    if(geecH.isValid()) genp_block->fGenEnergy = geecH->at(0).momentum().e();
+    else                genp_block->fGenEnergy = -1.;
+  }
 
   genp_block->SetGenProcessID(fGenProcessID);
 //-----------------------------------------------------------------------------

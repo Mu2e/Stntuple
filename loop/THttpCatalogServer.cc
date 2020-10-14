@@ -354,6 +354,7 @@ int THttpCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
 // assuming key uniquely identifies the line
 // the assumed line format  '# :key: value' (the key is surrounded by two ':' characters),
 // such that the key is the second word, 
+// Key is expected to be not case-sensitive
 //-----------------------------------------------------------------------------
 int THttpCatalogServer::GetDatasetKey(const char* Book, 
 				      const char* Dataset,
@@ -363,7 +364,7 @@ int THttpCatalogServer::GetDatasetKey(const char* Book,
 
   cmd = Form("wget %s/%s/%s/AAA_CATALOG.html -o /dev/null -O /dev/stdout",
 	     GetUrl(),Book,Dataset);
-  cmd += Form(" | grep :%s: | awk -v key=:%s: '{if ($2 == key) print $3}'",Key,Key);
+  cmd += Form(" | grep :%s: | awk -v key=:%s: '{if (toupper($2) == toupper(key)) print $3}'",Key,Key);
 
   if (fPrintLevel > 0)
     printf(" DEBUG DB KEY: Retrieving data with command: %s\n",cmd.Data());
@@ -376,8 +377,8 @@ int THttpCatalogServer::GetDatasetKey(const char* Book,
 }
 
 //_____________________________________________________________________________
-int THttpCatalogServer::InitChain(TChain*     Chain, 
-				 const char* Book,
+int THttpCatalogServer::InitChain(TChain*    Chain  , 
+				 const char* Book   ,
 				 const char* Dataset, 
 				 const char* Fileset,
 				 const char* File   ,
@@ -396,7 +397,7 @@ int THttpCatalogServer::InitChain(TChain*     Chain,
 //-----------------------------------------------------------------------------
 int THttpCatalogServer::InitDataset(TStnDataset*     Dataset,
 				    const char*      Book   ,
-				    const char*      Name   ,
+				    const char*      Dsid   ,
 				    const char*      Fileset,
 				    const char*      File   ,
 				    Int_t            MinRun ,
@@ -418,7 +419,7 @@ int THttpCatalogServer::InitDataset(TStnDataset*     Dataset,
 //-----------------------------------------------------------------------------
   if (strcmp(Book,"") != 0) {
     // inititalize dataset, otherwise assume it to be already initialized
-    int rc = Dataset->Init(Book,Name,MinRun,MaxRun,Type);
+    int rc = Dataset->Init(Book,Dsid,MinRun,MaxRun,Type);
     if (rc < 0) return rc;
   }
 
@@ -471,7 +472,7 @@ int THttpCatalogServer::InitDataset(TStnDataset*     Dataset,
 // returned value - integer
 //-----------------------------------------------------------------------------
   buf[0] = 0;
-  GetDatasetKey(book,dset,"mc_flag",buf);
+  GetDatasetKey(book,dset,"MC_FLAG",buf);
 
   if (strlen(buf) > 0) {
     sscanf(buf,"%i",&mc_flag);
@@ -637,9 +638,6 @@ int THttpCatalogServer::InitDataset(TStnDataset*     Dataset,
 	} // endif right fileset
       } // end loop over files
     }
-
-
-
     else if (strcmp(server,"sam") == 0) {
 //-----------------------------------------------------------------------------
 // query Oracle, directory = 
@@ -775,7 +773,7 @@ int THttpCatalogServer::InitDataset(TStnDataset*     Dataset,
     }
     else {
 //-----------------------------------------------------------------------------
-// non-DFC case
+// 2020: currently: text-based catalog accessed via 'wget'
 // list of files for this fileset already retrieved and stored in 'files'
 // filesets from this list have already passed all the name checks
 //-----------------------------------------------------------------------------
@@ -837,6 +835,18 @@ int THttpCatalogServer::InitDataset(TStnDataset*     Dataset,
 	    hostname[len-1] = 0;
 
 	    //	    sprintf(full_name,"root://%s//%s/%s",hostname,path.Data(),fn);
+	    sprintf(full_name,"//%s/%s",path.Data(),fn);
+	  }
+	  else if (strcmp(srv->GetProtocol(),"xroot") == 0) {
+//-----------------------------------------------------------------------------
+// XROOTD-based access
+// at Fermilab, need VOMS certificate: kinit->kx509->voms-proxy-init
+// xroot://fndca1.fnal.gov/pnfs/fnal.gov/usr/mu2e/scratch/users/murat/
+//-----------------------------------------------------------------------------
+ 	    TString s    = srv->GetFile();
+ 	    TString path = s(0,s.Length());
+
+// ####	    //	    sprintf(full_name,"root://%s//%s/%s",hostname,path.Data(),fn);
 	    sprintf(full_name,"//%s/%s",path.Data(),fn);
 	  }
 	  else {

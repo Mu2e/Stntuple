@@ -102,14 +102,14 @@ void TStrawHitData::Print(Option_t* Option) const {
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("-----------------------------------------------------------------------------------\n");
-    printf("  Index  Time   Dt   Energy  PdgCode  PdgCode(M)  GenCode  SimID  McMom     \n");
-    printf("-----------------------------------------------------------------------------------\n");
+    printf("---------------------------------------------------------------------------------------\n");
+    printf("  Index    Time       Dt       Energy    PdgCode    PdgCode(M)  GenCode  SimID    McMom\n");
+    printf("---------------------------------------------------------------------------------------\n");
   }
 
   if (opt == "banner") return;
   
-  printf("%6i %10.3f %10.3f %10.5f %8i %8i %8i %8i %10.3f\n",
+  printf("%6i %10.3f %8.3f %10.5f %10i %10i %8i %8i %9.3f\n",
 	 fIndex, 
 	 fTime,
 	 fDt,

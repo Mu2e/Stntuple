@@ -1,0 +1,300 @@
+# -*- mode: tcl -*-
+#------------------------------------------------------------------------------
+# defines templates, assume that standardProducers.fcl has been included 
+# a 'templates' file should include everything needed
+# package 'prolog' files shouldn't be including anything
+#
+# reconstruction and analysis modules
+#------------------------------------------------------------------------------
+#include "JobConfig/common/su2020_templates.fcl"
+
+Stntuple : { 
+    @table::Stntuple             # defined in Stntuple/fcl/prolog.fcl
+
+    producers : { 
+	@table::su2020.producers
+	@table::Stntuple.producers
+    }
+
+    filters : { 
+	@table::su2020.filters
+	@table::Stntuple.filters
+    }
+
+    analyzers : { 
+	@table::su2020.analyzers
+	@table::Stntuple.analyzers
+    }
+#------------------------------------------------------------------------------
+# all Stntuple modules are filters, they are defined in Stntuple/fcl/prolog.fcl
+# event mixing modules - all clones of the same module.
+# each clone takes certain collections from the input file and adds them to the event
+#------------------------------------------------------------------------------
+# FIXME#	@table::EventMixing.filters
+# FIXME        flashMixer           : { @table::mixerTemplate
+# FIXME#	    fileNames : @local::bgHitFiles 
+# FIXME	    detail: { @table::mixerTemplate.detail g4ModuleLabel:flashMixer genModuleLabel:flashMixer }
+# FIXME	}
+# FIXME	ootMixer             : { @table::mixerTemplate
+# FIXME#	    fileNames : @local::bgHitFiles 
+# FIXME	    detail: { @table::mixerTemplate.detail g4ModuleLabel:ootMixer   genModuleLabel:ootMixer   }
+# FIXME	}
+# FIXME	dioMixer             : { @table::mixerTemplate
+# FIXME#	    fileNames : @local::bgHitFiles 
+# FIXME	    detail: { @table::mixerTemplate.detail g4ModuleLabel:dioMixer   genModuleLabel:dioMixer   }
+# FIXME	}
+# FIXME	neutronMixer         : { @table::mixerTemplate
+# FIXME#	    fileNames : @local::bgHitFiles 
+# FIXME	    detail: { @table::mixerTemplate.detail g4ModuleLabel:neutronMixer genModuleLabel:neutronMixer }
+# FIXME	}
+# FIXME	photonMixer          : { @table::mixerTemplate
+# FIXME#	    fileNames : @local::bgHitFiles 
+# FIXME	    detail: { @table::mixerTemplate.detail g4ModuleLabel:photonMixer genModuleLabel:photonMixer }
+# FIXME	}
+# FIXME	protonMixer          : { @table::mixerTemplate
+# FIXME#	    fileNames : @local::bgHitFiles 
+# FIXME	    detail: { @table::mixerTemplate.detail g4ModuleLabel:protonMixer genModuleLabel:protonMixer }
+# FIXME	}
+# FIXME	deuteronMixer          : { @table::mixerTemplate
+# FIXME#	    fileNames : @local::bgHitFiles 
+# FIXME	    detail: { @table::mixerTemplate.detail g4ModuleLabel:deuteronMixer genModuleLabel:deuteronMixer }
+# FIXME	}
+#------------------------------------------------------------------------------
+}
+
+#------------------------------------------------------------------------------
+# sequences: can't define recursively within one namespace
+# aiming for ultimate unification of the reco sequences, use su2020 sequences as much as possible 
+#------------------------------------------------------------------------------
+Stntuple.gen_g4              : [ @sequence::su2020.gen_g4 ]
+Stntuple.gen_g4_detFilter    : [ @sequence::su2020.gen_g4_detFilter ]
+Stntuple.gen_g4_time_map     : [ @sequence::su2020.gen_g4_time_map  ]
+
+Stntuple.digis               : [ @sequence::su2020.digis ]
+
+Stntuple.mix                 : [ dioMixer, protonMixer, neutronMixer, photonMixer, ootMixer, flashMixer ]
+Stntuple.mix_time_map        : [ @sequence::Stntuple.mix, @sequence::CommonMC.DigiSim ]
+Stntuple.gen_g4_mix_time_map : [ @sequence::Stntuple.gen_g4, @sequence::Stntuple.mix, @sequence::CommonMC.DigiSim ]
+
+#------------------------------------------------------------------------------
+# proton reconstruction
+#------------------------------------------------------------------------------
+kludge_Tracking_TPRDpP       : [ TimeClusterFinder, HelixFinder, KSFDpP, KFFDpP ]
+
+Stntuple.trk_hit_reco        : [ @sequence::su2020.trk_hit_reco ]
+Stntuple.trk_reco_de         : [ @sequence::su2020.trk_reco_de  ]
+Stntuple.trk_reco_dmu        : [ @sequence::su2020.trk_reco_dmu ]
+Stntuple.calo_reco           : [ @sequence::su2020.calo_reco    ] 
+Stntuple.crv_reco            : [ @sequence::su2020.crv_reco     ]
+
+#------------------------------------------------------------------------------
+# downstream electron post-core-reconstruction path
+# assume Stntuple.
+# new tracking sequences: 2 lists in the end, 'MH' is the new default (MergeHelix)
+#------------------------------------------------------------------------------
+Stntuple.post_reco_de    : [ @sequence::TrackCaloMatching.matching_DeMHPar ,
+			     AvikPIDNewDeMHPar                               ,
+			     TrkQualDeMHPar                                  ,
+			     @sequence::TrackCaloMatching.matching_DeMHDar   ,
+			     AvikPIDNewDeMHDar                               ,
+			     TrkQualDeMHDar
+			    ]
+#------------------------------------------------------------------------------
+# muon post-core-reconstruction path
+# new tracking sequences: 2 lists in the end, 'MH' is the new default (MergeHelix)
+#------------------------------------------------------------------------------
+Stntuple.post_reco_dmu   : [ @sequence::TrackCaloMatching.matching_DmuMHPar  ,
+			     AvikPIDNewDmuMHPar                              ,
+			     TrkQualDmuMHPar                                 ,
+			     @sequence::TrackCaloMatching.matching_DmuMHDar  ,
+			     AvikPIDNewDmuMHDar                              ,
+			     TrkQualDmuMHDar
+			    ]
+
+#------------------------------------------------------------------------------
+# paths
+#------------------------------------------------------------------------------
+Stntuple.paths : {
+    @table::su2020.paths
+
+    stntuple_p0  : [ @sequence::Stntuple.stnmaker ]
+#------------------------------------------------------------------------------
+# MC generation, G4, reconstruction and stntuple making (e- and e+ included)
+# p1  : generate, simulate ... 
+# p01 : read    , simulate ... 
+#------------------------------------------------------------------------------
+    stntuple_p1  : [ # @sequence::su2020.gen_g4_time_map,
+		     @sequence::su2020.gen_g4         , 
+		     @sequence::CommonMC.DigiSim      ,  # time maps + window marker
+		     @sequence::su2020.digis          ,
+		     @sequence::su2020.trk_hit_reco   ,
+		     @sequence::su2020.calo_reco      ,
+		     @sequence::su2020.trk_reco_de    ,
+		     @sequence::su2020.crv_reco       ,
+		     @sequence::Stntuple.post_reco_de , 
+		     @sequence::Stntuple.stnmaker_De
+		    ]
+    stntuple_p01 : [ g4run, filterStepPointMomentum   , 
+		     @sequence::CommonMC.DigiSim      ,  #  time maps + window marker
+		     @sequence::su2020.digis          ,
+		     @sequence::su2020.trk_hit_reco   ,
+		     @sequence::su2020.calo_reco      ,
+		     @sequence::su2020.trk_reco_de    ,
+		     @sequence::su2020.crv_reco       ,
+		     @sequence::Stntuple.post_reco_de , 
+		     @sequence::Stntuple.stnmaker_De
+		    ]
+#------------------------------------------------------------------------------
+# p2  : electron reconstruction and stntuple making
+# p21 : the same as p2, but no CRV reco
+#------------------------------------------------------------------------------
+    stntuple_p2  : [ @sequence::su2020.trk_hit_reco   ,
+		     @sequence::su2020.calo_reco      ,
+		     @sequence::su2020.trk_reco_de    ,
+		     @sequence::su2020.crv_reco       ,
+		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and PID
+		     @sequence::Stntuple.stnmaker_De
+		   ]
+
+    stntuple_p21 : [ @sequence::su2020.trk_hit_reco   ,
+		     @sequence::su2020.calo_reco      ,
+		     @sequence::su2020.trk_reco_de    ,
+		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and PID
+		     @sequence::Stntuple.stnmaker_De         # stntupling
+		    ]
+#------------------------------------------------------------------------------
+# p3  : muon reconstruction and stntuple making
+# p31 : the same as p3, but no CRV reco
+#------------------------------------------------------------------------------
+    stntuple_p3  : [ @sequence::su2020.trk_hit_reco    ,
+		     @sequence::su2020.calo_reco       ,
+		     @sequence::su2020.trk_reco_dmu    ,
+		     @sequence::su2020.crv_reco        ,
+		     @sequence::Stntuple.post_reco_dmu   ,    # track-calo matching and PID
+		     @sequence::Stntuple.stnmaker_Dmu
+		    ]
+
+    stntuple_p31 : [ @sequence::su2020.trk_hit_reco    ,
+		     @sequence::su2020.calo_reco       ,
+		     @sequence::su2020.trk_reco_dmu    ,
+		     @sequence::Stntuple.post_reco_dmu ,    # track-calo matching and PID
+		     @sequence::Stntuple.stnmaker_Dmu         # stntupling
+		    ]
+#------------------------------------------------------------------------------
+# p40 : full downstream (e+mu) reconstruction and stntuple making
+# p41 : the same as p40, but no CRV reco
+# p42 : same as p41, but w/o reco_compression which crashes on muon decays in flight
+#------------------------------------------------------------------------------
+    stntuple_p40 : [ @sequence::su2020.trk_hit_reco     ,
+		     @sequence::su2020.calo_reco        ,
+		     @sequence::su2020.trk_reco_de      ,
+		     @sequence::su2020.trk_reco_dmu     ,
+		     @sequence::su2020.trk_reco_sep     ,    # Andy
+		     @sequence::su2020.crv_reco         ,    # Andy
+		     @sequence::su2020.reco_compression ,
+		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
+		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
+		     @sequence::Stntuple.stnmaker_De_Dmu
+		   ]
+
+    stntuple_p41 : [ @sequence::su2020.trk_hit_reco     ,
+		     @sequence::su2020.calo_reco        ,
+		     @sequence::su2020.trk_reco_de      ,
+		     @sequence::su2020.trk_reco_dmu     ,
+		     @sequence::su2020.trk_reco_sep     ,    # Andy
+		     # @sequence::su2020.crv_reco       ,
+		     @sequence::su2020.reco_compression ,    # Andy
+		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
+		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
+		     @sequence::Stntuple.stnmaker_De_Dmu 
+		   ]
+
+    stntuple_p42 : [ @sequence::su2020.trk_hit_reco     ,
+		     @sequence::su2020.calo_reco        ,
+		     @sequence::su2020.trk_reco_de      ,
+		     @sequence::su2020.trk_reco_dmu     ,
+		     # @sequence::su2020.trk_reco_sep     ,    # Andy
+		     # @sequence::su2020.crv_reco       ,
+		     # @sequence::su2020.reco_compression ,    # Andy
+		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
+		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
+		     @sequence::Stntuple.stnmaker_De_Dmu 
+		   ]
+
+    stntuple_p43 : [ @sequence::CrvDAQPackage.CrvDAQSequence, 
+		     @sequence::su2020.trk_hit_reco     ,
+		     @sequence::su2020.calo_reco        ,
+		     @sequence::su2020.trk_reco_de      ,
+		     @sequence::su2020.trk_reco_dmu     ,
+		     @sequence::su2020.trk_reco_sep     ,    # Andy
+		     @sequence::su2020.crv_reco         ,    # Andy
+		     @sequence::su2020.reco_compression ,
+		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
+		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
+		     @sequence::Stntuple.stnmaker_De_Dmu
+		   ]
+
+#------------------------------------------------------------------------------
+# read, reconstruct
+#------------------------------------------------------------------------------
+    stntuple_p5  : [ EventFilter,
+		     @sequence::su2020.trk_hit_reco   ,
+		     @sequence::su2020.calo_reco      ,
+		     @sequence::su2020.trk_reco_de    ,
+		     @sequence::su2020.crv_reco       ,
+		     @sequence::Stntuple.post_reco_de         # track-calo matching and PID;
+		    ]
+
+#------------------------------------------------------------------------------
+# paths 6x: displays 
+# p61     : DE reconstruction,         display
+# p62     : DE reconstruction, no CRV, display
+#------------------------------------------------------------------------------
+    stntuple_p60  : [ EventFilter,
+		      MuHitDisplayDeMHDar]
+
+    stntuple_p61  : [ EventFilter,
+		      @sequence::su2020.trk_hit_reco   ,
+		      @sequence::su2020.calo_reco      ,
+		      @sequence::su2020.trk_reco_de    ,
+		      @sequence::su2020.crv_reco       ,
+		      MuHitDisplayDeMHDar
+		    ]
+    stntuple_p62  : [ EventFilter,
+		      @sequence::su2020.trk_hit_reco   ,
+		      @sequence::su2020.calo_reco      ,
+		      @sequence::su2020.trk_reco_de    ,
+		      # @sequence::su2020.crv_reco       ,
+		      MuHitDisplayDeMHDar
+		    ]
+#------------------------------------------------------------------------------
+# p7: MC generation, G4, reconstruction and Event Display
+#------------------------------------------------------------------------------
+    stntuple_p7  : [ @sequence::su2020.gen_g4_time_map,
+		     @sequence::su2020.digis          ,
+		     @sequence::su2020.trk_hit_reco   ,
+		     @sequence::su2020.calo_reco      ,
+		     @sequence::su2020.trk_reco_de    ,
+		     @sequence::su2020.crv_reco       ,
+		     MuHitDisplayDeMHDar                
+		    ]
+#------------------------------------------------------------------------------
+# 2020-07-04 PM : don't use these paths - this is a provision for the future
+# paths 8x: stntupling only
+# p80 : e    stntupling, read output of reconstruction
+# p81 : e    stntupling, read output of reconstruction
+# p82 : e+mu stntupling, read output of reconstruction
+#------------------------------------------------------------------------------
+    stntuple_p80           : [ @sequence::Stntuple.stnmaker_De    ]
+
+    stntuple_p81           : [ @sequence::Stntuple.stnmaker_Dmu   ]
+
+    stntuple_p82           : [ @sequence::Stntuple.stnmaker_De    ,
+			       @sequence::Stntuple.stnmaker_Dmu
+			      ]
+#------------------------------------------------------------------------------
+# Stntuple event filter
+#------------------------------------------------------------------------------
+
+    event_filter  : [ EventFilter    ]   
+}

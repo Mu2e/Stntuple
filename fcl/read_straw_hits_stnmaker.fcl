@@ -1,0 +1,47 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# p1 : default reconstruction path
+# p2 : read and ntuple (use with RootInput to ntuple MDC'2018 files)
+# p3 : path to debug the TPR and CPR reconstruction paths separately
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  INPUT_MODULE  @protect_ignore: RootInput
+  TRIGGER_PATHS @protect_ignore: [ stntuple_p21 ]
+  GEN_ID        @protect_ignore: CeEndpoint
+  TIME_MAPS     @protect_ignore: [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap" ]
+END_PROLOG
+
+#include "Stntuple/fcl/stnmaker.fcl"
+
+process_name : ReadStrawHitsStnmaker
+
+outputs      : { @table::Stntuple.outputs   }
+producers    : { @table::Stntuple.producers }
+filters      : { @table::Stntuple.filters   }
+paths        : { @table::Stntuple.paths     }
+
+physics      : { 
+    producers     : { @table::producers }
+    filters       : { @table::filters   }
+
+    @table::paths
+    
+    trigger_paths : [ stntuple_p21 ]
+    out           : [     ]
+    end_paths     : [ out ]
+}
+
+services.TFileService.fileName            : "nts._USER_.xxx.read_reco_stnmaker_de.000001.root"
+physics.filters.InitStntuple.histFileName : "nts._USER_.xxx.read_reco_stnmaker_de.000001.stn"
+outputs.detectorOutput.fileName           : "sim._USER_.xxx.read_reco_stnmaker_de.000001.art"
+#------------------------------------------------------------------------------
+# configure STNTUPLE maker
+#------------------------------------------------------------------------------
+physics.filters.StntupleMakerDe.makeStrawData           : 1
+physics.filters.StntupleMakerDe.makeCalData             : 1
+physics.filters.StntupleMakerDe.makeSimp                : 1
+physics.filters.StntupleMakerDe.makeStepPointMC         : 1
+physics.filters.StntupleMakerDe.spmcBlockName           : [ "SpmcBlock"               ]
+physics.filters.StntupleMakerDe.spmcCollTag             : [ "compressDigiMCs:tracker" ]
+physics.filters.StntupleMakerDe.statusG4Tag             : [ "g4run"                   ]
+#------------------------------------------------------------------------------

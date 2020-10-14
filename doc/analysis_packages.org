@@ -1,0 +1,25 @@
+# -*- mode:org -*-
+
+* How to create your own analysis package:                      
+
+#+begin_src
+pkg=$USER                                           # strongly recommended
+source Stntuple/scripts/make_analysis_package $pkg  # if pkg is not specified, the created package name will be MyAna
+scons lib/lib${pkg}_ana.so
+#+end_src
+
+at this point, if everything went well
+
+- library lib/lib${pkg}_ana.so should be created
+
+- file:../../rootlogon.C in the working directory should include the following line:    
+
+#+begin_src
+gSystem->Load("lib/lib${pkg}_ana.so");
+#+end_src
+
+- file:../../.rootrc should have the following line added:
+
+#+begin_src
++Stnana.Package                ${pkg}
+#+end_src

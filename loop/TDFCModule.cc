@@ -202,7 +202,12 @@ int TDFCModule::EndJob() {
 //-----------------------------------------------------------------------------
   strncpy(id,fDatasetID.Data(),50);
 
-  sprintf(filename,"%s.%06i_%08i",fDatasetID.Data(),fMinRunNumber,fMinSectionNumber);
+  //  sprintf(filename,"%s.%06i_%08i",fDatasetID.Data(),fMinRunNumber,fMinSectionNumber);
+
+  TString user = gSystem->Getenv("USER");
+  if (user == "mu2epro") user = "mu2e";
+
+  sprintf(filename,"nts.%s.%s.%s.%06i_%08i.stn",user.Data(),fDatasetID.Data(),fBook.Data(),fMinRunNumber,fMinSectionNumber);
   fNewFileName = TString(filename);
 
   //if (PrintLevel() > 0) 

@@ -196,9 +196,7 @@ public:
 			   int                       Flags = -1);
   
   void printComboHitCollection (const char* StrawHitCollTag, 
-				const char* FlagBgrHitsCollTag,  // 'FlagBgrHits:StrawHits' or 'FlagBgrHits:ComboHits'
-				const char* StrawDigiMCCollTag,  // "makeSD" or "compressDigiMCs"
-				const char* ProcessName = "",
+				const char* StrawDigiMCCollTag = nullptr,  // "makeSD" or "compressDigiMCs"
 				double TMin = -1.e6,
 				double TMax =  1.e6);
  
@@ -219,23 +217,15 @@ public:
 			   int                       INit  = -1,
 			   int                       Flags = -1);
   
-  void printStrawHitCollection (const char* ModuleLabel, 
-				const char* ProductName = "", 
-				const char* ProcessName = "",
-				double TMin = -1.e6,
-				double TMax =  1.e6);
+  void printStrawHitCollection (const char* StrawHitCollTag, 
+				const char* StrawDigiMCCollTag = "compressDigiMCs", 
+				double TMin = -1.e6, double TMax =  1.e6);
 
-  // void printStrawHitMCTruth            (const mu2e::StrawHitMCTruth* Hit, const char* Opt = "");
-
-  // void printStrawHitMCTruthCollection  (const char* ModuleLabel, 
-  // 					const char* ProductName = "", 
-  // 					const char* ProcessName = "");
-
-  void printStrawHitPosition           (const mu2e::StrawHitPosition* Pos, const char* Opt = "");
-
-  void printStrawHitPositionCollection (const char* ModuleLabel     , 
-					const char* ProductName = "", 
-					const char* ProcessName = "");
+  void printStrawGasStep   (const mu2e::StrawGasStep* Step     ,
+			    const char*               Opt  = "",
+			    int   IStep                    = -1);
+  
+  void printStrawGasStepCollection (const char* CollTag, double TMin = -1.e6, double TMax =  1.e6);
 
   void printHelixHit      (const mu2e::HelixHit*     HelHit,
 			   const mu2e::ComboHit*     Hit, 

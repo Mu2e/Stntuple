@@ -9,9 +9,8 @@
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 
 class TStrawDataBlock: public TStnDataBlock {
-  friend Int_t StntupleInitMu2eStrawDataBlock(TStnDataBlock* block, 
-					      AbsEvent*      event, 
-					      int            mode);
+  friend class StntupleInitStrawDataBlock;
+
 public:
   Int_t          fNHits;	        // number of hits in the straw tracker
   TClonesArray*  fListOfHits;		// list of hits

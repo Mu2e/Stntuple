@@ -2,7 +2,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/scripts/global_vars.h"
-#include "Stntuple/ana/scripts/modules.hh"
+#include "modules.hh"
 
 def_name stn_crv_001("stn_crv_ana");
 

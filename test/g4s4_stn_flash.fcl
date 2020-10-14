@@ -1,0 +1,74 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# make STNTUPLE from the output of the stage 4 simulation  - 
+# step point MC's in the detector volume
+# flash S5 uses only the proton time map 
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TIME_MAPS        @protect_ignore: [ "protonTimeMap" ]
+  TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
+  TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+END_PROLOG
+
+#include "Stntuple/fcl/stnmaker.fcl"
+
+process_name : G4S4Stn
+
+# RootInput needs fileNames : [ ... ]
+source       : { module_type : RootInput 
+# use one of the concatenated Stage1 files 
+    fileNames : ["/mu2e/data/users/murat/datasets/ts3_tooth/v2/g4s3/00000/sim.murat.cd3-beam-g4s3-tgtstops.v622.001002_00010600.art"]
+}
+
+outputs      : { @table::Stntuple.outputs   }
+producers    : { @table::Stntuple.producers }
+filters      : { @table::Stntuple.filters   }
+analyzers    : { @table::Stntuple.analyzers }
+paths        : { @table::Stntuple.paths     }
+
+physics : {
+    producers: { @table::producers 
+	generate                 : { @table::producers.egun }
+# for CE, not old background mixing - default: 'compressPVDetector'
+	CaloShowerStepFromStepPt : { @table::producers.CaloShowerStepFromStepPt  
+	    physVolInfoInput: "g4run" 
+	}
+    }
+    
+    filters  : { @table::filters 
+	StntupleMaker: { @table::filters.StntupleMaker
+#------------------------------------------------------------------------------
+# disable everything, enable StepPointMC
+#------------------------------------------------------------------------------
+	    makeClusters    : 0
+	    makeCrvClusters : 0  # default: 1
+	    makePid         : 0
+	    makeTracks      : 0
+	    makeStepPointMC : 1
+
+	    simpCollTag     : "mothersFilter"
+
+# here need MC time offsets
+	    TimeOffsets     : [ @sequence::TIME_MAPS ]
+
+	    spmcBlockName   : [ "SpmcVDetBlock"         , "SpmcTrackerBlock" , "SpmcCaloBlock"    , "SpmcCaloROBlock"    ]
+	    spmcCollTag     : [ "g4run:virtualdetector" , "g4run:tracker"    , "g4run:calorimeter", "g4run:calorimeterRO"]
+	    statusG4Tag     : [ "g4run:Sim"             , "g4run:Sim"        , "g4run:Sim"        , "g4run:Sim"          ]
+	}
+
+	InitStntuple : { @table::filters.InitStntuple 
+	    histFileName : "nts._USER_._DATASET_.s3_mothers_stn.0000001.stn" 
+	}
+    }
+
+    analyzers : { @table::analyzers }
+
+    @table::paths
+
+    trigger_paths : [ @sequence::TRIGGER_PATHS ]
+    out           : [ ]
+    end_paths     : [ gcl, out ]
+}
+
+services.TFileService.fileName            : "nts._USER_._DATASET_.g4s4_stn_flash.00000001.root"
+#------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ services.TFileService.fileName            : "nts._USER_.flateminus_stn.xxx.00000
 physics.filters.InitStntuple.histFileName : "nts._USER_.flateminus_stn.xxx.000001.stn"
 outputs.detectorOutput.fileName           : "sim._USER_.flateminus_stn.xxx.000001.art"
 #------------------------------------------------------------------------------
-# iclude MVA's
+# include MVA configurations
 #------------------------------------------------------------------------------
 #include "Stntuple/fcl/trk_qual.fcl"
 #------------------------------------------------------------------------------
@@ -26,8 +26,7 @@ outputs.detectorOutput.fileName           : "sim._USER_.flateminus_stn.xxx.00000
 #------------------------------------------------------------------------------
 physics.filters.StntupleMakerDe.makeStrawData            : 0
 physics.filters.StntupleMakerDe.makeCalData              : 1
-physics.filters.StntupleMakerDe.genpCollTag              : "compressDigiMCs"
-physics.filters.StntupleMakerDe.makeSimp                 : 2          # save gen signal only
+physics.filters.StntupleMakerDe.makeSimp                 : 1
 physics.filters.StntupleMakerDe.makeStepPointMC          : 0
 physics.filters.StntupleMakerDe.spmcBlockName            : [ "SpmcBlock"               ]
 physics.filters.StntupleMakerDe.spmcCollTag              : [ "compressDigiMCs:tracker" ]

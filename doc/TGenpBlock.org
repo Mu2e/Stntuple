@@ -1,6 +1,14 @@
 # -*- mode: org -*
- *common problems*
 
+* setting generator ID : identifies particles of interest
+  default - "unknown" is defined in file:../fcl/prolog.fcl::GEN_ID
+
+
+
+
+* *------------------------------------------------------------------------------*
+* *common problems*
+* *------------------------------------------------------------------------------*
 * GenpBlock branch in not present in the STNTUPLE:               
 
   check FCL file, set makeGenp to 1

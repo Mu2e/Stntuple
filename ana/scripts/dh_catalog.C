@@ -189,7 +189,7 @@ void catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
           sprintf(fn,"%s/%s",input_dir,file);
 	}
 
-	//      printf("--- cataloging %s\n",fn);
+	// printf("--- cataloging file:%s output_dir: %s dataset_id:%s   book:  %s\n",fn,output_dir,dataset_id,book);
 
 	catalog_file(fn,Mode,output_dir,dataset_id,book);
       }

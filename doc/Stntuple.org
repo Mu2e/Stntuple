@@ -1,6 +1,6 @@
 # documentation - work in progress
 
-* fcl files
+* fcl files                                                
   the table below lists status of validation of various FCL files
 
 |-----------------------------------------+----------------------+----------|
@@ -10,6 +10,77 @@
 |-----------------------------------------+----------------------+----------|
 | Stntuple/fcl/primary/flateminus_stn.fcl | <2020-05-31 Sun>     |          |
 
+* [[file:stnana.org][stnana]] - STNTUPLE analysis framework                     
+* [[file:cataloging.org][How to create a cataloged dataset]] 
+* [[file:concatenation.org][concatenation]]                                            
+* STNTUPLE user analysis packages                          
 
-* STNTUPLE data blocks 
-* [[file:TGenpBlock.org][TGenpBlock]]: common problems
+ - User analysis code is organized in packages, similar to Offline packages. 
+   STNTUPLE analysis packages are specified in the .rootrc file , their list 
+   can be extended with '+' lines as shown below
+#+begin_src org
+#------------------------------------------------------------------------------ 
+# stnana packages, this example adds a single package - 'murat' - to the list of analysis packages
+#------------------------------------------------------------------------------ 
+ Stnana.Package                Stntuple 
+ +Stnana.Package               murat  
+ +Stnana.Package               muminus_eplus
+ +Stnana.Package               piplusenu
+#+end_src
+
+ An analysis package *pkg* (replace *$pkg* with the name of your choice) should have 
+ the following subdirectories:
+
+ - *$pkg/ana*           : contains analysis code (analysis modules) 
+ - *$pkg/ana/scripts*   : contains job configuration scripts 
+ - *$pkg/ana/scripts* directory should contain a script named *load_stnana_scripts_$pkg.C*, 
+   which at startup loads in ​​analysis job configuration scripts. See an example 
+   in [[file:../ana/scripts/load_stnana_scripts_Stntuple.C][Stntuple/ana/scripts/load_stnana_scripts_Stntuple.C]], make your own loader script, 
+   following the template
+
+ - each loaded script defines one or multiple job configurations - see example in 
+   [[file:../ana/scripts/validation.C][Stntuple/ana/scripts/validation.C]]
+
+ - file $pkg/ana/scripts/modules.hh declares user analysis modules - see example in 
+   [[file:../ana/scripts/modules.hh][Stntuple/ana/scripts/modules.hh]] (the namespace there doesn't have to be replicated)
+
+ - [[file:../ana/scripts][Stntuple/ana/scripts]] directory contains examples of the analysis job configuration scripts
+
+ - [[file:../scripts/.rootrc][Stntuple/scripts/.rootrc]] file shows how to configure Unix.*.Root.MacroPath - path for loading ROOT macros
+
+ - Internal structure of a user analysis package
+
+#+begin_src org
+  /mu2e/app/users/murat/mdc2018_prof/MyAna/ana:
+  total used in directory 60 available 1171570368
+  drwxr-xr-x 4 murat mu2e  2048 Jun 22 18:32 .
+  drwxr-xr-x 4 murat mu2e  2048 Jun 22 18:32 ..
+  -rw-r--r-- 1 murat mu2e  2071 Jun 22 18:32 SConscript
+  -rw-r--r-- 1 murat mu2e 37986 Jun 22 18:32 TMyTrackAnaModule.cc
+  drwxr-xr-x 3 murat mu2e  2048 Jun 22 18:32 ana
+  drwxr-xr-x 2 murat mu2e  2048 Jun 22 18:32 scripts
+
+  /mu2e/app/users/murat/mdc2018_prof/MyAna/ana/ana:
+  total used in directory 24 available 1171570368
+  drwxr-xr-x 3 murat mu2e 2048 Jun 22 18:32 .
+  drwxr-xr-x 4 murat mu2e 2048 Jun 22 18:32 ..
+  -rw-r--r-- 1 murat mu2e 9451 Jun 22 18:32 TMyTrackAnaModule.hh
+  drwxr-xr-x 2 murat mu2e 2048 Jun 22 18:32 dict
+
+  /mu2e/app/users/murat/mdc2018_prof/MyAna/ana/ana/dict:
+  total used in directory 12 available 1171570368
+  drwxr-xr-x 2 murat mu2e 2048 Jun 22 18:32 .
+  drwxr-xr-x 3 murat mu2e 2048 Jun 22 18:32 ..
+  -rw-r--r-- 1 murat mu2e  166 Jun 22 18:32 TMyTrackAnaModule_linkdef.h
+
+  /mu2e/app/users/murat/mdc2018_prof/MyAna/ana/scripts:
+  total used in directory 20 available 1171570368
+  drwxr-xr-x 2 murat mu2e 2048 Jun 22 18:32 .
+  drwxr-xr-x 4 murat mu2e 2048 Jun 22 18:32 ..
+  -rw-r--r-- 1 murat mu2e  957 Jun 22 18:32 load_stnana_scripts_MyAna.C
+  -rw-r--r-- 1 murat mu2e  148 Jun 22 18:32 modules.hh
+  -rw-r--r-- 1 murat mu2e  674 Jun 22 18:32 trk.C
+#+end_src
+
+* [[file:data_blocks.org][Stntuple data blocks]]
+* [[file:track_id.org][TStnTrackID]]

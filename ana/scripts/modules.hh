@@ -6,10 +6,12 @@
 class TStnCrvAnaModule;
 class TStnDebugModule;
 class TStnEventDisplayModule;
-class TStnGeneratorModule;
+class TStnGenAnaModule;
+class TStnGeneratorModule;		// event generator base class 
 class TStnHelixAnaModule;
 class TStnLumiMonModule;
 class TStnPhotosAnaModule;
+class TStnSpmcAnaModule;
 class TStnTrackAnaModule;
 class TStnPiplusenuAnaModule;
 class TStnTrackSeedAnaModule;
@@ -17,20 +19,22 @@ class TStnTriggerAnaModule;
 class TStnValidationModule;
 
 namespace stntuple {
-
-  TStnDebugModule*            m_dbg   = NULL;
-  TDFCModule*                 m_dfc   = NULL;
-  TStnLumiMonModule*          m_lum   = NULL;
-  TStnEventDisplayModule*     m_evd   = NULL;
-  TStnCrvAnaModule*           m_crv   = NULL;
-  TStnHelixAnaModule*         m_hel   = NULL;
-  TStnGeneratorModule*        m_stg   = NULL;
-  TStnPhotosAnaModule*        m_pho   = NULL;
-  TStnTrackAnaModule*         m_trk   = NULL;
+  TStnDebugModule*            m_dbg   = nullptr;
+  TDFCModule*                 m_dfc   = nullptr;
+  TStnClusterAnaModule*       m_cls   = nullptr;
+  TStnCrvAnaModule*           m_crv   = nullptr;
+  TStnLumiMonModule*          m_lum   = nullptr;
+  TStnEventDisplayModule*     m_evd   = nullptr;
+  TStnGenAnaModule*           m_gen   = nullptr;
+  TStnGeneratorModule*        m_stg   = nullptr;
+  TStnHelixAnaModule*         m_hel   = nullptr;
+  TStnPhotosAnaModule*        m_pho   = nullptr;
+  TStnSpmcAnaModule*          m_spmc  = nullptr;
+  TStnTrackAnaModule*         m_trk   = nullptr;
   TStnPiplusenuAnaModule*     m_pen   = NULL;
-  TStnTrackSeedAnaModule*     m_trs   = NULL;
-  TStnTriggerAnaModule*       m_trig  = NULL;
-  TStnValidationModule*       m_val   = NULL;
+  TStnTrackSeedAnaModule*     m_trs   = nullptr;
+  TStnTriggerAnaModule*       m_trig  = nullptr;
+  TStnValidationModule*       m_val   = nullptr;
 };
 
 #endif

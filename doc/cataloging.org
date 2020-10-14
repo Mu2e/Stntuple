@@ -1,0 +1,70 @@
+
+* How to catalog a STNTUPLE dataset
+
+  Catalog of a STNTUPLE dataset is created by the [[file:../scripts/catalog_stntuples][Stntuple/scripts/catalog_stntuples]] script, see its source for instructions
+
+** Call format:
+
+#+begin_src
+Stntuple/scripts/catalog_stntuples -b book -d dataset -m mode -v verbose -u user -h host -D directory -p pattern  
+Parameters:
+
+-D directory: directory with the STNTUPLE files to catalog
+-p pattern  : pattern, grepping on which one can create a list of files
+-d dataset  : dataset ID (name)
+-b book  : datasets could be associated with several books, for example, personal user books: book=gianipez or book=murat
+-h host  : if datasets are stored on a remote host
+-u user  : user name on a remote host to login
+#+end_src
+
+** Cataloging steps:   
+
+- move fileset and file catalogs to /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stnuple/cafdfc/$BOOK, 
+  $BOOK here stands for your book, (coordinate with murat@fnal.gov and gianipez@pi.infn.it)
+
+NOTE: /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stnuple/cafdfc is not accessible from mu2ebuild01. 
+you need to be a member of a special UNIX group to write to that area (ask Ray)
+
+** update the html book catalog and make the new dataset visible for everybody by running Stntuple/scripts/update_book_catalog:
+
+#+begin_src
+ Stntuple/scripts/update_book_catalog $BOOK
+#+end_src
+
+one can also use his private web area to catalog a dataset, private user web areas are located at 
+#+begin_src
+/publicweb/`echo $USER | cut -b 1`/$USER, 
+#+end_src
+for example, /publicweb/m/murat
+
+- if $BOOK/AAA_DESCRIPTION.html file exists, its contents is included into the book catalog
+
+- if you introduce a new dataset version (vvvV, described at Stntuple-Dataset-Naming-Conventions), 
+  add file $BOOK/AAA_DESCRIPTION.vvvV.html with brief description of the version specifics.
+
+Use files in /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stnuple/cafdfc/mdc2018 as templates
+
+** Notes on the catalog file format:                       
+
+#+begin_src
+Lines starting from '#' are comment lines. Exceptions ?? metadata lines (keys are 'NTOTAL:' and such, no space between 'NTOTAL' and ':')
+ '# NTOTAL: xxxxx'       : defines total number of events on disk 
+ '# NGENERATED: xxxx'    : defines total number of generated events (>= NTOTAL because of filtering) 
+ '# SIGNAL_PARTICLE: xx' : PDG code of the 'signal' particle, i.e. 11  
+ '# GENERATOR_CODE: xx'  : generator code 
+ '# DESCRIPTION: ??..'    : one-line description of the dataset,  Stntuple/scripts/update_book_catalog includes the description line into the book catalog
+#+end_src
+
+If a AAA_DESCRIPTION.html file exists in the dataset catalog directory, a link to it will be included into the html directory 
+of the book. This allows to have a more detailed description of the dataset available on the web.  The metadata may or may not 
+be present, currently no software tools rely on the metadata presence.
+
+** example                                                 
+
+#+begin_src
+# cataloging 
+       dsid=mumi0s51b0; 
+        dir=/pnfs/mu2e/persistent/users/mu2epro/su2020/stntuple/$dsid
+catalog_dir=/web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stntuple/cafdfc
+Stntuple/scripts/catalog_stntuples --access=xrootd -b su2020 -d $dsid -D $dir -p $dsid --install $catalog_dir
+#+end_src

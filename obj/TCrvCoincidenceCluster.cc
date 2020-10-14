@@ -67,13 +67,22 @@ void TCrvCoincidenceCluster::Print(Option_t* Option) const {
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("-----------------------------------------------------------------------------------\n");
-    printf("  Index  Time   Dt   Energy  PdgCode  PdgCode(M)  GenCode  SimID  McMom     \n");
-    printf("-----------------------------------------------------------------------------------\n");
+    printf("-------------------------------------------------------------------------------\n");
+    printf("Index  SType   NPulses N(PE) StartTime  EndTime      X         Y         Z     \n");
+    printf("-------------------------------------------------------------------------------\n");
   }
 
   if (opt == "banner") return;
   
-  printf("not implemented yet\n");
-  
+  printf(" %3i ",fIndex);
+  printf(" %5i ",fSectorType);
+  printf(" %5i ",fNPulses);
+  printf(" %5i ",fNPe);
+  printf(" %8.2f ",fStartTime);
+  printf(" %8.2f ",fEndTime);
+  printf(" %8.2f ",fPosition.X());
+  printf(" %8.2f ",fPosition.Y());
+  printf(" %8.2f ",fPosition.Z());
+  printf("\n");
+
 }

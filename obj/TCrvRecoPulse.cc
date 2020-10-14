@@ -80,13 +80,24 @@ void TCrvRecoPulse::Print(Option_t* Option) const {
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("-----------------------------------------------------------------------------------\n");
-    printf("  Index  Time   Dt   Energy  PdgCode  PdgCode(M)  GenCode  SimID  McMom     \n");
-    printf("-----------------------------------------------------------------------------------\n");
+    printf("---------------------------------------------------------------------------\n");
+    printf(" NPE   HPE  NDigis Bar   Sipm  Time     Height     Width      Chi2   LeTime   \n");
+    printf("---------------------------------------------------------------------------\n");
   }
+ 
+  if ((opt == "") || (opt.Index("data") >= 0)) {
 
-  if (opt == "banner") return;
-  
-  printf("not implemented yet\n");
-  
+    printf("%5i %5i %5i %5i %5i %8.3f %8.3f %8.3f %10.3f %8.3f",
+	   fNPe,
+	   fNPeHeight,
+	   fNDigis,
+	   fBar,
+	   fSipm,
+	   fTime,
+	   fHeight,
+	   fWidth,
+	   fChi2,
+	   fLeTime);
+    printf("\n");
+  }
 }

@@ -45,8 +45,8 @@ physics : {
 #	  @sequence::Stntuple.digis          ,
 #	  EventFilter                        , 
    	  @sequence::Stntuple.trk_hit_reco   ,
-	  @sequence::Stntuple.cal_reco       ,
-	  @sequence::Stntuple.dep_reco       ,
+	  @sequence::Stntuple.calo_reco      ,
+	  @sequence::Stntuple.trk_reco_de    ,
 	  #		     @sequence::Stntuple.stnmaker_dem
 	  MuHitDisplayDep
 	 ]

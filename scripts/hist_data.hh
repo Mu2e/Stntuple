@@ -9,8 +9,8 @@
 
 class hist_data_t {
 public:
-  TH1*          fHist;                  // if non-null, fFile is not needed
-  hist_file_t*  fFile;                  // it contains a pointer to the dataset
+  TH1*            fHist;                  // if non-null, fFile is not needed
+  hist_file_t*    fFile;                  // it contains a pointer to the dataset
   const stn_book* fBook;
 
   TString       fLabel  ;		// label to appear on a plot
@@ -20,9 +20,6 @@ public:
   float         fLabelFont;
 
   TString       fModule;	        // module name
-  TString       fCanvasName;
-  int           fCanvasSizeX;
-  int           fCanvasSizeY;
   TString       fName;	                // histogram name, as saved in a file
   TString       fNewName;	        // redefines histogram name at plotting time
   int           fLineColor;             // these are utility fields to be used as needed
@@ -54,6 +51,9 @@ public:
   float         fLegendYMin;
   float         fLegendXMax;
   float         fLegendYMax;
+  TString       fCanvasName;
+  int           fCanvasSizeX;
+  int           fCanvasSizeY;
   TCanvas*      fCanvas;
   TString       fOutputFn;
 
@@ -64,44 +64,7 @@ public:
     fBook        = nullptr;
     fName        = HistName;
     fModule      = Module;
-    fCanvasName  = "";
-    fCanvasSizeX = -1.;
-    fCanvasSizeY = -1.;
-    fNewName     = "";
-    fLabel       = "";
-    fLabelXMin   = 0.15;
-    fLabelYMin   = 0.86;
-    fLabelFontSize = 0.03;
-    fLabelFont     = 52; // lower left corner
-    fLineColor   = -1;
-    fLineWidth   =  1;
-    fMarkerSize  = -1;
-    fMarkerStyle = -1;
-    fMarkerColor = -1;
-    fFillColor   = -1;
-    fFillStyle   = -1;
-    fXMin        =  0;
-    fXMax        = -1;
-    fYMin        =  0;
-    fYMax        = -1;
-    fStats       =  1;
-    fOptStat     = -1;
-    fStatBoxXMin =  0.65;
-    fStatBoxYMin =  0.65;
-    fStatBoxXMax =  0.90;
-    fStatBoxYMax =  0.90;
-    fRebin       = -1;
-    fYLogScale   =  0;
-    fDrawOpt     = "";
-    fScale       = -1;
-    fPlotName    = "";
-    fPlotLabel   = "";
-    fXAxisTitle  = "";
-    fYAxisTitle  = "";
-    fLegendXMin  = -1;
-    fLegendYMin  = -1;
-    fLegendXMax  = -1;
-    fLegendYMax  = -1;
+    init();
   }
   
   hist_data_t(const stn_book* Book, const char* DsID = "", const char* JobName = "", const char* Module = "", const char* HistName = "") {
@@ -110,44 +73,18 @@ public:
     fFile        = Book->FindHistFile(DsID,"",JobName);
     fName        = HistName;
     fModule      = Module;
-    fCanvasName  = "";
-    fCanvasSizeX = -1.;
-    fCanvasSizeY = -1.;
-    fNewName     = "";
-    fLabel       = "";
-    fLabelXMin   = 0.15;
-    fLabelYMin   = 0.86;
-    fLabelFontSize = 0.03;
-    fLabelFont     = 52; // lower left corner
-    fLineColor   = -1;
-    fLineWidth   =  1;
-    fMarkerSize  = -1;
-    fMarkerStyle = -1;
-    fMarkerColor = -1;
-    fFillColor   = -1;
-    fFillStyle   = -1;
-    fXMin        =  0;
-    fXMax        = -1;
-    fYMin        =  0;
-    fYMax        = -1;
-    fStats       =  1;
-    fOptStat     = -1;
-    fStatBoxXMin =  0.65;
-    fStatBoxYMin =  0.65;
-    fStatBoxXMax =  0.90;
-    fStatBoxYMax =  0.90;
-    fRebin       = -1;
-    fYLogScale   =  0;
-    fDrawOpt     = "";
-    fScale       = -1;
-    fPlotName    = "";
-    fPlotLabel   = "";
-    fXAxisTitle  = "";
-    fYAxisTitle  = "";
-    fLegendXMin  = -1;
-    fLegendYMin  = -1;
-    fLegendXMax  = -1;
-    fLegendYMax  = -1;
+    init();
+  }
+  
+  hist_data_t(const stn_catalog* Catalog, const char* BookName, const char* DsID = "",
+	      const char* JobName = "",   const char* Module = "", const char* HistName = "") {
+
+    fHist        = nullptr;
+    fBook        = Catalog->FindBook(BookName);
+    fFile        = fBook->FindHistFile(DsID,"",JobName);
+    fName        = HistName;
+    fModule      = Module;
+    init();
   }
   
   hist_data_t(TH1* Hist, const char* JobName = "", const char* Module = "") {
@@ -156,6 +93,10 @@ public:
     fBook        = nullptr;            // same reason
     fName        = Hist->GetName();
     fModule      = Module;
+    init();
+  }
+
+  void  init() {
     fCanvasName  = "";
     fCanvasSizeX = 1200.;
     fCanvasSizeY =  800.;

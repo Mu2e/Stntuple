@@ -47,12 +47,22 @@ void TStrawDataBlock::Clear(Option_t* opt) {
   fLinksInitialized   =  0;
 }
 
-//______________________________________________________________________________
+//-----------------------------------------------------------------------------
+//  print all hits in the straw tracker
+//-----------------------------------------------------------------------------
 void TStrawDataBlock::Print(Option_t* opt) const {
-  // print all hits in the straw tracker
-  printf(" *** print Straw tracker *** \nNumber of hits: %d\n",fNHits);
+  TStrawDataBlock* blk = (TStrawDataBlock*) this;
+  int banner_printed = 0;
+  printf(" *** total number of straw hits: %d\n",fNHits);
   for(int i=0; i<fNHits; i++) {
-    fListOfHits->At(i)->Print();
+    TStrawHitData* hit = blk->Hit(i);
+    if (banner_printed == 0) {
+      hit->Print("banner");
+      banner_printed = 1;
+    }
+    else {
+      hit->Print("data");
+    }
   }
 }
 

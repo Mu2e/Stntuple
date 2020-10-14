@@ -128,11 +128,11 @@ void TStepPointMC::Print(Option_t* Opt) const {
   if ((opt == "banner") || (opt == "")) {
     // print banner
     printf("---------------------------------------------------------------------------------------------------------------");
-    printf("---------------------------------------------------------------\n");
+    printf("-------------------------------------------------------------------------\n");
     printf("   Vol   Gen     PDG Particle          Creation   SimID   PPdg  PSimID  StopProc     X          Y          Z   ");
-    printf("  Edep(Tot) Edep(NIO)  Step    Time      Px        Py        Pz\n");
+    printf("  Edep(Tot) Edep(NIO)  Step    Time      Px        Py        Pz     Ptot\n");
     printf("---------------------------------------------------------------------------------------------------------------");
-    printf("---------------------------------------------------------------\n");
+    printf("------------------------------------------------------------------------\n");
   }
 
   TDatabasePDG* db = TDatabasePDG::Instance();
@@ -165,6 +165,7 @@ void TStepPointMC::Print(Option_t* Opt) const {
      printf("%9.3f" ,fMom.Px());
      printf("%9.3f" ,fMom.Py());
      printf("%9.3f" ,fMom.Pz());
+     printf("%9.3f" ,fMom.Mag());
      printf("\n");
   }
 }

@@ -6,7 +6,7 @@
 #         fcdflnx3.fnal.gov:/cdf/opr2/cdfopr/datasets/cdfpewk/tmet0d/requests
 #
 # request file: contains int init_chain(TChain*, int JobNumber)
-# JOB_NUMBER initialized in parse_parameters...
+# JOB_NUMBER initialized in Stntuple/scripts/parse_parameters...
 #-----------------------------------------------------------------------
 echo [process_concatenation_request:$LINENO] --- BEGIN
 cd $WORK_DIR
@@ -40,8 +40,8 @@ nm=$name_stub.$index
 # avoid name clashes in case both - output file and stntuple are defined
 # (normally this should not be happening, just in case)
 #-----------------------------------------------------------------------
-export     OUTPUT_FILE=${JOB_OUTPUT_DIR}/${nm}.s
-export OUTPUT_STNTUPLE=${JOB_OUTPUT_DIR}/${nm}.s
+export     OUTPUT_FILE=${JOB_OUTPUT_DIR}/${nm}.stn
+export OUTPUT_STNTUPLE=${JOB_OUTPUT_DIR}/${nm}.stn
 
 if [ .$JOB_OUTPUT_DIR == "." ] ; then
   export JOB_OUTPUT_DIR=${WORK_DIR}/results/concat-$dataset.$index

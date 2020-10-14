@@ -52,51 +52,52 @@ for book in $books ; do
 #    cmd="ls -al $dir | grep -v AAA_ | grep -v index.shtml | awk '{if ((substr(\$9,0,1) != \".\") && (substr(\$9,0,1) != \"\")) print \$9}' | sort -k1.7,8" 
 #    cmd="ls -l $dir | grep -v AAA_ | grep -v index.shtml | cut -c48-55 | sort -k1.7,8" 
 
-    versions=`ls -d $dir/* | grep -v AAA_ | grep -v index.shtml | awk -F/ '{print $NF}' | cut -c5-8 | sort -k1.7,8 | uniq`
+#    versions=`ls -d $dir/* | grep -v AAA_ | grep -v index.shtml | awk -F/ '{print $NF}' | cut -c5-8 | sort -k1.7,8 | uniq`
     #echo versions=$versions
 
     list_of_datasets=`ls -d $dir/* | grep -v AAA_ | grep -v index.shtml | awk -F/ '{print $NF}' | sort -k1.7,8`
     # echo list_of_datasets=$list_of_datasets
     
-    for version in $versions ; do
+#    for version in $versions ; do
 
-	if [ -f $dir/AAA_DESCRIPTION.$version.html ] ; then
-	    cat $dir/AAA_DESCRIPTION.$version.html                            >> $HTML_CATALOG 
-	else
-	    echo "<p> <li> datasets version $version <p>"                     >> $HTML_CATALOG
-	fi
+#	if [ -f $dir/AAA_DESCRIPTION.$version.html ] ; then
+#	    cat $dir/AAA_DESCRIPTION.$version.html                            >> $HTML_CATALOG 
+#	else
+#	    echo "<p> <li> datasets version $version <p>"                     >> $HTML_CATALOG
+#	fi
 
-	list_of_datasets=`ls -d $dir/* | grep -v AAA_ | grep -v index.shtml | awk -F/ '{print $NF}' | grep $version | sort -k1.7,8`
-	# echo datasets:$list_of_datasets
+#    list_of_datasets=`ls -d $dir/* | grep -v AAA_ | grep -v index.shtml | awk -F/ '{print $NF}' | grep $version | sort -k1.7,8`
+    list_of_datasets=`ls -d $dir/* | grep -v AAA_ | grep -v index.shtml | awk -F/ '{print $NF}' | sort`
+    # echo datasets:$list_of_datasets
 
-	for f in $list_of_datasets ; do 
+    for f in $list_of_datasets ; do 
 #------------------------------------------------------------------------------
 # find fileset-level catalog of a dataset
 #------------------------------------------------------------------------------
-            catalog=$dir/$f/AAA_CATALOG.html
+        catalog=$dir/$f/AAA_CATALOG.html
     #    echo catalog:$catalog
-            description=`cat $catalog | grep "# :DESCRIPTION:" | sed 's/# :DESCRIPTION://'`
-            offline_ver=`cat $catalog | grep "# :OFFLINE_VERSION:" | sed 's/# :OFFLINE_VERSION://'`
-            if [ ".$offline_ver" == "." ] ; then offline_ver="......" ; fi
-            len0=${#description}
-            des1=`echo $description | sed 's#<b>##' |  sed 's#</b>##'`
-            len1=${#des1}
-            description=$description".........................................................."
-            description=$description"..............................................."
-            ldesc=$((99+$len0-$len1)) 
+        description=`cat $catalog | grep "# :DESCRIPTION:" | sed 's/# :DESCRIPTION://'`
+        offline_ver=`cat $catalog | grep "# :OFFLINE_VERSION:" | sed 's/# :OFFLINE_VERSION://'`
+        if [ ".$offline_ver" == "." ] ; then offline_ver="......" ; fi
+        len0=${#description}
+        des1=`echo $description | sed 's#<b>##' |  sed 's#</b>##'`
+        len1=${#des1}
+        description=$description".........................................................."
+        description=$description"..............................................."
+        ldesc=$((99+$len0-$len1)) 
 #------------------------------------------------------------------------------
 # see if there is a dataset description file - AAA_DESCRIPTION.html
 #------------------------------------------------------------------------------
-            if [ -f $dir/$f/AAA_DESCRIPTION.html ] ; then
-    		text=" see <a href=$f/AAA_DESCRIPTION.html> detailed description of the dataset </a>"
-            else
-    		text=" see more details in the fileset catalog ........."
-            fi
-            dsname=$f" ..................."
-            ov=`printf "%6s" $offline_ver`
-            echo "<li> <a href=$f/AAA_CATALOG.html width=200px>${dsname:0:12}</a> | <a href=$f/AAA_FILES.txt> files </a> | $ov | ${description:0:$ldesc} | $text" >> $HTML_CATALOG ; 
-	done
+        if [ -f $dir/$f/AAA_DESCRIPTION.html ] ; then
+    	    text=" see <a href=$f/AAA_DESCRIPTION.html> detailed description of the dataset </a>"
+        else
+    	    text=" see more details in the fileset catalog ........."
+        fi
+        dsname=$f" ..................."
+        ov=`printf "%6s" $offline_ver`
+        echo "<li> <a href=$f/AAA_CATALOG.html width=200px>${dsname:0:12}</a> | <a href=$f/AAA_FILES.txt> files </a> | $ov | ${description:0:$ldesc} | $text" >> $HTML_CATALOG ; 
     done
+ #    done
 #------------------------------------------------------------------------------
 # form catalog trailer
 #------------------------------------------------------------------------------

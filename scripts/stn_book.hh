@@ -6,6 +6,8 @@
 
 #include "Stntuple/scripts/stn_dataset.hh"
 #include "Stntuple/scripts/hist_file.hh"
+
+class stn_catalog;
 //-----------------------------------------------------------------------------
 // book is a list of datasets, list owns its pointers
 //-----------------------------------------------------------------------------
@@ -15,6 +17,7 @@ public:
   TString                fHistDir;
   vector<stn_dataset_t*> fListOfDatasets;
   vector<hist_file_t*>   fListOfHistFiles;
+  stn_catalog*           fCatalog;
 
   stn_book(const char* Name = "", const char* HistDir = "") {
     fName    = Name;

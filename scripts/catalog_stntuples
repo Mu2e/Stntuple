@@ -12,7 +12,7 @@
 #
 # examples:
 # ---------
-# cdfopr/scripts/catalog_stntuples -h diskpool -d jbmmgh -b ewk/wtaunu -p jbmm
+# cdfopr/scripts/catalog_stntuples -h diskpool -d jbmmgh -b ewk/wtaunu -p jbmm --install /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stntuple/cafdfc
 #
 # if pattern is not defined, it is assumed to coinside with the dataset name
 # $nev_fileset: number of events per fileset, default:200000
@@ -31,13 +31,14 @@ end
 usage if ARGV.length < 1
 
 opts = GetoptLong.new(
+  [ "--access"         , "-a",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--bluearc"        , "-B",        GetoptLong::NO_ARGUMENT       ],
   [ "--book"           , "-b",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--cleanup"        , "-c",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--dataset"        , "-d",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--Directory"      , "-D",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--help"           , "-h",        GetoptLong::NO_ARGUMENT       ],
-  [ "--install"        , "-i",        GetoptLong::REQUIRED_ARGUMENT ],
+  [ "--install"        , "-i",        GetoptLong::OPTIONAL_ARGUMENT ],
   [ "--host"           , "-H",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--pattern"        , "-p",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--mode"           , "-m",        GetoptLong::REQUIRED_ARGUMENT ],
@@ -48,6 +49,7 @@ opts = GetoptLong.new(
 )
 
 #----------------------------- defaults
+$access          = nil;
 $bluearc         = nil;
 $cleanup         = 'yes'
 $user            = ENV["USER"]
@@ -60,7 +62,8 @@ $nev_fileset     = 200000
 $offline_version = "vX_X_X"
 $dataset         = ""
 $verbose         = 0
-$install         = nil                       # catalog area
+$install         = nil                       # flag
+$install_dir     = '/web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stntuple/cafdfc'  # default directory
 $pid             = Process.pid.to_s();
 $protocol        = 'rsh'
 $diskpool        = nil;
@@ -69,8 +72,11 @@ $diskpool        = nil;
 
 #----------------------------- process the parsed options
 opts.each do |opt, arg|
-  if    (opt == "--book"           ) ; $book            = arg 
-  elsif (opt == "--bluearc"        ) ; $bluearc         = 1
+  if    (opt == "--access"         ) ; $access          = arg 
+  elsif (opt == "--book"           ) ; $book            = arg 
+  elsif (opt == "--bluearc"        ) ; 
+    $bluearc         = 1
+    $access          = 'bluearc'
   elsif (opt == "--cleanup"        ) ; $cleanup         = arg 
   elsif (opt == "--dataset"        ) then # dataset name defines the default filename pattern
      $dataset        = arg 
@@ -78,7 +84,11 @@ opts.each do |opt, arg|
   elsif (opt == "--Directory"      ) ; $directory       = arg 
   elsif (opt == "--help"           ) ; usage()    
   elsif (opt == "--host"           ) ; $host            = arg 
-  elsif (opt == "--install"        ) ; $install         = arg 
+  elsif (opt == "--install"        ) then
+    $install     = 1
+    if (arg != "") then 
+      $install_dir = arg; 
+    end
   elsif (opt == "--mode"           ) ; $mode            = arg 
   elsif (opt == "--nev_fileset"    ) ; $nev_fileset     = arg.to_i 
   elsif (opt == "--offline_version") ; $offline_version = arg
@@ -103,7 +113,12 @@ elsif ($host == "fcdfdata122") then
   if ($directory == "")  
     $directory = "/export/data2/ewk/datasets/cdfpewk/#{$dataset}" ; 
   end
-elsif ($bluearc) then
+elsif ($access == 'xrootd') then
+  if ($directory == "")  then
+    user       = ENV["USER"];
+    $directory = "/pnfs/mu2e/scratch/users/#{user}/datasets/#{$dataset}" ; 
+  end
+elsif ($access == 'bluearc') then
   if ($directory == "")  then
     user       = ENV["USER"];
     $directory = "/mu2e/data/users/#{user}/datasets/#{$dataset}" ; 
@@ -216,6 +231,7 @@ if ($verbose != 0) ; puts "::: #{cmd}" ; end
 rc = `#{cmd}`
 if ($verbose != 0) ; puts "rc = #{rc}" ; end
 
+puts "$input_file:#{$input_file}"
 $input_file=$logfile
 file = File.open($input_file);
 
@@ -250,6 +266,7 @@ a  = file.readlines().sort{|x,y|
 }
 
 a.each { |line|
+  # puts"line = #{line}"
   xx = line[0,1]
   if ( xx != "#" ) 
     a = line.split();
@@ -322,21 +339,15 @@ file_catalog.close
 #-----------------------------------------------------------------------
 fileset_catalog_fn = 'AAA_CATALOG.html.'+$pid
 fileset_catalog    = File.new(fileset_catalog_fn,"w");
-comment_line       = '#----------------------------------------------';
+comment_line       = '#---------------------------------------------------------';
 comment_line       = comment_line+'-------------------------------------------';
 comment_line       = comment_line+'-------------------------------------------';
 
-fileset_catalog.puts'<pre>'
-fileset_catalog.puts comment_line
-fileset_catalog.printf("# <b>dataset: #{$dataset}</b> \n");
-fileset_catalog.printf("# :DESCRIPTION: \n");
-fileset_catalog.printf("# fileset     server             directory   ");
-fileset_catalog.printf("       nevents\n");
-fileset_catalog.puts comment_line
 
 if ( not $diskpool) then
-  if ($bluearc) then host = "bluearc://localhost.fnal.gov"
-  else               host = $host
+  if    ($access == 'xrootd' ) then host = 'xroot://fndca1.fnal.gov'
+  elsif ($access == 'bluearc') then host = 'bluearc://localhost.fnal.gov'
+  else                              host = $host
   end
   dir  = $directory
 else
@@ -344,30 +355,51 @@ else
   dir  = "/#{$book}/#{$dataset}"
 end
 
-i      = 0;
-nev_total = 0
-$list_of_filesets.each {|fset| 
+nev_total = 0;
+ldir      = -1;
+$list_of_filesets.each { |fset| 
+  nev_total = nev_total+fset.nevents;
+  # ldir - max length of the directory string
+  if (dir.length > ldir) then 
+    ldir = dir.length
+  end
+}
+
+#------------------------------------------------------------------------------
+# make sure the printed catalog looks nice
+#------------------------------------------------------------------------------
+fileset_catalog.puts'<pre>'
+fileset_catalog.puts comment_line
+fileset_catalog.printf("# <b>dataset: #{$dataset}</b> \n");
+fileset_catalog.printf("# :DESCRIPTION: \n");
+fileset_catalog.printf("# fs       server                   directory   ");
+fileset_catalog.printf("%#{ldir-16}s nevents\n"," ");
+fileset_catalog.puts comment_line
+
+i=0
+$list_of_filesets.each { |fset| 
   i = i+1;
   fileset_catalog.printf("%06i  %-20s  %-45s %6i %7i %9i %7i %9i\n",i,host,dir,
                         fset.nevents,fset.lorun,fset.loevt,fset.hirun,fset.hievt)
-  nev_total = nev_total+fset.nevents;
 }
 #------------------------------------------------------------------------------
 # form catalog trailer - metadata
 #------------------------------------------------------------------------------
+format="%#{ldir+20}"
 fileset_catalog.puts comment_line
-fileset_catalog.printf("# :NTOTAL:          %62i\n",nev_total);
-fileset_catalog.printf("# :PROCESS_CODE:    %62s\n","");
-fileset_catalog.printf("# :NGENERATED:      %62s\n","");
-fileset_catalog.printf("# :OFFLINE_VERSION: %62s\n",$offline_version);
+fileset_catalog.printf("# :NTOTAL:          #{format}i\n",nev_total);
+fileset_catalog.printf("# :PROCESS_CODE:    #{format}s\n","");
+fileset_catalog.printf("# :NGENERATED:      #{format}s\n","");
+fileset_catalog.printf("# :MC_FLAG:         #{format}i\n", 1);
+fileset_catalog.printf("# :OFFLINE_VERSION: #{format}s\n",$offline_version);
 fileset_catalog.puts comment_line
 fileset_catalog.puts'</pre>'
 fileset_catalog.close();
 #-----------------------------------------------------------------------
 # installation, if requested
 #-----------------------------------------------------------------------
-if ($install != '') then
-  cdir = $install+'/'+$book+'/'+$dataset
+if ($install) then
+  cdir = $install_dir+'/'+$book+'/'+$dataset
   rc   = `mkdir -p #{cdir}`
   rc   = `mv #{fileset_catalog_fn} #{cdir}/AAA_CATALOG.html`
   rc   = `mv #{file_catalog_fn} #{cdir}/AAA_FILES.txt`

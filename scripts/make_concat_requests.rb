@@ -7,7 +7,7 @@
 #  last check: 2004-08-01 - works out of the box .P.Murat
 #
 #  make_concat_requests.rb -i [host:]input_dir -b book -d dataset -p name_pattern \
-#                          -o output_dir -t output_tcl -f mode
+#                          -o output_dir -t output_tcl -f mode [-m maxsize] [-l list_of_files]
 #
 # example:
 # --------
@@ -25,6 +25,9 @@
 #  need default for user in output_dir URL
 #  comment: it is important to remember the user name in the output_dir URL
 #  modes: "stntuple", "dst"
+#
+#  parameters are parsed independently, they are globals, not data members of 
+#  ConcatenationRequest objet
 #------------------------------------------------------------------------------
 puts "starting---"
 
@@ -52,6 +55,7 @@ $host           = "fcdfdata122.fnal.gov"
 $pattern        = ""
 $format         = "dst"
 $iuser          = `whoami`.strip
+$list_of_files  = nil
 $max_file_size  = 1100000000
 $ouser          = `whoami`.strip
 $output_dir     = "fcdfsgi2"
@@ -66,6 +70,8 @@ opts = GetoptLong.new(
   [ "--book"          , "-b",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--format"        , "-f",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--input_dir"     , "-i",        GetoptLong::REQUIRED_ARGUMENT ],
+  [ "--list_of_files" , "-l",        GetoptLong::REQUIRED_ARGUMENT ], 
+  [ "--max_file_size" , "-m",        GetoptLong::REQUIRED_ARGUMENT ],   # in megabytes
   [ "--output_tcl"    , "-t",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--output_dir"    , "-o",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--pattern"       , "-p",        GetoptLong::REQUIRED_ARGUMENT ],
@@ -94,6 +100,10 @@ opts.each do |opt, arg|
     else                            ; #  host is not specified
       $input_dir = x.strip;
     end
+  elsif (opt == "--list_of_files" ) then
+    $list_of_files = arg
+  elsif (opt == "--max_file_size" ) ; then 
+    $max_file_size = arg.to_i*1000000
   elsif (opt == "--output_dir"    ) 
 #-----------------------------------------------------------------------
 #  output directory
@@ -117,7 +127,7 @@ opts.each do |opt, arg|
   if ($verbose != 0) ; puts "Option: #{opt}, arg #{arg.inspect}" ; end
 end
 
-usage if ($pattern == "")
+usage if ($list_of_files == nil) && ($pattern == "")
 #-----------------------------------------------------------------------
 # derived global variables
 #-----------------------------------------------------------------------
@@ -125,12 +135,14 @@ if ( $output_tcl.split("/")[1] == nil )
   $output_tcl = "cdfopr@fcdflnx4.fnal.gov:/cdf/home/www/usr/cdfopr/datasets/#{$book}/#{$dataset}/#{$output_tcl}"
 end
 
-if ( $input_dir == "" ) 
-  $input_dir = "/cdf/scratch/cdfopr/datasets/#{$book}/#{$dataset}"
-end
+if ($list_of_files == nil) then
+  if ( $input_dir == "" ) 
+    $input_dir = "/cdf/scratch/cdfopr/datasets/#{$book}/#{$dataset}"
+  end
 
-if    ( $output_dir == "fcdfdata131" ) 
-  $output_dir="murat@fcdfdata131.fnal.gov/export/data4/ewk/murat/datasets/#{$dataset}"
+  if    ( $output_dir == "fcdfdata131" ) 
+    $output_dir="murat@fcdfdata131.fnal.gov/export/data4/ewk/murat/datasets/#{$dataset}"
+  end
 end
 
 
@@ -164,11 +176,19 @@ class ConcatenationRequest
       cmd="rsh -l #{$iuser} #{$ihost} ls -l #{$input_dir} | grep #{$pattern} | grep -v .log" ;
     end
 
-    puts " cmd = #{cmd}"
+    puts " [ConcatenationRequest::initialize] cmd = #{cmd}"
 
-    @list_of_files = `#{cmd}`.split("\n");  
+    if ($list_of_files) then
+      if ($verbose); then puts 'list of files comes from '+$list_of_files; end
+      f = File.new($list_of_files)
+      @list_of_files = f.readlines();
+      f.close()
+    else
+      @list_of_files = `#{cmd}`.split("\n");  
+    end
 
-#    puts @list_of_files
+    if ($verbose) then; puts @list_of_files ; end
+
     puts "@output_file_name = #{@output_file_name}"
     puts "@format           = #{@format}"
     puts "$ihost            = #{$ihost}"
@@ -180,17 +200,22 @@ class ConcatenationRequest
 #------------------------------------------------------------------------------
   def write_stntuple_header() 
     @tmp_file.puts "//----------------------------------------------"
-    @tmp_file.puts "// NJOBS           0  "
+    @tmp_file.puts "// NJOBS           __NJOBS__"
     @tmp_file.puts "// DATA_SERVER     root://#{$ihost}"
     @tmp_file.puts "// OUTPUT_DIR      ftp://#{$ouser}@#{$ohost}#{$output_dir}"
     @tmp_file.puts "// DATASET         #{$dataset}"
     @tmp_file.puts "// BOOK            #{$book}"
     @tmp_file.puts "//----------------------------------------------"
-    @tmp_file.puts "int init_chain(TChain* Chain, int JobNumber, TString& OutputDir, TString& Book, TString& Dataset) {"
+    @tmp_file.puts "void n_concatenation_jobs(int* N) {"
+    @tmp_file.puts "  *N = __NJOBS__;"
+    @tmp_file.puts "}"
+    @tmp_file.puts "//----------------------------------------------"
+    @tmp_file.puts "int init_chain(TChain* Chain, int JobNumber, TString* OutputDir, TString* Book, TString* Dataset) {"
   end
 
 #------------------------------------------------------------------------------
   def write_stntuple_trailer() 
+    @tmp_file.puts "  return 0;"
     @tmp_file.puts "}"
   end
 
@@ -219,7 +244,7 @@ class ConcatenationRequest
 #------------------------------------------------------------------------------
   def write_production_header() 
     @tmp_file.puts "#----------------------------------------------"
-    @tmp_file.puts "# NJOBS           0  "
+    @tmp_file.puts "# NJOBS           __NJOBS__"
     @tmp_file.puts "# DATA_SERVER     root://#{$ihost}"
     @tmp_file.puts "# OUTPUT_DIR      #{$output_dir}"
     @tmp_file.puts "# DATASET         #{$dataset}"
@@ -238,9 +263,9 @@ class ConcatenationRequest
     @tmp_file.puts "//----------------------------------------------"
     @tmp_file.puts "// total size:     #{@total_size}"
     @tmp_file.puts "//----------------------------------------------"
-    @tmp_file.puts "    Dataset   = \"#{$dataset}\";"
-    @tmp_file.puts "    Book      = \"#{$book}\";"
-    @tmp_file.puts "    OutputDir = \"#{$output_dir}\";"
+    @tmp_file.puts "    *Dataset   = \"#{$dataset}\";"
+    @tmp_file.puts "    *Book      = \"#{$book}\";"
+    @tmp_file.puts "    *OutputDir = \"#{$output_dir}\";"
  
     nf = @list.length;
     for i in 0...nf
@@ -311,7 +336,6 @@ class ConcatenationRequest
 
 #------------------------------------------------------------------------------
   def make_request_file()
-
     if ($verbose) then ; puts "[make_request_file] : $verbose = #{$verbose} START" ; end
 
     write_header();
@@ -322,13 +346,18 @@ class ConcatenationRequest
     snew=0
     nfiles = @list_of_files.length
     for i in 0...nfiles
-#      if ($verbose) then ; puts @list_of_files[i]; end
+      if ($verbose) then ; puts @list_of_files[i]; end
 
       word = @list_of_files[i].strip.split(" ");
 #  puts " word = #{word} #{word.length} #{word[4]}"
       name = word[8]
       size = word[4].to_i
-      filename = "#{$input_dir}/#{name}"
+
+      if ($input_dir != "") then 
+        filename = "#{$input_dir}/#{name}"
+      else
+        filename = name
+      end
 
 #      if ($verbose) then puts " --- #{filename}" ; end
 
@@ -377,22 +406,15 @@ class ConcatenationRequest
 
     @tmp_file.close()
 #-----------------------------------------------------------------------
-#  make sure output directory exists
+#  make sure output directory exists and write njobs
 #-----------------------------------------------------------------------
     @tmp_file   = File.open(@tmp_fn,"r");
     output_file = File.open(@tmp_fn+".1","w");
 
+    puts "NJOBS:#{@index}"
     @tmp_file.each_line { |line|
-      if (@format == "stntuple") 
-        if ((line.split()[0] == "//") && (line.split()[1] == "NJOBS")) 
-          line = "// NJOBS            #{@index}"
-        end
-      elsif (@format == "dst") 
-        if ((line.split()[0] == "#") && (line.split()[1] == "NJOBS")) 
-          line = "# NJOBS            #{@index}"
-        end
-      end
-      output_file.puts line
+      new_line = line.gsub("__NJOBS__","#{@index}");
+      output_file.puts new_line
     }
 
     output_file.close();
@@ -431,9 +453,14 @@ class ConcatenationRequest
 #------------------------------------------------------------------------------
 end
 
-req = ConcatenationRequest.new($format,1500000000);
 
-req.make_request_file();
+if __FILE__ == $PROGRAM_NAME
+  puts "emoe! #{$PROGRAM_NAME}"
+  if ($verbose) then puts(">>>>>>>>>>>>>> creating concatenation request"); end
 
+  req = ConcatenationRequest.new($format,1500000000);
+
+  req.make_request_file();
+end
 
 exit(0)

@@ -36,6 +36,7 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
   }
   
   TH2F* hpx1 = (TH2F*) gh2(hf1->fName,Hd->fModule,Hd->fName)->Clone(h1name);
+  Hd->fHist  = hpx1;
   if (Hd->fRebin > 0) hpx1->Rebin(Hd->fRebin);
 //-----------------------------------------------------------------------------
 // scale, if requested
@@ -126,7 +127,6 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
   }
   
   if (Print == -1) {
-    Hd->fCanvas   = c;
     Hd->fHist     = hpx1;
     Hd->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hd->fPlotName.Data());
   }
@@ -137,7 +137,9 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
     if (Print == 1) {
       c->Print(Form("%s/eps/%s.eps",FiguresDir,Hd->fPlotName.Data())) ;
     }
-  }
+  } 
+
+  Hd->fCanvas = c;
   return;
 }
 
@@ -165,23 +167,17 @@ void plot_hist_2D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   hist_file_t* hf2 = Hist2->fFile;
   
   TH2F* hpx1 = (TH2F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+  Hist1->fHist = hpx1;
+  
   if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);
   
   TH2F* hpx2 = (TH2F*) gh2(hf2->fName,Hist2->fModule,Hist2->fName)->Clone(h2name);
+  Hist2->fHist = hpx2;
+  
   if (Hist2->fRebin > 0) hpx2->Rebin(Hist2->fRebin);
 
   stn_dataset_t* ds1 = hf1->fDataset;
   stn_dataset_t* ds2 = hf2->fDataset;
-
-  // if (Hist2->fScale == 1) {
-  //   double scale = (ds1->fNGenEvents+0.)/(ds2->fNGenEvents+0.);
-  //   hpx2->Scale(scale);
-  // }
-  
-  // if (Hist2->fScale == 2) {
-  //   double scale = hpx1->Integral()/hpx2->Integral();
-  //   hpx2->Scale(scale);
-  //  }
 //-----------------------------------------------------------------------------
 // create a canvas
 //-----------------------------------------------------------------------------
@@ -310,6 +306,8 @@ void plot_hist_2D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
       c->Print(Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data())) ;
     }
   }
+  
+  Hist1->fCanvas   = c;
   return;
 }
 

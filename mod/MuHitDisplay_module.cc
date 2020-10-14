@@ -1134,13 +1134,11 @@ namespace mu2e {
 	  std::vector<StrawDigiIndex> shids;
 	  fShComboHitColl->fillStrawDigiIndices(Evt,ish,shids);
 
-	  printf("MuHitDisplay::filter : StrawDigiMC::stepPointMC no longer available. Ask Dave Brown. \n");
-	  
 	  const mu2e::SimParticle*     sim(nullptr);
-	  // thanks Dave ...  mu2e::StrawDigiMC     const& mcd1  = _strawDigiMCColl->at(shids[0]);
-	  // thanks Dave ...  art::Ptr<StepPointMC> const& spmcp = mcd1.stepPointMC(StrawEnd::cal);
-	  // thanks Dave ...  sim = spmcp->simParticle().get();
-	
+	  mu2e::StrawDigiMC     const& mcd1  = _strawDigiMCColl->at(shids[0]); 
+	  auto const& spmcp = mcd1.strawGasStep(StrawEnd::cal);
+	  sim = spmcp->simParticle().get();
+
 	  w = sh->wdir();
 
 	  isFromConversion = false;

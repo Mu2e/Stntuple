@@ -1,8 +1,8 @@
-#ifndef __stntuple_ana_TrackParBase_t__
-#define __stntuple_ana_TrackParBase_t__
+#ifndef __stntuple_ana_ParBase_t__
+#define __stntuple_ana_ParBase_t__
 
 namespace stntuple {
-  class TrackParBase_t {
+  class ParBase_t {
   public:
     int     fNumber;
   };

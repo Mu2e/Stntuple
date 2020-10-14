@@ -46,7 +46,7 @@ void stnana (TString     Book   ,
 
   TString test_release_dir = gEnv->GetValue("Stnana.TestReleaseDir",gSystem->Getenv("PWD"));
 
-  printf("test_release_dir: %s\n",test_release_dir.Data());
+  printf("[stnana.C]: test_release_dir: %s\n",test_release_dir.Data());
 
   const char* script[] = { // loaded explicitly
     "init_geometry.C"       , "PWD",
@@ -65,13 +65,13 @@ void stnana (TString     Book   ,
     if (dir) {
       sprintf(macro,"%s/Stntuple/scripts/%s",dir,script[i]);
       if (! cint->IsLoaded(macro)) {
-	printf("STNANA: locating %s\n",macro);
+	printf("[stnana.C]: locating %s\n",macro);
 	cint->LoadMacro(macro,&rc);
 	if (rc != 0) printf("stnana ERROR : failed to load %s\n",macro);
       }
     }
     else {
-      printf("STNANA WARNING: environment variable %s is not defined\n",script[i+1]);
+      printf("[stnana.C]: WARNING: environment variable %s is not defined\n",script[i+1]);
     }
   }
 
@@ -106,6 +106,7 @@ void stnana (TString     Book   ,
 //-----------------------------------------------------------------------------
 // parse job options: /mc[=] /grl= /little /newcuts /output[=] /save[=] /debug= /pass=
 //-----------------------------------------------------------------------------
+  printf("[stnana.C]: parsing command line\n");
   parse_job_parameters(JobName,g);
 
   if (g.dataset != 0) {
@@ -143,7 +144,7 @@ void stnana (TString     Book   ,
 //-----------------------------------------------------------------------------
 // generator-level MC study - use PHOTOS
 //-----------------------------------------------------------------------------
-      printf(">>> STNANA: PHOTOS initialization\n");
+      printf("[stnana.C]: PHOTOS initialization\n");
       g.x = new TStnAna();
       gInterpreter->ProcessLine("init_photos()");
     }
@@ -157,9 +158,9 @@ void stnana (TString     Book   ,
 //-----------------------------------------------------------------------------
       if (Book == "") Book = "file";
 
-/* DEBUG */     printf("[stnana.C]: Book=%s  Dataset=%s\n",Book.Data(),Dataset.Data());
-/* DEBUG */     printf("[stnana.C]: Fileset=%s  File=%s\n",Fileset.Data(),File.Data());
-/* DEBUG */     printf("[stnana.C]: g.MinRun=%i  g.MaxRun=%i\n",g.MinRun,g.MaxRun);    
+/* DEBUG */     printf("[stnana.C]: Book=%s  Dataset=%s",Book.Data(),Dataset.Data());
+/* DEBUG */     printf(" Fileset=%s  File=%s\n",Fileset.Data(),File.Data());
+      /* DEBUG */  //   printf("[stnana.C]: g.MinRun=%i  g.MaxRun=%i\n",g.MinRun,g.MaxRun);    
 
       g.catalog->InitDataset(g.dataset,Book,Dataset,Fileset,File,g.MinRun,g.MaxRun);
 
@@ -168,7 +169,7 @@ void stnana (TString     Book   ,
 	return;
       }
 
-/* DEBUG */     printf("[stnana.C]: done with the dataset initialization\n");
+      /* DEBUG */     // printf("[stnana.C]: done with the dataset initialization\n");
 //-----------------------------------------------------------------------------
 //  no matter what command line prevails
 //-----------------------------------------------------------------------------
@@ -179,7 +180,7 @@ void stnana (TString     Book   ,
 	g.dataset->SetMcFlag(0);
       }
       
-      printf(" [stnana.C]: dataset MC_FLAG = %i\n",g.dataset->GetMcFlag());
+      printf("[stnana.C]: dataset MC_FLAG = %i\n",g.dataset->GetMcFlag());
 
       g.x = new TStnAna(g.dataset);
       g.x->SetPrintLevel(0);
@@ -212,7 +213,7 @@ void stnana (TString     Book   ,
 // to specify '/mc' in either batch or interactive job to make trigger 
 // emulation to work
 //-----------------------------------------------------------------------------
-// /* DEBUG */     printf("[stnana.C]: before setup_trigger_path\n");    
+  printf("[stnana.C]: starting trigger setup\n");    
 
   setup_trigger_path(g.L3TrigPath.Data());
 
@@ -220,7 +221,7 @@ void stnana (TString     Book   ,
 //-----------------------------------------------------------------------------
 //  analyse definition of the requested job, handle debug mode
 //-----------------------------------------------------------------------------
-  printf(" --- job_name = .%s. task = %s\n",g.JobName.Data(), g.Task.Data());
+  // printf(" --- job_name = .%s. task = %s\n",g.JobName.Data(), g.Task.Data());
   
   int ind       = g.Task.Index("(");
 

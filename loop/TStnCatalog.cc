@@ -11,6 +11,7 @@
 
 #include "Stntuple/loop/TTxtCatalogServer.hh"
 #include "Stntuple/loop/THttpCatalogServer.hh"
+#include "Stntuple/loop/TSamCatalogServer.hh"
 #include "Stntuple/loop/TStnCatalog.hh"
 #include "Stntuple/base/TStnDataset.hh"
 
@@ -21,7 +22,7 @@ TStnCatalog::TStnCatalog(const char* name) :
   TNamed     (name,name),
   fPrintLevel(0)
 {
-  char        url [1000];
+  char        url [1000], server_type[100];
   const char *env;
   TString     cmd;
   TString     rsh("rsh -n -N"); // Default is set here
@@ -44,11 +45,13 @@ TStnCatalog::TStnCatalog(const char* name) :
 //-----------------------------------------------------------------------------
   cmd  = "fgrep -s 'Stntuple.Catalog ' $HOME/.rootrc  $PWD/.rootrc ";
   cmd += " | sed 's/#.*//' | awk '{if(NF>1) print $0}'"; //remove comments
-  cmd += " | awk '{print $2}' | uniq";
+  cmd += " | awk '{if ($3 == \"""\""") {x=\"txt\"} else {x=$3} {print $2 \" \" x}}' | uniq";
+
+  //  printf("cmd = %s\n",cmd.Data());
   f    = gSystem->OpenPipe(cmd.Data(),"r");
   fListOfCatalogServers = new TObjArray();
   TStnCatalogServer* server;
-  while (fscanf(f,"%s",url) != EOF) {
+  while (fscanf(f,"%s %s",url,server_type) != EOF) {
     server  = (TStnCatalogServer*) fListOfCatalogServers->FindObject(url);
     if (! server) {
 
@@ -60,7 +63,19 @@ TStnCatalog::TStnCatalog(const char* name) :
 	fListOfCatalogServers->Add(new TTxtCatalogServer(url,rsh.Data()));
       }
       else if (protocol.Index("http") == 0) {
-	fListOfCatalogServers->Add(new THttpCatalogServer(url,rsh.Data()));
+
+	TString stype(server_type);
+	stype.ToLower();
+
+	if (stype == "txt") {
+	  fListOfCatalogServers->Add(new THttpCatalogServer(url,rsh.Data()));
+	}
+	else if (stype == "sam") {
+	  fListOfCatalogServers->Add(new TSamCatalogServer(url,rsh.Data()));
+	}
+	else {
+	  Error("TStnCatalog",Form("Wrong server type:%s\n",server_type));
+	}
       }
     }
   }

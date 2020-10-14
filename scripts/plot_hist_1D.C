@@ -4,7 +4,7 @@
 //
 // overlay two histograms with the same ModuleName/HistName from two files
 // defined by Ds1 and Ds2, HistName like "spmc_1/mom"
-// Print = -1: don't print, store the name in the hist record instead
+// Print = -1: don't print, store the file name in the hist record instead
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef __plot_hist_1D__
 #define __plot_hist_1D__
@@ -33,7 +33,10 @@ void plot_hist_1D(hist_data_t* Hist1, int Print = 0) {
 
   hist_file_t* hf1 = Hist1->fFile;
 
-  if  (hf1) hpx1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+  if  (hf1) {
+    hpx1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+    Hist1->fHist = hpx1;
+  }
   else      hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
   
   if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);
@@ -132,19 +135,15 @@ void plot_hist_1D(hist_data_t* Hist1, int Print = 0) {
     }
   }
   
-  if (Print == -1) {
-    Hist1->fCanvas   = canvas;
-    Hist1->fHist     = hpx1;
-    Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
-  }
-  else { 
 //-----------------------------------------------------------------------------
-// .png files are written into /png/ subdirectory
+// define the output file name
 //-----------------------------------------------------------------------------
-    if (Print == 1) {
-      canvas->Print(Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data())) ;
-    }
+  Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+  if (Print == 1) {
+    canvas->Print(Form("%s",Hist1->fOutputFn.Data())) ;
   }
+
+  Hist1->fCanvas = canvas;
   return;
 }
 
@@ -173,14 +172,20 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   
   TH1F* hpx1;
 
-  if  (hf1) hpx1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+  if  (hf1) {
+    hpx1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+    Hist1->fHist = hpx1;
+  }
   else      hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
 
   if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);
   
   TH1F* hpx2;
 
-  if  (hf2) hpx2 = (TH1F*) gh1(hf2->fName,Hist2->fModule,Hist2->fName)->Clone(h2name);
+  if  (hf2) {
+    hpx2 = (TH1F*) gh1(hf2->fName,Hist2->fModule,Hist2->fName)->Clone(h2name);
+    Hist2->fHist = hpx2;
+  }
   else      hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
 
   if (Hist2->fRebin > 0) hpx2->Rebin(Hist2->fRebin);
@@ -343,19 +348,12 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
     }
   }
   
-  if (Print == -1) {
-    Hist1->fCanvas   = c;
-    Hist1->fHist     = hpx1;
-    Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+  Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+  if (Print == 1) {
+    c->Print(Form("%s",Hist1->fOutputFn.Data())) ;
   }
-  else { 
-//-----------------------------------------------------------------------------
-// .png files are written into /png/ subdirectory
-//-----------------------------------------------------------------------------
-    if (Print == 1) {
-      c->Print(Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data())) ;
-    }
-  }
+  
+  Hist1->fCanvas = c;
   return;
 }
 
@@ -364,7 +362,7 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
 // other ones - not necessarily
 // may have the problem with namng the output file
 //-----------------------------------------------------------------------------
-void plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
+int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
   
   char figure_name[200];
 //-----------------------------------------------------------------------------
@@ -381,7 +379,17 @@ void plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
   
   TH1F* hpx1;
 
-  if  (hf1) hpx1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+  //  printf("1:%s  2:%s    3:%s\n",hf1->fName.Data(),Hist1->fModule.Data(),Hist1->fName.Data());
+  
+  if  (hf1) {
+    if (gh1(hf1->fName,Hist1->fModule,Hist1->fName) == nullptr) {
+      printf("histogram %s/%s/%s not found, bail out\n",hf1->fName.Data(),Hist1->fModule.Data(),Hist1->fName.Data());
+      return -1;
+    }
+    
+    hpx1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+    Hist1->fHist = hpx1;
+  }
   else      hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
 
   if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);
@@ -467,17 +475,24 @@ void plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 //-----------------------------------------------------------------------------
   for (int ihist=1; ihist<NHist; ihist++) {
     hist_data_t* Hist2 = &Hist[ihist];
+
     TString h2name(Hist2->fName);
+    if (Hist2->fNewName == "") h2name.ReplaceAll("/","_");
+    else                       h2name = Hist2->fNewName;
 
     hist_file_t* hf2 = Hist2->fFile;
     
     TH1F* hpx2;
-    if  (hf2) hpx2 = (TH1F*) gh1(hf2->fName,Hist2->fModule,Hist2->fName)->Clone(h2name);
+    if  (hf2) {
+      if (gh1(hf2->fName,Hist2->fModule,Hist2->fName) == nullptr) {
+	printf("histogram %s/%s/%s not found, bail out\n",hf2->fName.Data(),Hist2->fModule.Data(),Hist2->fName.Data());
+	return -1;
+      }
+      hpx2 = (TH1F*) gh1(hf2->fName,Hist2->fModule,Hist2->fName)->Clone(h2name);
+      Hist2->fHist = hpx2;
+    }
     else      hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
     if (Hist2->fRebin > 0) hpx2->Rebin(Hist2->fRebin);
-    
-    if (Hist2->fNewName == "") h2name.ReplaceAll("/","_");
-    else                       h2name = Hist2->fNewName;
 //-----------------------------------------------------------------------------
 // in case there are 2 histograms, add the nam of the second one to the canvas name
 //-----------------------------------------------------------------------------
@@ -519,6 +534,9 @@ void plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
     if (Hist2->fMarkerStyle >=0) hpx2->SetMarkerStyle(Hist2->fMarkerStyle);
     if (Hist2->fMarkerColor >=0) hpx2->SetMarkerColor(Hist2->fMarkerColor);
     if (Hist2->fMarkerSize  >=0) hpx2->SetMarkerSize (Hist2->fMarkerSize );
+
+    // set the same limits as Hist1
+    if (Hist1->fXMin < Hist1->fXMax) hpx2->GetXaxis()->SetRangeUser(Hist1->fXMin,Hist1->fXMax);
 
     if (Hist2->fStats == 0) hpx2->SetStats(0);
 
@@ -589,20 +607,13 @@ void plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
     }
   }
   
-  if (Print == -1) {
-    Hist1->fCanvas   = c;
-    Hist1->fHist     = hpx1;
-    Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+  Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+  if (Print == 1) {
+    c->Print(Form("%s",Hist1->fOutputFn.Data())) ;
   }
-  else { 
-//-----------------------------------------------------------------------------
-// .png files are written into /png/ subdirectory
-//-----------------------------------------------------------------------------
-    if (Print == 1) {
-      c->Print(Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data())) ;
-    }
-  }
-  return;
+  Hist1->fCanvas   = c;
+
+  return 0;
 }
 
 
@@ -623,6 +634,7 @@ void fit_gaus_hist_1D(hist_data_t* Hist, const char* FOpt, const char* GOpt, dou
   stn_dataset_t* ds = hf->fDataset;
   
   TH1F* hpx1 = (TH1F*) gh1(hf->fName,Hist->fModule,Hist->fName)->Clone(hname);
+  Hist->fHist = hpx1;
 
   if (Hist->fRebin > 0) hpx1->Rebin(Hist->fRebin);
 //-----------------------------------------------------------------------------
@@ -686,6 +698,8 @@ void fit_gaus_hist_1D(hist_data_t* Hist, const char* FOpt, const char* GOpt, dou
     }
     c->Print(Form("%s/eps/%s.eps",FiguresDir,Hist->fPlotName.Data())) ;
   }
+
+  Hist->fCanvas   = c;
 }
 
 //-----------------------------------------------------------------------------

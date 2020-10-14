@@ -30,12 +30,13 @@ public:
     kRMaxBit           = 0x1 <<  7,     // 0x00000080
     kTrkQualBit        = 0x1 <<  8,     // 0x00000100
     kChi2DofBit        = 0x1 <<  9,     // 0x00000200
-    kDNaBit            = 0x1 << 10      // 0x00000200
+    kDNaBit            = 0x1 << 10,     // 0x00000200
+    kFNaBit            = 0x1 << 11      // 0x00000400
   };
 
   enum { 
     kNFreeInts         =  4,
-    kNFreeFloats       = 10
+    kNFreeFloats       =  9
   };
 
   struct Hist_t {
@@ -47,6 +48,7 @@ public:
     TH1F*    fT0Err       [5];
     TH1F*    fT0          [5];
     TH1F*    fDNa         [5];
+    TH1F*    fFNa         [5];
     TH1F*    fTanDip      [5];
     TH1F*    fD0          [5];
     TH1F*    fRMax        [5];
@@ -79,6 +81,7 @@ protected:
 
   Float_t    fMinTrkQual;               // min track quality
   float      fMaxChi2Dof;		// max chi2/DOF (as alternative)
+  float      fMinFNa;                   // fraction of active hits
 
   Float_t    fFloat[kNFreeFloats];	// spare words, added in V5
 
@@ -104,6 +107,7 @@ public:
   Float_t MaxTanDip    () const { return fMaxTanDip;    }
   Float_t MinTrkQual   () const { return fMinTrkQual;   }
   int     MaxDNa       () const { return fMaxDNa    ;   }
+  float   MinFNa       () const { return fMinFNa    ;   }
   float   MaxChi2Dof   () const { return fMaxChi2Dof;   }
   Int_t   MinD0        () const { return fMinD0;   }
   Int_t   MaxD0        () const { return fMaxD0;   }
@@ -115,6 +119,7 @@ public:
   void    SetMinFitCons  (Float_t FitCons) { fMinFitCons    = FitCons; }
   void    SetMaxChi2Dof  (Float_t Chi2Dof) { fMaxChi2Dof    = Chi2Dof; }
   void    SetMaxDNa      (int     DNa    ) { fMaxDNa        = DNa    ; }
+  void    SetMinFNa      (int     FNa    ) { fMinFNa        = FNa    ; }
   void    SetMinT0       (Float_t T0     ) { fMinT0         = T0;      }
   void    SetMinNActive  (Int_t   N      ) { fMinNActive    = N;       }
   void    SetMaxNActive  (Int_t   N      ) { fMaxNActive    = N;       }

@@ -38,7 +38,7 @@
 #include "RecoDataProducts/inc/HelixHit.hh"
 #include "RecoDataProducts/inc/KalSeed.hh"
 
-#include "RecoDataProducts/inc/AlgorithmIDCollection.hh"
+// #include "RecoDataProducts/inc/AlgorithmIDCollection.hh"
 #include "RecoDataProducts/inc/CaloCluster.hh"
 #include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
 
@@ -62,7 +62,7 @@ using namespace ROOT::Math::VectorUtil;
 int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 
   const mu2e::HelixSeedCollection* list_of_helices(0);
-  mu2e::AlgorithmIDCollection*     aid_coll    (0);
+  //  mu2e::AlgorithmIDCollection*     aid_coll    (0);
 
   char                 helix_module_label[100], helix_description[100]; 
   char                 makeSD_module_label[100];
@@ -84,27 +84,17 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
   cb->GetModuleLabel("mu2e::HelixSeedCollection", helix_module_label);
   cb->GetDescription("mu2e::HelixSeedCollection", helix_description );
 
-  art::Handle<mu2e::AlgorithmIDCollection> aidcH;
   art::Handle<mu2e::HelixSeedCollection>   hch;
-  const fhicl::ParameterSet*               pset(nullptr);
-  std::string                              module_type;
 
   if (helix_module_label[0] != 0) {
     if (helix_description[0] == 0) {
-      Evt->getByLabel(helix_module_label,aidcH);
       Evt->getByLabel(helix_module_label,hch);
     }
     else {
-      Evt->getByLabel(helix_module_label,helix_description,aidcH);
       Evt->getByLabel(helix_module_label,helix_description,hch);
     }
 
-    if (aidcH.isValid()) aid_coll = (mu2e::AlgorithmIDCollection*) aidcH.product();
-    if (hch.isValid()) { 
-      list_of_helices = hch.product();
-      pset            = &hch.provenance()->parameterSet();
-      module_type     = pset->get<std::string>("module_type");
-    }
+    if (hch.isValid()) list_of_helices = hch.product();
   }
 
   const mu2e::StrawDigiMCCollection* mcdigis(0);
@@ -165,48 +155,22 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
     int nhits = hits->size();
 
     const mu2e::ComboHit*           hit(0);
-    //    XYZVec                          pos(0,0,0), wdir(0,0,0), sdir(0,0,0), helix_center(0,0,0);
-    //    double                          phi(0), helix_phi(0);
 //-----------------------------------------------------------------------------
 // figure out which algorithm was used to reconstruct the helix - helix collections 
 // could be merged
 // 1: RobustHelixFinder 2: CalHelixFinder
 //-----------------------------------------------------------------------------
-    int alg(-1);
-
-    int mask = (0xffff << 16) | 0x0000;
-
-    if (aid_coll) {
-//-----------------------------------------------------------------------------
-// MergeHelixFinder always stored the algorithm ID collection
-//-----------------------------------------------------------------------------
-      const mu2e::AlgorithmID* aid = &aid_coll->at(i);
-      alg  = aid->BestID();
-      mask = aid->BestID() | (aid->AlgMask() << 16);
+    if (tmpHel->status().hasAnyProperty(mu2e::TrkFitFlagDetail::CPRHelix)) {
+      helix->fAlgorithmID = 0x20002;
     }
     else {
-//-----------------------------------------------------------------------------
-// no algorithm ID stored - either RobustHelixFinder or CalHelixFinder
-//-----------------------------------------------------------------------------
-      if      (module_type == "RobustHelixFinder") {
-	alg  = mu2e::AlgorithmID::TrkPatRecBit;
-	mask = alg | (alg << 16);
-      }
-      else if (module_type == "CalHelixFinder"   ) {
-	alg  = mu2e::AlgorithmID::CalPatRecBit;
-	mask = alg | (alg << 17);
-      }
-      else {
-	printf(" ERROR in InitHelixBlock: module_type = %s\n",module_type.data());
-      }
+      helix->fAlgorithmID = 0x10001;
     }
-
-    helix->fAlgorithmID = mask;
 
     int      nStrawHits(0);
     float    first_hit_z(0), last_hit_z(0);
     
-    for (int j=0; j<nhits; ++j) {      //this loop is made over the ComboHits
+    for (int j=0; j<nhits; ++j) {      //this is a loop is over ComboHits
       hit       = &hits->at(j);
 
       if(j==0) first_hit_z = hit->pos().z();
@@ -275,14 +239,14 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
     
     if (hits_simp_id.size()>0) {
       if ( (mostvalueindex != hits_simp_index[id_max]) ){
-	printf(">>> ERROR: event %i %s helix %i no MC found. MostValueindex = %i hits_simp_index[id_max] =%i \n", 
-	       Evt->event(), module_type.c_str(), i, mostvalueindex, hits_simp_index[id_max]);
+	printf(">>> ERROR: event %i helix %i no MC found. MostValueindex = %i hits_simp_index[id_max] =%i \n", 
+	       Evt->event(), i, mostvalueindex, hits_simp_index[id_max]);
       }
     }
     
     if ( (mostvalueindex<0) || (mostvalueindex >= (int)mcdigis->size()))        {
-      printf(">>> ERROR: event %i %s helix %i no MC found. MostValueindex = %i hits_simp_index[id_max] = %i mcdigis_size =%li \n", 
-	     Evt->event(), module_type.c_str(), i, mostvalueindex, hits_simp_index[id_max], mcdigis->size());
+      printf(">>> ERROR: event %i helix %i no MC found. MostValueindex = %i hits_simp_index[id_max] = %i mcdigis_size =%li \n", 
+	     Evt->event(), i, mostvalueindex, hits_simp_index[id_max], mcdigis->size());
       continue;
     }
     

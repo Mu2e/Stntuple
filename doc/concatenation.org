@@ -1,0 +1,19 @@
+#
+* concatenating and cataloging stntuples:      - this is an example   , not instructions :)
+
+# create list of files to concatenate: 
+
+   dir=/pnfs/mu2e/persistent/users/mu2epro/workflow/su2020.pos00s41b0.s5_reco_stn/outstage/35214508
+   dsid=pos00s51b0
+   ls -al $dir/00/000??/* | grep .stn$ > su2020.$dsid.stn.list
+
+   Stntuple/scripts/make_concat_requests.rb -l su2020.$dsid.stn.list -b su2020 -d $dsid \ 
+   -o $PWD -f stntuple -t $PWD/${dsid}_concat_request.C
+
+   this step will create a script with N jobs
+   root.exe
+   .L pos00s51b0_concat_request.C  // defines init_chain and n_concatenation_jobs
+   .L Stntuple/ana/scripts/dh.C
+   dh::concatenate()               // 
+
+# uploading to SAM

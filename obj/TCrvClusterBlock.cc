@@ -74,13 +74,25 @@ void TCrvClusterBlock::Clear(Option_t* opt) {
 void TCrvClusterBlock::Print(Option_t* opt) const {
   // print all hits in the straw tracker
   printf(" *** reconstructed CRV pulses *** \nNumber: %d\n",fNPulses);
+  int banner_printed = 0;
+
   for(int i=0; i<fNPulses; i++) {
-    fListOfPulses->At(i)->Print();
+    if (! banner_printed) {
+      fListOfPulses->At(i)->Print("banner");
+      banner_printed = 1;
+    }
+    fListOfPulses->At(i)->Print("data");
   }
 
   printf(" *** reconstructed CRV coincidence clusters *** \nNumber: %d\n",fNClusters);
+  
+  banner_printed = 0;
   for(int i=0; i<fNClusters; i++) {
-    fListOfClusters->At(i)->Print();
+    if (! banner_printed) {
+      fListOfClusters->At(i)->Print("banner");
+      banner_printed = 1;
+    }
+    fListOfClusters->At(i)->Print("data");
   }
 }
 

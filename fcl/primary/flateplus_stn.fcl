@@ -1,0 +1,37 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# stntuple dataset generated with JobConfg/primary/flateminus.fcl 
+# p21 (defined in Stntuple/fcl/stnmaker.fcl) : standard reconstruction paths, no CRV reco 
+# _USER_ below to be replaced by the real user name, fcl sucks
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  bgHitFiles                  : @nil
+  INPUT_MODULE @protect_ignore: RootInput
+  TRIGGER_PATH @protect_ignore: p21
+  PROCESS_NAME @protect_ignore: ReadRecoStnmaker
+  GEN_ID       @protect_ignore: "ExtRMC"
+END_PROLOG
+
+#include "Stntuple/test/stnmaker.fcl"
+
+services.TFileService.fileName            : "nts._USER_.flateminus_stn.xxx.000001.root"
+physics.filters.InitStntuple.histFileName : "nts._USER_.flateminus_stn.xxx.000001.stn"
+outputs.detectorOutput.fileName           : "sim._USER_.flateminus_stn.xxx.000001.art"
+#------------------------------------------------------------------------------
+# iclude MVA's
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/trk_qual.fcl"
+#------------------------------------------------------------------------------
+# configure STNTUPLE maker
+#------------------------------------------------------------------------------
+physics.filters.StntupleMakerDe.makeStrawData            : 0
+physics.filters.StntupleMakerDe.makeCalData              : 1
+physics.filters.StntupleMakerDe.genpCollTag              : "compressDigiMCs"
+physics.filters.StntupleMakerDe.makeSimp                 : 2          # save gen signal only
+physics.filters.StntupleMakerDe.makeStepPointMC          : 0
+physics.filters.StntupleMakerDe.spmcBlockName            : [ "SpmcBlock"               ]
+physics.filters.StntupleMakerDe.spmcCollTag              : [ "compressDigiMCs:tracker" ]
+physics.filters.StntupleMakerDe.statusG4Tag              : [ "g4run"                   ]
+#------------------------------------------------------------------------------
+# everything below is created by generate_fcl
+#------------------------------------------------------------------------------

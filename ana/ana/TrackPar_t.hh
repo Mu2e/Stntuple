@@ -1,10 +1,10 @@
 #ifndef __stntuple_ana_TrackPar_t__
 #define __stntuple_ana_TrackPar_t__
 
-#include "TrackParBase_t.hh"
+#include "ParBase_t.hh"
 
 namespace stntuple {
-class TrackPar_t : public TrackParBase_t {
+class TrackPar_t : public ParBase_t {
 public:
   int     fNHPl;
   int     fNEPl;

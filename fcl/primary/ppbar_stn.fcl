@@ -1,0 +1,33 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# p21 : read and ntuple : electron reconstruction, no CRV
+#       see definition of paths in Stntuple/fcl/stnmaker.fcl
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  PROCESS_NAME @protect_ignore: ReadRecoStnmaker
+  INPUT_MODULE @protect_ignore: RootInput
+  TRIGGER_PATH @protect_ignore: p21
+  GEN_ID       @protect_ignore: CeEndpoint       # this is wrong
+  TIME_MAPS    @protect_ignore: [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap" ]
+  bgHitFiles                  : @nil
+END_PROLOG
+
+#include "Stntuple/fcl/stnmaker.fcl"
+
+services.TFileService.fileName            : "nts._USER_.xxx.ppbar_stn.000001.root"
+physics.filters.InitStntuple.histFileName : "nts._USER_.xxx.ppbar_stn.000001.stn"
+outputs.detectorOutput.fileName           : "sim._USER_.xxx.ppbar_stn.000001.art"
+#------------------------------------------------------------------------------
+# configure STNTUPLE maker
+#------------------------------------------------------------------------------
+physics.filters.StntupleMakerDe.makeStrawData           : 0
+physics.filters.StntupleMakerDe.makeCalData             : 1
+physics.filters.StntupleMakerDe.makeSimp                : 1
+physics.filters.StntupleMakerDe.makeStepPointMC         : 0
+physics.filters.StntupleMakerDe.spmcBlockName           : [ "SpmcBlock"               ]
+physics.filters.StntupleMakerDe.spmcCollTag             : [ "compressDigiMCs:tracker" ]
+physics.filters.StntupleMakerDe.statusG4Tag             : [ "g4run"                   ]
+#------------------------------------------------------------------------------
+# MVA configs
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/trk_qual.fcl"

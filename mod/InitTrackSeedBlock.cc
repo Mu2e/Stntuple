@@ -117,7 +117,7 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
     
     mu2e::KalSegment kalSeg  = trkSeed->segments().at(0);//take the KalSegment closer to the entrance of the tracker
     trackSeed->fTrackSeed    = trkSeed;
-    trackSeed->fNHits        = trkSeed->hits().size();//_timeCluster._strawHitIdxs.size();
+    trackSeed->fNHits        = trkSeed->hits().size();
     trackSeed->fT0           = trkSeed->t0()._t0;
     trackSeed->fT0Err        = trkSeed->t0()._t0err;     
     trackSeed->fD0           = kalSeg.helix().d0();
@@ -302,8 +302,7 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
 }
 
 //_____________________________________________________________________________
-Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
-{
+Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   // Mu2e version, do nothing
 
   // Int_t  ev_number, rn_number;
@@ -314,23 +313,23 @@ Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEven
 
   if (Block->LinksInitialized()) return 0;
 
-  TStnTrackSeedBlock* tsb; // , *ftsb;
-  TStnTrackSeed*      trkseed; // , *ftrkseed;
-  TStnHelixBlock*     hb;//, *fhb;
-  TStnHelix          *helix;//, *fhelix;
+  TStnTrackSeedBlock* tsb;
+  TStnTrackSeed*      trkseed;
+  TStnHelixBlock*     hb;
+  TStnHelix          *helix;
   TStnEvent*          ev;
 
   const mu2e::HelixSeed* khelix, *fkhelix;
-  const mu2e::KalSeed*   kseed; // , *fkseed;
+  const mu2e::KalSeed*   kseed; 
 
   tsb    = (TStnTrackSeedBlock*) Block;
 
-  char                kseed_module_label[100], helix_block_name[100]; // , short_helix_block_name[100], short_seed_block_name[100];
+  char                kseed_module_label[100], helix_block_name[100];
   tsb->GetModuleLabel("mu2e::KalSeedCollection"  , kseed_module_label);
-  tsb->GetModuleLabel("HelixBlockName"           , helix_block_name  );
+  tsb->GetModuleLabel("HelixBlockName"           , helix_block_name);
 
   ev     = Block->GetEvent();
-  hb     = (TStnHelixBlock*)     ev->GetDataBlock(helix_block_name      );
+  hb     = (TStnHelixBlock*)     ev->GetDataBlock(helix_block_name);
   
   int    ntrkseed = tsb ->NTrackSeeds();
   int    nhelix(0);
@@ -353,39 +352,15 @@ Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEven
     }
     
     if (helixIndex < 0) {
-      printf(">>> ERROR: %s trackseed %i -> no HelixSeed associated\n", kseed_module_label, i);
+      printf(">>> InitTrackSeedBlock ERROR: %s trackseed %i -> no HelixSeed associated\n", kseed_module_label, i);
       continue;
     }
     trkseed->SetHelixIndex(helixIndex);
-//-----------------------------------------------------------------------------
-// a track seed may be used as an input for diferent track fits, so the track index
-// is not a well defined concept - leave it to the analysis code
-//-----------------------------------------------------------------------------
-    
-    // int      trkIndex(-1);
-    // for (int k=0; k<ntrk; ++k){
-    //   ftrkseed = ftsb->TrackSeed(k);
-    //   fkseed   = ftrkseed->fTrackSeed;
-    //   fkseed   = fkseed->kalSeed().get();
-    //   if (kseed == fkseed) {
-    // 	trkIndex = k;
-    // 	break;
-    //   }
-    // }
-    
-    // if (trkIndex < 0) {
-    //   printf(">>> ERROR: %s trackseed %i -> no KalRep associated\n", kseed_module_label, i);
-    //   continue;
-    // }
-    // trkseed->SetTrackIndex(trkIndex);
-   
   }
 //-----------------------------------------------------------------------------
 // mark links as initialized
 //-----------------------------------------------------------------------------
   Block->SetLinksInitialized();
-  //  tsb->fLinksInitialized = 1;
-
 
   return 0;
 }

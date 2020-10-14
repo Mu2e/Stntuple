@@ -71,8 +71,8 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   // Block->GetDescription("mu2e::StepPointMCCollection",g4_description );
 
   art::Handle<mu2e::StrawHitCollection> shHandle;
-  if (! fStrawHitsCollTag.empty()) {
-    bool ok = AnEvent->getByLabel(fStrawHitsCollTag,shHandle);
+  if (! fStrawHitCollTag.empty()) {
+    bool ok = AnEvent->getByLabel(fStrawHitCollTag,shHandle);
     if (ok) {
       list_of_straw_hits = shHandle.product();
       n_straw_hits      = list_of_straw_hits->size();
@@ -120,9 +120,14 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       }
     
       if (step) {
+//------------------------------------------------------------------------------
+// looking at the ppbar annihilation events - 
+// searching for the mother works for delta-electrons, but not otherwise, do we really need 
+// that? - it worked before, though... comment outp for teh time being
+//-----------------------------------------------------------------------------
 	art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
 	art::Ptr<mu2e::SimParticle> mother        = simptr;
-	while(mother->hasParent())  mother        = mother->parent();
+	//	while(mother->hasParent())  mother        = mother->parent();
 	const mu2e::SimParticle*    sim           = mother.get();
 	  
 	int sim_id = sim->id().asInt();
@@ -137,9 +142,9 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	}
 
 	if (found == 0) {
-	  vid[np_with_hits] =  sim_id;
-	  vin[np_with_hits] =  1;
-	  np_with_hits      =+ 1;
+	  vid[np_with_hits] = sim_id;
+	  vin[np_with_hits] = 1;
+	  np_with_hits      = np_with_hits+1;
 	}
       }
     }
@@ -171,7 +176,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       else      generator_id = -1;
 
       if ((fGenProcessID > 0) && (generator_id != fGenProcessID)) continue;
-
+      
       creation_code    = sim->creationCode();
       termination_code = sim->stoppingCode();
 
@@ -182,6 +187,11 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       py     = sim->startMomentum().y();
       pz     = sim->startMomentum().z();
       energy = sim->startMomentum().e();
+//-----------------------------------------------------------------------------
+// by default, do not store SimParticles produced in the calorimeter - those are useless
+//-----------------------------------------------------------------------------
+      const CLHEP::Hep3Vector* sp = &sim->startPosition();
+      if ((sp->z() > fMaxZ) && (pz > -0.1))                 continue;
 
       if (energy < fMinSimpEnergy)                          continue;
       simp   = simp_block->NewParticle(id, parent_id, pdg_code, 
@@ -189,7 +199,6 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 				       start_vol_id, end_vol_id,
 				       generator_id);
       simp->SetStartMom(px, py, pz, energy);
-      const CLHEP::Hep3Vector* sp = &sim->startPosition();
       simp->SetStartPos(sp->x(),sp->y(),sp->z(),sim->startGlobalTime());
       simp->SetEndMom  (sim->endMomentum().x(),
 			sim->endMomentum().y(),

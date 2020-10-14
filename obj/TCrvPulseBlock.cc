@@ -73,8 +73,16 @@ void TCrvPulseBlock::Clear(Option_t* opt) {
 void TCrvPulseBlock::Print(Option_t* opt) const {
   // print all hits in the straw tracker
   printf(" *** reconstructed CRV pulses *** \nNumber: %d\n",fNPulses);
+  int banner_printed = 0;
+  TCrvPulseBlock* block = (TCrvPulseBlock*) this; // bypassing constness...
+
   for(int i=0; i<fNPulses; i++) {
-    fListOfPulses->At(i)->Print();
+    TCrvRecoPulse* p = block->Pulse(i);
+    if (! banner_printed) {
+      p->Print("banner");
+      banner_printed = 1;
+    }
+    p->Print("data");
   }
 
   printf(" *** reconstructed CRV coincidences *** \nNumber: %d\n",fNCoincidences);

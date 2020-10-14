@@ -1,5 +1,12 @@
 #!/bin/bash
-
+#------------------------------------------------------------------------------
+# create a prototype of a user analysis package by cloning and renaming templates 
+# from Stntuple/ana 
+# call format:  
+#                 make_analysis_package [pkg]
+#
+#  pkg : name of the user analysis package to be created, default:"MyAna"
+#------------------------------------------------------------------------------
 pkg=MyAna
 
 if [ ".$1" != "." ] ; then pkg=$1 ; fi
@@ -15,12 +22,31 @@ cp Stntuple/ana/SConscript $pkg/ana
 
 cat Stntuple/scripts/build_config  | grep -v site_scons | sed "s/Stntuple/$pkg/g" >| $pkg/scripts/build_config
 
-cat Stntuple/ana/TStnTrackAnaModule.cc     | sed "s#Stntuple/ana/TStnTrackAna#$pkg/ana/TMyTrackAna#g" | \
-                                             sed 's/StnTrackAna/MyTrackAna/g' >| $pkg/ana/TMyTrackAnaModule.cc
+#------------------------------------------------------------------------------
+# copy modules
+#------------------------------------------------------------------------------
+declare -a modules
+declare -a scripts
+declare -a m_names
 
-cat Stntuple/ana/ana/TStnTrackAnaModule.hh | sed 's/StnTrackAna/MyTrackAna/g' >| $pkg/ana/ana/TMyTrackAnaModule.hh
+modules=(GenAna   TrackAna TriggerAna CrvAna HelixAna TrackSeedAna ClusterAna)
+scripts=(genp.C   trk.C    trigger.C  crv.C  helix.C  trs.C        calorimeter.C)
+m_names=(m_gen    m_trk    m_trig     m_crv  m_hel    m_trs        m_cls)
 
-cat Stntuple/ana/ana/dict/TStnTrackAnaModule_linkdef.h | sed 's/StnTrackAna/MyTrackAna/g' >| $pkg/ana/ana/dict/TMyTrackAnaModule_linkdef.h
+for m in ${modules[@]}; do
+    m1=Stn$m ; # echo m1 = $m1
+    m2=My$m  ; # echo m2 = $m2
+
+    module1=T${m1}Module
+    module2=T${m2}Module
+
+    # echo making $module2 from $module1
+    
+    cat Stntuple/ana/$module1.cc |\
+	sed "s#Stntuple/ana/T${m1}#$pkg/ana/T${m2}#g" | sed "s/$m1/$m2/g" >| $pkg/ana/$module2.cc
+    cat Stntuple/ana/ana/$module1.hh                  | sed "s/$m1/$m2/g" >| $pkg/ana/ana/$module2.hh
+    cat Stntuple/ana/ana/dict/${module1}_linkdef.h    | sed "s/$m1/$m2/g" >| $pkg/ana/ana/dict/${module2}_linkdef.h
+done
 
 source $pkg/scripts/build_config
 #------------------------------------------------------------------------------
@@ -28,13 +54,14 @@ source $pkg/scripts/build_config
 #------------------------------------------------------------------------------
 echo "#ifndef ${pkg}_ana_scripts_modules_hh" >| $pkg/ana/scripts/modules.hh 
 echo "#define ${pkg}_ana_scripts_modules_hh" >> $pkg/ana/scripts/modules.hh 
-cat << "EOF"                                 >> $pkg/ana/scripts/modules.hh 
 
-class TMyTrackAnaModule;
-TMyTrackAnaModule*        m_trk = NULL;
+for i in ${!modules[@]}; do
+    module=TMy${modules[$i]}Module
+    # echo  "class $module;"                                                >> $pkg/ana/scripts/modules.hh 
+    printf "%-30s %-8s %-10s\n" "${module}*" "${m_names[$i]}" " = NULL;" >> $pkg/ana/scripts/modules.hh 
+done
 
-#endif
-EOF
+echo "#endif" >> $pkg/ana/scripts/modules.hh 
 #------------------------------------------------------------------------------
 # load_${pkg}_scripts.C
 #------------------------------------------------------------------------------
@@ -50,7 +77,13 @@ cat << "EOF"                                      >> $pkg/ana/scripts/load_stnan
   char        macro[200];
 
   const char* script[] = { 
-    "trk.C"       , "PWD",
+    "calorimeter.C", "PWD",
+    "crv.C"        , "PWD",
+    "genp.C"       , "PWD",
+    "trk.C"        , "PWD",
+    "trs.C"        , "PWD",
+    "trigger.C"    , "PWD",
+    "helix.C"      , "PWD",
     0 
   };
 
@@ -71,31 +104,27 @@ cat << "EOF" >> $pkg/ana/scripts/load_stnana_scripts_$pkg.C
   return 0;
 }
 EOF
-#------------------------------------------------------------------------------
-# $pkg/ana/scripts/trk.C
-#------------------------------------------------------------------------------
-fn=$pkg/ana/scripts/trk.C
-cat << "EOF"                                    >| $fn
-///////////////////////////////////////////////////////////////////////////////
-//
-///////////////////////////////////////////////////////////////////////////////
-#include "Stntuple/scripts/global_vars.h"
-EOF
-echo "#include \"$pkg/ana/scripts/modules.hh\"" >> $fn
-cat << "EOF"                                    >> $fn
-def_name trk_001("trk_ana");
 
-void trk_ana(int PdgCode = 11, int GeneratorCode = 2) {
-//-----------------------------------------------------------------------------
-// configure validation module
-//-----------------------------------------------------------------------------
-  m_trk = (TMyTrackAnaModule*) g.x->AddModule("TMyTrackAnaModule",0);  
-  m_trk->SetPdgCode      (PdgCode);
-  m_trk->SetGeneratorCode(GeneratorCode);
-}
-EOF
 #------------------------------------------------------------------------------
-# finally, append .rootrc and rootlogon.C
+# copy individual job configuration scripts
+#------------------------------------------------------------------------------
+for i in ${!scripts[@]} ; do
+    script=${scripts[$i]}
+    f1=Stntuple/ana/scripts/$script
+    f2=$pkg/ana/scripts/$script
+
+    module=${modules[$i]}
+
+    m1=Stn${module}
+    m2=My${module}
+
+    cat $f1 | \
+	sed "s#Stntuple/ana#$pkg/ana#g" | sed "s/stn_//g" | \
+	sed "s/$m1/$m2/g" | \
+	sed "s/stntuple:://g" >| $f2
+done
+#------------------------------------------------------------------------------
+# modify .rootrc and rootlogon.C to include new package
 #------------------------------------------------------------------------------
 if [ ".`cat .rootrc | grep +Stnana.Package | grep $pkg`" == '.' ] ; then 
   echo "+Stnana.Package                $pkg" >> .rootrc
@@ -106,3 +135,8 @@ cat rootlogon.C | awk -v pkg=$pkg '
   else print $0; 
   endif 
 }' >| rootlogon.C.new ; mv  rootlogon.C.new rootlogon.C
+#------------------------------------------------------------------------------
+# finally, run build_config
+#------------------------------------------------------------------------------
+source $pkg/scripts/build_config
+echo package $pkg successfully created

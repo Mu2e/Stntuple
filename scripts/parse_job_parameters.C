@@ -18,7 +18,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
   TString  fileset, job_number;
   int      loc, loc1, loc2, len;
 
-  printf("job = %s\n",Parameters.Data());
+  printf("  job             : %s\n",Parameters.Data());
 //-----------------------------------------------------------------------------
 // environment variables which may be defined by default
 // tau_ana keeps list of the known jobs
@@ -61,7 +61,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
     g.JobNumber = Parameters(loc1,loc2-loc1);
   }
   gSystem->Setenv("JOB_NUMBER",g.JobNumber.Data());
-  printf("%-15s : %s\n","JOB_NUMBER",g.JobNumber.Data());
+  printf("  %-15s : %s\n","JOB_NUMBER",g.JobNumber.Data());
 //-----------------------------------------------------------------------------
 // l3_trig_path:
 // g.L3TrigPath is processed by murat/ana/scripts/setup_trigger_path.C called
@@ -76,7 +76,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
     if (loc2 < 0) loc2 = len;
     g.L3TrigPath = Parameters(loc1,loc2-loc1);
   }
-  printf("%-15s : %s\n","L3_TRIG_PATH",g.L3TrigPath.Data());
+  printf("  %-15s : %s\n","L3_TRIG_PATH",g.L3TrigPath.Data());
 //-----------------------------------------------------------------------------
 // MC flag (default: -1) this flag set to 1 indicates that for a MC dataset 
 // some MC-specific actions need to be taken
@@ -138,7 +138,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
     if (loc2 < 0) loc2 = len;
     g.LittleFileName = Parameters(loc1,loc2-loc1);
 
-    printf("%-15s : %s\n","LITTLE_FILE",g.LittleFileName.Data());
+    printf("  %-15s : %s\n","LITTLE_FILE",g.LittleFileName.Data());
   }
 //-----------------------------------------------------------------------------
 // flag controlling writing output of stripping
@@ -159,7 +159,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
       g.OutputFileName += Form(".%s",g.JobName.Data());
       g.OutputFileName += ".stn";
     }
-    printf("%-15s : %s\n","OUTPUT_FILE",g.OutputFileName.Data());
+    printf("  %-15s : %s\n","OUTPUT_FILE",g.OutputFileName.Data());
   }
 //-----------------------------------------------------------------------------
 // saving the histograms: /save
@@ -181,7 +181,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
       g.HistFileName += ".hist";
     }
 
-    printf("%-15s : %s\n","HISTOGRAM_FILE",g.HistFileName.Data());
+    printf("  %-15s : %s\n","HISTOGRAM_FILE",g.HistFileName.Data());
   }
 //-----------------------------------------------------------------------------
 // handle good run list  ( use -x STNTUPLE_GRL=ETF,141544,156487 )
@@ -210,7 +210,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
   
   g.GoodRunList = good_run_list;
   g.GoodRunList.ToUpper();
-  printf("GOOD RUN LIST : \"%s\" with run range %i-%i\n"
+  printf("  GOOD RUN LIST   : \"%s\" with run range %i-%i\n"
 	 ,g.GoodRunList.Data(),g.MinRun,g.MaxRun);
 //-----------------------------------------------------------------------------
 // Steve's "newcuts" flag

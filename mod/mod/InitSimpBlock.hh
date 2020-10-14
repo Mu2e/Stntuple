@@ -14,10 +14,11 @@
 class StntupleInitSimpBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fSimpCollTag;
-  art::InputTag   fStrawHitsCollTag;
+  art::InputTag   fStrawHitCollTag;
   art::InputTag   fStrawDigiMCCollTag;
   art::InputTag   fVDHitsCollTag;
   float           fMinSimpEnergy;
+  float           fMaxZ;
   int             fGenProcessID;
 //-----------------------------------------------------------------------------
 // functions
@@ -25,10 +26,11 @@ public:
 public:
 
   void   SetSimpCollTag       (std::string& Tag ) { fSimpCollTag        = art::InputTag(Tag); }
-  void   SetStrawHitsCollTag  (std::string& Tag ) { fStrawHitsCollTag   = art::InputTag(Tag); }
+  void   SetStrawHitCollTag   (std::string& Tag ) { fStrawHitCollTag    = art::InputTag(Tag); }
   void   SetStrawDigiMCCollTag(std::string& Tag ) { fStrawDigiMCCollTag = art::InputTag(Tag); }
   void   SetVDHitsCollTag     (std::string& Tag ) { fVDHitsCollTag      = art::InputTag(Tag); }
   void   SetMinSimpEnergy     (double       MinE) { fMinSimpEnergy      = MinE              ; }
+  void   SetMaxZ              (double       MaxZ) { fMaxZ               = MaxZ              ; }
   void   SetGenProcessID      (int          ID  ) { fGenProcessID       = ID                ; }
 
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
