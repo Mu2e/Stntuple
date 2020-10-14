@@ -22,6 +22,7 @@ int load_stnana_scripts_Stntuple() {
     "lumi.C"       , "PWD",
     "photos.C"     , "STNTUPLE_MC_GEN",
     "trk.C"        , "PWD",
+    "pen.C"        , "PWD",
     "trs.C"        , "PWD",                  // sample track seed analysis module
     "stn_trigger.C", "PWD",
     "validation.C" , "PWD",

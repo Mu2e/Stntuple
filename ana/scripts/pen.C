@@ -4,17 +4,17 @@
 #include "Stntuple/scripts/global_vars.h"
 #include "Stntuple/ana/scripts/modules.hh"
 
-def_name stn_trk_001("stn_trk_ana");
+def_name piplusenu_001("piplusenu_ana");
 
-void stn_trk_ana(int PdgCode = 11, int GeneratorCode = 2, int DebugBit = -1) {
+void piplusenu_ana(int PdgCode = 11, int GeneratorCode = 2, int DebugBit = -1) {
 //-----------------------------------------------------------------------------
 // configure validation module
 //-----------------------------------------------------------------------------
-  stntuple::m_trk = (TStnTrackAnaModule*) g.x->AddModule("TStnTrackAnaModule",0);  
-  stntuple::m_trk->SetPdgCode      (PdgCode);
-  stntuple::m_trk->SetGeneratorCode(GeneratorCode);
+  stntuple::m_pen = (TStnPiplusenuAnaModule*) g.x->AddModule("TStnPiplusenuAnaModule",0);
+  stntuple::m_pen->SetPdgCode      (PdgCode);
+  stntuple::m_pen->SetGeneratorCode(GeneratorCode);
 
   if (DebugBit >= 0) {
-    stntuple::m_trk->SetDebugBit(DebugBit,1);
+    stntuple::m_pen->SetDebugBit(DebugBit,1);
   }
 }
