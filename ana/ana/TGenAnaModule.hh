@@ -34,6 +34,7 @@ public:
     TH1F*    fPdgCode;		       //
     TH1F*    fMomentum;
     TH1F*    fNStrawHits;
+    TH1F*    fProperTime;
   };
 
   struct EventHist_t  {

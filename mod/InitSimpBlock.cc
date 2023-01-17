@@ -219,12 +219,15 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 // for SimParticles, do not wrap the time around the microbunch, do that only for hits
 //-----------------------------------------------------------------------------
       simp->SetStartPos(sp->x(),sp->y(),sp->z(),sim->startGlobalTime()+time_offsets);
+      simp->SetStartProperTime(sim->startProperTime());
       simp->SetEndMom  (sim->endMomentum().x(),
 			sim->endMomentum().y(),
 			sim->endMomentum().z(),
 			sim->endMomentum().e());
       const CLHEP::Hep3Vector* ep = &sim->endPosition();
       simp->SetEndPos(ep->x(),ep->y(),ep->z(),sim->endGlobalTime()+time_offsets);
+      simp->SetEndProperTime(sim->endProperTime());
+
       simp->SetNStrawHits(nhits);
 //-----------------------------------------------------------------------------
 // particle parameters at virtual detectors

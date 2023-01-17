@@ -32,6 +32,7 @@
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * [[file:how-to-make-first-stntuple.org][how to make first Stntuple]] 
 * [[file:stnana.org][stnana]] - STNTUPLE analysis framework                                       
+* [[file:analysis_packages.org][how to create your own analysis package]]
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
 * STNTUPLE [[file:how-tos.org][how-to's]]                                                                    
 * ------------------------------------------------------------------------------

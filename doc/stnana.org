@@ -5,11 +5,13 @@
 
   - *stnana* : an interactive event loop utility 
   - user analysis packages which contain the code used by *stnana*
+
 * steps to proceed :
 
   1) [[file:analysis_packages.org][create your own analysis package and compile its code into a shared library]]
 
-  2) start ROOT session, load [[file:../scripts/stnana.C][Stntuple/scripts/stnana.C]] , run the analysis job
+  2) start ROOT session, load [[file:../scripts/stnana.C][Stntuple/scripts/stnana.C]] , run the analysis job. Note that the following examples 
+     explain the logic, and as the input files may not exist, are not guaranteed to work
 
 ** example 1 :              
 
@@ -25,7 +27,7 @@ root [1] stnana("file","","","nts._USER_.cele0s81b2.su2020.001000_00000000.stn",
   - process 100 events
   - save output histograms to *eminus_gun_stnmaker.hist*
 
-** example 2   :            
+** example 2 :              
 
 The following example runs the job configured by function named *track_ana()* defined in [[file:../ana/scripts/validation.C][Stntuple/ana/scripts/trk.C]] 
 on first 10000 events of the dataset defined by the book="detsim" and dsname="cnvs0202".

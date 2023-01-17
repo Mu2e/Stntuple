@@ -9,7 +9,7 @@
 // 1  : passed events
 // 2  : rejected events
 // 
-// 3  : UNUSED
+// 3  : events with N>=2 "good" particles, good = (p>80) and (Nhits>20)
 // 4  : events with NHitsTF > 1
 // 5  : UNUSED
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,6 +63,7 @@ void TGenAnaModule::BookSimpHistograms(SimpHist_t* Hist, const char* Folder) {
   HBook1F(hist->fPdgCode   ,"pdg_code",Form("%s: PDG code"     ,Folder), 200,-1000, 1000,Folder);
   HBook1F(hist->fMomentum  ,"mom"    ,Form("%s: Momentum"      ,Folder), 200, 0, 200,Folder);
   HBook1F(hist->fNStrawHits,"nsh"    ,Form("%s: N(straw hits"  ,Folder), 200, 0, 200,Folder);
+  HBook1F(hist->fProperTime,"tprop"  ,Form("%s: proper time"   ,Folder), 200, 0,  50,Folder);
 }
 
 
@@ -171,6 +172,12 @@ void TGenAnaModule::FillSimpHistograms(SimpHist_t* Hist, TSimParticle* Part) {
   hist->fPdgCode->Fill(Part->PDGCode());
   hist->fMomentum->Fill(p->P());
   hist->fNStrawHits->Fill(Part->NStrawHits());
+
+  float t0 = Part->StartProperTime();
+  float t1 = Part->EndProperTime  ();
+  float dt = (t0 >= 0) ? t1-t0 : -1;
+
+  hist->fProperTime->Fill(dt);
 }
 
 //-----------------------------------------------------------------------------
@@ -287,6 +294,12 @@ int TGenAnaModule::Event(int ientry) {
 //-----------------------------------------------------------------------------
 void TGenAnaModule::Debug() {
 
+//-----------------------------------------------------------------------------
+// bit 3 : events with N(good particles) <= 2
+//-----------------------------------------------------------------------------
+  if ((GetDebugBit(3) == 1) and (fNSimp[1] >= 2)) {
+    GetHeaderBlock()->Print(Form("N(simp[1]) = %i",fNSimp[1]));
+  }
 //-----------------------------------------------------------------------------
 // bit 4: events with NHitsTF > 1
 //-----------------------------------------------------------------------------

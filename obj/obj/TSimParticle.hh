@@ -4,11 +4,17 @@
 #ifndef STNTUPLE_TSimParticle
 #define STNTUPLE_TSimParticle
 
+#include <vector>
+
 #include "TMath.h"
 #include "TObject.h"
 #include "TParticlePDG.h"
 #include "TLorentzVector.h"
 #include "TBuffer.h"
+
+namespace mu2e {
+  class SimParticle;
+};
 
 class TSimParticle : public TObject {
 public:
@@ -24,15 +30,20 @@ public:
   float           fMomTargetEnd;
   float           fMomTrackerFront;	// entrance to ST
 
+  float           fStartProperTime;     // ** addeed in V4
+  float           fEndProperTime;       // ** addeed in V4
+
   TLorentzVector  fStartPos;
   TLorentzVector  fStartMom;
-  TLorentzVector  fEndPos;
-  TLorentzVector  fEndMom;
+  TLorentzVector  fEndPos;              // ** added in V3
+  TLorentzVector  fEndMom;              // ** added in V3
 //-----------------------------------------------------------------------------
-// here start transient variables
+// transient variables
 //-----------------------------------------------------------------------------
-  int             fNumber;              //! number in the list, transient,
-					//  set by the reading streamer
+  int             fNumber;                //! number in the list, transient,
+					  //  set by the reading streamer
+  const mu2e::SimParticle*  fSimParticle; //! backward pointer to the offline SimParticle 
+  std::vector<int>*         fShid;        //! vector of straw hit indices
 public:
 //------------------------------------------------------------------------------
 //  functions
@@ -65,10 +76,16 @@ public:
   int    StartVolumeIndex () const { return fStartVolumeIndex; }
   int    EndVolumeIndex   () const { return fEndVolumeIndex  ; }
 
+  float  StartProperTime  () const { return fStartProperTime; }
+  float  EndProperTime    () const { return fEndProperTime  ; }
+
   const TLorentzVector* StartPos() const { return &fStartPos; }
   const TLorentzVector* StartMom() const { return &fStartMom; }
   const TLorentzVector* EndPos  () const { return &fEndPos;   }
   const TLorentzVector* EndMom  () const { return &fEndMom;   }
+
+  const mu2e::SimParticle* SimParticle() const { return fSimParticle; }
+  std::vector<int>*        Shid       ()       { return fShid;        }
 //------------------------------------------------------------------------------
 //  missing TParticle accessors and setters
 //------------------------------------------------------------------------------
@@ -76,6 +93,9 @@ public:
 
   void     SetMomTargetEnd   (double P) { fMomTargetEnd    = P; }
   void     SetMomTrackerFront(double P) { fMomTrackerFront = P; }
+
+  void     SetStartProperTime(double T) { fStartProperTime = T; }
+  void     SetEndProperTime  (double T) { fEndProperTime   = T; }
 
   void     SetStartPos(double X, double Y, double Z, double T) {
     fStartPos.SetXYZT(X,Y,Z,T);
@@ -94,17 +114,23 @@ public:
   }
 
   void     SetNumber(int N) { fNumber = N; }
+
+  void     SetShid       (std::vector<int>* Shid) { fShid = Shid; }
+  void     SetSimParticle(const mu2e::SimParticle* Simp) { fSimParticle = Simp; }
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void     Print(Option_t* opt = "") const;
+  virtual void     Print (Option_t* opt = "") const;
+  virtual void     Clear (Option_t* Opt = "");
+  virtual void     Delete(Option_t* Opt = "");
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
   void     ReadV1(TBuffer &R__b);
   void     ReadV2(TBuffer &R__b);
+  void     ReadV3(TBuffer &R__b);
 
-  ClassDef(TSimParticle,3)
+  ClassDef(TSimParticle,4)
 };
 
 #endif

@@ -47,13 +47,16 @@ void TSimParticle::ReadV1(TBuffer &R__b) {
   fEndVolumeIndex   = data.fEndVolumeIndex;
   fNStrawHits       = data.fNStrawHits;
 
-  fGeneratorID         = -1;         // ** added in V2 **
+  fGeneratorID         = -1;             // ** added in V2
 
   fStartPos.Streamer(R__b);
   fStartMom.Streamer(R__b);
   
-  fEndPos.SetXYZT(0.,0.,0.,0.);		// ** added in V3 **
-  fEndMom.SetXYZT(0.,0.,0.,0.);		// ** added in V3 **
+  fEndPos.SetXYZT(0.,0.,0.,0.);	         // ** added in V3
+  fEndMom.SetXYZT(0.,0.,0.,0.);	         // ** added in V3
+
+  fStartProperTime = -1.;                // ** added in v4
+  fEndProperTime   = -1.;                // ** added in v4
 }
 
 //-----------------------------------------------------------------------------
@@ -93,14 +96,64 @@ void TSimParticle::ReadV2(TBuffer &R__b) {
   fTerminationCode  = data.fTerminationCode;
   fEndVolumeIndex   = data.fEndVolumeIndex;
   fNStrawHits       = data.fNStrawHits;
-  fGeneratorID      = data.fGeneratorID;         // ** added in V2 **
+  fGeneratorID      = data.fGeneratorID; // ** added in V2
 
   fStartPos.Streamer(R__b);
   fStartMom.Streamer(R__b);
 
-  fEndPos.SetXYZT(0.,0.,0.,0.);		// ** added in V3 **
-  fEndMom.SetXYZT(0.,0.,0.,0.);		// ** added in V3 **
-  
+  fEndPos.SetXYZT(0.,0.,0.,0.);		 // ** added in V3
+  fEndMom.SetXYZT(0.,0.,0.,0.);		 // ** added in V3
+
+  fStartProperTime = -1.;                // ** added in v4
+  fEndProperTime   = -1.;                // ** added in v4
+}
+
+//-----------------------------------------------------------------------------
+void TSimParticle::ReadV3(TBuffer &R__b) {
+
+  struct TSimParticleV03_t {
+    int             fParentID;
+    int             fPdgCode;
+    int             fCreationCode;
+    int             fStartVolumeIndex;
+    int             fTerminationCode;
+    int             fEndVolumeIndex;
+    int             fNStrawHits;
+    int             fGeneratorID;               // ** MC generator ID, added in V2
+    
+    float           fMomTargetEnd;
+    float           fMomTrackerFront;		// entrance to ST
+
+    TLorentzVector  fStartPos;
+    TLorentzVector  fStartMom;
+    TLorentzVector  fEndPos;                    // ** added in V3
+    TLorentzVector  fEndMom;                    // ** added in V3
+  } data;
+
+  int nwi = ((int*  ) &data.fMomTargetEnd) - &data.fParentID;
+  int nwf = ((float*) &data.fStartPos    ) - &data.fMomTargetEnd ;
+
+  TObject::Streamer(R__b);
+
+  R__b.ReadFastArray(&data.fParentID   ,nwi);
+  R__b.ReadFastArray(&data.fMomTargetEnd,nwf);
+
+  fParentID         = data.fParentID;
+  fPdgCode          = data.fPdgCode;
+  fCreationCode     = data.fCreationCode;
+  fStartVolumeIndex = data.fStartVolumeIndex;
+  fTerminationCode  = data.fTerminationCode;
+  fEndVolumeIndex   = data.fEndVolumeIndex;
+  fNStrawHits       = data.fNStrawHits;
+  fGeneratorID      = data.fGeneratorID;         // ** added in V2 **
+
+  fStartPos.Streamer(R__b);
+  fStartMom.Streamer(R__b);
+  fEndPos.Streamer(R__b);                        // ** added in V3
+  fEndMom.Streamer(R__b);                        // ** added in V3
+
+  fStartProperTime = -1.;                        // ** added in v4
+  fEndProperTime   = -1.;                        // ** added in v4
 }
 
 //-----------------------------------------------------------------------------
@@ -116,6 +169,7 @@ void TSimParticle::Streamer(TBuffer& R__b) {
     Version_t R__v = R__b.ReadVersion(); 
     if (R__v == 1) ReadV1(R__b);
     if (R__v == 2) ReadV2(R__b);
+    if (R__v == 3) ReadV3(R__b);
     else {
 
       TObject::Streamer(R__b);
@@ -159,7 +213,14 @@ TSimParticle::TSimParticle(Int_t ID, Int_t ParentID, Int_t PDGCode,
 }
 
 //-----------------------------------------------------------------------------
+// fSimp is just cached
+//-----------------------------------------------------------------------------
 TSimParticle::~TSimParticle() {
+  if (fShid) {
+    delete fShid;
+    fShid = nullptr;
+  }
+  fSimParticle = nullptr;
 }
 
 //_____________________________________________________________________________
@@ -176,25 +237,47 @@ int  TSimParticle::Init(Int_t ID, Int_t ParentID, Int_t PDGCode,
   fStartVolumeIndex = StartVolumeIndex;
   fEndVolumeIndex   = EndVolumeIndex;
   fNStrawHits       = 0;
-  fGeneratorID           = GeneratorID;
+  fGeneratorID      = GeneratorID;
   fMomTargetEnd     = -1.;
   fMomTrackerFront  = -1.;
+  fSimParticle      = nullptr;
+  fShid             = nullptr;
 
   return 0;
 }
 
 //_____________________________________________________________________________
+void TSimParticle::Clear(Option_t* Opt) {
+  fSimParticle = nullptr;
+  if (fShid) {
+    delete fShid;
+    fShid = nullptr;
+  }
+}
+
+
+//_____________________________________________________________________________
+void TSimParticle::Delete(Option_t* Opt) {
+  fSimParticle = nullptr;
+  if (fShid) {
+    delete fShid;
+    fShid = nullptr;
+  }
+}
+
+
+//_____________________________________________________________________________
 void TSimParticle::Print(Option_t* Opt) const {
 
   TString opt = Opt;
-  if ((opt == "banner") || (opt == "")) {
+  if ((opt.Index("banner") >= 0) || (opt == "")) {
 				// print banner
     printf("------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------");
     printf("-----------------------------------------------------------------------------------------\n");
     printf("   i name                      PDG     ID GenID  ParentID");
-    printf("    p0x       p0y       p0z       p0    vol0     v0x        v0y      v0z         t0   ");
-    printf("    p1x       p1y        p1z      p1    vol1     v1x        v1y       v1z        t1 Nstrh\n");
+    printf("    p0x       p0y       p0z       p0    vol0     v0x        v0y       v0z        t0   ");
+    printf("    p1x       p1y       p1z       p1    vol1     v1x        v1y       v1z        t1 Nstrh\n");
     printf("------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------");
     printf("-----------------------------------------------------------------------------------------\n");
@@ -204,7 +287,7 @@ void TSimParticle::Print(Option_t* Opt) const {
 
   TParticlePDG* pdg = db->GetParticle(fPdgCode);
 
-  if ((opt == "data") || (opt == "")) {
+  if ((opt.Index("data") >= 0) || (opt == "")) {
     printf("%4i",Number());
 
     if (pdg) printf(" %-19s",pdg->GetName());
