@@ -75,7 +75,7 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
 	   Hit->time(),
 	   Hit->energyDep(),
 
-	   (int) Hit->driftEnd(),
+	   (int) Hit->endTime(),
 	   Hit->driftTime(),
 	   Hit->propTime(),
 	   Hit->transRes(),

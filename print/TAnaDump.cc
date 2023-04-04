@@ -179,12 +179,12 @@ double TAnaDump::evalWeight(const mu2e::ComboHit* Hit   ,
                                             //scale the weight for having chi2/ndof distribution peaking at 1
   if ( WeightMode == 1){//XY-Fit
     // double e2     = ew*ew*sinth2+rs*rs*costh*costh;
-    double e2     = Hit->wireErr2()*sinth2+transErr2*costh2;
+    double e2     = Hit->wireVar()*sinth2+transErr2*costh2;
     wt  = 1./e2;
     wt *= wtXY;
   } else if (WeightMode ==0 ){//Phi-Z Fit
     // double e2     = ew*ew*costh*costh+rs*rs*sinth2;
-    double e2     = Hit->wireErr2()*costh2+transErr2*sinth2;
+    double e2     = Hit->wireVar()*costh2+transErr2*sinth2;
     wt     = Radius*Radius/e2;
     wt    *= wtPhiZ;
   }
