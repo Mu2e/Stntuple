@@ -40,8 +40,8 @@ public:
 
  // in presence of background, mu = mus+mub
   
-  virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
-  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr);
+  virtual int  construct_interval(double MuB, double MuS);
+  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs, double* P);
 
   virtual int  make_prob_hist();
   virtual void make_belt_hist();

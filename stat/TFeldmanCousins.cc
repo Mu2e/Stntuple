@@ -162,7 +162,7 @@ void TFeldmanCousins::InitPoissonDist(double MuB, double MuS, double* Prob, int 
     double sbest = ix-MuB;
 
     if (sbest <= 0) sbest = 0;
-
+                                        // sb = ix, ALWAYS ! 
     double sb = sbest+MuB;
 
     fBestProb[ix] = TMath::Power(sb,ix)*TMath::Exp(-sb)/fFactorial[ix];
@@ -171,14 +171,22 @@ void TFeldmanCousins::InitPoissonDist(double MuB, double MuS, double* Prob, int 
     if (NObs == -1) {
       fLhRatio [ix] = fBsProb[ix]/fBestProb[ix];
     }
+    else if (NObs == -2) {
+//-----------------------------------------------------------------------------
+// measured NObs events, if Nobs < MuB, reduce P(best)
+//-----------------------------------------------------------------------------
+      fLhRatio [ix] = fBsProb[ix]/fBestProb[ix];
+      double sbest  = ix-MuB;
+      if (sbest < 0) fLhRatio [ix] *= exp(-sbest);
+    }
     else {
                                         // biased
       
       InitPoissonDist(fMuB,fMuS , prob     , NObs);
       InitPoissonDist(fMuB,sbest, best_prob, NObs);
-
+ 
       fLhRatio [ix] = prob[ix]/best_prob[ix];
-    }
+   }
   }
   
   if (fDebug.fAll > 10) {
@@ -965,11 +973,11 @@ int TFeldmanCousins::SolveFor(double Val, const double* X, const double* Y, int 
 
 
 //-----------------------------------------------------------------------------
-int TFeldmanCousins::TestCoverage(double MuB, double SMin, double SMax, int NPoints) {
+  int TFeldmanCousins::TestCoverage(double MuB, double SMin, double SMax, int NPoints, int NObs) {
   
   int rc(0);
-  rc = ConstructBelt(MuB,0,35,35001);
-  
+  rc = ConstructBelt(MuB,0,35,35001,NObs);
+
   if (rc < 0) return rc;
 
   float x[NPoints+2], y[NPoints+2];
@@ -978,35 +986,34 @@ int TFeldmanCousins::TestCoverage(double MuB, double SMin, double SMax, int NPoi
   y[0] = 0;
 
   double dy = (SMax-SMin)/(NPoints-1);
+  
   for (int i=0; i<NPoints; i++) {
-    double s = SMin + i*dy;
-    if (s == 0) s = 1.e-10;             // deal with a numerical issue around zero
+    double mus = SMin + i*dy;
+    if (mus == 0) mus = 1.e-10;             // deal with a numerical issue around zero
                                         // now generate pseudoexperiments
     int nmissed = 0;
     for (int k=0; k<fNExp; k++) {
-      int nobs = fRn.Poisson(s+MuB);
-
-      double mus = nobs;
+      int nobs = fRn.Poisson(mus+MuB);
                                         // determine SMin and SMax;
       double smin = fBelt.fSign[nobs][0];
       double smax = fBelt.fSign[nobs][1];
 
-      if ((s < smin) or (s > smax)) {
+      if ((mus < smin) or (mus > smax)) {
         nmissed += 1;
                                         // print only missed ones
         if (fDebug.fTestCoverage == 2) {
-          printf("k, s, MuB, nobs, mus, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10.3f %10i\n",
-                 k, s, MuB, nobs, mus, smin, smax, nmissed);
+          printf("k, mus, MuB, nobs, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10i\n",
+                 k, mus, MuB, nobs, smin, smax, nmissed);
         }
       }
 
       if (fDebug.fTestCoverage == 1) {
-        printf("k, s, MuB, nobs, mus, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10.3f %10i\n",
-               k, s, MuB, nobs, mus, smin, smax, nmissed);
+        printf("k, mus, MuB, nobs, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10i\n",
+               k, mus, MuB, nobs, smin, smax, nmissed);
       }
     }
     float prob = 1.- float(nmissed)/float(fNExp);
-    x[i+1] = s;
+    x[i+1] = mus;
     y[i+1] = prob;
   }
 

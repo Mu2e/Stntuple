@@ -258,7 +258,7 @@ double TKinLH::lh_sig(double P) {
 // normalized to the integral (not sum over the bins !)  = 1
 // NObs : number of observed events, P - array of the track momenta
 //-----------------------------------------------------------------------------
-  double TKinLH::wt_data(double MuB, double MuS,  int NObs, double* P, double* LlhrR) {
+  double TKinLH::wt_data(double MuB, double MuS, int NObs, double* P, double* LlhrR) {
   
   double pb[MaxNx];
 
@@ -438,17 +438,15 @@ void  TKinLH::quickSort(sdata a[], int low, int high) {
 
 //-----------------------------------------------------------------------------
 // three parameters, to maintain uniform interface
-// Nobs is used only to determine the binomial probabilities
+// Nobs is NOT USED, Zech was a mistake
 // the step can be completed only after all log_lhrR histograms are filled
 // assume the histograms are read in
 //-----------------------------------------------------------------------------
-int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
+int TKinLH::construct_interval(double MuB, double MuS) {
 
-                                        // need a different function to initialize probability
-                                        // coefficiencts for a given NObs
   double pb[MaxNx];
 
-  int rc = init_truncated_poisson_dist(MuB,NObs,pb);
+  int rc = init_poisson_dist(MuB,pb);
   
   if (fDebug.fConstructInterval) {
     printf("TKinLH::construct_interval 001:\n");
@@ -459,9 +457,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
         printf("\n");
       }
     }
-    
   }
-  if (rc < 0) return rc;
 //-----------------------------------------------------------------------------
 // next: for given MuB and MuS, construct LogLhrR_N histograms
 // LogLhrR_1: distribution in llhrR for a given ntot, summed over all nb with
@@ -618,18 +614,20 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
   if (fDebug.fConstructInterval) {
     printf("TKinLH::construct_interval 005: END\n");
   }
-  return 0;
+  
+  return rc;
 }
   
 //-----------------------------------------------------------------------------
 // vary signal from SMin to SMax in NPoints, construct FC belt, fill belt histogram
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
+// NObs is only used to calculate the likelihood of the observation:
+// 
 //-----------------------------------------------------------------------------
   int TKinLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs, double* P) {
 
   fMuB  = MuB;
-  fNObs = NObs;
   
   fBelt.fSMin = SMin;
   fBelt.fSMax = SMax;
@@ -647,7 +645,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
   for (int i=0; i<NPoints; i++) {
     double mus   = SMin+i*fBelt.fDy;
 
-    int rc       = construct_interval(MuB,mus,NObs);
+    int rc       = construct_interval(MuB,mus);
 
     if (rc == 0) {
       fBelt.fLlhInterval[5*i  ] = fInterval.fLlhrMin;
@@ -673,7 +671,6 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
     }
   }
   return 0;
-
 }
 
 

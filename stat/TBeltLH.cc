@@ -65,10 +65,10 @@ int TBeltLH::init_poisson_dist(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // three parameters to maintain uniform interface
 //-----------------------------------------------------------------------------
-int TBeltLH::construct_interval(double MuB, double MuS, int NObs) {
+int TBeltLH::construct_interval(double MuB, double MuS) {
   // defined fIxMin, fIxMax, and fSumP
   
-  int rc = init_poisson_dist(MuB,MuS,NObs);
+  int rc = init_poisson_dist(MuB,MuS);
   if (rc < 0) return rc;
 
   rc       = -1;
@@ -135,7 +135,7 @@ int TBeltLH::construct_interval(double MuB, double MuS, int NObs) {
   for (int i=0; i<NPoints; i++) {
     double mus = SMin+i*fBelt.fDy;
 
-    int rc       = construct_interval(MuB,mus,NObs);
+    int rc       = construct_interval(MuB,mus);
     double lhmax = fProb[fIPMax];
 
     if (rc == 0) {
@@ -277,7 +277,7 @@ void TBeltLH::make_belt_hist() {
 int TBeltLH::test_coverage(double MuB, double SMin, double SMax, int NPoints) {
   
   int rc(0);
-  rc = construct_belt(MuB,0,35,35001);
+  rc = construct_belt(MuB,0,35,35001,-1,nullptr);
   if (rc < 0) return rc;
 
   float x[NPoints+2], y[NPoints+2];

@@ -55,7 +55,7 @@ crow_gardner* test_cg_002(double MuB = 0, double CL = 0.9, int NObs = -1, const 
   if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
   else              c->cd();
 
-  cg->fHist.fBelt->Draw();
+  cg->belt(NObs)->fStack->Draw();
 
   return cg;
 }

@@ -149,14 +149,14 @@ public:
 
   int    SolveFor(double Val, const double* X, const double* Y, int NPoints, double* XVal);
 
-  int    TestCoverage(double MuB, double SMin, double SMax, int NPoints);
+  int    TestCoverage(double MuB, double SMin, double SMax, int NPoints, int NObs = -1);
     
   void   UpperLimit(double   MuB  , double SMin, double SMax, int NPoints, double* S, double* Prob);
 
   int    UpperLimit(double   MuB  , double SMin, double SMax, double* S, double* Prob);
   int    UpperLimit(model_t* Model, double SMin, double SMax, double* S, double* Prob);
 
-  ClassDef(TFeldmanCousins,0)
+  ClassDef(stntuple::TFeldmanCousins,0)
 };
 };
 #endif

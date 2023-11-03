@@ -190,10 +190,31 @@ int TBelt::init_poisson_dist(double MuB, double MuS, int NObs) {
   return 0;
 }
 
+  
+//-----------------------------------------------------------------------------
+// standard Poisson distribution
+// the length of 'Prob' should be at least N
+//-----------------------------------------------------------------------------
+int TBelt::init_poisson_dist(double MuB, double* Prob) {
+
+  fMean   = MuB;
+  Prob[0] = TMath::Exp(-fMean);
+
+  for (int i=1; i<MaxNx; i++) {
+    Prob[i] = Prob[i-1]*fMean/i;
+  }
+  
+  fIPMax = int(fMean);
+
+  return 0;
+}
+
+
+  
 //-----------------------------------------------------------------------------
 // two parameters for uniformity of the interface
 //-----------------------------------------------------------------------------
-int TBelt::construct_interval(double MuB, double MuS, int NObs) {
+int TBelt::construct_interval(double MuB, double MuS) {
   printf("TBelt::construct_interval is undefined. BAIL OUT\n");
   return -1;
 }
@@ -219,7 +240,7 @@ int TBelt::construct_interval(double MuB, double MuS, int NObs) {
   for (int iy=0; iy<NPoints; iy++) {
     double mus = SMin+iy*fBelt.fDy;
 
-    int rc     = construct_interval(MuB,mus,NObs);
+    int rc     = construct_interval(MuB,mus);
     if (rc == 0) {
       for (int ix=fIxMin; ix<=fIxMax; ix++) {
         if (mus > fBelt.fSign[ix][1]) fBelt.fSign[ix][1] = mus+fBelt.fDy/2;
@@ -311,7 +332,7 @@ void TBelt::make_belt_hist() {
 int TBelt::test_coverage(double MuB, double SMin, double SMax, int NPoints) {
   
   int rc(0);
-  rc = construct_belt(MuB,0,35,35001);
+  rc = construct_belt(MuB,0,35,35001,-1,nullptr);
   if (rc < 0) return rc;
 
   float x[NPoints+2], y[NPoints+2];

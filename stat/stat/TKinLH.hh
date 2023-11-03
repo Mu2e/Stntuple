@@ -138,9 +138,12 @@ public:
   double bgr_mom();
   double sig_mom();
 
-  virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
-  
-  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr);
+  int  construct_interval(double MuB, double MuS);
+
+                                        // NObs is the number of observed events, P - array of their momenta
+                                        // in principle, could pass a pointer (or a reference) to a vector
+    
+  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs, double* P);
   virtual int  test_coverage     (double MuB, double SMin, double SMax, int NPoints);
 
   static int   partition(sdata arr[], int low , int high, double pivot);

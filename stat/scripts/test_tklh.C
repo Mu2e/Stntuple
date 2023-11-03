@@ -80,14 +80,14 @@ TH1D* h_sig_llhr;
 //-----------------------------------------------------------------------------
 // read histogram file and construct a confidence interval
 // kinematic histograms do not know anything about CL, but do know about the object name...
+//  'Name' defines the input file name 
 //-----------------------------------------------------------------------------
 TKinLH* test_tklh_003(const char* Name    ,
                       double      CL          ,
-                      double      PMin = 103.6,
-                      double      PMax = 104.9,
+                      double      PMin = 102.0,
+                      double      PMax = 105.0,
                       double      MuB  =   0.1,
-                      double      MuS  =   4.5,
-                      int         NObs =     0) {
+                      double      MuS  =   4.5) {
 
   TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
@@ -97,7 +97,7 @@ TKinLH* test_tklh_003(const char* Name    ,
 
   //  x1->fDebug.fConstructInterval = 1;
   
-  x1->construct_interval(MuB,MuS,NObs);
+  x1->construct_interval(MuB,MuS);
 
   x1->plot_interval();
 
@@ -105,17 +105,18 @@ TKinLH* test_tklh_003(const char* Name    ,
 }
 
 //-----------------------------------------------------------------------------
-// read histogram file and construct a confidence interval, plot belt
+// read histogram file, construct a confidence belt, plot it
+// also plot a data likelihood (not sure what it is for NObs=0)
 //-----------------------------------------------------------------------------
 TKinLH* test_tklh_004(const char* Name,
-                      double      CL,
-                      double      PMin = 103.6,
-                      double      PMax=104.9,
-                      double      MuB=0.1,
-                      double      SMin=1,
-                      double      SMax=5,
+                      double      CL      = 0.9,
+                      double      PMin    = 102,
+                      double      PMax    = 105,
+                      double      MuB     = 0.1,
+                      double      SMin    = 1,
+                      double      SMax    = 5,
                       int         NPoints = 10,
-                      int         NObs = 0)
+                      int         NObs    = 0)
 {
   double p[] = {103., 104., 103, 104, 103., 104};
   
@@ -135,9 +136,10 @@ TKinLH* test_tklh_004(const char* Name,
   if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
   else              c->cd();
 
-  // x1->fHist.fBeltHi->GetYaxis()->SetRangeUser(0,5);
+  x1->fHist.fBeltHi->GetYaxis()->SetRangeUser(0,20);
+  x1->fHist.fBelt->SetMaximum(15);
   x1->fHist.fBelt->Draw();
-  // llh->fHist.fBeltHi->Draw("same");
+  x1->fHist.fBeltLhdt->Draw("same");
   // x1->fHist.fBeltNO1->Draw("same");
     
   return x1;
@@ -153,7 +155,7 @@ int test_tklh_005(TKinLH* X, double MuB=0.1, double MuS=1, int NObs = 0) {
 
   double llhrR;
   
-  X->construct_interval(MuB,MuS,NObs);
+  X->construct_interval(MuB,MuS);
 
   double wt = X->wt_data(MuB,MuS,NObs,p,&llhrR);
 

@@ -87,19 +87,21 @@ public:
 
   TBelt(const char* Name, double CL = -1);
 
-                                        // 'N' - number of measured events
+                                        // 'N' - number of measured events - both 'truncated' functions need to be removed....
                                         // 1. Zech
   int          init_truncated_poisson_dist(double MuB, int   NObs, double* Prob    );
 
                                         // 2. Mur
   int          init_truncated_poisson_dist(double MuB, double MuS, int NObs, double* Prob);
 
+  int          init_poisson_dist          (double MuB, double* Prob);
+  
   virtual int  init_poisson_dist          (double MuB, double MuS, int    NObs = -1);
   
                                         // in presence of background, mu = mus+mub
   
-  virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
-  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr);
+  virtual int  construct_interval(double MuB, double MuS);
+  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs, double* P);
 
   virtual int  make_prob_hist();
   virtual void make_belt_hist();

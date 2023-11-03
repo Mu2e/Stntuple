@@ -68,10 +68,10 @@ public:
 //-----------------------------------------------------------------------------
 // test_001: construct interval for a given (MuS,MuB)
 //-----------------------------------------------------------------------------
-TFeldmanCousins* test_fc_001(double MuB, double MuS, double CL=0.9, int NObs = -1, const char* Name = "test_fc_001") {
-  TFeldmanCousins* fc(nullptr);
+stntuple::TFeldmanCousins* test_fc_001(double MuB, double MuS, double CL=0.9, int NObs = -1, const char* Name = "test_fc_001") {
+  stntuple::TFeldmanCousins* fc(nullptr);
 
-  if (fc == nullptr) fc = new TFeldmanCousins(Name,CL);
+  if (fc == nullptr) fc = new stntuple::TFeldmanCousins(Name,CL);
   else               fc->SetCL(CL);
 
   fc->fDebug.fConstructInterval = 1;
@@ -111,10 +111,10 @@ TFeldmanCousins* test_fc_001(double MuB, double MuS, double CL=0.9, int NObs = -
 //-----------------------------------------------------------------------------
 // fc_test_002: construct belt for a given (MuS,MuB)
 //-----------------------------------------------------------------------------
-TFeldmanCousins* test_fc_002(double MuB, double CL, int NObs = -1, const char* Name = "test_fc_002") {
-  TFeldmanCousins* fc(nullptr);
+stntuple::TFeldmanCousins* test_fc_002(double MuB, double CL, int NObs = -1, const char* Name = "test_fc_002") {
+  stntuple::TFeldmanCousins* fc(nullptr);
 
-  if (fc == nullptr) fc = new TFeldmanCousins(Name,CL);
+  if (fc == nullptr) fc = new stntuple::TFeldmanCousins(Name,CL);
   else               fc->SetCL(CL);
 
   // fc->fDebug.fConstructBelt = 2;
@@ -142,9 +142,9 @@ TFeldmanCousins* test_fc_002(double MuB, double CL, int NObs = -1, const char* N
 // determine FC propability of a CL-level observation of a signal
 //-----------------------------------------------------------------------------
 void test_fc::test_009(double CL, double MuB, double  SMin, double SMax, int NPoints) {
-  TFeldmanCousins* fc(nullptr);
+  stntuple::TFeldmanCousins* fc(nullptr);
 
-  if (fc == nullptr) fc = new TFeldmanCousins("fc_009",CL);
+  if (fc == nullptr) fc = new stntuple::TFeldmanCousins("fc_009",CL);
   else               fc->SetCL(CL);
 
   fc->SetNExp(100000); // enough for defining 5
@@ -179,9 +179,9 @@ void test_fc::test_010(double CL, double MuB=0.1, double  SMin = 0, double SMax 
 // determine FC propability of a CL-level observation of a signal
 // use mean discovery
 //-----------------------------------------------------------------------------
-  TFeldmanCousins* fc(nullptr);
+  stntuple::TFeldmanCousins* fc(nullptr);
 
-  if (fc == nullptr) fc = new TFeldmanCousins("fc010",CL);
+  if (fc == nullptr) fc = new stntuple::TFeldmanCousins("fc010",CL);
   else               fc->SetCL(CL);
 
   fc->SetNExp(100000); // enough for defining 5
@@ -252,7 +252,7 @@ void test_fc::test_010(double CL, double MuB=0.1, double  SMin = 0, double SMax 
 //-----------------------------------------------------------------------------
 void test_fc::test_011(double CL) {
 
-  TFeldmanCousins* fc = new TFeldmanCousins("fc_011",CL);
+  stntuple::TFeldmanCousins* fc = new stntuple::TFeldmanCousins("fc_011",CL);
 
   const char* name     = "c_fc_011";
   
@@ -283,7 +283,7 @@ void test_fc::test_011(double CL) {
 void test_fc::test_012(double CL) {
   char name[100] = "fc_012";
 
-  TFeldmanCousins* fc = new TFeldmanCousins(name,CL);
+  stntuple::TFeldmanCousins* fc = new stntuple::TFeldmanCousins(name,CL);
   fc->SetNExp(100000);
 
   char cname[100];
@@ -325,7 +325,7 @@ void test_fc::test_012(double CL) {
 void test_fc::test_013(double CL) {
   char name[100] = "fc_013";
   
-  TFeldmanCousins* fc = new TFeldmanCousins(name,CL);
+  stntuple::TFeldmanCousins* fc = new stntuple::TFeldmanCousins(name,CL);
   fc->SetNExp(100000);
 
   char cname[100];
@@ -368,7 +368,7 @@ void test_fc::test_013(double CL) {
 void test_fc::test_014() {
   char name[100] = "fc_014";
   
-  TFeldmanCousins* fc = new TFeldmanCousins(name,0.9);
+  stntuple::TFeldmanCousins* fc = new stntuple::TFeldmanCousins(name,0.9);
   fc->SetNExp(100000);
 
   char cname[100];
@@ -425,7 +425,7 @@ void test_fc::test_014() {
 void test_fc::test_016(double CL) {
   char name[100] = "fc_test_016";
 
-  TFeldmanCousins* fc = new TFeldmanCousins(name,CL);
+  stntuple::TFeldmanCousins* fc = new stntuple::TFeldmanCousins(name,CL);
   fc->SetNExp(100000);
 
   char cname[100];
@@ -481,15 +481,19 @@ void test_fc::test_016(double CL) {
 // fc_test_017: test 90% coverage
 // fc17 = fc_test_017(0., 0., 10,1000,0.9,100000)
 //-----------------------------------------------------------------------------
-TFeldmanCousins* test_fc_017(double MuB, double SMin, double SMax, int NPoints,
-                              double CL        = 0.9,
-                              int    NExp      = -1,
-                              const char* Name = "test_fc_017",
-                              int DebugLevel   = -1) {
+stntuple::TFeldmanCousins* test_fc_017(double MuB,
+                                       double CL  ,
+                                       double SMin,       
+                                       double SMax,
+                                       int    NPoints,
+                                       int    NObs      = -1, // standard
+                                       int    NPsExp    = -1,
+                                       const char* Name = "test_fc_017",
+                                       int DebugLevel   = -1) {
 
-  TFeldmanCousins* fc = new TFeldmanCousins(Name,CL);
+  stntuple::TFeldmanCousins* fc = new stntuple::TFeldmanCousins(Name,CL);
 
-  if (NExp > 0) fc->SetNExp(NExp);
+  if (NPsExp > 0) fc->SetNExp(NPsExp);
                                         // test itself
   if (DebugLevel > 0) fc->fDebug.fTestCoverage = DebugLevel;
 
