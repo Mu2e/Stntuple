@@ -625,6 +625,12 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
 
   if (Plot->fXMin < Plot->fXMax) hpx1->GetXaxis()->SetRangeUser(Plot->fXMin,Plot->fXMax);
   if (Plot->fXAxisTitle != ""  ) hpx1->GetXaxis()->SetTitle(Plot->fXAxisTitle.Data());
+  if (Plot->fXTitleOffset > -10) hpx1->GetXaxis()->SetTitleOffset(Plot->fXTitleOffset);
+  
+  if (Plot->fXAxisFontSize >= 0. ) {
+    hpx1->GetXaxis()->SetTitleSize(Plot->fXAxisFontSize);
+    hpx1->GetXaxis()->SetLabelSize(Plot->fXAxisFontSize);
+  }
 
   if (Plot->fYMin < Plot->fYMax) hpx1->GetYaxis()->SetRangeUser(Plot->fYMin,Plot->fYMax);
 //-----------------------------------------------------------------------------
@@ -638,6 +644,13 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
     TString ytitle = Form(Plot->fYTitFormat,bin);
     hpx1->GetYaxis()->SetTitle(ytitle);
   }
+
+  if (Plot->fYAxisFontSize >= 0. ) {
+    hpx1->GetYaxis()->SetTitleSize(Plot->fYAxisFontSize);
+    hpx1->GetYaxis()->SetLabelSize(Plot->fYAxisFontSize);
+  }
+
+  if (Plot->fYTitleOffset > -10) hpx1->GetYaxis()->SetTitleOffset(Plot->fYTitleOffset);
 
   if (Hist1->fStats == 0) hpx1->SetStats(0);
 

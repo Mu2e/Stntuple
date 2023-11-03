@@ -36,8 +36,14 @@ public:
   float         fStatBoxYMax;
 					// --- titles
   TString       fXAxisTitle;
+  float         fXAxisFontSize;
+  float         fXTitleOffset;
+
   TString       fYAxisTitle;
+  float         fYAxisFontSize;
   TString       fYTitFormat;		// if "", Y axis title is not printed
+  float         fYTitOffset;
+  float         fYTitleOffset;
 
   float         fLegendXMin;
   float         fLegendYMin;
@@ -88,8 +94,13 @@ public:
     fYLogScale     =  0;
 
     fXAxisTitle    = "";
+    fXAxisFontSize = -1.;
+    fXTitleOffset  = -999.;
+    
     fYAxisTitle    = "";
+    fYAxisFontSize = -1.;
     fYTitFormat    = "N / %10.3f";
+    fYTitleOffset  = -999.;
     
     fLegendXMin    = 0.65;
     fLegendYMin    = 0.15;
