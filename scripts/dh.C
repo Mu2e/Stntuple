@@ -37,7 +37,8 @@ int  catalog_file(const char* InputFile,
                   const char* OutputDir  = ".",
                   const char* Dataset    = 0,
                   const char* Book       = "",
-                  const char* DbID       = "production_file_catalog_write")
+                  const char* DbID       = "production_file_catalog_write",
+                  int         Verbose    = 0)
 {
   // always process all the events
   // PrintLevel = 111 also would try to execute the commands
@@ -46,11 +47,11 @@ int  catalog_file(const char* InputFile,
   
   dset    = new TStnDataset();
 
-  // printf("before init_dataset : input file: %s\n",InputFile);
+  if (Verbose > 0) printf("before init_dataset : input file: %s\n",InputFile);
 
   catalog->InitDataset(dset,"file","","",InputFile);
 
-  // printf("after init_dataset : input file: %s\n",InputFile);
+  if (Verbose > 0) printf("after init_dataset : input file: %s\n",InputFile);
 
   x = new TStnAna(dset);
 
@@ -76,7 +77,7 @@ int  catalog_file(const char* InputFile,
 	   InputFile,OutputDir,Dataset,Book,DbID);
   }
 
-  printf(" -- debug: before Run\n");
+  if (Verbose > 0) printf(" -- debug: before Run\n");
   x->Run();
 
   int rc = m_dfc->ReturnCode();
@@ -85,6 +86,8 @@ int  catalog_file(const char* InputFile,
   delete chain;
   delete catalog;
 
+  if (Verbose > 0) printf("::: dh_catalog_file DONE, rc = %i\n",rc);
+  
   return rc;
 }
 
@@ -126,7 +129,7 @@ void catalog_dataset(const char* Book,
 }
 
 //_____________________________________________________________________________
-int catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
+  int catalog_list_of_files(const char* RequestFile, Int_t Mode=11, int Verbose = 0) {
   // catalog list of files returned by the shell command
 
   char  data_server[200], book     [100], dataset_id[100];
@@ -141,7 +144,7 @@ int catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
   fscanf(pipe,"%s",data_server);
   gSystem->ClosePipe(pipe);
 
-  //  printf(">>> data_server = %s\n",data_server);
+  if (Verbose) printf("dh::catalog_list_of_files: data_server = %s\n",data_server);
 
   sprintf(cmd,"cat %s | awk '{ if ($2 == \"BOOK\") print $3}'",RequestFile);
   pipe = gSystem->OpenPipe(cmd,"r");
@@ -163,10 +166,12 @@ int catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
   fscanf(pipe,"%s",input_dir);
   gSystem->ClosePipe(pipe);
 
-//   printf("output_dir    =  %s\n",output_dir   );
-//   printf("input_dir     =  %s\n",input_dir    );
-//   printf("book          =  %s\n",book         );
-//   printf("dataset_id    =  %s\n",dataset_id   );
+  if (Verbose) {
+    printf("dh::catalog_list_of_files: output_dir    =  %s\n",output_dir   );
+    printf("dh::catalog_list_of_files: input_dir     =  %s\n",input_dir    );
+    printf("dh::catalog_list_of_files: book          =  %s\n",book         );
+    printf("dh::catalog_list_of_files: dataset_id    =  %s\n",dataset_id   );
+  }
 //
 //     return 0;
 
@@ -181,6 +186,10 @@ int catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
     return -1;
   }
 
+  if (Verbose > 0) {
+    printf("dh::catalog_list_of_files: file %s opened\n",RequestFile);
+  }
+  
   while ( ((c[0]=getc(f)) != EOF) && !done) {
                                         // check if it is a comment line
     if (c[0] != '#') {
@@ -197,9 +206,9 @@ int catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
           sprintf(fn,"%s",file);
 	}
 
-	// printf("[catalog_list_of_files] : cataloging %s\n",fn);
+        if (Verbose > 0) printf("dh::catalog_list_of_files: cataloging %s\n",fn);
 
-	catalog_file(fn,Mode,output_dir,dataset_id,book);
+	catalog_file(fn,Mode,output_dir,dataset_id,book,nullptr,Verbose);
       }
     }
     else {

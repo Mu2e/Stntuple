@@ -114,5 +114,7 @@ for book in $books ; do
       
       echo "<!-- Start of footer:  End your html before this comment. -->"    >> $HTML_CATALOG
       echo "<!--#set var=\"contact\" value=\"kutschke@fnal.gov\" -->"         >> $HTML_CATALOG
-      echo "<!--#include virtual=\"/includes/mu2e_footer.shtml\" -->"         >> $HTML_CATALOG
+      echo "<!--#include virtual=\"/includes/mu2e_footer.shtml\" -->"         >> $HTML_CATALOG  
 done
+
+echo "done, now check https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc/$book/index.shtml"

@@ -1,16 +1,7 @@
 #
-* FCL files to configure sample jobs 
 
-  the table below lists status of validation of various FCL files
-
-|-----------------------------------------+----------------------+----------|
-| job configuration                       | last validation date | comments |
-|-----------------------------------------+----------------------+----------|
-| [[../test/eminus_gun_stnmaker.fcl][Stntuple/test/eminus_gun_stnmaker.fcl]]   | <2020-05-30 Sat>     |          |
-|-----------------------------------------+----------------------+----------|
-| Stntuple/fcl/primary/flateminus_stn.fcl | <2020-05-31 Sun>     |          |
-
-
+* global FCL variables
+- a number of global FCL variables are defined in file:../fcl/stntuple_external_prologs.fcl
 * can also use SU2020 fcl files as examples: [[https://github.com/Mu2e/su2020/blob/master/cele0/s5_reco_stn_cele0.fcl]] 
 * ------------------------------------------------------------------------------
 * back to [[file:Stntuple.org][Stntuple.org]] 
