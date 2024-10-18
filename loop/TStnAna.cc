@@ -198,7 +198,7 @@ TStnAna::~TStnAna()
   delete fModuleList;
 
   //printf(" TStnAna: input.\n"); fflush(stdout); fflush(stderr);
-  delete fInputModule;
+  //delete fInputModule;
   //printf(" TStnAna: output.\n"); fflush(stdout); fflush(stderr);
   delete fOutputModule;
   //printf(" TStnAna: output file.\n"); fflush(stdout); fflush(stderr);
