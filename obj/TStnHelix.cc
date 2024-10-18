@@ -499,6 +499,121 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
 }
 
 
+//--------------------------------------------------------------------------------
+void TStnHelix::ReadV6(TBuffer &R__b) {
+
+  struct TStnHelixDataV6_t {
+//-----------------------------------------------------------------------------
+// vectors, added in V3, I believe
+//-----------------------------------------------------------------------------
+    TLorentzVector            fMom1;  
+    TLorentzVector            fOrigin1;
+    TLorentzVector            fMom2;  
+    TLorentzVector            fOrigin2;
+//-----------------------------------------------------------------------------
+// integers
+//-----------------------------------------------------------------------------
+    int                       fNHits;
+    int                       fAlgorithmID;     // bit-packed : (alg_mask << 16 ) | best
+    int                       fTimeClusterIndex;
+    int                       fTrackSeedIndex;
+    int                       fNComboHits;     
+    int                       fSimpPDG1;          // added in v3
+    int                       fSimpPDGM1;         // added in v3
+    int                       fSimpId1Hits;       // added in v3
+    int                       fSimpPDG2;          // added in v3
+    int                       fSimpPDGM2;         // added in v3
+    int                       fSimpId2Hits;       // added in v3
+    int                       fHelicity;          // added in v4
+    int                       fInt[kNFreeIntsV6];
+//-----------------------------------------------------------------------------
+// floats
+//-----------------------------------------------------------------------------
+    float                     fT0;    
+    float                     fT0Err; 
+
+    float                     fRCent;   // radius of circle center
+    float                     fFCent;   // azimuth of circle center
+    float                     fRadius;  // transverse radius of the helix (mm).  Always positive
+    float                     fLambda;  // dz/dphi (mm/radian)
+    float                     fFZ0;     // azimuth (phi) at the center z position (radians)
+    float                     fD0;      // impact paramter 
+    float                     fChi2XYNDof;
+    float                     fChi2PhiZNDof;
+
+    float                     fClusterTime;   
+    float		      fClusterEnergy; 
+    float                     fClusterX;      
+    float		      fClusterY;      
+    float		      fClusterZ;      
+    float                     fNLoops;
+    float                     fTZSlope;
+    float                     fTZSlopeError;
+    float                     fChi2TZNDof;
+    float                     fHitRatio; 
+    float                     fFloat[kNFreeFloatsV6]; // provision for future I/O expansion
+//-----------------------------------------------------------------------------
+// transients
+//-----------------------------------------------------------------------------
+    const mu2e::HelixSeed*    fHelix;  //!
+ };
+
+  TStnHelixDataV6_t data;
+
+  int            nwi, nwf;
+  
+  nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
+  nwf      = ((float*) &data.fHelix         ) - &data.fT0;
+    
+  fMom1.Streamer(R__b);
+  fOrigin1.Streamer(R__b);
+  fMom2.Streamer(R__b);
+  fOrigin2.Streamer(R__b);
+
+  R__b.ReadFastArray(&data.fNHits ,nwi);
+  R__b.ReadFastArray(&data.fT0    ,nwf);
+
+  fNHits             = data.fNHits;	     
+  fAlgorithmID       = data.fAlgorithmID;    
+  fTimeClusterIndex  = data.fTimeClusterIndex;
+  fTrackSeedIndex    = data.fTrackSeedIndex;
+  fNComboHits        = data.fNComboHits ;
+  fSimpPDG1          = data.fSimpPDG1   ;
+  fSimpPDGM1         = data.fSimpPDGM1  ;
+  fSimpId1Hits       = data.fSimpId1Hits;
+  fSimpPDG2          = data.fSimpPDG2   ;
+  fSimpPDGM2         = data.fSimpPDGM2  ;
+  fSimpId2Hits       = data.fSimpId2Hits;
+  fHelicity          = data.fHelicity   ;         
+  fNLoops            = data.fNLoops;
+
+  fT0                = data.fT0;    	  
+  fT0Err             = data.fT0Err; 	  
+                
+  fRCent             = data.fRCent;
+  fFCent             = data.fFCent;
+  fRadius            = data.fRadius;
+  fLambda            = data.fLambda;
+  fFZ0               = data.fFZ0;   
+  fD0                = data.fD0;    
+  fChi2XYNDof        = data.fChi2XYNDof;  
+  fChi2PhiZNDof      = data.fChi2PhiZNDof;
+                
+  fClusterTime       = data.fClusterTime; 
+  fClusterEnergy     = data.fClusterEnergy; 
+  fClusterX          = data.fClusterX;      
+  fClusterY          = data.fClusterY;    
+  fClusterZ          = data.fClusterZ;    
+
+  fTZSlope           = data.fTZSlope; 
+  fTZSlopeError      = data.fTZSlopeError; 
+  fChi2TZNDof        = data.fChi2TZNDof;
+  fHitRatio          = data.fHitRatio;
+
+  fPropDir           = 0; //added in v7
+}
+
+
 
 //-----------------------------------------------------------------------------
 void TStnHelix::Streamer(TBuffer& R__b) {
@@ -515,6 +630,7 @@ void TStnHelix::Streamer(TBuffer& R__b) {
     else if (R__v == 3) ReadV3 (R__b);
     else if (R__v == 4) ReadV4 (R__b);
     else if (R__v == 5) ReadV5 (R__b);
+    else if (R__v == 6) ReadV6 (R__b);
     else {
       fMom1.Streamer(R__b);
       fOrigin1.Streamer(R__b);

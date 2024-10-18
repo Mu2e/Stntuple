@@ -168,6 +168,8 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
 //-----------------------------------------------------------------------------
     trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                     ,1));
     trigger_table->AddTrigger(new TStnTrigger(   1,   1,"p1"                          ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   2,   2,"recoDe"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   3,   3,"recoDeLeg"                   ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDe_highP_stopTarg"        ,1));
     trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDe_lowP_stopTarg"         ,1));
@@ -188,9 +190,13 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
     trigger_table->AddTrigger(new TStnTrigger( 201, 201,"caloFast_MVANNCE"            ,1));
     trigger_table->AddTrigger(new TStnTrigger( 202, 202,"caloFast_cosmic"             ,1));
-    for (int i=203; i<220; ++i){
+    for (int i=203; i<210; ++i){
       trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
     }    
+    trigger_table->AddTrigger(new TStnTrigger( 210, 210,"mprDe_highP_stopTarg"        ,1));
+    for (int i=211; i<220; ++i){
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
+    } 
     trigger_table->AddTrigger(new TStnTrigger( 220, 220,"caloFast_RMC"                ,1));
     for (int i=221; i<300; ++i){
       trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      

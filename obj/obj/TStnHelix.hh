@@ -46,7 +46,10 @@ class TStnHelix : public TObject {
     kNFreeIntsV5   =  3,	        // v5: added number of loops
     kNFreeFloatsV5 =  9,                //
 
-    kNFreeInts     =  3,	        // v6: added TZSlope, TZSlope error, TZChi2NDof, hitRatio (expected/collected)
+    kNFreeIntsV6   =  3,	        // v6: added TZSlope, TZSlope error, TZChi2NDof, hitRatio (expected/collected)
+    kNFreeFloatsV6 =  5,		// 
+
+    kNFreeInts     =  2,	        // v7: added propDir
     kNFreeFloats   =  5			// 
   };
 
@@ -73,6 +76,7 @@ public:
   int                       fSimpPDGM2;         // added in v3
   int                       fSimpId2Hits;       // added in v3
   int                       fHelicity;          // added in v4
+  int                       fPropDir;           // added in v7: -1,0,1 stand for upstream, ambigous an downstream respectively
   int                       fInt[kNFreeInts];   // provision for future I/O expansion
 //-----------------------------------------------------------------------------
 // floats
@@ -128,6 +132,7 @@ public:
   int     PDG2            () { return fSimpPDG2; }
   int     PDGMother2      () { return fSimpPDGM2; }
   int     ComboHitsFrom2  () { return fSimpId2Hits; }
+  int     PropDir         () { return fPropDir;}
 
   float   T0         () { return  fT0;     }
   float   T0Err      () { return  fT0Err;  }
@@ -185,6 +190,7 @@ public:
   void ReadV3(TBuffer& R__b);   // 2018-12-05 P.M.
   void ReadV4(TBuffer& R__b);   // 2019-02-27 G.P.
   void ReadV5(TBuffer& R__b);   // 2024-03-07 G.P.
+  void ReadV6(TBuffer& R__b);   // 2024-10-17 G.P.
 
   ClassDef(TStnHelix,6);
 };

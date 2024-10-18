@@ -204,6 +204,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
     helix->fTZSlopeError = hSlopeError;
     helix->fChi2TZNDof   = chi2ndof;
     helix->fHitRatio     = helTool.hitRatio();
+    helix->fPropDir      = tmpHel->propDir();
 
 //-----------------------------------------------------------------------------
 // find the SimParticle that created the majority of the hits

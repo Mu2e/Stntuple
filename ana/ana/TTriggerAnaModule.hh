@@ -55,6 +55,7 @@ public:
     TH1F* fTZSlope;
     TH1F* fTZSlopeSig;
     TH1F* fHitRatio;
+    TH1F* fPropDir;
   };
 
   struct TrackHist_t : public stntuple::HistBase_t {
