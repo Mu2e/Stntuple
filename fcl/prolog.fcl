@@ -695,6 +695,28 @@ Stntuple : {
             pidCollTag             : [ ""                  ,  ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                  ]
             trkQualCollTag         : [ ""                  ,  ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                  ]
         }
+
+        StntupleMakerTrigTot : { @table::StntupleMakerTemplate 
+	    makePid                : 0
+	    makeTimeClusters       : 0 #temporary fix
+	    makeHelices            : 1
+	    makeTrackSeeds         : 0
+	    makeTracks             : 1
+            timeClusterBlockName   : [ "TimeClusterBlockDe", "TimeClusterBlockDe", "TimeClusterBlockDe","TimeClusterBlockDmu", "TimeClusterBlockAprHighP"  , "TimeClusterBlockAprLowPMultiTrk"         , "TimeClusterBlockCprDeHighP" ]
+            timeClusterCollTag     : [ "TZClusterFinder"   , "CalTimePeakFinder" , "TZClusterFinder"   ,"TimeClusterFinder"  , "aprHighPTriggerInfoMerger" , "aprLowPStopTargMultiTrkTriggerInfoMerger", "cprDeHighPTriggerInfoMerger"]
+            helixBlockName         : [ "HelixBlockDe"      , "HelixBlockDeCpr"   , "HelixBlockDeApr"   ,"HelixBlockDmu"      , "HelixBlockAprHighP"        , "HelixBlockAprLowPMultiTrk"               , "HelixBlockCprDeHighP"       ]
+            helixCollTag           : [ "MHDeM"             , "CalHelixFinderDe"  ,"AgnosticHelixFinder","MHDmu"              , "aprHighPTriggerInfoMerger" , "aprLowPStopTargMultiTrkTriggerInfoMerger", "cprDeHighPTriggerInfoMerger"]
+            trackBlockName         : [ "TrackBlockDe"      , "TrackBlockDe"      , "TrackBlockDe"      ,"TrackBlockDmu"      , "TrackBlockAprHighP"        , "TrackBlockAprLowPMultiTrk"               , "TrackBlockCprDeHighP"       ]
+            trackCollTag           : [ "KKDeM"             , "KKDeM"             , "KKDeM"             ,"KKDmu"              , "aprHighPTriggerInfoMerger" , "aprLowPStopTargMultiTrkTriggerInfoMerger", "cprDeHighPTriggerInfoMerger"]
+            helixKsCollTag         : [ ""                  , ""                  , ""                  ,""                   , ""                          , ""                                        , ""                           ]
+            trackHsBlockName       : [ "HelixBlockDe"      , "HelixBlockDeCpr"   , "HelixBlockDeApr"   ,"HelixBlockDmu"      , "HelixBlockAprHighP"        , "HelixBlockAprLowPMultiTrk"               , "HelixBlockCprDeHighP"       ]
+            tciCollTag             : [ ""                  , ""                  , ""                  ,""                   , ""                          , ""                                        , ""                           ]
+            tcmCollTag             : [ ""                  , ""                  , ""                  ,""                   , ""                          , ""                                        , ""                           ]
+            trackSHBlockName       : []
+            pidBlockName           : []
+            pidCollTag             : [ ""                  ,  ""                 ,  ""                 ,  ""                 , ""                          , ""                                        , ""                           ]
+            trkQualCollTag         : [ ""                  ,  ""                 ,  ""                 ,  ""                 , ""                          , ""                                        , ""                           ]
+        }
 #------------------------------------------------------------------------------
 # make 4 track blocks: train PID
 #------------------------------------------------------------------------------
@@ -730,6 +752,7 @@ Stntuple : {
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
 Stntuple.stnmaker_trig    : [ InitStntuple, StntupleMakerTrig,                  FillStntuple ]
+Stntuple.stnmaker_trig_tot: [ InitStntuple, StntupleMakerTrigTot,               FillStntuple ]
 #------------------------------------------------------------------------------
 # new sequences
 #------------------------------------------------------------------------------
