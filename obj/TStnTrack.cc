@@ -1601,11 +1601,12 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 void TStnTrack::Streamer(TBuffer& R__b) {
 
-  int nwi, nwf, nwf_vint, imins, imaxep;
+  int nwi, nwf, nwf_vint, imins, imaxep, nwf2; // nwf2 added in v15
 
   nwi      = ((int*  ) &fChi2            ) - &fNumber;
   nwf      = ((float*) &fDisk            ) - &fChi2;
   nwf_vint = ((float*) &fDisk[0].fCluster) - &fDisk[0].fTime;
+  nwf2     = ((float*) &fTrkCaloHit) - &fPST; 
 
   if (R__b.IsReading()) {
 //-----------------------------------------------------------------------------
@@ -1650,7 +1651,7 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
       else             fVMaxEp = NULL;
     }
-    else {
+    else if ( (R__v == 13) || (R__v == 14)){
 //-----------------------------------------------------------------------------
 // current version - v14
 // V13 and V14 are different only by NDoF being packed into fNGoodMCHits
@@ -1683,8 +1684,41 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 
       fVTCH = &fTrkCaloHit;
     }
-  }
-  else {
+    else if (R__v == 15 ){
+//-----------------------------------------------------------------------------
+// current version - v15
+// adding second second of floats to read 
+//-----------------------------------------------------------------------------
+      fMomentum.Streamer(R__b);
+      fHitMask.Streamer(R__b);
+      fExpectedHitMask.Streamer(R__b);
+
+      R__b.ReadFastArray(&fNumber,nwi);
+      R__b.ReadFastArray(&fChi2,nwf);
+      R__b.ReadFastArray(&fPST,nwf2);
+					// read intersection info
+      R__b >> imins;
+      R__b >> imaxep;
+
+      for (int i=0; i<kNDisks; i++) {
+	R__b >> fDisk[i].fID;
+	R__b >> fDisk[i].fClusterIndex;
+	R__b.ReadFastArray(&fDisk[i].fTime,nwf_vint);
+      }
+    
+      if (imins >= 0) fVMinS = &fDisk[imins];
+      else            fVMinS = NULL;
+
+      if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
+      else             fVMaxEp = NULL;
+      
+      R__b >> fTrkCaloHit.fID;
+      R__b >> fTrkCaloHit.fClusterIndex;
+      R__b.ReadFastArray(&fTrkCaloHit.fTime,nwf_vint);
+
+      fVTCH = &fTrkCaloHit;
+    }
+    else {
 //-----------------------------------------------------------------------------
 // write track data out
 //-----------------------------------------------------------------------------
@@ -1714,6 +1748,7 @@ void TStnTrack::Streamer(TBuffer& R__b) {
     R__b << fTrkCaloHit.fID;
     R__b << fTrkCaloHit.fClusterIndex;
     R__b.WriteFastArray(&fTrkCaloHit.fTime,nwf_vint);
+    }
   }
 }
 
@@ -1806,6 +1841,11 @@ void TStnTrack::Clear(Option_t* Opt) {
   fVMinS        = NULL;
   fVMaxEp       = NULL;
 
+  fPST              = 0.0;
+  fPTrackerEntrance = 0.0;
+  fPTrackerMiddle   = 0.0;
+  fPTrackerExit     = 0.0;
+  
   fTrkCaloHit.fID           = -1;
   fTrkCaloHit.fClusterIndex = -1;
   fTrkCaloHit.fEnergy       = -1.;

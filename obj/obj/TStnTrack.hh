@@ -75,7 +75,8 @@ class TStnTrack : public TObject {
     kNFreeFloatsV12=  3,
 
     kNFreeInts     =  3,     //         V13: add interData for housing the TrkCaloHit info
-    kNFreeFloats   =  3
+    kNFreeFloats   =  3,
+    kNFreeFloats2   = 20     //         Added in V15 since we were running low on floats
   };
 
   //  enum { kMaxNLayers = 88 }; // 22x2*2
@@ -187,6 +188,16 @@ public:
   float                     fFloat[kNFreeFloats]; // provision for future I/O expansion
 
   InterData_t               fDisk [kNDisks];      // track intersections with disks
+
+  // new floats added in v15
+  float fPST; // momentum at the stopping target
+  float fPTrackerEntrance; // momentum at tracker entrance (i.e. entering to stopping target)
+  float fPTrackerMiddle; // at middle
+  float fPTrackerExit; // at exit (i.e. exiting towards calorimeter)
+  float fFloat2[kNFreeFloats2]; // for future I/O expansion for versions > 15
+
+  // floats added 
+  
   InterData_t               fTrkCaloHit;          // TrkCaloHit info
 //-----------------------------------------------------------------------------
 //  transient data members, all persistent ones should go above
@@ -298,6 +309,11 @@ public:
   float  Pt() const { return fPt; }
   Int_t  GetMomentum  (TLorentzVector* Momentum) ;
   
+  float  PST              () const { return fPST; }
+  float  PTrackerEntrance () const { return fPTrackerEntrance; }
+  float  PTrackerMiddle   () const { return fPTrackerMiddle; }
+  float  PTrackerExit     () const { return fPTrackerExit; }
+  
   mu2e::KalSeed*   GetKalRep() { return fKalRep[0]; }
   
   float  P0         () const { return fP0;      }
@@ -336,7 +352,7 @@ public:
   void ReadV9 (TBuffer& R__b);
   void ReadV10(TBuffer& R__b);
 
-  ClassDef(TStnTrack,14)
+  ClassDef(TStnTrack,15)
 
 };
 

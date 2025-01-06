@@ -46,6 +46,7 @@
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 #include "Offline/DataProducts/inc/VirtualDetectorId.hh"
+#include "Offline/DataProducts/inc/SurfaceId.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
@@ -332,6 +333,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	kseg_exit = &ks;
 	zmax      = z;
       }
+    }
+
+    for(size_t ikinter = 0; ikinter < kffs->intersections().size(); ++ikinter) {
+      auto const& kinter = kffs->intersections()[ikinter];
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Front) { track->fPTrackerEntrance = kinter.mom(); }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Mid) { track->fPTrackerMiddle = kinter.mom(); }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Back) { track->fPTrackerExit = kinter.mom();  }
     }
 
     KinKal::VEC3 fitmom = kseg->momentum3();
