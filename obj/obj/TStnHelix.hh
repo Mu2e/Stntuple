@@ -146,6 +146,7 @@ public:
   float   CenterY    () { return  fRCent*sin(fFCent);}
   float   D0         () { return  fD0;     }
 
+  float   Pz         () { return  fLambda*3./10;}//assumes 1T magnetic field!
   float   Pt         () { return  fRadius*3./10;}//assumes 1T magnetic field!
   float   P          () { return  sqrt(fRadius*fRadius + fLambda*fLambda)*3./10;}//assumes 1T magnetic field!
 
@@ -163,7 +164,7 @@ public:
   float   TZSlope       () { return fTZSlope;      }
   float   TZSlopeError  () { return fTZSlopeError; }
   float   TZSlopeSig    () { return std::fabs(fTZSlope/fTZSlopeError);      }
-  float   Chi2TZNDof(){ return fChi2TZNDof;   }
+  float   Chi2TZNDof    () { return fChi2TZNDof;   }
   float   HitRatio      () { return fHitRatio;     }
   
   TLorentzVector  Mom1     () { return fMom1; }

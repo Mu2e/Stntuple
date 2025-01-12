@@ -233,6 +233,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   art::Handle<mu2e::ComboHitCollection> sschcH;
   AnEvent->getByLabel(fSsChCollTag,sschcH);
   if (sschcH.isValid()) fSschColl = sschcH.product();
+  else printf(" WARNING InitTrackBlock::%s: ComboHitCollection %s not found\n", __func__, fSsChCollTag.encode().c_str());
 
   list_of_mc_straw_hits = 0;
   art::Handle<mu2e::StrawDigiMCCollection> sdmcHandle;
@@ -430,7 +431,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     const mu2e::SimParticle   *sim   (nullptr); 
     const mu2e::StrawGasStep  *stgs  (nullptr);
 
-    nss_ch = fSschColl->size();
+    nss_ch = (fSschColl) ? fSschColl->size() : -1;
 
     if (nss_ch <= 0) {
       printf(">>> ERROR in StntupleInitMu2eTrackBlock: ComboHitCollection by module XXXX is empty, NHITS = %i\n",

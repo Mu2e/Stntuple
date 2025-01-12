@@ -88,9 +88,12 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
   TStnTrackBlock* tb = (TStnTrackBlock*) Block;
   TStnEvent*      ev = Block->GetEvent();
   TStnHelixBlock* hb = (TStnHelixBlock*) ev->GetDataBlock(fTrackHsBlockName.Data());
+  if(!hb) {
+    printf(" WARNING in InitTrackBlock_KK::%s: Helix block %s not found!\n", __func__, fTrackHsBlockName.Data());
+  }
 
-  int nt = tb->NTracks();
-  int nh = hb->NHelices();
+  int nt = (tb) ? tb->NTracks() : 0;
+  int nh = (hb) ? hb->NHelices() : 0;
   
   for (int i=0; i<nt; i++) {
     TStnTrack* trk = tb->Track(i);
@@ -114,9 +117,10 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
 
     int  hindex(-1);
 
-    if (hs == nullptr) { 
-      mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
-                            << ": kseed->helix() is gone. FIXIT" ;
+    if (hs == nullptr) {
+      mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__
+                            << ": kseed->helix() is gone. kalseedassn = " << ((ksfha) ? 1 : 0)
+                            << ", len(assn) = " << ((ksfha) ? int((*ksfha).size()) : -1) << " --> FIXIT" ;
     }
     else {
 //-----------------------------------------------------------------------------
@@ -136,7 +140,7 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
     if (hindex < 0) {
       mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
                             << ": tracjseed " << fKFFCollTag.encode().data() 
-                            << ":" << i << "has no HelixSeed associated" ;
+                            << ":" << i << " has no HelixSeed associated" ;
     }
     trk->SetHelixIndex(hindex);
   }
