@@ -190,7 +190,8 @@ public:
   InterData_t               fDisk [kNDisks];      // track intersections with disks
 
   // new floats added in v15
-  float fPST; // momentum at the stopping target
+  float fPSTFront; // momentum at the front of the stopping target
+  float fPSTBack; // at back
   float fPTrackerEntrance; // momentum at tracker entrance (i.e. entering to stopping target)
   float fPTrackerMiddle; // at middle
   float fPTrackerExit; // at exit (i.e. exiting towards calorimeter)
@@ -309,7 +310,8 @@ public:
   float  Pt() const { return fPt; }
   Int_t  GetMomentum  (TLorentzVector* Momentum) ;
   
-  float  PST              () const { return fPST; }
+  float  PSTFront         () const { return fPSTFront; }
+  float  PSTBack          () const { return fPSTBack; }
   float  PTrackerEntrance () const { return fPTrackerEntrance; }
   float  PTrackerMiddle   () const { return fPTrackerMiddle; }
   float  PTrackerExit     () const { return fPTrackerExit; }

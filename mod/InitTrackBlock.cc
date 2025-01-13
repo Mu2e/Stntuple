@@ -338,6 +338,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     for(size_t ikinter = 0; ikinter < kffs->intersections().size(); ++ikinter) {
       auto const& kinter = kffs->intersections()[ikinter];
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Front) { track->fPSTFront = kinter.mom();  }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Back) { track->fPSTBack = kinter.mom();  }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Front) { track->fPTrackerEntrance = kinter.mom(); }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Mid) { track->fPTrackerMiddle = kinter.mom(); }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Back) { track->fPTrackerExit = kinter.mom();  }

@@ -1606,7 +1606,7 @@ void TStnTrack::Streamer(TBuffer& R__b) {
   nwi      = ((int*  ) &fChi2            ) - &fNumber;
   nwf      = ((float*) &fDisk            ) - &fChi2;
   nwf_vint = ((float*) &fDisk[0].fCluster) - &fDisk[0].fTime;
-  nwf2     = ((float*) &fTrkCaloHit) - &fPST; 
+  nwf2     = ((float*) &fTrkCaloHit) - &fPSTFront; 
 
   if (R__b.IsReading()) {
 //-----------------------------------------------------------------------------
@@ -1695,7 +1695,7 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 
       R__b.ReadFastArray(&fNumber,nwi);
       R__b.ReadFastArray(&fChi2,nwf);
-      R__b.ReadFastArray(&fPST,nwf2);
+      R__b.ReadFastArray(&fPSTFront,nwf2);
 					// read intersection info
       R__b >> imins;
       R__b >> imaxep;
@@ -1841,7 +1841,8 @@ void TStnTrack::Clear(Option_t* Opt) {
   fVMinS        = NULL;
   fVMaxEp       = NULL;
 
-  fPST              = 0.0;
+  fPSTFront         = 0.0;
+  fPSTBack          = 0.0;
   fPTrackerEntrance = 0.0;
   fPTrackerMiddle   = 0.0;
   fPTrackerExit     = 0.0;
