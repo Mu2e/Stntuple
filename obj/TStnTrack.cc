@@ -175,6 +175,12 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fC0               = -1.e6             ;  // ** added in V7
   fPhi0             = -1.e6             ;  // ** added in V8
   fTrkQual          = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
 // read intersection info 
 //-----------------------------------------------------------------------------
@@ -395,6 +401,12 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
   fC0           = -1.e6             ;  // ** added in V7
   fPhi0         = -1.e6             ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
 // read intersection info 
 //-----------------------------------------------------------------------------
@@ -619,6 +631,12 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
   fC0           = -1.e6             ;  // ** added in V7
   fPhi0         = -1.e6             ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
 // read intersection info 
 //-----------------------------------------------------------------------------
@@ -847,6 +865,12 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
   fC0           = data.fC0          ;  // ** added in V7
   fPhi0         = -1.e6;            ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
 // read intersection info 
 //-----------------------------------------------------------------------------
@@ -1078,6 +1102,12 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
   fC0           = data.fC0;         ;  // ** added in V7 ?
   fPhi0         = data.fPhi0;       ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
 // read intersection info 
 //-----------------------------------------------------------------------------
@@ -1311,6 +1341,12 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
   fC0           = data.fC0;         ;  // ** added in V7 ?
   fPhi0         = data.fPhi0;       ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
 // read intersection info 
 //-----------------------------------------------------------------------------
@@ -1545,6 +1581,12 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
   fC0           = data.fC0;         ;	// ** added in V7 ?
   fPhi0         = data.fPhi0;       ;	// ** added in V8
   fTrkQual      = -1.               ;	// ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
 // read intersection info 
 //-----------------------------------------------------------------------------
@@ -1650,10 +1692,16 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 
       if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
       else             fVMaxEp = NULL;
+
+      // added in v15
+      fPSTFront         = 0.f;
+      fPSTBack          = 0.f;
+      fPTrackerEntrance = 0.f;
+      fPTrackerMiddle   = 0.f;
+      fPTrackerExit     = 0.f;
     }
     else if ( (R__v == 13) || (R__v == 14)){
 //-----------------------------------------------------------------------------
-// current version - v14
 // V13 and V14 are different only by NDoF being packed into fNGoodMCHits
 //-----------------------------------------------------------------------------
       fMomentum.Streamer(R__b);
@@ -1683,6 +1731,13 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       R__b.ReadFastArray(&fTrkCaloHit.fTime,nwf_vint);
 
       fVTCH = &fTrkCaloHit;
+
+      // added in v15
+      fPSTFront         = 0.f;
+      fPSTBack          = 0.f;
+      fPTrackerEntrance = 0.f;
+      fPTrackerMiddle   = 0.f;
+      fPTrackerExit     = 0.f;
     }
     else if (R__v == 15 ){
 //-----------------------------------------------------------------------------
@@ -1695,7 +1750,6 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 
       R__b.ReadFastArray(&fNumber,nwi);
       R__b.ReadFastArray(&fChi2,nwf);
-      R__b.ReadFastArray(&fPSTFront,nwf2);
 					// read intersection info
       R__b >> imins;
       R__b >> imaxep;
@@ -1712,13 +1766,18 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
       else             fVMaxEp = NULL;
       
+      R__b.ReadFastArray(&fPSTFront,nwf2);
+
       R__b >> fTrkCaloHit.fID;
       R__b >> fTrkCaloHit.fClusterIndex;
       R__b.ReadFastArray(&fTrkCaloHit.fTime,nwf_vint);
 
       fVTCH = &fTrkCaloHit;
+    } else {
+      printf(" >>> ERROR: TStnTrack::Streamer unknown read version = %i. BAIL OUT\n",R__v);
     }
-    else {
+  }
+  else {
 //-----------------------------------------------------------------------------
 // write track data out
 //-----------------------------------------------------------------------------
@@ -1745,10 +1804,11 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       R__b.WriteFastArray(&fDisk[i].fTime,nwf_vint);
     }
     
+    R__b.WriteFastArray(&fPSTFront,nwf2);
+
     R__b << fTrkCaloHit.fID;
     R__b << fTrkCaloHit.fClusterIndex;
     R__b.WriteFastArray(&fTrkCaloHit.fTime,nwf_vint);
-    }
   }
 }
 
