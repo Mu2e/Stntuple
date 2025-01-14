@@ -61,10 +61,19 @@ END_PROLOG
 #include "mu2e_trig_config/core/trigFilters.fcl"
 #include "mu2e_trig_config/core/trigMCProductionSequences.fcl"
 #include "mu2e_trig_config/core/trigSequences.fcl"
+
 #------------------------------------------------------------------------------
 # include-less clones of Production fcls - does the sequence of inclusion matter ?
 #------------------------------------------------------------------------------
-#include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
-#include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
-#include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
-#include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
+# #include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
+# #include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
+# #include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
+# #include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
+
+#------------------------------------------------------------------------------
+# Production prologs
+#------------------------------------------------------------------------------
+#include "Production/JobConfig/common/prolog.fcl"
+#include "Production/JobConfig/primary/prolog.fcl"
+#include "Production/JobConfig/digitize/prolog.fcl"
+#include "Production/JobConfig/reco/prolog.fcl"
