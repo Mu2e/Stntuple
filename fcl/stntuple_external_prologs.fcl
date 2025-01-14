@@ -52,7 +52,7 @@ END_PROLOG
 #include "Offline/CaloReco/fcl/prolog.fcl"
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
-#include "Offline/CalPatRec/fcl/prolog_common.fcl"
+# #include "Offline/CalPatRec/fcl/prolog_common.fcl"
 #include "Offline/CosmicReco/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # trigger prologs
