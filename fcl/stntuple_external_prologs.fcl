@@ -59,7 +59,7 @@ END_PROLOG
 #------------------------------------------------------------------------------
 #include "mu2e_trig_config/core/trigProducers.fcl"
 #include "mu2e_trig_config/core/trigFilters.fcl"
-#include "mu2e_trig_config/core/trigMCProductionSequences.fcl"
+#include "mu2e_trig_config/core/trigRecoSequences.fcl"
 #include "mu2e_trig_config/core/trigSequences.fcl"
 
 #------------------------------------------------------------------------------

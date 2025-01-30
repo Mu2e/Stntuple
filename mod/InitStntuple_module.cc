@@ -176,6 +176,9 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger(   7,   7,"reco2Dmu"                    ,1));
     trigger_table->AddTrigger(new TStnTrigger(   8,   8,"reco2De"                     ,1));
 
+    trigger_table->AddTrigger(new TStnTrigger(   9,   9,"recoUe"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger(  10,  10,"recoUmu"                     ,1));
+
     trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDe_highP_stopTarg"        ,1));
     trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDe_lowP_stopTarg"         ,1));
     trigger_table->AddTrigger(new TStnTrigger( 120, 120,"tprHelixDe_ipa"              ,1));
