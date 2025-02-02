@@ -19,7 +19,7 @@
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
-#include "Offline/RecoDataProducts/inc/TrkQual.hh"
+#include "Offline/RecoDataProducts/inc/MVAResult.hh"
 #include "Offline/RecoDataProducts/inc/PIDProduct.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
@@ -34,7 +34,7 @@ namespace mu2e {
   class PIDProductCollection;
   class StrawDigiMCCollection;
   class StepPointMCCollection;
-  class TrkQualCollection;
+  class MVAResultCollection;
   class TrkCaloIntersectCollection;
 };
 #endif
@@ -65,7 +65,7 @@ public:
 
   mu2e::AlgorithmIDCollection*             list_of_algs               ;
   const mu2e::KalSeedCollection*           list_of_kffs               ;
-  const mu2e::TrkQualCollection*           list_of_trk_qual           ;
+  const mu2e::MVAResultCollection*         list_of_trk_qual           ;
   const mu2e::StrawDigiMCCollection*       list_of_mc_straw_hits      ;
   const mu2e::ComboHitCollection*          fSschColl                  ;
   const mu2e::TrkCaloIntersectCollection*  list_of_extrapolated_tracks;

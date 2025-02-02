@@ -8,7 +8,7 @@
 #include "TFolder.h"
 #include "TLorentzVector.h"
 #include "TVector2.h"
-					// Mu2e 
+					// Mu2e
 #include "Stntuple/obj/TStnTrack.hh"
 #include "Stntuple/obj/TStnTrackBlock.hh"
 #include "Stntuple/obj/TStnEvent.hh"
@@ -54,7 +54,7 @@
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
 
-					          // BaBar 
+					          // BaBar
 #include "BTrk/ProbTools/ChisqConsistency.hh"
 #include "BTrk/BbrGeom/BbrVectorErr.hh"
 #include "BTrk/BbrGeom/TrkLineTraj.hh"
@@ -108,7 +108,7 @@ void StntupleInitTrackBlock::get_station(const mu2e::Tracker* Tracker, ZMap_t* M
 
   double dz, dz_min(1.e10);
   int    iface(-1);
-  // looks that Device == Plane 
+  // looks that Device == Plane
   int nplanes = Tracker->nPlanes();
   // a plane has 2 "faces", 2 layers in each
   int nfaces  = 2*nplanes;
@@ -189,15 +189,20 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // cached pointers, owned by the StntupleMaker_module
 //-----------------------------------------------------------------------------
   static int                          initialized(0);
-  
+
+  const int verbose(0); //control output level for debugging
+
   int                       ntrk(0), ev_number, rn_number;
   TStnTrack*                track;
-  TStnTrackBlock            *data(0);   
+  TStnTrackBlock            *data(0);
 
   ev_number = AnEvent->event();
   rn_number = AnEvent->run();
 
-  if (Block->Initialized(ev_number,rn_number)) return 0;
+  if (Block->Initialized(ev_number,rn_number)) {
+    if(verbose > 0) printf("%s::%s: Block initialized already, exiting\n", typeid(*this).name(), __func__);
+    return 0;
+  }
 
   mu2e::GeomHandle<mu2e::Tracker> ttHandle;
   tracker = ttHandle.get();
@@ -219,15 +224,19 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   list_of_kffs = 0;
   art::Handle<mu2e::KalSeedCollection> kffcH;
   AnEvent->getByLabel(fKFFCollTag,kffcH);
-  if (kffcH.isValid())    { 
+  if (kffcH.isValid())    {
     list_of_kffs = kffcH.product();
     ntrk         = list_of_kffs->size();
+    if(verbose > 0) printf("%s::%s: KalSeedCollection %15s has %2i tracks\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), ntrk);
+  } else {
+    if(verbose > 0) printf("%s::%s: KalSeedCollection %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
   }
 
   list_of_trk_qual = 0;
-  art::Handle<mu2e::TrkQualCollection> trkQualHandle;
+  art::Handle<mu2e::MVAResultCollection> trkQualHandle;
   AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
   if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
+  else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
 
   fSschColl = 0;
   art::Handle<mu2e::ComboHitCollection> sschcH;
@@ -239,6 +248,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   art::Handle<mu2e::StrawDigiMCCollection> sdmcHandle;
   AnEvent->getByLabel(fStrawDigiMCCollTag,sdmcHandle);
   if (sdmcHandle.isValid()) list_of_mc_straw_hits = sdmcHandle.product();
+  else if(fStrawDigiMCCollTag != "") printf(" InitTrackBlock::%s: StrawDigiMC collection %s not found\n", __func__, fStrawDigiMCCollTag.encode().c_str());
 
   list_of_extrapolated_tracks = 0;
   art::Handle<mu2e::TrkCaloIntersectCollection>  texHandle;
@@ -247,7 +257,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
   art::Handle<mu2e::TrackClusterMatchCollection>  tcmH;
   AnEvent->getByLabel(fTcmCollTag,tcmH);
-  
+
   list_of_pidp = 0;
   art::Handle<mu2e::PIDProductCollection>  pidpHandle;
   AnEvent->getByLabel(fPIDProductCollTag,pidpHandle);
@@ -261,13 +271,14 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   int                       mask;
 
   const mu2e::Calorimeter* bc(NULL);
-  
+
   if (geom->hasElement<mu2e::DiskCalorimeter>() ) {
     mu2e::GeomHandle<mu2e::DiskCalorimeter> h;
     bc = (const mu2e::Calorimeter*) h.get();
   }
 
   for (int itrk=0; itrk<ntrk; itrk++) {
+    if(verbose > 1) printf("%s::%s: KalSeedCollection %s track %2i:\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
     track          = data->NewTrack();
     const mu2e::KalSeed* kffs = &list_of_kffs->at(itrk);
 //-----------------------------------------------------------------------------
@@ -292,13 +303,14 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->fAlgorithmID = mask;
 //-----------------------------------------------------------------------------
 // in all cases define momentum at lowest Z - ideally, at the tracker entrance
-// 'entlen' - trajectory length, corresponding to the first point in Z (?) 
+// 'entlen' - trajectory length, corresponding to the first point in Z (?)
 //-----------------------------------------------------------------------------
     // double  h1_fltlen(1.e6), hn_fltlen(1.e6), sent, sexit;
     // const mu2e::TrkStrawHitSeed *first(nullptr), *last(nullptr);
 
     const std::vector<mu2e::TrkStrawHitSeed>* hots = &kffs->hits();
     int n_kffs_hits = hots->size();
+    if(verbose > 1) printf("  N(hits) = %2i:\n", n_kffs_hits);
 
     // const TrkHit* first = kffs->firstHit()->kalHit()->hit();
     // const TrkHit* last  = kffs->lastHit ()->kalHit()->hit();
@@ -327,13 +339,19 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       double z = ks.position3().z();
       if (z < zmin) {
 	kseg = &ks;
-	zmin = z  ;  
+	zmin = z  ;
       }
 
       if (z > zmax) {
 	kseg_exit = &ks;
 	zmax      = z;
       }
+    }
+    if(verbose > 1) printf(" InitTrackBlock::InitDataBlock: KalSeed collection %s track %i has %2lu KalSegments\n", fKFFCollTag.encode().c_str(), itrk, kffs->segments().size());
+    if(verbose > 1) printf("  zmin = %6.1f, zmax = %6.1f:\n", zmin, zmax);
+    if(!kseg) {
+      printf("!!! InitTrackBlock::InitDataBlock: KalSegment for Track %i in KalSeed collection %s not found!\n", itrk, fKFFCollTag.encode().c_str());
+      continue;
     }
 
     for(size_t ikinter = 0; ikinter < kffs->intersections().size(); ++ikinter) {
@@ -343,10 +361,11 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Front) { track->fPTrackerEntrance = kinter.mom(); }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Mid) { track->fPTrackerMiddle = kinter.mom(); }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Back) { track->fPTrackerExit = kinter.mom();  }
+      if(verbose > 2) printf("  Surface %10s: p = %4.1f:\n", kinter.surfaceId().name().c_str(), kinter.mom());
     }
 
-    KinKal::VEC3 fitmom = kseg->momentum3();
-    KinKal::VEC3 pos    = kseg->position3();
+    KinKal::VEC3 fitmom = (kseg) ? kseg->momentum3() : KinKal::VEC3();
+    KinKal::VEC3 pos    = (kseg) ? kseg->position3() : KinKal::VEC3();
 
     track->fX1 = pos.x();
     track->fY1 = pos.y();
@@ -370,10 +389,10 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // momentum error in the first point
 //-----------------------------------------------------------------------------
 //    ROOT::Math::XYZVector  momdir = fitmom.unit();
-    
+
     track->fFitMomErr = kseg->momerr();
 //-----------------------------------------------------------------------------
-// determine, approximately, 'sz0' - flight length corresponding to the 
+// determine, approximately, 'sz0' - flight length corresponding to the
 // virtual detector at the tracker front
 //-----------------------------------------------------------------------------
     // Hep3Vector tfront = ds->toDetector(vdet->getGlobal(mu2e::VirtualDetectorId::TT_FrontPA));
@@ -418,117 +437,139 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     const mu2e::TrkStrawHitSeed  *hit; // , *closest_hit(NULL);
 
     //const TrkHitVector*       kffs_hits = &kffs->hitVector();
-    
+
     for (int j=0; j<40; j++) {
       track->fNHPerStation[j] = 0;
     }
-    
+
     int     loc, nss_ch, found, ntrkhits(0), nhitsambig0(0); // , pdg_code;
     int     ipart;
-    int     id(-1),  npart(0), part_nh[100], part_id[100];
-    int     part_pdg_code[100]; 
+    const static int max_npart(100);
+    int     id(-1),  npart(0), part_nh[max_npart], part_id[max_npart];
+    int     part_pdg_code[max_npart];
+    double  part_first_z[max_npart], part_first_z_p[max_npart];
+    double  part_last_z [max_npart], part_last_z_p [max_npart];
     int     nwrong = 0;
     double  mcdoca;
 
-    const mu2e::SimParticle   *sim   (nullptr); 
+    const mu2e::SimParticle   *sim   (nullptr);
     const mu2e::StrawGasStep  *stgs  (nullptr);
 
     nss_ch = (fSschColl) ? fSschColl->size() : -1;
 
     if (nss_ch <= 0) {
-      printf(">>> ERROR in StntupleInitMu2eTrackBlock: ComboHitCollection by module XXXX is empty, NHITS = %i\n",
-	     nss_ch);
+      printf(">>> ERROR in InitTrackBlock::%s ComboHitCollection by module %s is empty, NHITS = %i\n", __func__, fSsChCollTag.encode().c_str(), nss_ch);
     }
     else {
       for (int it=0; it<n_kffs_hits; it++) {
-	hit = &hots->at(it);
-	mu2e::StrawId sid = hit->strawId();
-	const mu2e::Straw* straw = &tracker->straw(sid);
-	++ntrkhits;
+        if(verbose > 5) printf(" Checking hit %i\n", it);
+        hit = &hots->at(it);
 //-----------------------------------------------------------------------------
 // skip calorimeter hit
 //-----------------------------------------------------------------------------
-	if (! hit) continue;
+        if (! hit) continue;
+        mu2e::StrawId sid = hit->strawId();
+        const mu2e::Straw* straw = &tracker->straw(sid);
+        ++ntrkhits;
 //-----------------------------------------------------------------------------
 // the rest makes sense only for active hits
-// all KalSeed hits are "active", figuring out non-active ones 
+// all KalSeed hits are "active", figuring out non-active ones
 // now requires comparing the outputs of the seed fit and the full fit
 //-----------------------------------------------------------------------------
-	if (1) { // hit->isActive()) { // all KalSeed hits are active 
-	  loc   = hit->index();
-	  if ((loc >= 0) && (loc < nss_ch)) {
-	    if ((list_of_mc_straw_hits != NULL) && (list_of_mc_straw_hits->size() > 0)) {
+        if (1) { // hit->isActive()) { // all KalSeed hits are active
+          loc   = hit->index();
+          if ((loc >= 0) && (loc < nss_ch)) {
+            if ((list_of_mc_straw_hits) && (list_of_mc_straw_hits->size() > 0)) {
+              if(verbose > 5) printf(" --> MC digi found\n");
+              const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
 
-	      const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
-
-	      stgs = mcdigi->earlyStrawGasStep().get();
+              stgs = mcdigi->earlyStrawGasStep().get();
 //-----------------------------------------------------------------------------
 // count number of active hits with R > 200 um and misassigned drift signs
 //-----------------------------------------------------------------------------
-	      if (stgs) {
-		if (hit->driftRadius() > 0.2) {
-		  const CLHEP::Hep3Vector* v1 = &straw->getMidPoint();
-		  HepPoint p1(v1->x(),v1->y(),v1->z());
-		  
-		  CLHEP::Hep3Vector v2 = stgs->position();
-		  HepPoint    p2(v2.x(),v2.y(),v2.z());
-		  
-		  TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
+              if (stgs) {
+                if(verbose > 5) printf(" --> MC gas step found\n");
+                if (hit->driftRadius() > 0.2) {
+                  const CLHEP::Hep3Vector* v1 = &straw->getMidPoint();
+                  HepPoint p1(v1->x(),v1->y(),v1->z());
 
-		  TrkLineTraj trstep (p2,stgs->momvec().unit(),0.,0.);
-		  
-		  TrkPoca poca(trstep, 0., trstraw, 0.);
-	      
-		  mcdoca = poca.doca();
+                  CLHEP::Hep3Vector v2 = stgs->position();
+                  HepPoint    p2(v2.x(),v2.y(),v2.z());
+
+                  TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
+
+                  TrkLineTraj trstep (p2,stgs->momvec().unit(),0.,0.);
+
+                  TrkPoca poca(trstep, 0., trstraw, 0.);
+
+                  mcdoca = poca.doca();
 //-----------------------------------------------------------------------------
 // if mcdoca and hit->_iamb have different signs, the hit drift direction has wrong sign
 //-----------------------------------------------------------------------------
-		  if (hit->ambig()*mcdoca < 0) nwrong      += 1;
-		  if (hit->ambig()       == 0) nhitsambig0 += 1;
-		}
-	    
-		sim = &(*stgs->simParticle());
-	      }
-	      if (sim != NULL) id = sim->id().asInt();
-	      else {
-		printf(">>> ERROR in %s : sim is NULL, set PDG_CODE to -1\n",oname);
-		id = -1;
-	      }
+                  if (hit->ambig()*mcdoca < 0) nwrong      += 1;
+                  if (hit->ambig()       == 0) nhitsambig0 += 1;
+                }
 
-	      found = 0;
-	      for (int ip=0; ip<npart; ip++) {
-		if (id == part_id[ip]) {
-		  found        = 1;
-		  part_nh[ip] += 1;
-		  break;
-		}
-	      }
-	    
-	      if (found == 0) {
-		part_id      [npart] = id;
-		part_pdg_code[npart] = sim->pdgId();
-		part_nh      [npart] = 1;
-		npart               += 1;
-	      }
-	    }
-	  }
-	  else {
-	    printf(">>> ERROR in StntupleInitMu2eTrackBlock: wrong hit collection used");
+                sim = &(*stgs->simParticle());
+              }
+
+              // check if there's an associated SIM particle, store the ID
+              if (sim != NULL) id = sim->id().asInt();
+              else {
+                printf(">>> ERROR in %s : sim is NULL, set PDG_CODE to -1\n",oname);
+                id = -1;
+              }
+
+              // check if this SIM particle has already been seen
+              found = 0;
+              for (int ip=0; ip<npart; ip++) {
+                if (id == part_id[ip]) { //increment N(hits) by this SIM if already seen
+                  found        = 1;
+                  part_nh[ip] += 1;
+                  const double dz = stgs->position().z();
+                  if(dz < part_first_z[ip]) {
+                    part_first_z  [ip] = dz;
+                    part_first_z_p[ip] = std::sqrt(stgs->momentum().mag2());
+                  }
+                  if(dz > part_last_z[ip]) {
+                    part_last_z  [ip] = dz;
+                    part_last_z_p[ip] = std::sqrt(stgs->momentum().mag2());
+                  }
+                  break;
+                }
+              }
+
+              // if this is the first occurrence, add it to the list
+              if (found == 0) {
+                const double dz = stgs->position().z();
+                part_id       [npart] = id;
+                part_pdg_code [npart] = sim->pdgId();
+                part_nh       [npart] = 1;
+                part_first_z  [npart] = dz;
+                part_first_z_p[npart] = std::sqrt(stgs->momentum().mag2());
+                part_last_z   [npart] = dz;
+                part_last_z_p [npart] = std::sqrt(stgs->momentum().mag2());
+                npart                += 1;
+              }
+            }
+          }
+          else {
+            printf(">>> ERROR in StntupleInitMu2eTrackBlock: wrong hit collection used");
             printf(", loc = %10i, n_straw_hits = %10i\n", loc,nss_ch);
-	  }
+          }
 
-	  const mu2e::StrawId& straw_id = straw->id();
-	
-	  int ist = straw_id.getStation();
-	
-	  track->fNHPerStation[ist] += 1;
-	
-	  int pan = straw_id.getPanel();
-	  int lay = straw_id.getLayer();
-	  int bit = zmap.fMap[ist][pan][lay];
+          const mu2e::StrawId& straw_id = straw->id();
 
-	  track->fHitMask.SetBit(bit,1);
-	}
+          int ist = straw_id.getStation();
+
+          track->fNHPerStation[ist] += 1;
+
+          int pan = straw_id.getPanel();
+          int lay = straw_id.getLayer();
+          int bit = zmap.fMap[ist][pan][lay];
+
+          track->fHitMask.SetBit(bit,1);
+        }
       }
     }
 //-----------------------------------------------------------------------------
@@ -542,13 +583,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
     track->fNMatSites = 0; // _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
 
-    if (list_of_trk_qual) track->fTrkQual = list_of_trk_qual->at(itrk).MVAOutput();
+    if (list_of_trk_qual) track->fTrkQual = list_of_trk_qual->at(itrk)._value;
     else                  track->fTrkQual = -1.e6;
 //-----------------------------------------------------------------------------
 // defined bit-packed fNActive word
 //-----------------------------------------------------------------------------
     track->fNActive   = kffs->hits().size() | (nwrong << 16);
-    
+
     mu2e::Doublet*                     d;
     mu2e::DoubletAmbigResolver::Data_t r;
 
@@ -566,8 +607,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     for (int i=0; i<nd; i++) {
       d  = &list_of_doublets.at(i);
       ns = d->fNStrawHits;
-					
-      if (ns > 1) { 
+
+      if (ns > 1) {
 	nd_tot += 1;
 	if (d->isSameSign()) nd_ss += 1;
 	else                 nd_os += 1;
@@ -684,6 +725,11 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->fPdgCode     = part_pdg_code[ipart];
     track->fPartID      = part_id      [ipart];
     track->fNGoodMcHits = (kffs->nDOF() << 16) + nh0;
+
+    if(verbose > 1) printf(" Track %i MC info: ID = %3i, PDG = %5i, N(hits) = %2i, z(first) = %6.1f, p(first) = %5.1f, z(last) = %6.1f, p(last) = %5.1f\n",
+                           itrk, track->fPartID, track->fPdgCode, nh0,
+                           part_first_z[ipart], part_first_z_p[ipart],
+                           part_last_z [ipart], part_last_z_p [ipart]);
 //-----------------------------------------------------------------------------
 // particle parameters at virtual detectors
 //-----------------------------------------------------------------------------
@@ -691,9 +737,11 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     double t_front(1.e6), t_stout(1.e6);
 
-    track->fPFront = -1.;
+    // initialize MC track front to an early sim hit in case no virtual detector hit is found
+    track->fPFront = part_first_z_p[ipart];
     track->fPStOut = -1.;
 
+    if(verbose > 1) printf(" N(virtual detectors) = %i\n", vdg->nDet());
     if (vdg->nDet() > 0) {
 //-----------------------------------------------------------------------------
 // no more step point MC's in the tracker - straw gas steps there
@@ -708,11 +756,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       }
       else {
 	int nvdhits = vdhits->size();
+        if(verbose > 2) printf(" N(virtual detector hits) = %i with tag %s\n", nvdhits, fVdhCollTag.encode().c_str());
 	for (int i=0; i<nvdhits; i++) {
 	  const mu2e::StepPointMC* hit = &(*vdhits)[i];
-	  
+
 	  //int vdid = hit.volumeId();
 	  mu2e::VirtualDetectorId vdid(hit->volumeId());
+          if(verbose > 3) printf("  Virtual detector hit %2i: %15s\n", i, vdid.name().c_str());
 
 	  if (vdid.id() == mu2e::VirtualDetectorId::ST_Out) {
 
@@ -726,12 +776,15 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	      printf(">>> ERROR: %s sim == NULL\n",oname);
 	      sprintf(warning,"WARNING: SimParticle for step %i = NULL\n",i);
 	      mf::LogWarning(oname) << warning;
-	    }
-	    int sim_id = sim->id().asInt();
-	    if ((sim_id == track->fPartID)  && (hit->time() <  t_stout)) {
-	      track->fPStOut = hit->momentum().mag();
-	      t_stout        = hit->time();
-	    }
+	    } else {
+              int sim_id = sim->id().asInt();
+              if(verbose > 4) printf("   simID = %5i\n", sim_id);
+              if ((sim_id == track->fPartID)  && (hit->time() <  t_stout)) {
+                track->fPStOut = hit->momentum().mag();
+                t_stout        = hit->time();
+                if(verbose > 3) printf(" Sim ST_Out hit found: p = %5.1f, t = %6.1f\n", track->fPStOut, t_stout);
+              }
+            }
 	  }
 	  else if (vdid.isTrackerFront()) {
 
@@ -742,16 +795,21 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
 	    if (sim == NULL) {
 	      printf(">>> ERROR: %s sim == NULL\n",oname);
-	    }
-	    int sim_id = sim->id().asInt();
-	    if ((sim_id == track->fPartID) && (hit->time() < t_front)) {
-	      track->fPFront = hit->momentum().mag();
-	      t_front        = hit->time();
-	    }
+	    } else {
+              int sim_id = sim->id().asInt();
+              if(verbose > 4) printf("   simID = %5i\n", sim_id);
+              if ((sim_id == track->fPartID) && (hit->time() < t_front)) {
+                track->fPFront = hit->momentum().mag();
+                t_front        = hit->time();
+                if(verbose > 3) printf(" Sim TT_Front hit found: p = %5.1f, t = %6.1f\n", track->fPFront, t_front);
+              }
+            }
 	  }
 	}
       }
     }
+    if(verbose > 1) printf(" Track MC P(front) = %5.1f, MC P(ST Out) = %5.1f\n", track->fPFront, track->fPStOut);
+
 //-----------------------------------------------------------------------------
 // number of MC hits produced by the mother particle
 //-----------------------------------------------------------------------------
@@ -764,7 +822,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
         const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
 
 	if (step) {
-	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
+	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle();
 	  art::Ptr<mu2e::SimParticle> mother        = simptr;
 	  while(mother->hasParent())  mother        = mother->parent();
 	  const mu2e::SimParticle*    sim           = mother.get();
@@ -789,7 +847,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     // if (list_of_extrapolated_tracks != NULL) next = list_of_extrapolated_tracks->size();
     // else                                     next = 0;
-  
+
 //     for (int iext=0; iext<next; iext++) {
 //       extrk = &list_of_extrapolated_tracks->at(iext);
 //       kffs  = extrk->trk().get();
@@ -797,7 +855,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // 	if (track->fExtrk == 0) {
 // 	  track->fExtrk = (const mu2e::TrkToCaloExtrapol*) extrk;
 // 	}
-// 	if (bc) { 
+// 	if (bc) {
 // //-----------------------------------------------------------------------------
 // // store coordinates of the best intersection in a plane
 // //-----------------------------------------------------------------------------
@@ -810,14 +868,14 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // 	    vint->fChi2Match = 1.e6;
 // 	  }
 // 	  else {
-// 	    printf("Run:Event: %i:%i %s : ADDITIONAL EXTR POINT for track %i on vane = %i\n", 
+// 	    printf("Run:Event: %i:%i %s : ADDITIONAL EXTR POINT for track %i on vane = %i\n",
 // 		   rn_number,ev_number,oname,itrk,iv);
 // 	  }
 // 	}
 //       }
 //    }
 //-----------------------------------------------------------------------------
-// now loop over track-cluster matches and find the right ones to associate 
+// now loop over track-cluster matches and find the right ones to associate
 // with the track
 //-----------------------------------------------------------------------------
 //    unsigned int nm (0);
@@ -862,7 +920,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //	vint->fYTrk  = tcm->ytrk();
 //	vint->fZTrk  = tcm->ztrk();
 //	vint->fTime  = tcm->ttrk();
-//	
+//
 //	vint->fNxTrk = tcm->nx();
 //	vint->fNyTrk = tcm->ny();
 //	vint->fNzTrk = tcm->nz();
@@ -893,7 +951,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //      }
 //    }
 //-----------------------------------------------------------------------------
-// find intersections to use for electron ID, 
+// find intersections to use for electron ID,
 // in this version both VMinS and VMaxEp are the same
 //-----------------------------------------------------------------------------
     double                    min_chi2_match(1.e6);
@@ -917,7 +975,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       }
     }
 //-----------------------------------------------------------------------------
-// define E/P by the first intersection, if it exists, the second in the 
+// define E/P by the first intersection, if it exists, the second in the
 // high-occupancy environment may be unreliable
 //----------------------------------------------------
     track->fClusterE = -track->fP;
@@ -966,17 +1024,17 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     //-----------------------------------------------------------------------------
     // skip TrkStrawHit hit
     //-----------------------------------------------------------------------------
-    if (tch) { 
+    if (tch) {
       vtch = &(track->fTrkCaloHit);
       const mu2e::CaloCluster* cl = tch->caloCluster().get();
-      
+
       if (cl) {
 	CLHEP::Hep3Vector cpos = bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector()));
-    
+
 	CLHEP::Hep3Vector pos;
 	// tch->hitPosition(pos);
-      
-	vtch->fID           = cl->diskID();		// 
+
+	vtch->fID           = cl->diskID();		//
 	vtch->fClusterIndex = -1;         // cluster index in the list of clusters
 
       // the following includes the (Calibrated) light-propagation time delay.  It should eventually be put in the reconstruction FIXME!
@@ -1021,7 +1079,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // 2015-04-02: this routine is not finished yet
 //-----------------------------------------------------------------------------
-Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
+Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode)
 {
   int    ev_number, rn_number;
 
@@ -1047,7 +1105,7 @@ Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 
   if (not fTrackTsCollTag.empty()) {
 //-----------------------------------------------------------------------------
-// seeds are stored, fill links part: 'TrackTs' collection stores, for each track, 
+// seeds are stored, fill links part: 'TrackTs' collection stores, for each track,
 // its KalSeed
 //-----------------------------------------------------------------------------
     art::Handle<mu2e::KalSeedCollection>  ksch;
@@ -1072,13 +1130,13 @@ Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 	  break;
 	}
       }
-    
+
       if (loc < 0) {
-	printf(">>> ERROR: %s track %i -> no TrackSeed associated\n", 
+	printf(">>> ERROR: %s track %i -> no TrackSeed associated\n",
                fKFFCollTag.encode().data(), i);
 	continue;
       }
-    
+
       trk->SetTrackSeedIndex(loc);
     }
   }
@@ -1089,4 +1147,3 @@ Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 
   return 0;
 }
-
