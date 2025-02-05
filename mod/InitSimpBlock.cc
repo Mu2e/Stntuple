@@ -183,6 +183,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   art::Handle<mu2e::PrimaryParticle> pp_handle;
   const mu2e::PrimaryParticle*       pp(nullptr);
   const mu2e::SimParticle*           primary(nullptr);
+  const int verbose(0);
 
   if (! fPrimaryParticleTag.empty()) {
     AnEvent->getByLabel(fPrimaryParticleTag,pp_handle);
@@ -193,6 +194,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	primary       = pp->primarySimParticles().front().get();
 	fGenProcessID = primary->creationCode();
 	fPdgID        = primary->pdgId();
+        if(verbose > 0) {
+          printf("Primary particles:\n");
+          for(auto sim : pp->primarySimParticles()) printf(" ProcessCode = %20s, PDG = %5i\n", sim->creationCode().name().c_str(), sim->pdgId());
+        }
       }
     }
   }
@@ -225,17 +230,28 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
       pdg_code         = (int) sim->pdgId();
       process_id       = sim->creationCode();
-
       if (pp != nullptr) {
-	int found = 0;
+	bool found = 0;
 	for (auto pr : pp->primarySimParticles()) {
 	  if (pr.get() == sim) {
-	    found = 1;
+	    found = true;
 	    break;
 	  }
 	}
-	if (found == 0)                                     continue;
+
+        // check a for important Process codes that may not get labeled "PrimaryParticle"
+        found |= process_id == mu2e::ProcessCode::mu2eGammaConversion;
+        found |= process_id == mu2e::ProcessCode::mu2eInternalRMC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eExternalRMC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eInternalRPC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eExternalRPC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eFlatPhoton     ;
+
+	if (!found)                                     continue;
       }
+      if(verbose) printf("InitSimpBlock::%s: Accepting SIM: ID = %4i, PDG = %5i, Code = %s\n",
+                         __func__, id, pdg_code, sim->creationCode().name().c_str());
+
 //-----------------------------------------------------------------------------
 // if primary particle is not defined, or defined incorrectly (!) 
 // store all particles
