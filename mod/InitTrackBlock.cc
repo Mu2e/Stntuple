@@ -190,7 +190,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
   static int                          initialized(0);
 
-  const int verbose(0); //control output level for debugging
+  const int verbose(fVerbose); //control output level for debugging
 
   int                       ntrk(0), ev_number, rn_number;
   TStnTrack*                track;
@@ -420,6 +420,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       mf::LogWarning(oname) << " ERROR line " << __LINE__ << ": KinKal::CentralHelix trouble" ;
       continue;
     }
+    if(verbose > 1) printf("  p = %5.1f, pT = %5.1f, t0 = %6.1f, d0 = %6.1f, z0 = %7.1f, phi0 = %5.2f, tdip = %4.2f\n",
+                           track->fP, track->fPt, track->fT0, track->fD0, track->fZ0, track->fPhi0, track->fTanDip);
 
 //-----------------------------------------------------------------------------
 // virtual detector at the tracker exit: Time at Z(TT_Back)
@@ -589,6 +591,9 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // defined bit-packed fNActive word
 //-----------------------------------------------------------------------------
     track->fNActive   = kffs->hits().size() | (nwrong << 16);
+    if(verbose > 1) printf("  N(hits) = %2i, N(active) = %2i, N(wrong) = %2i, trkqual = %5.2f\n",
+                           track->fNHits, track->NActive(), track->NWrong(),
+                           track->fTrkQual);
 
     mu2e::Doublet*                     d;
     mu2e::DoubletAmbigResolver::Data_t r;

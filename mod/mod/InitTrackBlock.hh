@@ -62,6 +62,7 @@ public:
   art::InputTag   fTrackTsCollTag;
 
   TString         fTrackHsBlockName;
+  int             fVerbose;
 
   mu2e::AlgorithmIDCollection*             list_of_algs               ;
   const mu2e::KalSeedCollection*           list_of_kffs               ;

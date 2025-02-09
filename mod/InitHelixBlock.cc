@@ -100,7 +100,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
   mu2e::GeomHandle<mu2e::Tracker> th;
   const mu2e::Tracker* trackerGeom = th.get();
 
-  const int verbose(0);
+  const int verbose(fVerbose);
   if(verbose > 3) printf("InitHelixBlock %s: Printing helix collection info: N(helices) = %2i\n", Block->GetName(), nhelices);
   for (int i=0; i<nhelices; i++) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;

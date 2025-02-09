@@ -196,6 +196,12 @@ protected:
   string                   fCutHelixSeedCollTag; // helix collection to cut on
   int                      fMinNHelices        ; // min number of helices (for cosmics)
 
+//-----------------------------------------------------------------------------
+// debug parameters
+//-----------------------------------------------------------------------------
+  int                      fTrackVerbose; // verbosity by data block
+  int                      fHelixVerbose;
+
   TNamed*                  fVersion;
 
   TNamedHandle*            fDarHandle;
@@ -318,6 +324,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMinNStrawHits           (PSet.get<int>           ("minNStrawHits"       ))
   , fCutHelixSeedCollTag     (PSet.get<string>        ("cutHelixSeedCollTag" ))
   , fMinNHelices             (PSet.get<int>           ("minNHelices"         ))
+
+  , fTrackVerbose            (PSet.get<int>           ("trackVerbose", 0     ))
+  , fHelixVerbose            (PSet.get<int>           ("helixVerbose", 0     ))
 {
 
   char  ver[20], text[200];
@@ -555,6 +564,8 @@ void StntupleMaker::beginJob() {
         init_block->SetKsfBlockName(fKsfBlockName  [i]);
       }
 
+      init_block->fVerbose = fHelixVerbose;
+
       AddDataBlock(block_name,"TStnHelixBlock",init_block,
                    buffer_size,split_mode,compression_level);
     }
@@ -734,6 +745,8 @@ void StntupleMaker::beginJob() {
       init_block->SetTrkQualCollTag     (fTrkQualCollTag[i]);
 
       init_block->SetDoubletAmbigResolver(fDar);
+
+      init_block->fVerbose = fTrackVerbose;
 
       TStnDataBlock* db = AddDataBlock(block_name,"TStnTrackBlock",init_block,
 				       buffer_size,split_mode,compression_level);

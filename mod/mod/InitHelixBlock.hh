@@ -38,7 +38,9 @@ public:
   art::InputTag   fKsCollTag;           // helix KSF coll tag, to find assns
   TString         fKsfBlockName;        // KalSeedFit  block name for BTRK
   TString         fTclBlockName;        // TimeCluster block name
-  int             fTrackFitType;        // for KinKal, 
+  int             fTrackFitType;        // for KinKal
+
+  int             fVerbose;             // for debug printout
 
   const mu2e::HelixSeedCollection*         fListOfHSeeds;
 
