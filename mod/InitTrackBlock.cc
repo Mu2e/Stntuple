@@ -331,41 +331,47 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // find segments corresponding to entry and exit points in the tracker
 //-----------------------------------------------------------------------------
-    const mu2e::KalSegment *kseg(nullptr), *kseg_exit(nullptr);
+    // Intersections with the tracker surfaces
+    const mu2e::KalIntersection *kinter_front(nullptr), *kinter_mid(nullptr), *kinter_back(nullptr);
+    // Intersections with the stopping target surfaces
+    const mu2e::KalIntersection *kinter_st_front(nullptr), *kinter_st_back(nullptr);
+    std::vector<const mu2e::KalIntersection *> kinter_st_foils;
 
-    double zmin(1.e6), zmax(-1.e6);
-
-    for(auto const& ks : kffs->segments() ) {
-      double z = ks.position3().z();
-      if (z < zmin) {
-	kseg = &ks;
-	zmin = z  ;
-      }
-
-      if (z > zmax) {
-	kseg_exit = &ks;
-	zmax      = z;
-      }
-    }
-    if(verbose > 1) printf(" InitTrackBlock::InitDataBlock: KalSeed collection %s track %i has %2lu KalSegments\n", fKFFCollTag.encode().c_str(), itrk, kffs->segments().size());
-    if(verbose > 1) printf("  zmin = %6.1f, zmax = %6.1f:\n", zmin, zmax);
-    if(!kseg) {
-      printf("!!! InitTrackBlock::InitDataBlock: KalSegment for Track %i in KalSeed collection %s not found!\n", itrk, fKFFCollTag.encode().c_str());
-      continue;
-    }
-
+    // Take the first intersection (in time) for each surface (for the ST foil, take the highest Z foil)
     for(size_t ikinter = 0; ikinter < kffs->intersections().size(); ++ikinter) {
       auto const& kinter = kffs->intersections()[ikinter];
-      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Front) { track->fPSTFront = kinter.mom();  }
-      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Back) { track->fPSTBack = kinter.mom();  }
-      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Front) { track->fPTrackerEntrance = kinter.mom(); }
-      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Mid) { track->fPTrackerMiddle = kinter.mom(); }
-      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Back) { track->fPTrackerExit = kinter.mom();  }
-      if(verbose > 2) printf("  Surface %10s: p = %4.1f:\n", kinter.surfaceId().name().c_str(), kinter.mom());
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Front) {
+        if(!kinter_st_front || kinter_st_front->time() < kinter.time()) kinter_st_front = &kinter;
+      }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Back) {
+        if(!kinter_st_back || kinter_st_back->time() < kinter.time()) kinter_st_back = &kinter;
+      }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Foils) { // save all the foils, ask about them later
+        kinter_st_foils.push_back(&kinter);
+      }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Front) {
+        if(!kinter_front || kinter_front->time() < kinter.time()) kinter_front = &kinter;
+      }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Mid) {
+        if(!kinter_mid || kinter_mid->time() < kinter.time()) kinter_mid = &kinter;
+      }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Back) {
+        if(!kinter_back || kinter_back->time() < kinter.time()) kinter_back = &kinter;
+      }
+      if(verbose > 2) printf("  Surface %10s: p = %4.1f t = %6.1f:\n", kinter.surfaceId().name().c_str(), kinter.mom(), kinter.time());
     }
 
-    KinKal::VEC3 fitmom = (kseg) ? kseg->momentum3() : KinKal::VEC3();
-    KinKal::VEC3 pos    = (kseg) ? kseg->position3() : KinKal::VEC3();
+    // Store the momentum at each surface if found
+    if(kinter_st_front) { track->fPSTFront         = kinter_st_front->mom(); }
+    if(kinter_st_back ) { track->fPSTBack          = kinter_st_back ->mom(); }
+    if(kinter_front   ) { track->fPTrackerEntrance = kinter_front   ->mom(); }
+    if(kinter_mid     ) { track->fPTrackerMiddle   = kinter_mid     ->mom(); }
+    if(kinter_back    ) { track->fPTrackerExit     = kinter_back    ->mom(); }
+
+    // Decide which intersection to use for the defaults, using the front if available (only Mid available for Online tracks)
+    const mu2e::KalIntersection* kinter((kinter_front) ? kinter_front : (kinter_mid) ? kinter_mid : nullptr);
+    KinKal::VEC3 fitmom = (kinter) ? kinter->momentum3() : KinKal::VEC3();
+    KinKal::VEC3 pos    = (kinter) ? kinter->position3() : KinKal::VEC3();
 
     track->fX1 = pos.x();
     track->fY1 = pos.y();
@@ -379,7 +385,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // track parameters in the first point
 //-----------------------------------------------------------------------------
     track->Momentum()->SetXYZM(px,py,pz,0.511);
-    track->fP         = kseg->mom();
+    track->fP         = (kinter) ? kinter->mom() : 0.f;
     track->fPt        = track->Momentum()->Pt();
     track->fChi2      = kffs->chisquared();
     track->fFitCons   = kffs->fitConsistency();
@@ -390,7 +396,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 //    ROOT::Math::XYZVector  momdir = fitmom.unit();
 
-    track->fFitMomErr = kseg->momerr();
+    track->fFitMomErr = (kinter) ? kinter->momerr() : 0.f;
 //-----------------------------------------------------------------------------
 // determine, approximately, 'sz0' - flight length corresponding to the
 // virtual detector at the tracker front
@@ -403,22 +409,24 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // fP2 : track momentum at Z(TT_Back), just for fun, should not be used for anything
 //-----------------------------------------------------------------------------
     track->fP0        = track->fP; // can reuse , if needed
-    track->fP2        = kseg_exit->mom();
+    track->fP2        = (kinter_back) ? kinter_back->mom() : 0.f;
 //-----------------------------------------------------------------------------
 // helical parameters at Z(TT_FrontPA)
 //-----------------------------------------------------------------------------
-    try {
-      KinKal::CentralHelix helx = kseg->centralHelix();
-      track->fC0        = helx.omega(); // old
-      track->fD0        = helx.d0();
-      track->fZ0        = helx.z0();
-      track->fPhi0      = helx.phi0();
-      track->fTanDip    = helx.tanDip(); // old
-      track->fCharge    = helx.charge();
-    }
-    catch (...) {
-      mf::LogWarning(oname) << " ERROR line " << __LINE__ << ": KinKal::CentralHelix trouble" ;
-      continue;
+    if(kinter) {
+      try {
+        KinKal::CentralHelix helx = kinter->centralHelix();
+        track->fC0        = helx.omega(); // old
+        track->fD0        = helx.d0();
+        track->fZ0        = helx.z0();
+        track->fPhi0      = helx.phi0();
+        track->fTanDip    = helx.tanDip(); // old
+        track->fCharge    = helx.charge();
+      }
+      catch (...) {
+        mf::LogWarning(oname) << " ERROR line " << __LINE__ << ": KinKal::CentralHelix trouble" ;
+        continue;
+      }
     }
     if(verbose > 1) printf("  p = %5.1f, pT = %5.1f, t0 = %6.1f, d0 = %6.1f, z0 = %7.1f, phi0 = %5.2f, tdip = %4.2f\n",
                            track->fP, track->fPt, track->fT0, track->fD0, track->fZ0, track->fPhi0, track->fTanDip);
@@ -430,8 +438,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // double     zback      = vd_tt_back.z();
     // double     szb        = s_at_given_z(kffs,zback);
 
-    double     tback      = -1; // FIXME kffs->arrivalTime(szb);
-					// rename later
+    const float tback = -1.f; //FIXME
+    // rename later
     track->fTBack         = tback;
 //-----------------------------------------------------------------------------
 // the total number of planes is 36, use 40 for simplicity
@@ -829,7 +837,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	if (step) {
 	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle();
 	  art::Ptr<mu2e::SimParticle> mother        = simptr;
-	  while(mother->hasParent())  mother        = mother->parent();
+	  // while(mother->hasParent())  mother        = mother->parent();
 	  const mu2e::SimParticle*    sim           = mother.get();
 
 	  int sim_id = sim->id().asInt();
@@ -991,32 +999,36 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     const mu2e::CaloCluster* calo_cluster = kffs->caloHit().caloCluster().get();
     if (calo_cluster) track->fClusterE = calo_cluster->energyDep();
+    track->fEp = track->fClusterE/track->fP2;
 
-    if (track->fVMinS != 0) {
-      if (track->fVMinS->fCluster) {
-	track->fClusterE = track->fVMinS->fCluster->energyDep();
-	track->fDx       = track->fVMinS->fDx;
-	track->fDy       = track->fVMinS->fDy;
-	track->fDz       = track->fVMinS->fDz;
-	track->fDt       = track->fVMinS->fDt;
-      }
-      else {
-//-----------------------------------------------------------------------------
-// intersection with minimal S doesn't have a cluster, check MaxP
-//-----------------------------------------------------------------------------
-	if (track->fVMaxEp != 0) {
-	  if (track->fVMaxEp->fCluster) {
-	    track->fClusterE = track->fVMaxEp->fCluster->energyDep();
-	    track->fDx       = track->fVMaxEp->fDx;
-	    track->fDy       = track->fVMaxEp->fDy;
-	    track->fDz       = track->fVMaxEp->fDz;
-	    track->fDt       = track->fVMaxEp->fDt;
-	  }
-	}
+    const bool use_calo_hit(true); // use calo-hit info vs. intersections
+
+    if(!use_calo_hit) {
+      if (track->fVMinS != 0) {
+        if (track->fVMinS->fCluster) {
+          track->fClusterE = track->fVMinS->fCluster->energyDep();
+          track->fDx       = track->fVMinS->fDx;
+          track->fDy       = track->fVMinS->fDy;
+          track->fDz       = track->fVMinS->fDz;
+          track->fDt       = track->fVMinS->fDt;
+        }
+        else {
+          //-----------------------------------------------------------------------------
+          // intersection with minimal S doesn't have a cluster, check MaxP
+          //-----------------------------------------------------------------------------
+          if (track->fVMaxEp != 0) {
+            if (track->fVMaxEp->fCluster) {
+              track->fClusterE = track->fVMaxEp->fCluster->energyDep();
+              track->fDx       = track->fVMaxEp->fDx;
+              track->fDy       = track->fVMaxEp->fDy;
+              track->fDz       = track->fVMaxEp->fDz;
+              track->fDt       = track->fVMaxEp->fDt;
+            }
+          }
+        }
       }
     }
 
-    track->fEp = track->fClusterE/track->fP2;
 //--------------------------------------------------------------------------------
 // now set the parameters associated with the TrkCaloHit
 //--------------------------------------------------------------------------------
@@ -1070,6 +1082,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	// vtch->fSInt         = -9999.;                 // ** added in V10: interaction length, calculated
 	vtch->fCluster      = cl;
 	//    vtch->fExtrk        = NULL;
+
+        if(use_calo_hit) {
+          track->fDx       = vtch->fDx;
+          track->fDy       = vtch->fDy;
+          track->fDz       = vtch->fDz;
+          track->fDt       = vtch->fDt;
+        }
       }
     }
   }

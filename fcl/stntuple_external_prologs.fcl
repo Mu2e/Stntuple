@@ -44,6 +44,7 @@ END_PROLOG
 #------------------------------------------------------------------------------
 # reconstruction prologs
 #------------------------------------------------------------------------------
+#include "Offline/TrkPatRec/fcl/Particle.fcl"
 #include "Offline/Mu2eKinKal/fcl/prolog.fcl"
 #include "Offline/TrkDiag/fcl/prolog.fcl"
 #include "Offline/TrkHitReco/fcl/prolog.fcl"
