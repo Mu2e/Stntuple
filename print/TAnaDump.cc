@@ -1342,7 +1342,7 @@ void TAnaDump::printCalorimeter() {
     return;
   }
 
-  int nd = cal->nDisk();
+  int nd = cal->nDisks();
   printf(" ndisks = %i\n", nd);
   printf(" crystal size  : %10.3f\n", cal->caloInfo().getDouble("crystalXYLength"));
   printf(" crystal length: %10.3f\n", cal->caloInfo().getDouble("crystalZLength"));
@@ -1350,7 +1350,7 @@ void TAnaDump::printCalorimeter() {
   for (int i=0; i<nd; i++) {
     disk = &cal->disk(i);
     printf(" ---- disk # %i\n",i);
-    printf(" Rin  : %10.3f  Rout : %10.3f\n", disk->innerRadius(),disk->outerRadius());
+    printf(" Rin  : %10.3f  Rout : %10.3f\n", disk->geomInfo().innerEnvelopeR(), disk->geomInfo().outerEnvelopeR());
     printf(" X : %12.3f Y : %12.3f Z : %12.3f\n",
 	   disk->geomInfo().origin().x(),
 	   disk->geomInfo().origin().y(),

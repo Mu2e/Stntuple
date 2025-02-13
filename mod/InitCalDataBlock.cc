@@ -87,12 +87,12 @@ Int_t StntupleInitMu2eCalDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
 
   cal = dc.get();
 
-  data->fNDisks = cal->nDisk();
+  data->fNDisks = cal->nDisks();
   for (int i=0; i<data->fNDisks; i++) {
     disk = &cal->disk(i);
     data->fNCrystals[i] = disk->nCrystals();
-    data->fRMin     [i] = disk->innerRadius();
-    data->fRMax     [i] = disk->outerRadius();
+    data->fRMin     [i] = disk->geomInfo().innerEnvelopeR();
+    data->fRMax     [i] = disk->geomInfo().outerEnvelopeR();
     data->fZ0       [i] = disk->geomInfo().origin().z();
   }
 

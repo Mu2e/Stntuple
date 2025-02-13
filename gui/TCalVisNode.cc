@@ -93,7 +93,7 @@ int TCalVisNode::LocalCrystalID(int CrystalID) {
   mu2e::GeomHandle<mu2e::DiskCalorimeter> dc;
   int nc, ns, id;
 
-  ns = dc->nDisk();//nSection();
+  ns = dc->nDisks();//nSection();
   id = CrystalID;
 
   for (int i=0; i<ns; ++i) {

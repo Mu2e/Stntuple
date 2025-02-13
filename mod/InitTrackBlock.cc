@@ -973,7 +973,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->fVMinS  = 0;
     track->fVMaxEp = 0;
 
-    int ndisks = bc->nDisk();
+    int ndisks = bc->nDisks();
 
     for (int iv=0; iv<ndisks; iv++) {
       v = &track->fDisk[iv];
