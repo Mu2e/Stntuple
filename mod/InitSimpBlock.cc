@@ -228,8 +228,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 // need to store e+ and e- from an external photon conversion
 // it is possible that will need to lop over the primary particles
 //-----------------------------------------------------------------------------
-      pdg_code         = (int) sim->pdgId();
-      process_id       = sim->creationCode();
+      pdg_code           = (int) sim->pdgId();
+      process_id         = sim->creationCode();
+
+      const bool is_pion = std::abs(pdg_code) == 211;
       if (pp != nullptr) {
 	bool found = 0;
 	for (auto pr : pp->primarySimParticles()) {
@@ -246,6 +248,9 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
         found |= process_id == mu2e::ProcessCode::mu2eInternalRPC    ;
         found |= process_id == mu2e::ProcessCode::mu2eExternalRPC    ;
         found |= process_id == mu2e::ProcessCode::mu2eFlatPhoton     ;
+        found |= is_pion                                             ; // save pions for reweighting RPC
+        if(verbose > 1) printf("InitSimpBlock::%s: Checking SIM: ID = %4i, PDG = %5i, Code = %s --> found = %o\n",
+                               __func__, id, pdg_code, sim->creationCode().name().c_str(), found);
 
 	if (!found)                                     continue;
       }
@@ -289,8 +294,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
       const CLHEP::Hep3Vector sp = sim->startPosition();
 
-      if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
-      if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
+      if(!is_pion) { //no additional requirements for pions needed for reweighting
+        if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
+        if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
+      }
 
       simp   = simp_block->NewParticle(id, parent_id, pdg_code        , 
 				       creation_code, termination_code,
