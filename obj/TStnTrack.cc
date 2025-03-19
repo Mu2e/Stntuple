@@ -135,11 +135,11 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fPdgCode          = data.fPdgCode     ;     // PDF code of the particle produced most hits
   fNGoodMcHits      = data.fNGoodMcHits ; // 
   fPartID           = data.fPartID      ;          // MC particle ID (number in the list)
-  fMcDirection      = 0 ; // added in v15
   fNMcStrawHits     = data.fNMcStrawHits;
   fAlgorithmID      = data.fAlgorithmID ;
   fNHits            = -1                ;   // added in V9
   fNDoublets        = -1                ;   // added in V9
+  fMcDirection      = 0 ; // added in v15
 					      // floats
   fChi2             = data.fChi2        ;
   fTBack            = data.fChi2C       ;      // calculated...
@@ -356,11 +356,11 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
   fPartID       = data.fPartID      ;
-  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fMcDirection      = 0 ; // added in v15
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;         
@@ -587,11 +587,11 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
   fPartID       = data.fPartID      ;
-  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fMcDirection      = 0 ; // added in v15
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;         
@@ -822,11 +822,11 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
   fPartID       = data.fPartID      ;
-  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fMcDirection      = 0 ; // added in v15
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;         
@@ -1059,11 +1059,11 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
   fPartID       = data.fPartID      ;
-  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fMcDirection      = 0 ; // added in v15
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1299,11 +1299,11 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
   fPartID       = data.fPartID      ;
-  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = data.fNHits       ;  // added in V9
   fNDoublets    = data.fNDoublets   ;  // added in V9
+  fMcDirection      = 0 ; // added in v15
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1540,11 +1540,11 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
   fPartID       = data.fPartID      ;
-  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = data.fNHits       ;	// ** added in V9
   fNDoublets    = data.fNDoublets   ;	// ** added in V9
+  fMcDirection      = 0 ; // added in v15
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1869,6 +1869,7 @@ void TStnTrack::Clear(Option_t* Opt) {
   fBestHyp[1]     = -1;
   fNHits          = -1;
   fNDoublets      = -1;
+  fMcDirection    = 0;
 
   for (int i=0; i<kNDisks; i++) {
     fDisk[i].fID           = -1;

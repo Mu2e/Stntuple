@@ -598,7 +598,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // defined bit-packed fNActive word
 //-----------------------------------------------------------------------------
-    track->fNActive   = kffs->nHits(); // kffs->hits().size() | (nwrong << 16);
+    track->fNActive   = kffs->nHits() | (nwrong << 16); // kffs->hits().size() | (nwrong << 16);
     if(verbose > 1) printf("  N(hits) = %2i, N(active) = %2i, N(wrong) = %2i, trkqual = %5.2f\n",
                            track->fNHits, track->NActive(), track->NWrong(),
                            track->fTrkQual);

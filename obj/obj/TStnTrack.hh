@@ -136,13 +136,13 @@ public:
   int                       fPdgCode;         // PDG code of the particle produced most hits
   int                       fNGoodMcHits;     // (NDOF << 16) + (Nhits on the track produced by the associated MC particle)
   int                       fPartID;          // MC particle ID (number in the list)
-  int                       fMcDirection;     // -1 for upstream, +1 for downstream
   int                       fNMcStrawHits;    // Nhits by associated particle in the straw tracker
   int                       fAlgorithmID;     // bit-packed : (alg_mask << 16 ) | best
   int                       fNHits;           // undefined before V9: total number of hits associated with the track | (nbend << 16)
   int                       fNDoublets;       // undefined before V9: nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nda << 24)
   int                       fHelixIndex;      // added in V12
   int                       fSeedIndex;
+  int                       fMcDirection;     // -1 for upstream, +1 for downstream
   int                       fInt[kNFreeInts]; // provision for future I/O expansion
   
   float                     fChi2;
@@ -244,7 +244,6 @@ public:
   int    NMatActive   () const { return (fNMatSites >> 16) & 0xffff; }
   
   int    NClusters();
-  int    McDirection () const { return fMcDirection;  }
   int    NMcStrawHits() const { return fNMcStrawHits; }
 
                                         // P.M. pack the number of degrees of freedom into the same word with
@@ -259,6 +258,8 @@ public:
 
   int    HelixIndex     () const { return fHelixIndex; }
   int    TrackSeedIndex () const { return fSeedIndex; }
+
+  int    McDirection () const { return fMcDirection;  }
 
   int    PDGCode() const { return fPdgCode; }
                                         // ID of the corresponding TSimParticle
