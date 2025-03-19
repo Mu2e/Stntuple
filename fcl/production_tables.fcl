@@ -351,12 +351,12 @@ production.paths : {
            @sequence::Reconstruction.CaloReco,  ##   @sequence::Reconstruction.CaloReco includes:
                                                 ##     @sequence::CaloReco.Reco
                                                 ##     @sequence::CaloCluster.Reco
-           @sequence::Reconstruction.TrkReco,   ##   @sequence::Reconstruction.TrkReco includes:
+           @sequence::Reconstruction.TrkHitReco,##   @sequence::Reconstruction.TrkReco includes:
                                                 ##     @sequence::TrkHitReco.PrepareHits includes:
                                                 ##       PBTFSD, makeSH, makePH, makeSTH, FlagBkgHits
            @sequence::Reconstruction.CrvReco,   ##   @sequence::Reconstruction.CrvReco includes:
                                                 ##     @sequence::CrvRecoPackage.CrvRecoSequence
-           @sequence::Reconstruction.TrackReco  ##   @sequence::Reconstruction.TrackReco includes:
+           @sequence::Reconstruction.DeReco     ##   @sequence::Reconstruction.TrackReco includes:
                                                 ##     @sequence::Reconstruction.DeReco includes: 
                                                 ##       TimeClusterFinderDe, HelixFinderDe,
                                                 ##       CalTimePeakFinder, CalHelixFinderDe,
@@ -386,7 +386,7 @@ production.paths : {
            @sequence::Reconstruction.CaloReco,  ##   @sequence::Reconstruction.CaloReco includes:
                                                 ##     @sequence::CaloReco.Reco
                                                 ##     @sequence::CaloCluster.Reco
-           @sequence::Reconstruction.TrkReco,   ##   @sequence::Reconstruction.TrkReco includes:
+           @sequence::Reconstruction.TrkHitReco,##   @sequence::Reconstruction.TrkReco includes:
                                                 ##     @sequence::TrkHitReco.PrepareHits includes:
                                                 ##       PBTFSD, makeSH, makePH, makeSTH, FlagBkgHits
            ## @sequence::Reconstruction.CrvReco,   ##   @sequence::Reconstruction.CrvReco includes:

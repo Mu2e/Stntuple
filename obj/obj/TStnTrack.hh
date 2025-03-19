@@ -74,9 +74,9 @@ class TStnTrack : public TObject {
     kNFreeIntsV12  =  3,     //         V12: add helix and seed indices, I/O doesn't change
     kNFreeFloatsV12=  3,
 
-    kNFreeInts     =  3,     //         V13: add interData for housing the TrkCaloHit info
-    kNFreeFloats   =  3,
-    kNFreeFloats2   = 20     //         Added in V15 since we were running low on floats
+    kNFreeInts      =  2,     //         V13: add interData for housing the TrkCaloHit info
+    kNFreeFloats    =  3,
+    kNFreeFloats2   = 20
   };
 
   //  enum { kMaxNLayers = 88 }; // 22x2*2
@@ -142,6 +142,7 @@ public:
   int                       fNDoublets;       // undefined before V9: nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nda << 24)
   int                       fHelixIndex;      // added in V12
   int                       fSeedIndex;
+  int                       fMCTrajectory;    // MC downstream (1) or upstream (-1) particle trajectory
   int                       fInt[kNFreeInts]; // provision for future I/O expansion
   
   float                     fChi2;
