@@ -135,6 +135,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fPdgCode          = data.fPdgCode     ;     // PDF code of the particle produced most hits
   fNGoodMcHits      = data.fNGoodMcHits ; // 
   fPartID           = data.fPartID      ;          // MC particle ID (number in the list)
+  fMcDirection      = 0 ; // added in v15
   fNMcStrawHits     = data.fNMcStrawHits;
   fAlgorithmID      = data.fAlgorithmID ;
   fNHits            = -1                ;   // added in V9
@@ -354,7 +355,8 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
   fDiskID       = data.fDiskID      ;	
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
+  fPartID       = data.fPartID      ;
+  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
@@ -584,7 +586,8 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
   fDiskID       = data.fDiskID      ;	
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
+  fPartID       = data.fPartID      ;
+  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
@@ -818,7 +821,8 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
   fDiskID       = data.fDiskID      ;	
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
+  fPartID       = data.fPartID      ;
+  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
@@ -1054,7 +1058,8 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
   fDiskID       = data.fDiskID      ;	
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
+  fPartID       = data.fPartID      ;
+  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = -1                ;   // added in V9
@@ -1293,7 +1298,8 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
   fDiskID       = data.fDiskID      ;	
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
+  fPartID       = data.fPartID      ;
+  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = data.fNHits       ;  // added in V9
@@ -1533,7 +1539,8 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
   fDiskID       = data.fDiskID      ;	
   fPdgCode      = data.fPdgCode     ;       
   fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
+  fPartID       = data.fPartID      ;
+  fMcDirection  = 0 ; // added in v15
   fNMcStrawHits = data.fNMcStrawHits;  
   fAlgorithmID  = data.fAlgorithmID ;   
   fNHits        = data.fNHits       ;	// ** added in V9

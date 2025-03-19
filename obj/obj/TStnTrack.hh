@@ -74,7 +74,7 @@ class TStnTrack : public TObject {
     kNFreeIntsV12  =  3,     //         V12: add helix and seed indices, I/O doesn't change
     kNFreeFloatsV12=  3,
 
-    kNFreeInts     =  3,     //         V13: add interData for housing the TrkCaloHit info
+    kNFreeInts     =  2,     //         V13: add interData for housing the TrkCaloHit info
     kNFreeFloats   =  3,
     kNFreeFloats2   = 20     //         Added in V15 since we were running low on floats
   };
@@ -136,6 +136,7 @@ public:
   int                       fPdgCode;         // PDG code of the particle produced most hits
   int                       fNGoodMcHits;     // (NDOF << 16) + (Nhits on the track produced by the associated MC particle)
   int                       fPartID;          // MC particle ID (number in the list)
+  int                       fMcDirection;     // -1 for upstream, +1 for downstream
   int                       fNMcStrawHits;    // Nhits by associated particle in the straw tracker
   int                       fAlgorithmID;     // bit-packed : (alg_mask << 16 ) | best
   int                       fNHits;           // undefined before V9: total number of hits associated with the track | (nbend << 16)
@@ -243,6 +244,7 @@ public:
   int    NMatActive   () const { return (fNMatSites >> 16) & 0xffff; }
   
   int    NClusters();
+  int    McDirection () const { return fMcDirection;  }
   int    NMcStrawHits() const { return fNMcStrawHits; }
 
                                         // P.M. pack the number of degrees of freedom into the same word with
