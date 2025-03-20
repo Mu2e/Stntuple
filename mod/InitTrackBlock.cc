@@ -853,15 +853,15 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
               if ((sim_id == track->fPartID) && (hit->time() < t_front)) {
                 track->fPFront = hit->momentum().mag();
                 t_front        = hit->time();
-                track->fMCTrajectory = (hit->momentum().z() >= 0.) ? 1 : -1;
-                if(verbose > 3) printf(" Sim TT_Front hit found: p = %5.1f, t = %6.1f MC trajectory = %2i\n", track->fPFront, t_front, track->fMCTrajectory);
+                track->fMcDirection = (hit->momentum().z() >= 0.) ? 1 : -1;
+                if(verbose > 3) printf(" Sim TT_Front hit found: p = %5.1f, t = %6.1f MC trajectory = %2i\n", track->fPFront, t_front, track->fMcDirection);
               }
             }
 	  }
 	}
       }
     }
-    if(verbose > 1) printf(" Track MC P(front) = %5.1f, MC P(ST Out) = %5.1f, MC trajectory = %2i\n", track->fPFront, track->fPStOut, track->fMCTrajectory);
+    if(verbose > 1) printf(" Track MC P(front) = %5.1f, MC P(ST Out) = %5.1f, MC trajectory = %2i\n", track->fPFront, track->fPStOut, track->fMcDirection);
 
 //-----------------------------------------------------------------------------
 // number of MC hits produced by the mother particle

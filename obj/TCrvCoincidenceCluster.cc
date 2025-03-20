@@ -13,17 +13,19 @@ void TCrvCoincidenceCluster::Streamer(TBuffer &R__b) {
 
   int nwi = ((int*) &fStartTime) - &fIndex;
   int nwf = ((float*) &fPosition) - &fStartTime;
-  
   if (R__b.IsReading()) {
-    //    Version_t R__v = R__b.ReadVersion();
-    R__b.ReadVersion();
+    Version_t R__v = R__b.ReadVersion();
+    if(R__v == 1) { //for backwards compatibility with version 1 before development room was added
+      nwi = 4;
+      nwf = 2;
+    }
 //-----------------------------------------------------------------------------
 // curent version: V2
 //-----------------------------------------------------------------------------
     R__b.ReadFastArray(&fIndex    ,nwi);
     R__b.ReadFastArray(&fStartTime,nwf);
     fPosition.Streamer(R__b);
-    fMCAvgPosition.Streamer(R__b);
+    if(R__v > 1) fMCAvgPosition.Streamer(R__b);
   }
   else {
     R__b.WriteVersion(TCrvCoincidenceCluster::IsA());
@@ -31,7 +33,7 @@ void TCrvCoincidenceCluster::Streamer(TBuffer &R__b) {
     R__b.WriteFastArray(&fStartTime,nwf);
     fPosition.Streamer(R__b);
     fMCAvgPosition.Streamer(R__b);
-  } 
+  }
 }
 
 //_____________________________________________________________________________
