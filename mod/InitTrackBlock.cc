@@ -389,8 +389,10 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->fPt        = track->Momentum()->Pt();
     track->fChi2      = kffs->chisquared();
     track->fFitCons   = kffs->fitConsistency();
-    track->fT0        = kffs->t0().t0();
-    track->fT0Err     = kffs->t0().t0Err();
+    if(kinter_mid) {
+      track->fT0 = kinter_mid->time();
+      track->fT0Err = std::sqrt(kinter_mid->loopHelix().paramVar(KinKal::LoopHelix::t0_));
+    }
 //-----------------------------------------------------------------------------
 // momentum error in the first point
 //-----------------------------------------------------------------------------
