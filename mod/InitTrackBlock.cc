@@ -457,7 +457,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     const static int max_npart(100);
     int     id(-1),  npart(0), part_nh[max_npart], part_id[max_npart];
     int     part_pdg_code[max_npart];
-    double  part_first_z[max_npart], part_first_z_p[max_npart];
+    double  part_first_z[max_npart], part_first_z_p[max_npart], part_first_z_pz[max_npart];
     double  part_last_z [max_npart], part_last_z_p [max_npart];
     int     nwrong = 0;
     double  mcdoca;
@@ -540,6 +540,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                   if(dz < part_first_z[ip]) {
                     part_first_z  [ip] = dz;
                     part_first_z_p[ip] = std::sqrt(stgs->momentum().mag2());
+                    part_first_z_pz[ip] = stgs->momentum().z();
                   }
                   if(dz > part_last_z[ip]) {
                     part_last_z  [ip] = dz;
@@ -557,6 +558,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                 part_nh       [npart] = 1;
                 part_first_z  [npart] = dz;
                 part_first_z_p[npart] = std::sqrt(stgs->momentum().mag2());
+                part_first_z_pz[npart] = stgs->momentum().z();
                 part_last_z   [npart] = dz;
                 part_last_z_p [npart] = std::sqrt(stgs->momentum().mag2());
                 npart                += 1;
