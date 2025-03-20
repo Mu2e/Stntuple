@@ -791,7 +791,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // initialize MC track front to an early sim hit in case no virtual detector hit is found
     track->fPFront = part_first_z_p[ipart];
     track->fPStOut = -1.;
-    track->fMCTrajectory = (part_first_z_pz[ipart] >= 0.) ? 1 : -1;
+    track->fMcDirection = (part_first_z_pz[ipart] >= 0.) ? 1 : -1;
 
     if(verbose > 1) printf(" N(virtual detectors) = %i\n", vdg->nDet());
     if (vdg->nDet() > 0) {

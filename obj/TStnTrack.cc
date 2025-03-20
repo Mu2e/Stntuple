@@ -141,7 +141,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fNDoublets        = -1                ;   // added in V9
   fHelixIndex       = -1                ;   // added in V12
   fSeedIndex        = -1                ;   // added in V12
-  fMCTrajectory     =  0                ;   // added in V15
+  fMcDirection      = 0                 ;   // added in v15
 					      // floats
   fChi2             = data.fChi2        ;
   fTBack            = data.fChi2C       ;      // calculated...
@@ -362,9 +362,9 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
   fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
-  fHelixIndex       = -1                ;   // added in V12
-  fSeedIndex        = -1                ;   // added in V12
-  fMCTrajectory     =  0                ;   // added in V15
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;
@@ -595,9 +595,9 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
   fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
-  fHelixIndex       = -1                ;   // added in V12
-  fSeedIndex        = -1                ;   // added in V12
-  fMCTrajectory     =  0                ;   // added in V15
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;
@@ -832,9 +832,9 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
   fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
-  fHelixIndex       = -1                ;   // added in V12
-  fSeedIndex        = -1                ;   // added in V12
-  fMCTrajectory     =  0                ;   // added in V15
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;
@@ -1071,9 +1071,9 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
   fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
-  fHelixIndex       = -1                ;   // added in V12
-  fSeedIndex        = -1                ;   // added in V12
-  fMCTrajectory     =  0                ;   // added in V15
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1313,9 +1313,9 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
   fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = data.fNHits       ;  // added in V9
   fNDoublets    = data.fNDoublets   ;  // added in V9
-  fHelixIndex       = -1                ;   // added in V12
-  fSeedIndex        = -1                ;   // added in V12
-  fMCTrajectory     =  0                ;   // added in V15
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1556,9 +1556,9 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
   fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = data.fNHits       ;	// ** added in V9
   fNDoublets    = data.fNDoublets   ;	// ** added in V9
-  fHelixIndex       = -1                ;   // added in V12
-  fSeedIndex        = -1                ;   // added in V12
-  fMCTrajectory     =  0                ;   // added in V15
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                   ; // added in v15
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1885,7 +1885,7 @@ void TStnTrack::Clear(Option_t* Opt) {
   fNDoublets      = -1;
   fHelixIndex     = -1;
   fSeedIndex      = -1;
-  fMCTrajectory   =  0;
+  fMcDirection    = 0;
 
   for (int i=0; i<kNDisks; i++) {
     fDisk[i].fID           = -1;
