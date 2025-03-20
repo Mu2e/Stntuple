@@ -74,15 +74,9 @@ class TStnTrack : public TObject {
     kNFreeIntsV12  =  3,     //         V12: add helix and seed indices, I/O doesn't change
     kNFreeFloatsV12=  3,
 
-<<<<<<< HEAD
-    kNFreeInts      =  2,     //         V13: add interData for housing the TrkCaloHit info
-    kNFreeFloats    =  3,
-    kNFreeFloats2   = 20
-=======
     kNFreeInts     =  2,     //         V13: add interData for housing the TrkCaloHit info
     kNFreeFloats   =  3,
     kNFreeFloats2   = 20     //         Added in V15 since we were running low on floats
->>>>>>> mmackenz/stortini/ePlus2024
   };
 
   //  enum { kMaxNLayers = 88 }; // 22x2*2
