@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------
 // Description:
 // -----------
-// Class InitStntuple : books tree and does other initializations 
+// Class InitStntuple : books tree and does other initializations
 //                            for STNTUPLE
 //
 // Nov 23 2000 P.Murat
@@ -83,7 +83,7 @@ public:
 //------------------------------------------------------------------------------
 // constructors
 //------------------------------------------------------------------------------
-InitStntuple::InitStntuple(fhicl::ParameterSet const& Pset): 
+InitStntuple::InitStntuple(fhicl::ParameterSet const& Pset):
   StntupleModule   (Pset,"InitStntuple")
 {
 //-----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
   // unsigned long trigger_table_tag;
   // int           trigger_id;
 
-				// delete all the previous definitions 
+				// delete all the previous definitions
 
   TStnDBManager* dbm = TStnDBManager::Instance();
   TStnTriggerTable* trigger_table;
@@ -142,7 +142,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
 
   trigger_table->Delete();
 //-----------------------------------------------------------------------------
-// data run, so far all trigger tags (versions) are set to 1, 
+// data run, so far all trigger tags (versions) are set to 1,
 // trigger bit assignment is arbitrary
 //-----------------------------------------------------------------------------
   if (RunNumber < 1200) {
@@ -163,7 +163,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
   }
   else if (RunNumber <= 1210) {
 //-----------------------------------------------------------------------------
-// runs 1200-1210: this may or may not be correct, consider the following 
+// runs 1200-1210: this may or may not be correct, consider the following
 // just an example
 //-----------------------------------------------------------------------------
     trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                     ,1));
@@ -195,33 +195,33 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 181, 181,"apr_highP"                   ,1));
     trigger_table->AddTrigger(new TStnTrigger( 190, 190,"apr_lowP_stopTarg"           ,1));
     trigger_table->AddTrigger(new TStnTrigger( 191, 191,"apr_lowP_stopTarg_multiTrk"  ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 195, 190,"aprHelix"                    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 195, 195,"aprHelix"                    ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
     trigger_table->AddTrigger(new TStnTrigger( 201, 201,"caloFast_MVANNCE"            ,1));
     trigger_table->AddTrigger(new TStnTrigger( 202, 202,"caloFast_cosmic"             ,1));
     for (int i=203; i<210; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
     trigger_table->AddTrigger(new TStnTrigger( 210, 210,"mprDe_highP_stopTarg"        ,1));
     for (int i=211; i<220; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    } 
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
     trigger_table->AddTrigger(new TStnTrigger( 220, 220,"caloFast_RMC"                ,1));
     for (int i=221; i<300; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
 
     trigger_table->AddTrigger(new TStnTrigger( 300, 300,"cst"                         ,1));
     trigger_table->AddTrigger(new TStnTrigger( 310, 310,"cstTimeCluster"              ,1));
     for (int i=311; i<400; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
 
     trigger_table->AddTrigger(new TStnTrigger( 400, 400,"minBias_SDCount"             ,1));
     for (int i=401; i<410; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
     trigger_table->AddTrigger(new TStnTrigger( 410, 410,"minBias_CDCount"             ,1));
 
   }
@@ -265,7 +265,7 @@ void InitStntuple::beginRun(const art::Run&  aRun) {
 
 //------------------------------------------------------------------------------
 void InitStntuple::analyze(const AbsEvent& AnEvent) {
-  // event entry point: initialize all the registered data blocks with the event 
+  // event entry point: initialize all the registered data blocks with the event
   // data
   // it is assumed that the tree itself is filled in FillStntupleModule
   // order in which branches are filled may be important - for example,
@@ -295,7 +295,7 @@ void InitStntuple::analyze(const AbsEvent& AnEvent) {
   etime = (unsigned long)(gSystem->Now()) - etime;
 
   //compute avg inst lum
-  TStnHeaderBlock* fHeaderBlock = 
+  TStnHeaderBlock* fHeaderBlock =
     (TStnHeaderBlock*) Event()->GetDataBlock("HeaderBlock");
   if(fHeaderBlock) {
     float ilum = fHeaderBlock->InstLum()*1.0e-30;

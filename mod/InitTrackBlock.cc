@@ -34,6 +34,7 @@
 
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalSeedAssns.hh"
 
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 #include "Offline/BTrkData/inc/TrkCaloHit.hh"
@@ -192,7 +193,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
   const int verbose(fVerbose); //control output level for debugging
 
-  int                       ntrk(0), ev_number, rn_number;
+  int                       ntrk(0), nassns(0), ev_number, rn_number;
   TStnTrack*                track;
   TStnTrackBlock            *data(0);
 
@@ -230,6 +231,19 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     if(verbose > 0) printf("%s::%s: KalSeedCollection %15s has %2i tracks\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), ntrk);
   } else {
     if(verbose > 0) printf("%s::%s: KalSeedCollection %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
+  }
+
+  const mu2e::KalHelixAssns* list_of_kff_assns = nullptr;
+  art::Handle<mu2e::KalHelixAssns> kffAssnsH;
+  AnEvent->getByLabel(fKFFCollTag,kffAssnsH);
+  if (kffAssnsH.isValid()) {
+    list_of_kff_assns = kffAssnsH.product();
+    nassns = list_of_kff_assns->size();
+    if(verbose > 0) printf("%s::%s: KalHelixAssns %15s has %2i associations\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns);
+    if(nassns != ntrk) printf("%s::%s: KalHelixAssns %15s has a different number of tracks! %i assns %i trks\n",
+                              typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns, ntrk);
+  } else {
+    if(verbose > 0) printf("%s::%s: KalHelixAssns %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
   }
 
   list_of_trk_qual = 0;
@@ -281,6 +295,28 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     if(verbose > 1) printf("%s::%s: KalSeedCollection %s track %2i:\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
     track          = data->NewTrack();
     const mu2e::KalSeed* kffs = &list_of_kffs->at(itrk);
+    if(!kffs) {
+      printf("%s::%s: KalSeed %s track %2i not defined!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
+      continue;
+    }
+
+    // Attempt to find the corresponding helix
+    const mu2e::HelixSeed* helix = nullptr;
+    if(list_of_kff_assns) {
+      for(int iassn = 0; iassn < nassns; ++iassn) {
+        const auto assn = list_of_kff_assns->at(iassn);
+        const mu2e::KalSeed*   itrack = &(*(assn.first));
+        const mu2e::HelixSeed* ihelix = &(*(assn.second));
+        if(&(*(itrack)) == &(*kffs)) {
+          if(verbose > 1) printf(" --> Associated helix found, association index %i\n", iassn);
+          helix = ihelix;
+          break;
+        }
+      }
+      if(!helix) printf("%s::%s: KalSeedCollection %s track %2i: Associated helix not found! N(track) = %i N(Assns) = %i\n",
+                        typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk, ntrk, nassns);
+    }
+
 //-----------------------------------------------------------------------------
 // track-only-based particle ID, initialization ahs already happened in the constructor
 //-----------------------------------------------------------------------------
@@ -540,13 +576,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                   part_nh[ip] += 1;
                   const double dz = stgs->position().z();
                   if(dz < part_first_z[ip]) {
-                    part_first_z  [ip] = dz;
-                    part_first_z_p[ip] = std::sqrt(stgs->momentum().mag2());
+                    part_first_z   [ip] = dz;
+                    part_first_z_p [ip] = std::sqrt(stgs->momentum().mag2());
                     part_first_z_pz[ip] = stgs->momentum().z();
                   }
                   if(dz > part_last_z[ip]) {
-                    part_last_z  [ip] = dz;
-                    part_last_z_p[ip] = std::sqrt(stgs->momentum().mag2());
+                    part_last_z    [ip] = dz;
+                    part_last_z_p  [ip] = std::sqrt(stgs->momentum().mag2());
                   }
                   break;
                 }
@@ -555,15 +591,15 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
               // if this is the first occurrence, add it to the list
               if (found == 0) {
                 const double dz = stgs->position().z();
-                part_id       [npart] = id;
-                part_pdg_code [npart] = sim->pdgId();
-                part_nh       [npart] = 1;
-                part_first_z  [npart] = dz;
-                part_first_z_p[npart] = std::sqrt(stgs->momentum().mag2());
+                part_id        [npart] = id;
+                part_pdg_code  [npart] = sim->pdgId();
+                part_nh        [npart] = 1;
+                part_first_z   [npart] = dz;
+                part_first_z_p [npart] = std::sqrt(stgs->momentum().mag2());
                 part_first_z_pz[npart] = stgs->momentum().z();
-                part_last_z   [npart] = dz;
-                part_last_z_p [npart] = std::sqrt(stgs->momentum().mag2());
-                npart                += 1;
+                part_last_z    [npart] = dz;
+                part_last_z_p  [npart] = std::sqrt(stgs->momentum().mag2());
+                npart                 += 1;
               }
             }
           }
@@ -602,7 +638,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // defined bit-packed fNActive word
 //-----------------------------------------------------------------------------
-    track->fNActive   = kffs->nHits() | (nwrong << 16); // kffs->hits().size() | (nwrong << 16);
+    track->fNActive   = kffs->nHits() | (nwrong << 16);
     if(verbose > 1) printf("  N(hits) = %2i, N(active) = %2i, N(wrong) = %2i, trkqual = %5.2f\n",
                            track->fNHits, track->NActive(), track->NWrong(),
                            track->fTrkQual);
@@ -819,14 +855,15 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
               if ((sim_id == track->fPartID) && (hit->time() < t_front)) {
                 track->fPFront = hit->momentum().mag();
                 t_front        = hit->time();
-                if(verbose > 3) printf(" Sim TT_Front hit found: p = %5.1f, t = %6.1f\n", track->fPFront, t_front);
+                track->fMcDirection = (hit->momentum().z() >= 0.) ? 1 : -1;
+                if(verbose > 3) printf(" Sim TT_Front hit found: p = %5.1f, t = %6.1f MC trajectory = %2i\n", track->fPFront, t_front, track->fMcDirection);
               }
             }
 	  }
 	}
       }
     }
-    if(verbose > 1) printf(" Track MC P(front) = %5.1f, MC P(ST Out) = %5.1f\n", track->fPFront, track->fPStOut);
+    if(verbose > 1) printf(" Track MC P(front) = %5.1f, MC P(ST Out) = %5.1f, MC trajectory = %2i\n", track->fPFront, track->fPStOut, track->fMcDirection);
 
 //-----------------------------------------------------------------------------
 // number of MC hits produced by the mother particle

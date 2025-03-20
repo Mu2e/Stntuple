@@ -83,7 +83,10 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
   const mu2e::KalHelixAssns* ksfha;
   AnEvent->getByLabel(fKFFCollTag, ksfhaH);
   if (ksfhaH.isValid()) {ksfha = ksfhaH.product();}
-  else {ksfha = NULL;}
+  else {
+    printf(" WARNING in InitTrackBlock_KK::%s: KalHelixAssns %s not found!\n", __func__, fKFFCollTag.encode().c_str());
+    ksfha = nullptr;
+  }
 
   TStnTrackBlock* tb = (TStnTrackBlock*) Block;
   TStnEvent*      ev = Block->GetEvent();
@@ -105,10 +108,12 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
 // looking for the seed in associations
 //-----------------------------------------------------------------------------
     const mu2e::HelixSeed* hs(nullptr);
-    if (ksfha != NULL) {
+    if (ksfha) {
       for (auto ass: *ksfha) {
         const mu2e::KalSeed* qsf = ass.first.get();
         if (qsf == ksf) {
+          if(fVerbose > 1) printf("%s::%s: KalSeedCollection %s track %2i: Associated helix found\n",
+                            typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), i);
           hs = ass.second.get();
           break;
         }

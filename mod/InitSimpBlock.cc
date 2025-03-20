@@ -249,6 +249,16 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
         found |= process_id == mu2e::ProcessCode::mu2eExternalRPC    ;
         found |= process_id == mu2e::ProcessCode::mu2eFlatPhoton     ;
         found |= is_pion                                             ; // save pions for reweighting RPC
+
+        // Check if this is a relevant particle for tracking studies
+        const bool relevant_track = nhits > 12 && sim->startMomentum().vect().mag() > 70. && (std::abs(pdg_code) == 11 ||
+                                                                                            std::abs(pdg_code) == 13);
+        if(verbose && !found && relevant_track)
+          printf("InitSimpBlock::%s: Relevant Trk SIM: ID = %4i, PDG = %5i, Code = %s\n",
+                 __func__, id, pdg_code, sim->creationCode().name().c_str());
+        found |= relevant_track;
+
+
         if(verbose > 1) printf("InitSimpBlock::%s: Checking SIM: ID = %4i, PDG = %5i, Code = %s --> found = %o\n",
                                __func__, id, pdg_code, sim->creationCode().name().c_str(), found);
 

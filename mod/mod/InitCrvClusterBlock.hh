@@ -15,15 +15,17 @@ class StntupleInitCrvClusterBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fCrvRecoPulseCollTag;
   art::InputTag   fCrvCoincidenceClusterCollTag;
+  art::InputTag   fCrvCoincidenceClusterMCCollTag;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetCrvRecoPulseCollTag         (std::string& Tag) { fCrvRecoPulseCollTag          = art::InputTag(Tag); }
-  void   SetCrvCoincidenceClusterCollTag(std::string& Tag) { fCrvCoincidenceClusterCollTag = art::InputTag(Tag); }
+  void   SetCrvRecoPulseCollTag           (std::string& Tag) { fCrvRecoPulseCollTag            = art::InputTag(Tag); }
+  void   SetCrvCoincidenceClusterCollTag  (std::string& Tag) { fCrvCoincidenceClusterCollTag   = art::InputTag(Tag); }
+  void   SetCrvCoincidenceClusterMCCollTag(std::string& Tag) { fCrvCoincidenceClusterMCCollTag = art::InputTag(Tag); }
 
-  
+
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
 
