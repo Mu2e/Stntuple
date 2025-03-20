@@ -67,10 +67,11 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
 # default tags for CRV reco collections
 #------------------------------------------------------------------------------
-    crvRecoPulseCollTag          : "CrvRecoPulses"
-    crvCoincidenceCollTag        : "CrvCoincidence"
-    crvCoincidenceClusterCollTag : "CrvCoincidenceClusterFinder"
-#------------------------------------------------------------------------------
+    crvRecoPulseCollTag            : "CrvRecoPulses"
+    crvCoincidenceCollTag          : "CrvCoincidence"
+    crvCoincidenceClusterCollTag   : "CrvCoincidenceClusterFinder"
+    crvCoincidenceClusterMCCollTag : "CrvCoincidenceClusterMCAssns"
+    #------------------------------------------------------------------------------
 # sometimes may need to store multiple track blocks, thus - vectors
 # by default, always run MergePatRec, which, in case only one track reconstruction
 # module is running upstream, simply copies its output

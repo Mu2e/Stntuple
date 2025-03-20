@@ -6,6 +6,8 @@
 #include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
 #include "Offline/RecoDataProducts/inc/CrvCoincidence.hh"
 #include "Offline/RecoDataProducts/inc/CrvCoincidenceCluster.hh"
+#include "Offline/MCDataProducts/inc/CrvCoincidenceClusterMC.hh"
+#include "Offline/MCDataProducts/inc/CrvCoincidenceClusterMCAssns.hh"
 
 //-----------------------------------------------------------------------------
 // in this case AbsEvent is just not used
@@ -17,6 +19,8 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   const int sr = Event->subRun();
 
   if (Block->Initialized(ev,rn,sr)) return 0;
+
+  const int verbose(0);
 
   TCrvClusterBlock* block = (TCrvClusterBlock*) Block;
 
@@ -56,8 +60,41 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     }
   }
 
+  // Retrieve MC information if it's available
+  art::Handle<mu2e::CrvCoincidenceClusterMCAssns> mc_ccc_assnsH;
+  const mu2e::CrvCoincidenceClusterMCAssns*       mc_ccc_assns(nullptr);
+  if(!fCrvCoincidenceClusterMCCollTag.empty()) {
+    if(Event->getByLabel(fCrvCoincidenceClusterMCCollTag,mc_ccc_assnsH)) mc_ccc_assns = mc_ccc_assnsH.product();
+    else printf("InitCrvClusterBlock::%s: No MC <--> Reco CRV coincidence cluster associations found\n", __func__);
+  }
+  const int nmc_ccc_assns = (mc_ccc_assns) ? mc_ccc_assns->size() : 0;
+  if(mc_ccc_assns && nmc_ccc_assns != nccc) printf("InitCrvClusterBlock::%s: MC cluster associations (%i) and Reco clusters (%i) don't match\n",
+                                                   __func__, nmc_ccc_assns, nccc);
+
+  //------------------------------------------------------
+  // Loop through the clusters
   for (int iccc=0; iccc<nccc; iccc++) {
+    if(verbose > 0) printf("InitCrvClusterBlock::%s: Processing cluster %i\n", __func__, iccc);
     const mu2e::CrvCoincidenceCluster* cluster = &cccc->at(iccc);
+    const mu2e::CrvCoincidenceClusterMC* mc_cluster = nullptr;
+    if(!cluster) {
+      printf("InitCrvClusterBlock::%s: Cluster %i is not defined!\n", __func__, iccc);
+      continue;
+    }
+    if(mc_ccc_assns) {
+      for(int iassn = 0; iassn < nmc_ccc_assns; ++iassn) {
+        const auto assn = mc_ccc_assns->at(iassn);
+        const mu2e::CrvCoincidenceCluster*   ireco = &(*(assn.first));
+        const mu2e::CrvCoincidenceClusterMC* imc   = &(*(assn.second));
+        if(&(*(ireco)) == &(*cluster)) {
+          if(verbose > 1) printf(" --> Associated MC cluster found, association index %i\n", iassn);
+          mc_cluster = imc;
+          break;
+        }
+      }
+      if(!mc_cluster) printf("%s::%s: Cluster %2i: Associated MC cluster not found! N(clusters) = %i N(Assns) = %i\n",
+                        typeid(*this).name(), __func__, iccc, nccc, nmc_ccc_assns);
+    }
 
     TCrvCoincidenceCluster* ccc = block->NewCluster();
 
@@ -74,6 +111,23 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     const float  t2     = cluster->GetEndTime();
 
     ccc->Set(iccc,sector,np,npe,x,y,z,t1,t2);
+    if(verbose > 1) printf("  Cluster sector = %2i, N(pulses) = %2i, N(PE) = %3i, x = %7.1f, y = %7.1f, z = %8.1f, t1 = %6.1f, t2 = %6.1f mc_found = %o\n",
+                           sector, np, npe, x, y, z, t1, t2, mc_cluster != nullptr);
+    if(mc_cluster) {
+      auto sim = mc_cluster->GetMostLikelySimParticle();
+      const int   sim_id  = (sim) ? sim->id().asInt() : -1;
+      const int   mc_np   = mc_cluster->GetPulses().size();
+
+      const float mc_edep = mc_cluster->GetTotalEnergyDeposited();
+      const float mc_time = mc_cluster->GetAvgHitTime();
+      const float mc_x    = mc_cluster->GetAvgHitPos().x();
+      const float mc_y    = mc_cluster->GetAvgHitPos().y();
+      const float mc_z    = mc_cluster->GetAvgHitPos().z();
+
+      ccc->SetMC(sim_id, mc_np, mc_edep, mc_time, mc_x, mc_y, mc_z);
+      if(verbose > 1) printf("  MC Info: SIM ID = %i, N(pulses) = %2i, E(dep) = %4.1f, x = %7.1f, y = %7.1f, z = %8.1f, tavg = %6.1f\n",
+                             sim_id, mc_np, mc_edep, mc_x, mc_y, mc_z, mc_time);
+    }
 //-----------------------------------------------------------------------------
 // now store pulses associated with the cluster
 //-----------------------------------------------------------------------------
