@@ -22,27 +22,34 @@ double RMCSpectra::Weight(double energy) {
 }
 
 void RMCSpectra::InitializeSpectrum() {
-  if(external_version_ == 0) { //closure approximation
+  if(external_version_ == kClosure) { //closure approximation
     fSpectrum_ = new TF1("closure", "(x < [0]) * 20./[0]*(1-2*x/[0]+2*(x/[0])^2)*x/[0]*(1-x/[0])^2", 0., kmax_kn_);
     fSpectrum_->FixParameter(0, kmax_cl_);
-  } else if(external_version_ == -1) { //flat spectrum
+  } else if(external_version_ == kFlat) { //flat spectrum
     fSpectrum_ = new TF1("flat", "1./([0] - 1.022)", 0., kmax_kn_);
     fSpectrum_->FixParameter(0, kmax_kn_);
-  } else if(external_version_ == 2) { //closure approximation + power law tail
+  } else if(external_version_ == kModifiedClosure) { //closure approximation + power law tail
     TF1* ftmp = new TF1("closure", "(x < [0])*20./[0]*(1-2*(x/[0])+2*((x/[0])^2))*(x/[0])*((1-x/[0])^ 2 )", 0., kmax_cl_);
     fSpectrum_ = new TF1("mod_closure",  "[2]*20./[0]*(1-2*(x/[0])+2*((x/[0])^2))*(x/[0])*((1-x/[0])^[1])", 0., kmax_kn_);
     ftmp->FixParameter(0., kmax_cl_);
     fSpectrum_->SetParameters(kmax_kn_, var_[0], 1.);
     fSpectrum_->SetParameter(2, ftmp->Integral(57., kmax_cl_)/fSpectrum_->Integral(57., kmax_cl_)); //match closure integral in measured region
-  } else if(external_version_ == 3) { //closure approximation + flat tail
+  } else if(external_version_ == kClosureFlat) { //closure approximation + flat tail
     TF1* ftmp = new TF1("closure"     , "(x < [0])*20./[0]*(1-2*(x/[0])+2*((x/[0])^2))*(x/[0])*((1-x/[0])^ 2)", 0., kmax_cl_);
     fSpectrum_ = new TF1("mod_closure", "(x < [0])*20./[0]*(1-2*(x/[0])+2*((x/[0])^2))*(x/[0])*((1-x/[0])^ 2) + [1]", 0., kmax_kn_);
     ftmp->FixParameter(0., kmax_cl_);
     fSpectrum_->SetParameters(kmax_cl_, 1.);
     float br_tail = var_[0];
     fSpectrum_->SetParameter(1, br_tail*ftmp->Integral(57., kmax_cl_)/fSpectrum_->Integral(kmax_cl_, kmax_kn_)); //set branching ratio above 90
-  } else if(external_version_ == 4) { //only allow kinematic endpoint
+  } else if(external_version_ == kDeltaLine) { //only allow kinematic endpoint
     fSpectrum_ = new TF1("endpoint", "1.", kmax_kn_-0.01, kmax_kn_+0.01);
+  } else if(external_version_ == kTwoClosures) {
+    TString formula = "(x < [0])*20./[0]*(1-2*(x/[0])+2*((x/[0])^2))*(x/[0])*((1-x/[0])^ 2)"; //nominal closure
+    formula += " + (x < [1])*[2]*20./[1]*(1-2*(x/[1])+2*((x/[1])^2))*(x/[1])*((1-x/[1])^ 2)"; //second, reduced closure
+    fSpectrum_ = new TF1("two_closure", formula.Data(), 0., kmax_kn_);
+    float k_two = var_[0];
+    float br_two = var_[1];
+    fSpectrum_->SetParameters(kmax_cl_, k_two, br_two);
   } else {
     std::cout << "UNKNOWN External RMC Version " << external_version_ << "! Exiting...\n";
     return;
@@ -69,22 +76,21 @@ void RMCSpectra::ConvolveInternal() {
 }
 
 void RMCSpectra::InitializePlestidHillHistogram() {
-  const int nentries = 1e8; //entries to make convolution
+  const int nentries = ngen_; //entries to make convolution
 
-  hSpectrum_ = new TH1D("int_conv", "int_conv", 1000, 0., (external_version_ == 0) ? kmax_cl_ : kmax_kn_);
+  hSpectrum_ = new TH1D("int_conv", "int_conv", 1000, 0., (external_version_ == kClosure) ? kmax_cl_ : kmax_kn_);
   for(int entry = 0; entry < nentries; ++entry) {
     double photon_energy(0.), positron_energy(1.), prob(1.);
     //get photon energy
-    if(external_version_ == 0) { //closure approximation
+    if(external_version_ == kClosure) { //closure approximation
       photon_energy = 2.*pl_hill_int_.me_ + (kmax_cl_ - 2.*pl_hill_int_.me_)*rand_->Uniform(); //needs at least 2*electron mass
       prob = fSpectrum_->Eval(photon_energy) * (kmax_cl_ - 2.*pl_hill_int_.me_); //external PDF / (flat PDF)
-    }
-    else if(external_version_ == 2 || external_version_ == 3) { //closure approximation + tail
-      photon_energy = 2.*pl_hill_int_.me_ + (kmax_kn_ - 2.*pl_hill_int_.me_)*rand_->Uniform(); //needs at least 2*electron mass
-      prob = fSpectrum_->Eval(photon_energy) * (kmax_kn_ - 2.*pl_hill_int_.me_); //external PDF / (flat PDF)
-    } else if(external_version_ == 4) { //kinematic endpoint
+    } else if(external_version_ == kDeltaLine) { //kinematic endpoint
       photon_energy = kmax_kn_;
       prob = 1.;
+    } else { //closure approximation + some sort of tail
+      photon_energy = 2.*pl_hill_int_.me_ + (kmax_kn_ - 2.*pl_hill_int_.me_)*rand_->Uniform(); //needs at least 2*electron mass
+      prob = fSpectrum_->Eval(photon_energy) * (kmax_kn_ - 2.*pl_hill_int_.me_); //external PDF / (flat PDF)
     }
 
     //get internal conversion given photon energy
@@ -102,8 +108,8 @@ void RMCSpectra::InitializePlestidHillHistogram() {
 //Get the branching fraction of Kroll+Wada as a function of photon energy
 TH1D* RMCSpectra::GetRhoVsEHist(int entries) {
   const double me = kwj_int_.me_;
-  double emax = (external_version_ == 0) ? kmax_cl_ : kmax_kn_;
-  double emin = (external_version_ == 4) ? kmax_kn_-0.01 : 2.*me;
+  double emax = (external_version_ == kClosure) ? kmax_cl_ : kmax_kn_;
+  double emin = (external_version_ == kDeltaLine) ? kmax_kn_-0.01 : 2.*me;
   TH1D* h = new TH1D("hRhoVsE", "hRhoVsE", 1000, 0., emax);
   if(verbose_ > 0) std::cout << " initializing Kroll+Wada Rho vs Energy histogram\n";
   for(int i = 0; i < entries; ++i) {
@@ -130,12 +136,12 @@ TH1D* RMCSpectra::GetRhoVsEHist(int entries) {
 void RMCSpectra::InitializeKrollWadaHistogram(bool removeRho) {
   if(verbose_ > 0) std::cout << " Using removeRho = " << removeRho << std::endl;
   kwj_int_.verbose_ = (verbose_ > 0) ? verbose_ - 1 : 0;
-  int entries = 1e8;
+  int entries = ngen_;
   const double me = kwj_int_.me_;
-  double emax = (external_version_ == 0) ? kmax_cl_ : kmax_kn_;
-  double emin = (external_version_ == 4) ? kmax_kn_ - 0.02 : 2.*me;
+  double emax = (external_version_ == kClosure) ? kmax_cl_ : kmax_kn_;
+  double emin = (external_version_ == kDeltaLine) ? kmax_kn_ - 0.02 : 2.*me;
   hSpectrum_ = new TH1D("int_conv", "int_conv", 1000, 0., emax);
-  TH1D* hRhoVsEg = (removeRho && external_version_ != 4) ? GetRhoVsEHist(2e8) : 0;
+  TH1D* hRhoVsEg = (removeRho && external_version_ != kDeltaLine) ? GetRhoVsEHist(2*entries) : 0;
   TH1D* h = (verbose_ > 1) ? new TH1D("hRhoVsEDebug", "hRhoVsEDebug", 1000, 0., emax) : 0; //for debugging
   TH1D* h2 = (verbose_ > 1) ? new TH1D("hExt", "hExt", 1000, 0., emax) : 0; //for debugging
   if(verbose_ > 0) std::cout << " initializing Kroll+Wada Energy histogram\n";
@@ -156,7 +162,7 @@ void RMCSpectra::InitializeKrollWadaHistogram(bool removeRho) {
     }
 
     //real photon weight
-    const double cl  = (external_version_ == 4) ? 1. : fSpectrum_->Eval(e_g)*(emax-emin);
+    const double cl  = (external_version_ == kDeltaLine) ? 1. : fSpectrum_->Eval(e_g)*(emax-emin);
     double prob = cl*kw;
 
     double energy = 0.;

@@ -406,6 +406,10 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     // Decide which intersection to use for the defaults, using the front if available (only Mid available for Online tracks)
     const mu2e::KalIntersection* kinter((kinter_front) ? kinter_front : (kinter_mid) ? kinter_mid : nullptr);
+    if(!kinter) {
+      printf("%s::%s: KalSeedCollection %s track %2i: No tracker front/middle intersection found! Unable to define the track information...\n",
+             typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
+    }
     KinKal::VEC3 fitmom = (kinter) ? kinter->momentum3() : KinKal::VEC3();
     KinKal::VEC3 pos    = (kinter) ? kinter->position3() : KinKal::VEC3();
 
@@ -428,6 +432,11 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     if(kinter_mid) {
       track->fT0 = kinter_mid->time();
       track->fT0Err = std::sqrt(kinter_mid->loopHelix().paramVar(KinKal::LoopHelix::t0_));
+    } else {
+      track->fT0    = -1.e6;
+      track->fT0Err = -1.e6;
+      if(kinter) printf("%s::%s: KalSeedCollection %s track %2i: No tracker middle intersection found! Unable to define the time at the tracker center\n",
+                        typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
     }
 //-----------------------------------------------------------------------------
 // momentum error in the first point
@@ -480,13 +489,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // rename later
     track->fTBack         = tback;
 //-----------------------------------------------------------------------------
-// the total number of planes is 36, use 40 for simplicity
+// the total number of planes is 36, use 50 for simplicity
 //-----------------------------------------------------------------------------
     const mu2e::TrkStrawHitSeed  *hit; // , *closest_hit(NULL);
 
     //const TrkHitVector*       kffs_hits = &kffs->hitVector();
 
-    for (int j=0; j<40; j++) {
+    for (int j=0; j<50; j++) {
       track->fNHPerStation[j] = 0;
     }
 
