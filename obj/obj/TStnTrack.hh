@@ -76,7 +76,7 @@ class TStnTrack : public TObject {
 
     kNFreeInts     =  2,     //         V13: add interData for housing the TrkCaloHit info
     kNFreeFloats   =  3,
-    kNFreeFloats2   = 20     //         Added in V15 since we were running low on floats
+    kNFreeFloats2  = 20      //         Added in V15 since we were running low on floats
   };
 
   //  enum { kMaxNLayers = 88 }; // 22x2*2

@@ -51,6 +51,7 @@
 
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
@@ -299,7 +300,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       printf("%s::%s: KalSeed %s track %2i not defined!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
       continue;
     }
-
+    
     // Attempt to find the corresponding helix
     const mu2e::HelixSeed* helix = nullptr;
     if(list_of_kff_assns) {
@@ -521,11 +522,10 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
         ++ntrkhits;
 //-----------------------------------------------------------------------------
 // the rest makes sense only for active hits
-// all KalSeed hits are "active", figuring out non-active ones
-// now requires comparing the outputs of the seed fit and the full fit
 //-----------------------------------------------------------------------------
-        if (1) { // hit->isActive()) { // all KalSeed hits are active
+        if (hit->flag().hasAllProperties(mu2e::StrawHitFlag::active)) {
           loc   = hit->index();
+          if (hit->ambig() == 0) nhitsambig0 += 1;
           if ((loc >= 0) && (loc < nss_ch)) {
             if ((list_of_mc_straw_hits) && (list_of_mc_straw_hits->size() > 0)) {
               if(verbose > 5) printf(" --> MC digi found\n");
@@ -555,7 +555,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // if mcdoca and hit->_iamb have different signs, the hit drift direction has wrong sign
 //-----------------------------------------------------------------------------
                   if (hit->ambig()*mcdoca < 0) nwrong      += 1;
-                  if (hit->ambig()       == 0) nhitsambig0 += 1;
                 }
 
                 sim = &(*stgs->simParticle());
@@ -643,40 +642,26 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                            track->fNHits, track->NActive(), track->NWrong(),
                            track->fTrkQual);
 
-    mu2e::Doublet*                     d;
-    mu2e::DoubletAmbigResolver::Data_t r;
+    int nd_os(0), nd_ss(0); // number of doublets with opposite sign ambig and same sign ambig (note: not just active doublets)
+    int nad(0); // number of active doublets
 
-    int   nd, nd_tot(0), nd_os(0), nd_ss(0), ns;
-    vector<mu2e::Doublet> list_of_doublets;
-
-    //    _dar->findDoublets(kffs,&list_of_doublets);
-
-    nd = list_of_doublets.size();
-//-----------------------------------------------------------------------------
-// counting only 2+ hit doublets
-//-----------------------------------------------------------------------------
-    int nad(0);  // number of doublets with all hits active
-
-    for (int i=0; i<nd; i++) {
-      d  = &list_of_doublets.at(i);
-      ns = d->fNStrawHits;
-
-      if (ns > 1) {
-	nd_tot += 1;
-	if (d->isSameSign()) nd_ss += 1;
-	else                 nd_os += 1;
-
-	int active = 1;
-	for (int is=0; is<ns; is++) {
-	  if (!d->fHit[is]->isActive()) {
-	    active = 0;
-	    break;
-	  }
-	}
-
-	if (active == 1) {
-	  nad += 1;
-	}
+    for (int it = 0; it < n_kffs_hits - 1; it++) {
+      
+      const mu2e::TrkStrawHitSeed* ihit = &hots->at(it);
+      const mu2e::TrkStrawHitSeed* jhit = &hots->at(it + 1);
+      
+      if (ihit->strawId().uniquePanel() == jhit->strawId().uniquePanel()) {
+        
+        if (ihit->flag().hasAllProperties(mu2e::StrawHitFlag::active)
+            && jhit->flag().hasAllProperties(mu2e::StrawHitFlag::active)) {
+          ++nad;
+        }
+        
+        if (ihit->ambig() == jhit->ambig()) {
+          ++nd_ss;
+        } else {
+          ++nd_os;
+        }
       }
     }
 
