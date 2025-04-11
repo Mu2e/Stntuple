@@ -426,25 +426,22 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // track parameters in the first point
 //-----------------------------------------------------------------------------
     track->Momentum()->SetXYZM(px,py,pz,0.511);
-    track->fP         = (kinter) ? kinter->mom() : 0.f;
+    track->fP         = (kinter) ? kinter->mom()    : 0.f;
+    track->fFitMomErr = (kinter) ? kinter->momerr() : 0.f;
     track->fPt        = track->Momentum()->Pt();
     track->fChi2      = kffs->chisquared();
     track->fFitCons   = kffs->fitConsistency();
     if(kinter_mid) {
       track->fT0 = kinter_mid->time();
       track->fT0Err = std::sqrt(kinter_mid->loopHelix().paramVar(KinKal::LoopHelix::t0_));
+      // track->fFitMomErr = kinter_mid->momerr();
     } else {
       track->fT0    = -1.e6;
       track->fT0Err = -1.e6;
       if(kinter) printf("%s::%s: KalSeedCollection %s track %2i: No tracker middle intersection found! Unable to define the time at the tracker center\n",
                         typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
     }
-//-----------------------------------------------------------------------------
-// momentum error in the first point
-//-----------------------------------------------------------------------------
-//    ROOT::Math::XYZVector  momdir = fitmom.unit();
 
-    track->fFitMomErr = (kinter) ? kinter->momerr() : 0.f;
 //-----------------------------------------------------------------------------
 // determine, approximately, 'sz0' - flight length corresponding to the
 // virtual detector at the tracker front
@@ -639,7 +636,14 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // total number of hits associated with the trackand the number of bend sites
 //-----------------------------------------------------------------------------
     track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
-    track->fNMatSites = 0; // _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
+
+    int nmat =0; int nmatactive = 0;
+    for (const auto& straw : kffs->straws()) {
+      ++nmat;
+      if (straw.active()) ++nmatactive;
+    }
+    
+    track->fNMatSites = nmat | (nmatactive << 16);
 
     if (list_of_trk_qual) track->fTrkQual = list_of_trk_qual->at(itrk)._value;
     else                  track->fTrkQual = -1.e6;
