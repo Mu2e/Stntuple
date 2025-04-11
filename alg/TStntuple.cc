@@ -9,6 +9,7 @@
 #include "TLorentzVector.h"
 #include "TTree.h"
 #include "TH1.h"
+#include "TString.h"
 
 #include "Stntuple/alg/TStntuple.hh"
 
@@ -41,15 +42,20 @@ TStntuple::TStntuple() {
 // initialize the LO DIO spectrum
 //-----------------------------------------------------------------------------
   TTree tree("t1","t1");
-
-  tree.ReadFile("Offline/ConditionsService/data/czarnecki_Al.tbl","e/f:w/f");
-  int n = tree.GetEntries();
-
   double emin = 0.05;
   double emax = 110.05;
   int    nb   = 1100;
-  double bin  = 0.1; 
-  
+  double bin  = 0.1;
+
+  TString table = "Offline/ConditionsService/data/czarnecki_Al.tbl";
+  if(true) { //FIXME: Make this configurable
+    table = "Offline/ConditionsService/data/heeck_finer_binning_2016_szafron.tbl";
+    nb  = 11000; //finer binning in this table
+    bin = 0.01;
+  }
+  tree.ReadFile(table,"e/f:w/f");
+  int n = tree.GetEntries();
+
   TH1D hist("h_dio","LO DIO spectrum",nb,emin,emax);
 
   float e, w;

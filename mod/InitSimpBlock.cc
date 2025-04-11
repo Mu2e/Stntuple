@@ -232,6 +232,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       process_id         = sim->creationCode();
 
       const bool is_pion = std::abs(pdg_code) == 211;
+      const bool is_pbar = pdg_code == -2212;
       if (pp != nullptr) {
 	bool found = 0;
 	for (auto pr : pp->primarySimParticles()) {
@@ -249,6 +250,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
         found |= process_id == mu2e::ProcessCode::mu2eExternalRPC    ;
         found |= process_id == mu2e::ProcessCode::mu2eFlatPhoton     ;
         found |= is_pion                                             ; // save pions for reweighting RPC
+        found |= is_pbar                                             ; // save pbar for reweighting
 
         // Check if this is a relevant particle for tracking studies
         const bool relevant_track = nhits > 12 && sim->startMomentum().vect().mag() > 70. && (std::abs(pdg_code) == 11 ||
@@ -304,7 +306,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
       const CLHEP::Hep3Vector sp = sim->startPosition();
 
-      if(!is_pion) { //no additional requirements for pions needed for reweighting
+      if(!is_pion && !is_pbar) { //no additional requirements for pions needed for reweighting
         if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
         if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
       }

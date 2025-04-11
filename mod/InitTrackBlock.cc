@@ -40,6 +40,7 @@
 #include "Offline/BTrkData/inc/TrkCaloHit.hh"
 #include "Offline/BTrkData/inc/Doublet.hh"
 
+#include "Offline/RecoDataProducts/inc/TrkStraw.hh"
 #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
 #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 
@@ -516,6 +517,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       printf(">>> ERROR in InitTrackBlock::%s ComboHitCollection by module %s is empty, NHITS = %i\n", __func__, fSsChCollTag.encode().c_str(), nss_ch);
     }
     else {
+      if(verbose > 2) printf("Printing hit collection:\n");
       for (int it=0; it<n_kffs_hits; it++) {
         if(verbose > 5) printf(" Checking hit %i\n", it);
         hit = &hots->at(it);
@@ -526,10 +528,16 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
         mu2e::StrawId sid = hit->strawId();
         const mu2e::Straw* straw = &tracker->straw(sid);
         ++ntrkhits;
+        const bool is_active = hit->flag().hasAllProperties(mu2e::StrawHitFlag::active);
+        if(verbose > 2)
+          printf("%3i: active = %o; ID = %5i, plane = %3i, panel = %5i, layer = %5i\n", it, is_active,
+                 (int) sid.asUint16(), (int) sid.getPlane(),
+                 (int) sid.getPanelId().asUint16(),
+                 (int) sid.getLayerId().asUint16());
 //-----------------------------------------------------------------------------
 // the rest makes sense only for active hits
 //-----------------------------------------------------------------------------
-        if (hit->flag().hasAllProperties(mu2e::StrawHitFlag::active)) {
+        if (is_active) {
           loc   = hit->index();
           if (hit->ambig() == 0) nhitsambig0 += 1;
           if ((loc >= 0) && (loc < nss_ch)) {
@@ -637,22 +645,33 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
     track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
 
-    int nmat =0; int nmatactive = 0;
+    track->fNMatSites = 0; // _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
+    int nmat(0), nmatactive (0); double radlen(0.);
+    if(verbose > 2) printf("Printing material crossing collection:\n");
     for (const auto& straw : kffs->straws()) {
       ++nmat;
-      if (straw.active()) ++nmatactive;
+      if (straw.active()) {
+        ++nmatactive;
+        radlen += straw.radLen();
+      }
+      if(verbose > 2) {
+        printf("%3i: active = %o; ID = %5i, plane = %2i, panel = %5i, layer = %5i\n", nmat-1, straw.active(),
+               (int) straw.straw().asUint16(), (int) straw.straw().getPlane(),
+               (int) straw.straw().getPanelId().asUint16(),
+               (int) straw.straw().getLayerId().asUint16());
+      }
     }
     
     track->fNMatSites = nmat | (nmatactive << 16);
-
     if (list_of_trk_qual) track->fTrkQual = list_of_trk_qual->at(itrk)._value;
     else                  track->fTrkQual = -1.e6;
 //-----------------------------------------------------------------------------
 // defined bit-packed fNActive word
 //-----------------------------------------------------------------------------
     track->fNActive   = kffs->nHits() | (nwrong << 16);
-    if(verbose > 1) printf("  N(hits) = %2i, N(active) = %2i, N(wrong) = %2i, trkqual = %5.2f\n",
+    if(verbose > 1) printf("  N(hits) = %2i, N(active) = %2i, N(wrong) = %2i, N(mat) = %3i, N(active mat) = %3i, trkqual = %5.2f\n",
                            track->fNHits, track->NActive(), track->NWrong(),
+                           nmat, nmatactive,
                            track->fTrkQual);
 
     int nd_os(0), nd_ss(0); // number of doublets with opposite sign ambig and same sign ambig (note: not just active doublets)

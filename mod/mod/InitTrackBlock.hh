@@ -21,6 +21,7 @@
 #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
 #include "Offline/RecoDataProducts/inc/MVAResult.hh"
 #include "Offline/RecoDataProducts/inc/PIDProduct.hh"
+#include "Offline/RecoDataProducts/inc/TrkStraw.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
