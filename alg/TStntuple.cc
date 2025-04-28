@@ -56,7 +56,7 @@ TStntuple::TStntuple() {
   tree.ReadFile(table,"e/f:w/f");
   int n = tree.GetEntries();
 
-  TH1D hist("h_dio","LO DIO spectrum",nb,emin,emax);
+  fDioSpectrumHist = new TH1D("h_dio_spectrum","DIO spectrum",nb,emin,emax);
 
   float e, w;
 
@@ -68,12 +68,15 @@ TStntuple::TStntuple() {
 
     int ibin = (e-emin)/bin+1;
     // skip 0th bin written out (underflows)
-    if (ibin > 0) hist.SetBinContent(ibin,w);
+    if (ibin > 0) fDioSpectrumHist->SetBinContent(ibin,w);
 
     //    printf(" %5i %10.3f %12.5e\n",ibin,e,w);
   }
 
-  fDioSpectrum = new smooth(&hist);
+  // Normalize the input spectral shape to per DIO event
+  fDioSpectrumHist->Scale(1./(fDioSpectrumHist->Integral() * bin));
+
+  fDioSpectrum = new smooth(&(*fDioSpectrumHist));
 
   PBar_Striganov_SetP2Max(2.0);
 }
@@ -131,7 +134,14 @@ Int_t TStntuple::Init(Int_t RunNumber) {
 // of protons on target
 //-----------------------------------------------------------------------------
 double TStntuple::DioWeightAlFull(double E) {
-  double w = fDioSpectrum->GetFunc()->Eval(E);
+  // double w = fDioSpectrum->GetFunc()->Eval(E);
+  double w = std::max(0., fDioSpectrumHist->Interpolate(E));
+  // double w = fDioSpectrumHist->GetBinContent(fDioSpectrumHist->FindBin(E));
+  if(!std::isfinite(w) || w < 0.) {
+    const double binval = std::max(0., fDioSpectrumHist->Interpolate(E));
+    printf("TStntuple::%s: Error! Undefined spectrum value for DIO with E = %.3f: %f --> Using interpolation of %.3g\n", __func__, E, w, binval);
+    w = binval;
+  }
   return w;
 }
 
