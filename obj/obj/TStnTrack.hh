@@ -74,9 +74,15 @@ class TStnTrack : public TObject {
     kNFreeIntsV12  =  3,     //         V12: add helix and seed indices, I/O doesn't change
     kNFreeFloatsV12=  3,
 
-    kNFreeInts     =  2,     //         V13: add interData for housing the TrkCaloHit info
+                             //         V13: add interData for housing the TrkCaloHit info
+
+    kNFreeIntsV15  =  2,     //         V15: add additional track momentum sampling points and MC trajectory
+    kNFreeFloatsV15=  3,
+    kNFreeFloats2V15= 20,
+
+    kNFreeInts     =  1,     //         V16: add ST/IPA/OPA intersection counts
     kNFreeFloats   =  3,
-    kNFreeFloats2  = 20      //         Added in V15 since we were running low on floats
+    kNFreeFloats2  = 20,
   };
 
   //  enum { kMaxNLayers = 88 }; // 22x2*2
@@ -143,6 +149,7 @@ public:
   int                       fHelixIndex;      // added in V12
   int                       fSeedIndex;
   int                       fMcDirection;     // -1 for upstream, +1 for downstream
+  int                       fInterCounts;     // ST/IPA/OPA intersection (packed)
   int                       fInt[kNFreeInts]; // provision for future I/O expansion
   
   float                     fChi2;
@@ -242,7 +249,11 @@ public:
 
   int    NMat         () const { return (fNMatSites      ) & 0xffff; }
   int    NMatActive   () const { return (fNMatSites >> 16) & 0xffff; }
-  
+
+  int    NSTIntersections () const { return (fInterCounts      ) & 0xff;}
+  int    NIPAIntersections() const { return (fInterCounts >>  8) & 0xff;}
+  int    NOPAIntersections() const { return (fInterCounts >> 16) & 0xff;}
+
   int    NClusters();
   int    NMcStrawHits() const { return fNMcStrawHits; }
 
@@ -357,7 +368,7 @@ public:
   void ReadV9 (TBuffer& R__b);
   void ReadV10(TBuffer& R__b);
 
-  ClassDef(TStnTrack,15)
+  ClassDef(TStnTrack,16)
 
 };
 

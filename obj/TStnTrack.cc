@@ -142,6 +142,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fHelixIndex       = -1                ;   // added in V12
   fSeedIndex        = -1                ;   // added in V12
   fMcDirection      = 0                 ;   // added in v15
+  fInterCounts      = 0                 ;   // added in v16
 					      // floats
   fChi2             = data.fChi2        ;
   fTBack            = data.fChi2C       ;      // calculated...
@@ -365,6 +366,7 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
   fHelixIndex   = -1                ;   // added in V12
   fSeedIndex    = -1                ;   // added in V12
   fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;
@@ -598,6 +600,7 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
   fHelixIndex   = -1                ;   // added in V12
   fSeedIndex    = -1                ;   // added in V12
   fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;
@@ -835,6 +838,7 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
   fHelixIndex   = -1                ;   // added in V12
   fSeedIndex    = -1                ;   // added in V12
   fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 					// floats
   fChi2         = data.fChi2        ;
   fTBack        = data.fChi2C       ;
@@ -1074,6 +1078,7 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
   fHelixIndex   = -1                ;   // added in V12
   fSeedIndex    = -1                ;   // added in V12
   fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1316,6 +1321,7 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
   fHelixIndex   = -1                ;   // added in V12
   fSeedIndex    = -1                ;   // added in V12
   fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1559,6 +1565,7 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
   fHelixIndex   = -1                ;   // added in V12
   fSeedIndex    = -1                ;   // added in V12
   fMcDirection  = 0                   ; // added in v15
+  fInterCounts  = 0                   ; // added in v16
 
 					// floats
   fChi2         = data.fChi2        ;
@@ -1760,10 +1767,12 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       fPTrackerMiddle   = 0.f;
       fPTrackerExit     = 0.f;
     }
-    else if (R__v == 15 ){
+    else if (R__v == 15 || R__v == 16){
 //-----------------------------------------------------------------------------
-// current version - v15
+// version - v15
 // adding second second of floats to read
+// version - v16
+// add intersection counts
 //-----------------------------------------------------------------------------
       fMomentum.Streamer(R__b);
       fHitMask.Streamer(R__b);
@@ -1794,6 +1803,9 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       R__b.ReadFastArray(&fTrkCaloHit.fTime,nwf_vint);
 
       fVTCH = &fTrkCaloHit;
+
+      // Set the intersection counts to 0 for V15
+      if(R__v == 15) fInterCounts = 0;
     } else {
       printf(" >>> ERROR: TStnTrack::Streamer unknown read version = %i. BAIL OUT\n",R__v);
     }
@@ -1886,6 +1898,7 @@ void TStnTrack::Clear(Option_t* Opt) {
   fHelixIndex     = -1;
   fSeedIndex      = -1;
   fMcDirection    = 0;
+  fInterCounts    = 0;
 
   for (int i=0; i<kNDisks; i++) {
     fDisk[i].fID           = -1;
