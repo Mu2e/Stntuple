@@ -394,7 +394,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
         ++nipa_inters;
       }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::OPA) { // count OPA intersections
-        ++nipa_inters;
+        ++nopa_inters;
       }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Front) {
         if(!kinter_front || kinter_front->time() < kinter.time()) kinter_front = &kinter;
@@ -406,7 +406,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
         if(!kinter_back || kinter_back->time() < kinter.time()) kinter_back = &kinter;
       }
 
-      if(verbose > 2) printf("  Surface %10s: p = %4.1f t = %6.1f:\n", kinter.surfaceId().name().c_str(), kinter.mom(), kinter.time());
+      if(verbose > 2) printf("  Surface %10s: p = %4.1f pz = %5.1f t = %6.1f:\n", kinter.surfaceId().name().c_str(), kinter.mom(), kinter.momentum3().z(), kinter.time());
     }
 
     // Store the momentum at each surface if found
@@ -485,8 +485,10 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
         continue;
       }
     }
-    if(verbose > 1) printf("  p = %5.1f, pT = %5.1f, t0 = %6.1f, d0 = %6.1f, z0 = %7.1f, phi0 = %5.2f, tdip = %4.2f\n",
-                           track->fP, track->fPt, track->fT0, track->fD0, track->fZ0, track->fPhi0, track->fTanDip);
+    if(verbose > 1) printf("  p = %5.1f, pT = %5.1f, t0 = %6.1f, d0 = %6.1f, z0 = %7.1f, phi0 = %5.2f, tdip = %4.2f, p(ST)-p(Front) = %.2f, N(IPA) = %i\n",
+                           track->fP, track->fPt, track->fT0, track->fD0, track->fZ0, track->fPhi0, track->fTanDip,
+                           track->fPSTBack - track->fP, track->NIPAIntersections()
+                           );
 
 //-----------------------------------------------------------------------------
 // virtual detector at the tracker exit: Time at Z(TT_Back)

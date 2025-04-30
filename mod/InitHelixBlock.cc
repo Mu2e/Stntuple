@@ -82,10 +82,16 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
     if (hch.isValid()) fListOfHSeeds = hch.product();
   }
 
-  const mu2e::StrawDigiMCCollection* sdmcColl(0);
+  const mu2e::StrawDigiMCCollection* sdmcColl(nullptr);
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
-  Evt->getByLabel(fSdmcCollTag, sdmccH);
-  sdmcColl = sdmccH.product();
+  if(Evt->getByLabel(fSdmcCollTag, sdmccH) && sdmccH.isValid()) {
+    sdmcColl = sdmccH.product();
+  } else {
+    printf("InitHelixBlock::%s::%s: Did not find StrawDigiMC collection %s\n Available collections:\n",
+           __func__, fHSeedCollTag.encode().c_str(), fSdmcCollTag.encode().c_str());
+    auto handles = Evt->getMany<mu2e::StrawDigiMCCollection>();
+    for(auto handle : handles) printf(" %s\n", handle.provenance()->productDescription().branchName().c_str());
+  }
 
   const mu2e::HelixSeed     *tmpHel(0);
   const mu2e::RobustHelix   *robustHel(0);
@@ -168,24 +174,26 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
       // get the MC truth info
       if (hit->_flag.hasAnyProperty(mu2e::StrawHitFlag::outlier))         continue;
 
-      std::vector<StrawDigiIndex> shids;
-      tmpHel->hits().fillStrawDigiIndices(j,shids);
+      if(sdmcColl) {
+        std::vector<StrawDigiIndex> shids;
+        tmpHel->hits().fillStrawDigiIndices(j,shids);
 
-      if(verbose > 5) printf(" %2i: Idx   ID  PDGID  SimID Parent   Z     T      P(MC)\n", j);
-      const float minP(30.);//MeV/c, minimum MC sim P to count in the hits
-      for (size_t k=0; k<shids.size(); ++k) {
-        const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
-        auto const& spmcp = sdmc->earlyStrawGasStep();
-        art::Ptr<mu2e::SimParticle> const& simptr = spmcp->simParticle();
-        int sim_id        = simptr->id().asInt();
-        float   dz        = spmcp->position().z();// - trackerZ0;
-        float   pMC       = std::sqrt(spmcp->momentum().mag2());
-        if (verbose > 5) printf("     %2li %5i %5i %5i %5li %8.1f %7.1f %6.1f\n", k, shids[k], simptr->pdgId(), sim_id, simptr->parentId().asInt(), dz, spmcp->time(), pMC);
-        if (pMC<minP)     continue;
-        hits_simp_id.push_back   (sim_id);
-        hits_simp_index.push_back(shids[k]);
-        hits_simp_z.push_back(dz);
-        break;
+        if(verbose > 5) printf(" %2i: Idx   ID  PDGID  SimID Parent   Z     T      P(MC)\n", j);
+        const float minP(30.);//MeV/c, minimum MC sim P to count in the hits
+        for (size_t k=0; k<shids.size(); ++k) {
+          const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
+          auto const& spmcp = sdmc->earlyStrawGasStep();
+          art::Ptr<mu2e::SimParticle> const& simptr = spmcp->simParticle();
+          int sim_id        = simptr->id().asInt();
+          float   dz        = spmcp->position().z();// - trackerZ0;
+          float   pMC       = std::sqrt(spmcp->momentum().mag2());
+          if (verbose > 5) printf("     %2li %5i %5i %5i %5li %8.1f %7.1f %6.1f\n", k, shids[k], simptr->pdgId(), sim_id, simptr->parentId().asInt(), dz, spmcp->time(), pMC);
+          if (pMC<minP)     continue;
+          hits_simp_id.push_back   (sim_id);
+          hits_simp_index.push_back(shids[k]);
+          hits_simp_z.push_back(dz);
+          break;
+        }
       }
       nStrawHits += hit->nStrawHits();
     }
@@ -244,14 +252,14 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
       }
     }
 
-    if ( (mostvalueindex<0) || (mostvalueindex >= (int) sdmcColl->size()))        {
+    if(sdmcColl && ((mostvalueindex<0) || (mostvalueindex >= (int) sdmcColl->size()))) {
       printf(">>> ERROR: event %i helix %i no MC found. MostValueindex = %i mcdigis_size = %li size(hits_simp_index) = %lu\n",
              Evt->event(), i, mostvalueindex, sdmcColl->size(), hits_simp_index.size());
       if (hits_simp_index.size()>0) {
         printf(">>> ERROR:  hits_simp_index[id_max] = %i  \n",
                hits_simp_index[id_max]);
       }
-    } else {
+    } else if(sdmcColl) {
 
       const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(mostvalueindex);
 
