@@ -190,13 +190,19 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
     if (pp_handle.isValid()) {
       pp            = pp_handle.product();
-      if (pp->primarySimParticles().size() > 0) {
-	primary       = pp->primarySimParticles().front().get();
-	fGenProcessID = primary->creationCode();
-	fPdgID        = primary->pdgId();
-        if(verbose > 0) {
-          printf("Primary particles:\n");
-          for(auto sim : pp->primarySimParticles()) printf(" ProcessCode = %20s, PDG = %5i\n", sim->creationCode().name().c_str(), sim->pdgId());
+      if (!pp->primarySimParticles().empty()) {
+        auto front = pp->primarySimParticles().front();
+        if(front) {
+          primary       = front.get();
+          fGenProcessID = primary->creationCode();
+          fPdgID        = primary->pdgId();
+          if(verbose > 0) {
+            printf("Primary particles:\n");
+            for(auto sim : pp->primarySimParticles()) printf(" ProcessCode = %20s, PDG = %5i\n", sim->creationCode().name().c_str(), sim->pdgId());
+          }
+        } else {
+          printf("InitSimpBlock::%s: Primary particle (collection %s) sim particle is not valid\n", __func__, fPrimaryParticleTag.encode().c_str());
+          pp = nullptr;
         }
       }
     }

@@ -39,7 +39,7 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       crpc = crpch.product();
       ncrp = crpc->size();
     } else {
-      printf("InitCrvClusterBlock::%s: No CRV pulse collection found\n", __func__);
+      printf("InitCrvClusterBlock::%s: No CRV pulse collection (%s) found\n", __func__, fCrvRecoPulseCollTag.encode().c_str());
     }
   }
 
@@ -56,7 +56,7 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       cccc = cccch.product();
       nccc = cccc->size();
     } else {
-      printf("InitCrvClusterBlock::%s: No CRV coincidence cluster collection found\n", __func__);
+      printf("InitCrvClusterBlock::%s: No CRV coincidence cluster collection (%s) found\n", __func__, fCrvCoincidenceClusterCollTag.encode().c_str());
     }
   }
 
@@ -65,7 +65,7 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   const mu2e::CrvCoincidenceClusterMCAssns*       mc_ccc_assns(nullptr);
   if(!fCrvCoincidenceClusterMCCollTag.empty()) {
     if(Event->getByLabel(fCrvCoincidenceClusterMCCollTag,mc_ccc_assnsH)) mc_ccc_assns = mc_ccc_assnsH.product();
-    else printf("InitCrvClusterBlock::%s: No MC <--> Reco CRV coincidence cluster associations found\n", __func__);
+    else printf("InitCrvClusterBlock::%s: No MC <--> Reco CRV coincidence cluster associations (%s) found\n", __func__, fCrvCoincidenceClusterMCCollTag.encode().c_str());
   }
   const int nmc_ccc_assns = (mc_ccc_assns) ? mc_ccc_assns->size() : 0;
   if(mc_ccc_assns && nmc_ccc_assns != nccc) printf("InitCrvClusterBlock::%s: MC cluster associations (%i) and Reco clusters (%i) don't match\n",
@@ -84,6 +84,7 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     if(mc_ccc_assns) {
       for(int iassn = 0; iassn < nmc_ccc_assns; ++iassn) {
         const auto assn = mc_ccc_assns->at(iassn);
+        if(!assn.first || !assn.second) continue;
         const mu2e::CrvCoincidenceCluster*   ireco = &(*(assn.first));
         const mu2e::CrvCoincidenceClusterMC* imc   = &(*(assn.second));
         if(&(*(ireco)) == &(*cluster)) {
