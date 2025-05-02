@@ -22,7 +22,7 @@ class TStnHeaderBlock : public TStnDataBlock {
   };
   enum {
     kNFreeInts   =  4,                  // starting from version 3
-    kNFreeFloats =  5
+    kNFreeFloats =  4
   };
 
 public:
@@ -45,6 +45,7 @@ public:
 
   float             fInstLum;		 // instantaneous luminosity
   float             fMeanLum;		 // *** added in V2 : mean luminosity (MC)
+  float             fEventWeight;        // *** added in V4 : event weight
   float             fFloat[kNFreeFloats];// provision for future I/O expansion
   TString           fStnVersion;         // STNTUPLE version, like "dev_243_16"
 //------------------------------------------------------------------------------
@@ -91,7 +92,7 @@ public:
   void   ReadV1(TBuffer& R__b);
 
 
-  ClassDef(TStnHeaderBlock,3)	       // Mu2e STNTUPLE event header
+  ClassDef(TStnHeaderBlock,4)	       // Mu2e STNTUPLE event header
 };
 
 #endif

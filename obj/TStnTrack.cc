@@ -1899,6 +1899,7 @@ void TStnTrack::Clear(Option_t* Opt) {
   fSeedIndex      = -1;
   fMcDirection    = 0;
   fInterCounts    = 0;
+  fPdgCode        = 0;
 
   for (int i=0; i<kNDisks; i++) {
     fDisk[i].fID           = -1;
@@ -1938,11 +1939,19 @@ void TStnTrack::Clear(Option_t* Opt) {
   fVMinS        = NULL;
   fVMaxEp       = NULL;
 
+  fP                = 0.0;
+  fPFront           = 0.0;
   fPSTFront         = 0.0;
   fPSTBack          = 0.0;
   fPTrackerEntrance = 0.0;
   fPTrackerMiddle   = 0.0;
   fPTrackerExit     = 0.0;
+  fPStOut           = 0.0;
+  fClusterE         = 0.0;
+  fDt               = 0.0;
+  fDx               = 0.0;
+  fDy               = 0.0;
+  fDz               = 0.0;
 
   fTrkCaloHit.fID           = -1;
   fTrkCaloHit.fClusterIndex = -1;
