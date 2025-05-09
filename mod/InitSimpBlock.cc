@@ -290,7 +290,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       px               = sim->startMomentum().x();
       py               = sim->startMomentum().y();
       pz               = sim->startMomentum().z();
-      double ptot      = sim->startMomentum().vect().mag();
+      // double ptot      = sim->startMomentum().vect().mag();
       energy           = sim->startMomentum().e();
 //-----------------------------------------------------------------------------
 // more on parent ID
@@ -314,10 +314,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
       const CLHEP::Hep3Vector sp = sim->startPosition();
 
-      if(!is_pion && !is_pbar) { //no additional requirements for pions needed for reweighting
-        if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
-        if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
-      }
+      // if(!is_pion && !is_pbar) { //no additional requirements for pions needed for reweighting
+      //   if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
+      //   if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
+      // }
 
       simp   = simp_block->NewParticle(id, parent_id, pdg_code        , 
 				       creation_code, termination_code,
