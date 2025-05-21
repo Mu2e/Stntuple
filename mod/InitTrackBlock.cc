@@ -514,9 +514,9 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     int     loc, nss_ch, found, ntrkhits(0), nhitsambig0(0); // , pdg_code;
     int     ipart;
     const static int max_npart(100);
-    int     id(-1),  npart(0), part_nh[max_npart], part_id[max_npart];
+    int     id(-1),  npart(0), part_nh[max_npart], part_id[max_npart], part_netDir[max_npart];
     int     part_pdg_code[max_npart];
-    double  part_first_z[max_npart], part_first_z_p[max_npart], part_first_z_pz[max_npart];
+    double  part_first_z[max_npart], part_first_z_p[max_npart];
     double  part_last_z [max_npart], part_last_z_p [max_npart];
     int     nwrong = 0;
     double  mcdoca;
@@ -600,11 +600,12 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                 if (id == part_id[ip]) { //increment N(hits) by this SIM if already seen
                   found        = 1;
                   part_nh[ip] += 1;
+                  int d = (stgs->momentum().z() >= 0) ? 1 : -1;
+                  part_netDir[ip] += d;
                   const double dz = stgs->position().z();
                   if(dz < part_first_z[ip]) {
                     part_first_z   [ip] = dz;
                     part_first_z_p [ip] = std::sqrt(stgs->momentum().mag2());
-                    part_first_z_pz[ip] = stgs->momentum().z();
                   }
                   if(dz > part_last_z[ip]) {
                     part_last_z    [ip] = dz;
@@ -622,7 +623,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                 part_nh        [npart] = 1;
                 part_first_z   [npart] = dz;
                 part_first_z_p [npart] = std::sqrt(stgs->momentum().mag2());
-                part_first_z_pz[npart] = stgs->momentum().z();
+                part_netDir    [npart] = (stgs->momentum().z() >= 0) ? 1 : -1;
                 part_last_z    [npart] = dz;
                 part_last_z_p  [npart] = std::sqrt(stgs->momentum().mag2());
                 npart                 += 1;
@@ -823,7 +824,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // initialize MC track front to an early sim hit in case no virtual detector hit is found
     track->fPFront = part_first_z_p[ipart];
     track->fPStOut = -1.;
-    track->fMcDirection = (part_first_z_pz[ipart] >= 0.) ? 1 : -1;
+    track->fMcDirection = (part_netDir[ipart] >= 0.) ? 1 : -1;
 
     if(verbose > 1) printf(" N(virtual detectors) = %i\n", vdg->nDet());
     if (vdg->nDet() > 0) {
@@ -885,7 +886,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
               if ((sim_id == track->fPartID) && (hit->time() < t_front)) {
                 track->fPFront = hit->momentum().mag();
                 t_front        = hit->time();
-                track->fMcDirection = (hit->momentum().z() >= 0.) ? 1 : -1;
+                //track->fMcDirection = (hit->momentum().z() >= 0.) ? 1 : -1;
                 if(verbose > 3) printf(" Sim TT_Front hit found: p = %5.1f, t = %6.1f MC trajectory = %2i\n", track->fPFront, t_front, track->fMcDirection);
               }
             }
