@@ -316,7 +316,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCaloCrystalHitMaker     (PSet.get<string>        ("caloCrystalHitsMaker"))
   , fCaloClusterMaker        (PSet.get<string>        ("caloClusterMaker"    ))
 
-  , fGenId(GenId::findByName (PSet.get<std::string>   ("genId"               ),"unknown"))
+  , fGenId((PSet.get<std::string>("genId","unknown") == "unknown") ? GenId::findByName (PSet.get<std::string>("genId")) : GenId::unknown)
   , fPdgId                   (PSet.get<int>           ("pdgId"               ))
 
   , fMinTActive              (PSet.get<double>        ("minTActive"          ))
@@ -537,7 +537,7 @@ void StntupleMaker::beginJob() {
   if (fMakeGenp) {
     fInitGenpBlock = new StntupleInitGenpBlock();
     fInitGenpBlock->SetGenpCollTag(fGenpCollTag);
-    fInitGenpBlock->SetGenProcessID (fGenId.id());
+    fInitGenpBlock->SetGenProcessID ((fGenId == GenId::unknown) ? -1 : fGenId.id());
     fInitGenpBlock->SetPdgID        (fPdgId     );
 
     AddDataBlock("GenpBlock","TGenpBlock",fInitGenpBlock,buffer_size,split_mode,compression_level);

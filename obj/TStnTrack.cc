@@ -2015,11 +2015,11 @@ void TStnTrack::Print(Option_t* Option) const {
 // print banner
 //-----------------------------------------------------------------------------
     printf("------------------------------------------------------------------------------------------------");
-    printf("------------------------------------------------------\n");
+    printf("------------------------------------------------------------------\n");
     printf(" i  nh  na nw nosd nssd na0 ncl  alg_mask    id_word   q     p     momerr    T0     T0Err     D0");
-    printf("       Z0    TanDip   TBack   chi2/dof   fcon  TrkQual\n");
+    printf("       Z0    TanDip   TBack   chi2/dof   fcon  TrkQual p(MC front)\n");
     printf("------------------------------------------------------------------------------------------------");
-    printf("------------------------------------------------------\n");
+    printf("------------------------------------------------------------------\n");
   }
 
   if ((opt == "") || (opt.Index("data") >= 0)) {
@@ -2029,11 +2029,11 @@ void TStnTrack::Print(Option_t* Option) const {
 	   t->NClusters(),
 	   t->AlgorithmID());
 
-    printf(" 0x%08x %2.0f %8.3f %7.3f %8.3f %6.3f %8.3f %8.3f %7.4f %8.3f %8.2f %8.2e %7.3f",
+    printf(" 0x%08x %2.0f %8.3f %7.3f %8.3f %6.3f %8.3f %8.3f %7.4f %8.3f %8.2f %8.2e %6.3g %6.1f",
 	   t->fIDWord,
 	   fCharge,
 	   fP*fCharge, fFitMomErr, fT0, fT0Err, fD0, fZ0, fTanDip, TBack(),
-	   t->Chi2Dof(),t->FitCons(),t->DaveTrkQual());
+	   t->Chi2Dof(),t->FitCons(),t->DaveTrkQual(), t->fPFront);
     printf("\n");
   }
 }
