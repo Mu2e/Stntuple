@@ -39,7 +39,7 @@ Stntuple.Catalog   https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc
 #------------------------------------------------------------------------------
 # geometry - extracted from the Offline
 #------------------------------------------------------------------------------
-Stntuple.GeometryData $(MU2E_BASE_RELEASE)/Stntuple/geom/data
+Stntuple.GeometryData $(MUSE_WORK_DIR)/Stntuple/geom/data
 #------------------------------------------------------------------------------
 # name of the oracle server (used by TStnCatalogServer)
 #------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ Stntuple.OracleServer          cdfofprd
 #------------------------------------------------------------------------------
 # Calibration DB for TGeant: not used at Mu2e
 #------------------------------------------------------------------------------
-# TGeant.Database         $(MU2E_BASE_RELEASE)/Stntuple/db
+# TGeant.Database         $(MUSE_WORK_DIR)/Stntuple/db
 #------------------------------------------------------------------------------
 # Mu2E: 1. figures and histograms for TPlotNote
 #------------------------------------------------------------------------------
