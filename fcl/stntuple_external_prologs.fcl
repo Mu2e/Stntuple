@@ -72,4 +72,4 @@ END_PROLOG
 #include "Production/JobConfig/common/prolog.fcl"
 #include "Production/JobConfig/primary/prolog.fcl"
 #include "Production/JobConfig/digitize/prolog.fcl"
-#include "Production/JobConfig/reco/prolog.fcl"
+#include "Production/JobConfig/recoMC/prolog.fcl"
