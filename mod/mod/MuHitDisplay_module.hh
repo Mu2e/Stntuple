@@ -50,9 +50,9 @@ class TApplication;
 #include "Stntuple/obj/TStnHeaderBlock.hh"
 #include "Stntuple/obj/TSimpBlock.hh"
 
-#ifndef __CLING__
+// #ifndef __CLING__
 #include "Offline/Mu2eUtilities/inc/McUtilsToolBase.hh"
-#endif
+// #endif
 // using namespace std;
 
 class DoubletAmbigResolver;
@@ -61,7 +61,7 @@ namespace mu2e {
 
 class MuHitDisplay : public THistModule {
 public:
-#ifndef __CLING__  
+  // #ifndef __CLING__  
   struct VmConfig {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
@@ -110,7 +110,7 @@ public:
     fhicl::Atom<bool>            showTracks             {Name("showTracks"        )    , Comment("showTracks"     ) };
     fhicl::Table<VmConfig>       visManager             {Name("visManager"        )    , Comment("vis manager config" ) };
   };
-#endif
+  // #endif
 private:
 //-----------------------------------------------------------------------------
 // Input parameters: Module labels 
@@ -153,9 +153,9 @@ private:
   bool				_showTracks;
 
   //  fhicl::ParameterSet           _vmConfig;
-#ifndef __CLING__
+  // #ifndef __CLING__
   VmConfig           _vmConfig;
-#endif
+  //#endif
 //-----------------------------------------------------------------------------
 // end of input parameters
 // Options to control the display
@@ -183,9 +183,9 @@ private:
   mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Dwnstrm;
   mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Upstrm;
   
-#ifndef __CLING__
+  // #ifndef __CLING__
   std::unique_ptr<McUtilsToolBase>            _mcUtils;
-#endif
+  // #endif
 //-----------------------------------------------------------------------------
 // need to detect the first call to initialize fVisManager
 //-----------------------------------------------------------------------------
@@ -211,10 +211,10 @@ public:
   // for some reason, this line is required by art to allow the command line help print
   MuHitDisplay();
   
-#ifndef __CLING__
+  // #ifndef __CLING__
   typedef art::EDAnalyzer::Table<Config> Parameters;
   explicit MuHitDisplay(const art::EDAnalyzer::Table<Config>& config);
-#endif
+  // #endif
   // explicit MuHitDisplay(fhicl::ParameterSet const& pset);
   virtual ~MuHitDisplay();
 

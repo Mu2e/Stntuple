@@ -4,7 +4,7 @@
 #ifndef __Stntuple_mod_TModule_hh__
 #define __Stntuple_mod_TModule_hh__
 
-#ifndef __CLING__
+// #ifndef __CLING__
 #include "fhiclcpp/types/Atom.h"
 #include "fhiclcpp/types/DelegatedParameter.h"
 #include "fhiclcpp/ParameterSet.h"
@@ -13,17 +13,17 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/Handle.h"
-#else
-namespace fhiclcpp {
-  class Atom;
-  class DelegatedParameter;
-};
-namespace art {
-  class EDAnalyzer;
-  class Run;
-  class Event;
-};
-#endif
+// #else
+// namespace fhiclcpp {
+//   class Atom;
+//   class DelegatedParameter;
+// };
+// namespace art {
+//   class EDAnalyzer;
+//   class Run;
+//   class Event;
+// };
+// #endif
 
 
 #include <string>
@@ -43,15 +43,15 @@ namespace art {
 // everything should be OK
 class TAnaRint;
 class TAnaDump;
-#ifndef __CLING__
+// #ifndef __CLING__
 class TModule : public art::EDAnalyzer, public TNamed {
-#else
-class TModule {
-#endif
+// #else
+// class TModule {
+// #endif
   enum { kNDebugBits = 100 };
 
 public:
-#ifndef __CLING__
+  // #ifndef __CLING__
   struct Config {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
@@ -60,7 +60,7 @@ public:
     fhicl::Table<fhicl::ParameterSet>  debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
     fhicl::DelegatedParameter          TAnaDump       {Name("TAnaDump"       ), Comment("TAnaDump parameters"  ) };
   };
-#endif
+  // #endif
 					// there are some initializations which need 
 					// to be done just once
   static int          fgInitialized;
@@ -69,9 +69,9 @@ public:
 
   int                 fDebugBit[kNDebugBits];		// flags for different debug options
 
-#ifndef __CLING__
+  // #ifndef __CLING__
   fhicl::ParameterSet fFclDebugBits;
-#endif
+  // #endif
   int                 fInteractiveMode;
 
   int                 fEventNumber;
@@ -101,13 +101,13 @@ public:
 // methods 
 //-----------------------------------------------------------------------------
   TModule();     // should not be called
-#ifndef __CLING__
+  // #ifndef __CLING__
   explicit TModule(const fhicl::ParameterSet&  PSet       ,
                    const fhicl::ParameterSet&  TModulePSet,
                    const char* Name                       );
   
   explicit TModule(const fhicl::Table<TModule::Config>& config, const char* Name);
-#endif
+  // #endif
   
   virtual      ~TModule();
 
