@@ -21,7 +21,7 @@
 
 // typedef artdaq::Fragment::type_t  type_t;
 
-#include "artdaq-core-mu2e/Data/TrackerDataDecoder.hh"
+#include "artdaq-core-mu2e/Overlays/Decoders/TrackerDataDecoder.hh"
 #include "artdaq-core/Data/Fragment.hh"
 //  #else 
 //  namespace mu2e {
