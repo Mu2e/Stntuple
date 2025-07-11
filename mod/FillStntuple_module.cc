@@ -81,7 +81,7 @@ void FillStntuple::beginRun(const art::Run &  aRun) {
   if (runnum != fLastRun) {
 					// create new subdirectory and store 
 					// calibration constants in there
-    ProcessNewRun(runnum);
+    // [2025-05-12 PM bypass for the time being]  ProcessNewRun(runnum);
     fLastRun = runnum;
   }
 
