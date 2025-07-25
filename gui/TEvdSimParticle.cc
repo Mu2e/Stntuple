@@ -96,18 +96,18 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   int color(0);
 
   if      (pdg_id == 11) {
-    if    (p       > 20  ) { color = kRed;    }
-    else                   { color = kRed+2;  }
+    if    (p       > 20  ) { color = kRed;      }
+    else                   { color = kRed+2;    }
   }
-  else if (pdg_id ==  -11) { color = kBlue;   } 
-  else if (pdg_id ==   13) { color = kGreen+2;} 
-  else if (pdg_id ==  -13) { color = kGreen-2;}
-  else if (pdg_id ==   13) { color = kGreen+2;} 
-  else if (pdg_id ==  -13) { color = kGreen-2;}
-  else if (pdg_id == 2212) { color = kBlue+2; }
-  else if (pdg_id ==  211) { color = kOrange-3;} 
+  else if (pdg_id ==  -11) { color = kBlue;     } 
+  else if (pdg_id ==   13) { color = kGreen+2;  } 
+  else if (pdg_id ==  -13) { color = kGreen-2;  }
+  else if (pdg_id ==   13) { color = kGreen+2;  } 
+  else if (pdg_id ==  -13) { color = kGreen-2;  }
+  else if (pdg_id == 2212) { color = kBlue+2;   }
+  else if (pdg_id ==  211) { color = kOrange-3; } 
   else if (pdg_id == -211) { color = kOrange+7; }
-  else                     { color = kBlack;} 
+  else                     { color = kBlack;    } 
 
   fListOfHits = new TObjArray();
 

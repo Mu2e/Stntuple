@@ -276,16 +276,16 @@ int TTrkVisNode::InitEvent() {
           // else        color = kAzure+1;
           color = kRed;
 	}
-	else                   { color = kRed+2;  }
+	else                   { color = kRed+2;    }
       }
-      else if (pdg_id ==  -11) { color = kBlue;   }
-      else if (pdg_id ==   13) { color = kGreen+2;}
-      else if (pdg_id ==  -13) { color = kGreen-2;}
-      else if (pdg_id == 2212) { color = kBlue+2; }
-      else if (pdg_id ==  211) { color = kOrange-3;}
+      else if (pdg_id ==  -11) { color = kBlue;     }
+      else if (pdg_id ==   13) { color = kGreen+2;  }
+      else if (pdg_id ==  -13) { color = kGreen-2;  }
+      else if (pdg_id == 2212) { color = kBlue+2;   }
+      else if (pdg_id ==  211) { color = kOrange-3; }
       else if (pdg_id == -211) { color = kOrange+7; }
 
-      else                     { color = kBlack;  }
+      else                     { color = kBlack;    }
     }
 //-----------------------------------------------------------------------------
 // add a pointer to the hit to the straw

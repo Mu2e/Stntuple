@@ -78,16 +78,16 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
   float size(0.);
 
   if      (fPdgID == 11) {
-    if    (fP      > 20  ) { style = 20; size = 0.8; color = kRed; }
-    else                   { style = 20; size = 0.4; color = kRed+2; }
+    if    (fP      > 20  ) { style = 20; size = 0.8; color = kRed;     }
+    else                   { style = 20; size = 0.4; color = kRed+2;   }
   }
-  else if (fPdgID ==  -11) { style = 20; size = 0.8; color = kBlue;   }
-  else if (fPdgID ==   13) { style = 20; size = 0.8; color = kGreen+2;}
-  else if (fPdgID ==  -13) { style = 20; size = 0.8; color = kGreen-2;}
+  else if (fPdgID ==  -11) { style = 20; size = 0.8; color = kBlue;    }
+  else if (fPdgID ==   13) { style = 20; size = 0.8; color = kGreen+2; }
+  else if (fPdgID ==  -13) { style = 20; size = 0.8; color = kGreen-2; }
   else if (fPdgID ==  211) { style = 20; size = 0.8; color = kOrange-3;}
-  else if (fPdgID == -211) { style = 20; size = 0.8; color = kOrange+7; }
-  else if (fPdgID == 2212) { style = 20; size = 1.0; color = kBlue+2; }
-  else                     { style = 20; size = 1.0; color = kBlack;}
+  else if (fPdgID == -211) { style = 20; size = 0.8; color = kOrange+7;}
+  else if (fPdgID == 2212) { style = 20; size = 1.0; color = kBlue+2;  }
+  else                     { style = 20; size = 1.0; color = kBlack;   }
 
   fColor = color;
 //-----------------------------------------------------------------------------
