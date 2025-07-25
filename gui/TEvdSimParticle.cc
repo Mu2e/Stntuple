@@ -101,9 +101,13 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   }
   else if (pdg_id ==  -11) { color = kBlue;   } 
   else if (pdg_id ==   13) { color = kGreen+2;} 
-  else if (pdg_id ==  -13) { color = kGreen-2;} 
-  else if (pdg_id == 2212) { color = kBlue+2; } 
-  else                     { color = kMagenta;} 
+  else if (pdg_id ==  -13) { color = kGreen-2;}
+  else if (pdg_id ==   13) { color = kGreen+2;} 
+  else if (pdg_id ==  -13) { color = kGreen-2;}
+  else if (pdg_id == 2212) { color = kBlue+2; }
+  else if (pdg_id ==  211) { color = kOrange-3;} 
+  else if (pdg_id == -211) { color = kOrange+7; }
+  else                     { color = kBlack;} 
 
   fListOfHits = new TObjArray();
 

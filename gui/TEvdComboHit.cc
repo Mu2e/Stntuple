@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // May 04 2013 P.Murat
-// 
-// in 'XY' mode draw calorimeter clusters as circles with different colors 
+//
+// in 'XY' mode draw calorimeter clusters as circles with different colors
 // in 'Cal' mode draw every detail...
 ///////////////////////////////////////////////////////////////////////////////
 #include "TVirtualX.h"
@@ -70,22 +70,24 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
    // printf("TEvdComboHit::TEvdComboHit: StrawDidiMC::driftDistance disabled. ask Dave Brown\n");
 
   fSigW  = Hit->wireRes();
-  fSigR  = 2.5 ;                // Hit->transRes(); 
+  fSigR  = 2.5 ;                // Hit->transRes();
 //-----------------------------------------------------------------------------
 // style and color
 //-----------------------------------------------------------------------------
   int   style(0), color(0);
   float size(0.);
-  
+
   if      (fPdgID == 11) {
     if    (fP      > 20  ) { style = 20; size = 0.8; color = kRed; }
     else                   { style = 20; size = 0.4; color = kRed+2; }
   }
-  else if (fPdgID ==  -11) { style = 24; size = 0.8; color = kBlue;   } 
-  else if (fPdgID ==   13) { style = 20; size = 0.8; color = kGreen+2;} 
-  else if (fPdgID ==  -13) { style = 20; size = 0.8; color = kGreen-2;} 
-  else if (fPdgID == 2212) { style = 20; size = 1.0; color = kBlue+2; } 
-  else                     { style = 20; size = 1.0; color = kMagenta;} 
+  else if (fPdgID ==  -11) { style = 20; size = 0.8; color = kBlue;   }
+  else if (fPdgID ==   13) { style = 20; size = 0.8; color = kGreen+2;}
+  else if (fPdgID ==  -13) { style = 20; size = 0.8; color = kGreen-2;}
+  else if (fPdgID ==  211) { style = 20; size = 0.8; color = kOrange-3;}
+  else if (fPdgID == -211) { style = 20; size = 0.8; color = kOrange+7; }
+  else if (fPdgID == 2212) { style = 20; size = 1.0; color = kBlue+2; }
+  else                     { style = 20; size = 1.0; color = kBlack;}
 
   fColor = color;
 //-----------------------------------------------------------------------------
@@ -104,7 +106,7 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
   fLineR.SetLineColor(color);
 
   //  const CLHEP::Hep3Vector* mid_point = &fStraw->GetStraw()->getMidPoint();
-  
+
   // double rdrift(2.);
 //-----------------------------------------------------------------------------
 // RZ view - for straw hits
