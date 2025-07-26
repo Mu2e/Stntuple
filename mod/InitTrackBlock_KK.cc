@@ -84,7 +84,8 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
   AnEvent->getByLabel(fKFFCollTag, ksfhaH);
   if (ksfhaH.isValid()) {ksfha = ksfhaH.product();}
   else {
-    printf(" WARNING in InitTrackBlock_KK::%s: KalHelixAssns %s not found!\n", __func__, fKFFCollTag.encode().c_str());
+    // Online trigger paths typically don't have this, so ignore this in normal running
+    if(fVerbose > 0) printf(" WARNING in InitTrackBlock_KK::%s: KalHelixAssns %s not found!\n", __func__, fKFFCollTag.encode().c_str());
     ksfha = nullptr;
   }
 
@@ -122,12 +123,12 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
 
     int  hindex(-1);
 
-    if (hs == nullptr) {
+    if (hs == nullptr && ksfha) {
       mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__
-                            << ": kseed->helix() is gone. kalseedassn = " << ((ksfha) ? 1 : 0)
-                            << ", len(assn) = " << ((ksfha) ? int((*ksfha).size()) : -1) << " --> FIXIT" ;
+                            << ": kseed->helix() is gone."
+                            << " len(assn) = " << ksfha->size() << " --> FIXIT" ;
     }
-    else {
+    else if(ksfha) {
 //-----------------------------------------------------------------------------
 // search for the helix in the helix block
 //-----------------------------------------------------------------------------
@@ -142,7 +143,7 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
       }
     }
     
-    if (hindex < 0) {
+    if (hindex < 0 && ksfha) {
       mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
                             << ": tracjseed " << fKFFCollTag.encode().data() 
                             << ":" << i << " has no HelixSeed associated" ;
