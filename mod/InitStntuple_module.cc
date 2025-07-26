@@ -195,6 +195,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 181, 181,"apr_highP"                   ,1));
     trigger_table->AddTrigger(new TStnTrigger( 190, 190,"apr_lowP_stopTarg"           ,1));
     trigger_table->AddTrigger(new TStnTrigger( 191, 191,"apr_highP_stopTarg_multiTrk"  ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 192, 192,"apr_lowP_multiHelix"         ,1));
     trigger_table->AddTrigger(new TStnTrigger( 195, 195,"aprHelix"                    ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
