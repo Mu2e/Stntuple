@@ -1,21 +1,21 @@
 //------------------------------------------------------------------------------
-//  rootlogon.C: a sample ROOT logon macro allowing use of ROOT script 
+//  rootlogon.C: a sample ROOT logon macro allowing use of ROOT script
 //               compiler in Mu2e environment. The name of this macro file
 //               is defined by the .rootrc file
 //
 // Jul 08 2014 P.Murat
 //------------------------------------------------------------------------------
 {
-                                // the line below tells rootcling where to look for 
-				// the include files
+                                // the line below tells rootcling where to look for
+                                // the include files
 
   gInterpreter->AddIncludePath("./build/include");
-  gInterpreter->AddIncludePath(gSystem->Getenv("CLHEP_INC"));
+  if(gSystem->Getenv("CLHEP_INC")) gInterpreter->AddIncludePath(gSystem->Getenv("CLHEP_INC"));
   gInterpreter->AddIncludePath(Form("%s/include",gSystem->Getenv("ROOTSYS")));
 
 
   // gInterpreter->AddIncludePath(Form("%s/tex/cdfnotes",
-  // 				    gSystem->Getenv("HOME")));
+  //                                gSystem->Getenv("HOME")));
 
   //  gSystem->SetMakeSharedLib("cd $BuildDir ; g++ -c -g $Opt -pipe -m32 -Wall -W -Woverloaded-virtual -fPIC -pthread $IncludePath $SourceFiles ;  g++ -g $ObjectFiles -shared -Wl,-soname,$LibName.so -m32 $LinkedLibs -o $SharedLib");
 //-----------------------------------------------------------------------------
@@ -45,15 +45,15 @@
 
   printf("   batch_mode = %i\n",batch_mode);
 //-----------------------------------------------------------------------------
-// always need libStntuple_loop, but the other 2 libs should be loaded in 
+// always need libStntuple_loop, but the other 2 libs should be loaded in
 // only if we're running bare root
 //-----------------------------------------------------------------------------
   const char* exec_name = gApplication->Argv(0);
- 
+
   printf(" nargs = %2i exec_name = %s\n",nargs, exec_name);
 
   if (exec_name) {
-    if (strstr(exec_name,"root.exe") != 0) {
+    if (TString(exec_name) == "root.exe") {
 //-----------------------------------------------------------------------------
 // assume STNTUPLE  analysis job
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@
 //-----------------------------------------------------------------------------
 //     //     gSystem->Load("lib/libmu2e_Mu2eInterfaces.so");
 //     //     gSystem->Load("lib/libmu2e_CalorimeterGeom.so");
-// 
+//
       gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_base.so");
       gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_obj.so");
       gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_loop.so");
@@ -71,10 +71,10 @@
       gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_ana.so");
       gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_val.so");
 
-//insert_user_libs_here    
-					// print overflows/underflows in the stat box
+//insert_user_libs_here
+                                        // print overflows/underflows in the stat box
       gStyle->SetOptStat(11111111);
-					// print fit results in the stat box
+                                        // print fit results in the stat box
       gStyle->SetOptFit(1110);
       TArrow::SetDefaultArrowSize(0.015);
     }
