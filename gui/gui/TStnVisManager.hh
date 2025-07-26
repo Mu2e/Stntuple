@@ -9,6 +9,9 @@
 
 #include "Stntuple/obj/AbsEvent.hh"
 #include "Stntuple/base/TVisManager.hh"
+#include "Stntuple/gui/TCalVisNode.hh"
+#include "Stntuple/gui/TEvdCrystal.hh"
+
 
 class TControlBar;
 class TGMenuBar;
@@ -67,6 +70,10 @@ public:
     TIMEHIGH_DISP = 12,
     UPDATER_BTN   = 13
   };
+
+  // legend operator
+  static std::map<std::string, std::string> GetLegendLabelMap();
+
 
 //-----------------------------------------------------------------------------
 //  data members
@@ -129,12 +136,19 @@ protected:
   int                 fIgnoreComptonHits;   // 1: do not show hits marked as 'compton'(flag='bgr')
   int                 fIgnoreProtonHits;    // 1: do not show hits marked as 'proton' (no 'energysel' flag)
   int                 fIgnoreProtons;       // 1: do not show trajectories of MC proton (too many)
+
+//  Legend Map
+  std::map<std::string, std::string> fLegendLabelMap;
+
+  
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
 public:
 
   TStnVisManager(const char* name = "TStnVisManager",	const char* title = "TStnVisManager");
+
+  std::map<std::string, std::string> GetTagFromNodeNameMap();
 
   virtual ~TStnVisManager();
 
@@ -271,6 +285,12 @@ public:
 //-----------------------------------------------------------------------------
   void    NextEvent        ();   //
   void    PrintColls(const char* Tag);
+
+
+  // Legend setter
+  void SetLegendLabelMap(const std::map<std::string, std::string>& map) {
+  fLegendLabelMap = map;
+}
 
  
   // ClassDef(TStnVisManager, 0)

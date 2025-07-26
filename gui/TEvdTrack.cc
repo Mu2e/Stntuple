@@ -142,7 +142,7 @@ void TEvdTrack::PaintXY(Option_t* Option) {
 
   fEllipse->SetFillStyle(0);
   fEllipse->SetFillColor(0);
-  fEllipse->SetLineColor(2);
+  fEllipse->SetLineColor(kViolet);
   fEllipse->PaintEllipse(x0,y0,r,r,0,2*M_PI*180,0);
 }
 
