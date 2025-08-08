@@ -104,6 +104,7 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     const int    sector = cluster->GetCrvSectorType();
     const int    np     = list_of_pulses->size();
     const int    npe    = cluster->GetPEs();
+    const float  slope  = cluster->GetSlope();
 
     const double x      = cluster->GetAvgHitPos().x();
     const double y      = cluster->GetAvgHitPos().y();
@@ -111,9 +112,9 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     const float  t1     = cluster->GetStartTime();
     const float  t2     = cluster->GetEndTime();
 
-    ccc->Set(iccc,sector,np,npe,x,y,z,t1,t2);
-    if(verbose > 1) printf("  Cluster sector = %2i, N(pulses) = %2i, N(PE) = %3i, x = %7.1f, y = %7.1f, z = %8.1f, t1 = %6.1f, t2 = %6.1f mc_found = %o\n",
-                           sector, np, npe, x, y, z, t1, t2, mc_cluster != nullptr);
+    ccc->Set(iccc,sector,np,npe,x,y,z,t1,t2, slope);
+    if(verbose > 1) printf("  Cluster sector = %2i, N(pulses) = %2i, N(PE) = %3i, x = %7.1f, y = %7.1f, z = %8.1f, t1 = %6.1f, t2 = %6.1f, slope = %6.2f, mc_found = %o\n",
+                           sector, np, npe, x, y, z, t1, t2, slope, mc_cluster != nullptr);
     if(mc_cluster) {
       auto sim = mc_cluster->GetMostLikelySimParticle();
       const int   sim_id  = (sim) ? sim->id().asInt() : -1;
@@ -132,45 +133,47 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 //-----------------------------------------------------------------------------
 // now store pulses associated with the cluster
 //-----------------------------------------------------------------------------
-    for (int ip=0; ip<np; ip++) {
-      const mu2e::CrvRecoPulse* pulse = list_of_pulses->at(ip).get();
-      const int index = pulse-p0;
+    if(fStorePulses) {
+      for (int ip=0; ip<np; ip++) {
+        const mu2e::CrvRecoPulse* pulse = list_of_pulses->at(ip).get();
+        const int index = pulse-p0;
 //-----------------------------------------------------------------------------
 // check if the pulse is already stored
 //-----------------------------------------------------------------------------
-      int loc(-1);
-      const int npulses = block->NPulses();
+        int loc(-1);
+        const int npulses = block->NPulses();
 
-      for (int i=0; i<npulses; i++) {
-        TCrvRecoPulse* p = block->Pulse(i);
-        if (p->Index() == index) {
-          loc   = i;
-          break;
+        for (int i=0; i<npulses; i++) {
+          TCrvRecoPulse* p = block->Pulse(i);
+          if (p->Index() == index) {
+            loc   = i;
+            break;
+          }
         }
-      }
-      if (loc == -1) {
+        if (loc == -1) {
 //-----------------------------------------------------------------------------
 // add pulse to the list
 //-----------------------------------------------------------------------------
-        loc                  = npulses;
+          loc                  = npulses;
 
-        TCrvRecoPulse* new_pulse = block->NewPulse();
+          TCrvRecoPulse* new_pulse = block->NewPulse();
 
-        const int   npes           = pulse->GetPEs();
-        const int   npes_height    = pulse->GetPEsPulseHeight();
-        const int   nind           = pulse->GetWaveformIndices().size();
-        const int   bar            = pulse->GetScintillatorBarIndex().asInt();
-        const int   sipm           = pulse->GetSiPMNumber();
+          const int   npes           = pulse->GetPEs();
+          const int   npes_height    = pulse->GetPEsPulseHeight();
+          const int   nind           = pulse->GetWaveformIndices().size();
+          const int   bar            = pulse->GetScintillatorBarIndex().asInt();
+          const int   sipm           = pulse->GetSiPMNumber();
 
-        const float time           = pulse->GetPulseTime();
-        const float height         = pulse->GetPulseHeight();
-        const float width          = pulse->GetPulseBeta(); // was GetPulseWidth();
-        const float chi2           = pulse->GetPulseFitChi2();
-        const float le_time        = pulse->GetLEtime();
+          const float time           = pulse->GetPulseTime();
+          const float height         = pulse->GetPulseHeight();
+          const float width          = pulse->GetPulseBeta(); // was GetPulseWidth();
+          const float chi2           = pulse->GetPulseFitChi2();
+          const float le_time        = pulse->GetLEtime();
 
-        new_pulse->Set(index,npes,npes_height,nind,bar,sipm,time,height,width,chi2,le_time);
+          new_pulse->Set(index,npes,npes_height,nind,bar,sipm,time,height,width,chi2,le_time);
+        }
+        block->fClusterPulseLinks->Add(iccc,loc);
       }
-      block->fClusterPulseLinks->Add(iccc,loc);
     }
   }
   return 0;
