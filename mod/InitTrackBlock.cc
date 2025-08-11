@@ -666,13 +666,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       ++nmat;
       if (straw.active()) {
         ++nmatactive;
-        radlen += straw.radLen();
+        radlen += straw._radlen;
       }
       if(verbose > 2) {
         printf("%3i: active = %o; ID = %5i, plane = %2i, panel = %5i, layer = %5i\n", nmat-1, straw.active(),
-               (int) straw.straw().asUint16(), (int) straw.straw().getPlane(),
-               (int) straw.straw().getPanelId().asUint16(),
-               (int) straw.straw().getLayerId().asUint16());
+               (int) straw._straw.asUint16(), (int) straw._straw.getPlane(),
+               (int) straw._straw.getPanelId().asUint16(),
+               (int) straw._straw.getLayerId().asUint16());
       }
     }
     
