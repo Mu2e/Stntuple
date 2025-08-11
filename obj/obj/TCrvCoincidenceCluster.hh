@@ -9,7 +9,7 @@ class TCrvCoincidenceCluster: public TObject {
 public:
   enum {
     kNFreeInts = 10,
-    kNFreeFloats = 10
+    kNFreeFloats = 9
   };
 
   int          fIndex;                   // index in the list
@@ -23,6 +23,7 @@ public:
   float        fEndTime;
   float        fMCEnergyDep;
   float        fMCAvgHitTime;
+  float        fSlope;
   float        fFreeFloats[kNFreeFloats];
   TVector3     fPosition;
   TVector3     fMCAvgPosition;
@@ -43,13 +44,14 @@ public:
 
   float   StartTime       () const { return fStartTime;       }
   float   EndTime         () const { return fEndTime;         }
+  float   Slope           () const { return fSlope;           }
 
   const TVector3* Position() const { return &fPosition;       }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
   void Set(int Index, int SectorType, int Np, int NPe, 
-	   float X, float Y, float Z, float T1, float T2);
+	   float X, float Y, float Z, float T1, float T2, float Slope);
   void SetMC(int SimID, int Np, float EnergyDep, float AvgTime,
 	   float X, float Y, float Z);
 //-----------------------------------------------------------------------------
@@ -58,7 +60,7 @@ public:
   void Clear(Option_t* Opt = "");
   void Print(Option_t* Opt = "") const;
 
-  ClassDef(TCrvCoincidenceCluster,2)	         // STNTUPLE representation of CrvCoincidenceCluster
+  ClassDef(TCrvCoincidenceCluster,3)	         // STNTUPLE representation of CrvCoincidenceCluster
 };
 
 

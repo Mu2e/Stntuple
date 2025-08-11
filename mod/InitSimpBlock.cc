@@ -242,13 +242,13 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       const bool is_pion = std::abs(pdg_code) == 211;
       const bool is_pbar = pdg_code == -2212;
       if (pp != nullptr) {
-	bool found = 0;
-	for (auto pr : pp->primarySimParticles()) {
-	  if (pr.get() == sim) {
-	    found = true;
-	    break;
-	  }
-	}
+        bool found = 0;
+        for (auto pr : pp->primarySimParticles()) {
+          if (pr.get() == sim) {
+            found = true;
+            break;
+          }
+        }
 
         // check a for important Process codes that may not get labeled "PrimaryParticle"
         found |= process_id == mu2e::ProcessCode::mu2eGammaConversion;

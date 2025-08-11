@@ -55,6 +55,8 @@ using namespace ROOT::Math;
 //-----------------------------------------------------------------------------
 int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 
+  const char* name = Form("InitHelixBlock::%s::%s", __func__, fHSeedCollTag.encode().c_str());
+
   //  mu2e::AlgorithmIDCollection*     aid_coll    (0);
 
   //   char                 helix_module_label[100], helix_description[100];
@@ -161,7 +163,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
       helix->fAlgorithmID = 0x10001;
     }
 
-    int      nStrawHits(0);
+    int      nStrawHits(0), nLowPHits(0);
     float    first_hit_z(0), last_hit_z(0);
 
     if(verbose > 5) printf("InitHelixBlock %s: Printing helix %i hit info:\n", Block->GetTitle(), i);
@@ -179,7 +181,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
         tmpHel->hits().fillStrawDigiIndices(j,shids);
 
         if(verbose > 5) printf(" %2i: Idx   ID  PDGID  SimID Parent   Z     T      P(MC)\n", j);
-        const float minP(30.);//MeV/c, minimum MC sim P to count in the hits
+        const float minP(10.);//MeV/c, minimum MC sim P to count in the hits
         for (size_t k=0; k<shids.size(); ++k) {
           const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
           auto const& spmcp = sdmc->earlyStrawGasStep();
@@ -187,8 +189,12 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
           int sim_id        = simptr->id().asInt();
           float   dz        = spmcp->position().z();// - trackerZ0;
           float   pMC       = std::sqrt(spmcp->momentum().mag2());
-          if (verbose > 5) printf("     %2li %5i %5i %5i %5li %8.1f %7.1f %6.1f\n", k, shids[k], simptr->pdgId(), sim_id, simptr->parentId().asInt(), dz, spmcp->time(), pMC);
-          if (pMC<minP)     continue;
+          if (verbose > 5) printf("     %2li %5i %5i %5i %5li %8.1f %7.1f %6.1f\n",
+                                  k, shids[k], simptr->pdgId(), sim_id, simptr->parentId().asInt(), dz, spmcp->time(), pMC);
+          if (pMC<minP) {
+            ++nLowPHits;
+            continue;
+          }
           hits_simp_id.push_back   (sim_id);
           hits_simp_index.push_back(shids[k]);
           hits_simp_z.push_back(dz);
@@ -247,29 +253,25 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
 
     if (hits_simp_id.size()>0) {
       if ( (mostvalueindex != hits_simp_index[id_max]) ){
-        printf(">>> ERROR: event %i helix %i no MC Sim Particle found. MostValueindex = %i hits_simp_index[id_max] = %i\n",
-               Evt->event(), i, mostvalueindex, hits_simp_index[id_max]);
+        printf(">>> %s::%i: ERROR: event %i helix %i no MC Sim Particle found. MostValueindex = %i hits_simp_index[id_max] = %i\n",
+               name, __LINE__, Evt->event(), i, mostvalueindex, hits_simp_index[id_max]);
       }
     }
-
-    if(sdmcColl && ((mostvalueindex<0) || (mostvalueindex >= (int) sdmcColl->size()))) {
-      printf(">>> ERROR: event %i helix %i no MC found. MostValueindex = %i mcdigis_size = %li size(hits_simp_index) = %lu\n",
-             Evt->event(), i, mostvalueindex, sdmcColl->size(), hits_simp_index.size());
-      if (hits_simp_index.size()>0) {
-        printf(">>> ERROR:  hits_simp_index[id_max] = %i  \n",
-               hits_simp_index[id_max]);
+    const bool has_best_simp = sdmcColl && !((mostvalueindex<0) || (mostvalueindex >= (int) sdmcColl->size()));
+    if(!has_best_simp) {
+      if(sdmcColl && nLowPHits == 0) {
+        printf(">>> %s::%i: ERROR: event %i helix %i no MC found. MostValueindex = %i mcdigis_size = %li size(hits_simp_index) = %lu\n",
+               name, __LINE__, Evt->event(), i, mostvalueindex, sdmcColl->size(), hits_simp_index.size());
+        if (hits_simp_index.size()>0) {
+          printf(">>> %s::%i: ERROR:  hits_simp_index[id_max] = %i  \n",
+                 name, __LINE__, hits_simp_index[id_max]);
+        }
       }
-    } else if(sdmcColl) {
+    } else {
 
       const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(mostvalueindex);
 
       auto const& step = sdmc->earlyStrawGasStep();
-      // if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-      //   step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-      // }
-      // else {
-      //   step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-      // }
 
       const mu2e::SimParticle* sim(nullptr);
 

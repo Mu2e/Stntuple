@@ -372,7 +372,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // Intersections with the tracker surfaces
     const mu2e::KalIntersection *kinter_front(nullptr), *kinter_mid(nullptr), *kinter_back(nullptr);
     // Intersections with the stopping target surfaces
-    const mu2e::KalIntersection *kinter_st_front(nullptr), *kinter_st_back(nullptr);
+    const mu2e::KalIntersection *kinter_st_front(nullptr), *kinter_st_back(nullptr), *kinter_st_outer(nullptr), *kinter_st_inner(nullptr);
     std::vector<const mu2e::KalIntersection *> kinter_st_foils;
 
     // count relevant intersections along the track extrapolation
@@ -385,6 +385,12 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Back) {
         if(!kinter_st_back || kinter_st_back->time() < kinter.time()) kinter_st_back = &kinter;
+      }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Outer) {
+        if(!kinter_st_outer || kinter_st_outer->time() < kinter.time()) kinter_st_outer = &kinter;
+      }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Inner) {
+        if(!kinter_st_inner || kinter_st_inner->time() < kinter.time()) kinter_st_inner = &kinter;
       }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Foils) { // save all the foils, ask about them later
         ++nst_inters;
@@ -410,11 +416,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     }
 
     // Store the momentum at each surface if found
-    if(kinter_st_front) { track->fPSTFront         = kinter_st_front->mom(); }
-    if(kinter_st_back ) { track->fPSTBack          = kinter_st_back ->mom(); }
-    if(kinter_front   ) { track->fPTrackerEntrance = kinter_front   ->mom(); }
-    if(kinter_mid     ) { track->fPTrackerMiddle   = kinter_mid     ->mom(); }
-    if(kinter_back    ) { track->fPTrackerExit     = kinter_back    ->mom(); }
+    if     (kinter_st_front) { track->fPSTFront         = kinter_st_front->mom(); }
+    if     (kinter_st_back ) { track->fPSTBack          = kinter_st_back ->mom(); }
+    else if(kinter_st_outer) { track->fPSTBack          = kinter_st_outer->mom(); } // if no ST exit sampling, check for an exit through the edge
+    else if(kinter_st_inner) { track->fPSTBack          = kinter_st_inner->mom(); }
+    if     (kinter_front   ) { track->fPTrackerEntrance = kinter_front   ->mom(); }
+    if     (kinter_mid     ) { track->fPTrackerMiddle   = kinter_mid     ->mom(); }
+    if     (kinter_back    ) { track->fPTrackerExit     = kinter_back    ->mom(); }
     track->fInterCounts = nst_inters | (nipa_inters << 8) | (nopa_inters << 16);
 
     // Decide which intersection to use for the defaults, using the front if available (only Mid available for Online tracks)

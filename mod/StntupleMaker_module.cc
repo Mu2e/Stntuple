@@ -123,6 +123,7 @@ protected:
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
   string                   fCrvCoincidenceClusterMCCollTag; //
+  int                      fCrvClustersStorePulses;
 
   art::InputTag            fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
@@ -276,6 +277,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
   , fCrvCoincidenceClusterCollTag(PSet.get<string>    ("crvCoincidenceClusterCollTag"))
   , fCrvCoincidenceClusterMCCollTag(PSet.get<string>  ("crvCoincidenceClusterMCCollTag", ""))
+  , fCrvClustersStorePulses        (PSet.get<int>     ("crvClustersStorePulses", 1))
 
   , fVdhCollTag              (PSet.get<art::InputTag> ("vdHitsCollTag"       ))
   , fTClBlockName            (PSet.get<vector<string>>("timeClusterBlockName"))
@@ -524,6 +526,7 @@ void StntupleMaker::beginJob() {
     fInitCrvClusterBlock->SetCrvRecoPulseCollTag(fCrvRecoPulseCollTag);
     fInitCrvClusterBlock->SetCrvCoincidenceClusterCollTag(fCrvCoincidenceClusterCollTag);
     fInitCrvClusterBlock->SetCrvCoincidenceClusterMCCollTag(fCrvCoincidenceClusterMCCollTag);
+    fInitCrvClusterBlock->SetStorePulses(fCrvClustersStorePulses);
 
     AddDataBlock("CrvClusterBlock","TCrvClusterBlock",
 		 fInitCrvClusterBlock,
