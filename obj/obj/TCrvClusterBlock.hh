@@ -12,10 +12,10 @@ class TCrvClusterBlock: public TStnDataBlock {
   friend class StntupleInitCrvClusterBlock;
 
 public:
-  int            fNPulses;	             // number of reconstructed pulses - only those associated with clusters
+  int            fNPulses = 0;	             // number of reconstructed pulses - only those associated with clusters
   TClonesArray*  fListOfPulses;	             // list of pulses
 
-  int            fNClusters;                 // number of reconstructed CrvCoincidenceCluster's
+  int            fNClusters = 0;             // number of reconstructed CrvCoincidenceCluster's
   TClonesArray*  fListOfClusters;            // list of those
   TStnLinkBlock* fClusterPulseLinks;
 //-----------------------------------------------------------------------------

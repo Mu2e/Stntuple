@@ -176,6 +176,7 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       }
     }
   }
+  if(verbose > 2) block->Print();
   return 0;
 }
 
