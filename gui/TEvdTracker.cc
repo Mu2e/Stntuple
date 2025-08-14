@@ -45,11 +45,6 @@ namespace stntuple {
 
   for (int i=0; i<fNStations; i++) {
     TEvdStation* s = new TEvdStation(i,Tracker);
-
-    // for VST, make only one station visible
-    if (i == 0) s->SetVisible(1);
-    else        s->SetVisible(0);
-    
     fListOfStations->Add(s);
   }
 }

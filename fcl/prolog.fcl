@@ -190,11 +190,11 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
 # when needed, mask DeltaFinder under 'FlagBkgHits' label
 #------------------------------------------------------------------------------
-MuHitDisplay: { module_type: MuHitDisplay                 # class name;
+MuHitDisplay: { module_type: MuHitDisplay                 ## class name;
 # -- defaults of the base class
     THistModule: { @table::StntupleTHistModule
         TModule: { @table::StntupleTHistModule.TModule
-            interactiveMode  : 1                      # 1:stop  after each event 2: stop at end-of-job
+            interactiveMode  : 1                          ## 1:stop  after each event 2: stop at end-of-job;
         }
     }
 # --
@@ -225,8 +225,8 @@ MuHitDisplay: { module_type: MuHitDisplay                 # class name;
     vdHitsCollTag                : "compressDigiMCs:virtualdetector" # this is new, to be passed to InitSimpBlock
     
     # goodHitMask                 : ["EnergySelection","RadiusSelection","TimeSelection"]
-    # goodHitMask                  : ["EnergySelection", "RadiusSelection"]
-    # badHitMask                   : ["Background"] 
+    # goodHitMask                 : ["EnergySelection", "RadiusSelection"]
+    # badHitMask                  : ["Background"] 
     
     minSimpMomentum              : 40.      ## MeV
     maxSimpMomentum              : 1.e12    ## MeV
@@ -243,12 +243,19 @@ MuHitDisplay: { module_type: MuHitDisplay                 # class name;
 	displayStrawDigiMC : 1
 	displayStrawHitsXY : 1
 	debugLevel         : 0
-	bField             : 1.0      # in Tesla
         ewLength           : 1800     # with some margin
 	tMin               : 0.
 	tMax               : 2000.    # for extracted position, needs to be overriden
         minEDep            : 0.       # for straw/combo hits
         maxEDep            : 1.       # 1 MeV (very large number)
+        visibleStations    : [                                 # 18 in total
+                              1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1, 1, 1
+                             ]
+    }
+
+    geoManager: {
+	bField             : 1.0      # in Tesla
     }
 }
 #------------------------------------------------------------------------------

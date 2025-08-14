@@ -11,6 +11,7 @@ namespace {
 }
 
 TTrkVisNode* tnode(nullptr);
+
 //-----------------------------------------------------------------------------
 // Mode = 0: begin job (run)
 // Mode = 1: event
@@ -39,13 +40,20 @@ void display_001(int Mode, TModule* Module) {
     if (tnode == nullptr) {
       tnode = (TTrkVisNode*) TStnVisManager::Instance()->FindNode("TrkVisNode");
     }
-    const mu2e::ComboHitCollection* chc = tnode->GetCComboHitColl();
 
-    int nh = chc->size();
+    if (tnode) {
+                 
+      const mu2e::ComboHitCollection* chc = tnode->GetCComboHitColl();  // const
 
-    hist->Fill(nh);
+      int nh = chc->size();
 
-    printf("nh:  %i\n",nh);
+      hist->Fill(nh);
+
+      printf("nh:  %i\n",nh);
+    }
+    else {
+      std::cout << "ERROR: tnode == nullptr" << std::endl;
+    }
 
     c->Modified();
     c->Update();

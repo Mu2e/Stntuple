@@ -26,11 +26,14 @@
 // #include "TrackerGeom/inc/Sector.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
+#include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Offline/TrackerGeom/inc/Panel.hh"
 //#include "TTrackerGeom/inc/ZLayer.hh"
+#include "Offline/DAQ/inc/TrkPanelMap_t.hh"
 
 ClassImp(stntuple::TEvdPanel)
 
@@ -42,6 +45,7 @@ namespace stntuple {
 //_____________________________________________________________________________
 TEvdPanel::TEvdPanel(): TObject() {
   fVisible      = 0;
+  fMnID         = -1;
 }
 
 //_____________________________________________________________________________
@@ -51,6 +55,10 @@ TEvdPanel::TEvdPanel(): TObject() {
   fNLayers = Panel->nLayers();
   fPanel   = Panel;
   fVisible = 1;
+
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(Plane->ID(),ID); // plane ID : 0-35 (???)
+  if (tpm) fMnID              = tpm->mnid();
 					// assume that the number of straws is the same
   int id;
 

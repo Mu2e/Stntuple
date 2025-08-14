@@ -119,9 +119,6 @@ protected:
   float               fEWLength;        // event window length, ns 
   float               fMbTime;
 
-  float               fBField;          // by defautl , 1 T, but could be less. Need to know to display straight
-                                        // cosmics
-
   int                 fDisplayStrawDigiMC;
   int                 fDisplayStrawHitsXY;
 
@@ -134,6 +131,8 @@ protected:
   int                 fIgnoreComptonHits;   // 1: do not show hits marked as 'compton'(flag='bgr')
   int                 fIgnoreProtonHits;    // 1: do not show hits marked as 'proton' (no 'energysel' flag)
   int                 fIgnoreProtons;       // 1: do not show trajectories of MC proton (too many)
+
+  std::vector<int>    fListOfVisibleStations; // length should be 18
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -167,7 +166,6 @@ public:
   stntuple::TEvdTimeCluster*  SelectedPhiCluster () { return fSelectedPhiCluster;  }
 
   float          MbTime() { return fMbTime; }
-  float          BField() { return fBField; }
 
   void           GetTimeWindow(float& TMin, float& TMax) {
     TMin = fTMin;
@@ -231,7 +229,6 @@ public:
   void   SetMaxEDep(float E) override { fMaxEDep = E; }
 
   void  SetMbTime(float MbTime) { fMbTime = MbTime; } // *FIXME* almost the same meaning with EWLength
-  void  SetBField(float BField) { fBField = BField; }
 //-----------------------------------------------------------------------------
 // print functions
 //-----------------------------------------------------------------------------

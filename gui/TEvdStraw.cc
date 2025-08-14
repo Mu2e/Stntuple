@@ -142,7 +142,7 @@ void TEvdStraw::PaintRZ(Option_t* Option) {
   for (int i=0; i<nhits; ++i) {
     stntuple::TEvdStrawHit* evd_sh = Hit(i);
     const mu2e::ComboHit*   sch    = evd_sh->StrawHit();
-    float t = sch->time();
+    float t = sch->correctedTime();
     if ((t >= tmin) and (t <= tmax)) {    
       int ok = 1;
       if (etcl and vm->DisplayOnlyTCHits()) { 

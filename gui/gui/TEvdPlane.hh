@@ -24,12 +24,13 @@ class TEvdPlane: public TObject {
 public:
   
 protected:
-  int                 fID;
+  int                 fID;              // geo (or sequential) ID
+  int                 fProductionID;    // production ID
   int                 fVisible;
   int                 fNPanels;
   TObjArray*          fListOfPanels;
 
-  TEvdStation*        fStation; 		// backward pointers
+  TEvdStation*        fStation;         // backward pointers
   const mu2e::Plane*  fPlane;
 
 public:
@@ -43,13 +44,16 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
+  int        ID         () { return fID;       }
   int        NPanels    () { return fNPanels;  }
   TEvdPanel* Panel (int I) { return (TEvdPanel*) fListOfPanels->UncheckedAt(I); }
   int        Visible()     { return fVisible; }
+  int        ProductionID() { return fProductionID; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void        SetVisible(int YesNo) { fVisible = YesNo; }
+  void        SetVisible     (int YesNo) { fVisible      = YesNo; }
+  void        SetProductionID(int ID   ) { fProductionID = ID; }
 
   //  virtual void  Draw    (Option_t* option = "");
 

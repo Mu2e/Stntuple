@@ -59,7 +59,6 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fTMin                = 0;
   fTMax                = 1.e5;
   fEvent               = nullptr;
-  fBField              = 1.0;                   // in Tesla
 
   fSelectedTimeCluster = nullptr;
   fSelectedPhiCluster  = nullptr;

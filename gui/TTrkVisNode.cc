@@ -27,14 +27,14 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+// #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/DataProducts/inc/StrawId.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
-#include "Offline/RecoDataProducts/inc/KalSegment.hh"
+// #include "Offline/RecoDataProducts/inc/KalSegment.hh"
 #include "Offline/RecoDataProducts/inc/CosmicTrackSeed.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
@@ -241,7 +241,7 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // CosmicTrackSeeds
 //-----------------------------------------------------------------------------
-  fKsColl = nullptr;
+//  fKsColl = nullptr;
   // an empty coll tag is not worth a warning
   if (fCtsCollTag != "") {
     art::Handle<mu2e::CosmicTrackSeedCollection> ctscH;
@@ -996,12 +996,12 @@ void TTrkVisNode::PaintVRZ(Option_t* Option) {
 //-----------------------------------------------------------------------------
   TStnVisManager* vm = TStnVisManager::Instance();
   if (vm->DisplayTracks()) {
-    // int ntrk(0);
-    // if (fListOfTracks != nullptr) ntrk = fListOfTracks->GetEntriesFast();
+    int ntrk(0);
+    if (fListOfTracks != nullptr) ntrk = fListOfTracks->GetEntriesFast();
 
-    // for (int i=0; i<ntrk; i++ ) {
-    //   stntuple::TEvdTrack* evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
-    //   evd_trk->Paint(Option);
+    for (int i=0; i<ntrk; i++ ) {
+      stntuple::TEvdTrack* evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
+      evd_trk->PaintVRZ(Option);
 
     //   nhits = evd_trk->NHits();
     //   for (int ih=0; ih<nhits; ih++) {
@@ -1012,9 +1012,10 @@ void TTrkVisNode::PaintVRZ(Option_t* Option) {
     //       hit->PaintRZ(Option);
     //     }
     //   }
-    // }
-    // cosmic tracks
-
+    }
+//-----------------------------------------------------------------------------
+// cosmic tracks (?) seeds (?)
+//-----------------------------------------------------------------------------
     int nctrk(0);
     if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
 

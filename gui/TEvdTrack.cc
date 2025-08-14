@@ -10,7 +10,7 @@
 //      phi0  = Trk->helix(0.).phi0();
 //      x0    =  -(1/om+d0)*sin(phi0);
 //      y0    =   (1/om+d0)*cos(phi0);
-//
+// clang-format off
 ///////////////////////////////////////////////////////////////////////////////
 #include "TVirtualX.h"
 #include "TPad.h"
@@ -25,31 +25,27 @@
 #include "TPolyLine.h"
 #include "TObjArray.h"
 
-
-// #include "BTrk/KalmanTrack/KalRep.hh"
-// #include "BTrk/KalmanTrack/KalRep.hh"
-
 #include "art/Framework/Principal/Handle.h"
 
-
-#include "BTrk/TrkBase/HelixParams.hh"
-#include "BTrk/TrkBase/HelixTraj.hh"
+// #include "BTrk/TrkBase/HelixParams.hh"
+// #include "BTrk/TrkBase/HelixTraj.hh"
 
 #include "Offline/RecoDataProducts/inc/KalSegment.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+// #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
 #include "Stntuple/gui/TEvdTrack.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
-#include "Stntuple/gui/TEvdTrkStrawHit.hh"
-#include "Stntuple/base/TObjHandle.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
+// #include "Stntuple/gui/TEvdTrkStrawHit.hh"
+// #include "Stntuple/base/TObjHandle.hh"
 
-#include "CLHEP/Vector/ThreeVector.h"
+// #include "CLHEP/Vector/ThreeVector.h"
 
 ClassImp(stntuple::TEvdTrack)
 
@@ -60,6 +56,8 @@ TEvdTrack::TEvdTrack(): TObject() {
   fKSeed      = nullptr;
   fListOfHits = nullptr;
   fEllipse    = nullptr;
+  fLineXY     = nullptr;
+  fLineZY     = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,6 +75,63 @@ TEvdTrack::TEvdTrack(): TObject() {
   // fEllipse->SetFillStyle(3001);		// make it transparent
     
   fEllipse->SetLineColor(kBlue-7);
+
+  auto gm = TStnGeoManager::Instance();
+
+  if (gm->BField()) {
+
+    const mu2e::KalSegment* kseg = &fKSeed->segments().at(0);
+
+    KinKal::LoopHelix helx  = kseg->loopHelix();
+
+    //  KinKal::CentralHelix helx  = kseg->centralHelix();
+
+    double r    = fabs(helx.rad());
+    double x0   = helx.cx();
+    double y0   = helx.cy();
+
+    // if (helx.charge() < 0) {
+    //   x0 = -helx.cy();
+    //   y0 = -helx.cx();
+    // }
+    // printf("[MuHitDispla::printHelixParams] d0 = %5.3f r = %5.3f phi0 = %5.3f x0 = %5.3f y0 = %5.3f\n",
+    // 	 d0, r, phi0, x0, y0);
+   
+    fEllipse->SetR1(r);
+    fEllipse->SetR2(r);
+    fEllipse->SetX1(x0);
+    fEllipse->SetY1(y0);
+    fEllipse->SetPhimin(0);
+    fEllipse->SetPhimax(2*M_PI*180);
+    fEllipse->SetTheta(0);
+
+    fEllipse->SetFillStyle(0);
+    fEllipse->SetFillColor(0);
+    fEllipse->SetLineColor(2);
+  }
+  else {
+    KinKal::KinematicLine kline = fKSeed->segments().back().kinematicLine();
+    KinKal::VEC3 pos = kline.pos0();
+    KinKal::VEC3 dir = kline.direction();
+    
+    double dydx = dir.y()/dir.x();
+
+    double y1(1000.), y2(-1000.);
+
+    double x1 = (y1-pos.y())/dydx + pos.x();
+    double x2 = (y2-pos.y())/dydx + pos.x();
+    
+    fLineXY   = new TLine(x1,y1,x2,y2);
+    // fLineXY->SetLineColor(color);
+
+    double dydz = dir.y()/dir.z();
+    double z1 = (y1-pos.y())/dydz + pos.z();
+    double z2 = (y2-pos.y())/dydz + pos.z();
+    
+    fLineZY   = new TLine(z1,y1,z2,y2);
+  }
+
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -96,6 +151,7 @@ void TEvdTrack::Paint(Option_t* Option) {
 
   if      (view == TStnVisManager::kXY ) PaintXY (Option);
   else if (view == TStnVisManager::kRZ ) PaintRZ (Option);
+  else if (view == TStnVisManager::kVRZ) PaintRZ (Option);
   else if (view == TStnVisManager::kCal) {
 //-----------------------------------------------------------------------------
 // calorimeter-specific view: do not draw tracks
@@ -115,40 +171,26 @@ void TEvdTrack::Paint(Option_t* Option) {
 //-----------------------------------------------------------------------------
 void TEvdTrack::PaintXY(Option_t* Option) {
 
-  const mu2e::KalSegment* kseg = &fKSeed->segments().at(0);
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  if (gm->BField()) {
+    //    fEllipse->PaintEllipse(x0,y0,r,r,0,2*M_PI*180,0);
+    fEllipse->Paint();
+  }
+  else {
+//-----------------------------------------------------------------------------
+// no field, cosmics
+//-----------------------------------------------------------------------------
+    fLineXY->Paint();
+  }
+}
 
-  KinKal::LoopHelix helx  = kseg->loopHelix();
-
-  //  KinKal::CentralHelix helx  = kseg->centralHelix();
-
-  double r    = fabs(helx.rad());
-  double x0   = helx.cx();
-  double y0   = helx.cy();
-
-  // if (helx.charge() < 0) {
-  //   x0 = -helx.cy();
-  //   y0 = -helx.cx();
-  // }
-  // printf("[MuHitDispla::printHelixParams] d0 = %5.3f r = %5.3f phi0 = %5.3f x0 = %5.3f y0 = %5.3f\n",
-  // 	 d0, r, phi0, x0, y0);
-   
-  fEllipse->SetR1(r);
-  fEllipse->SetR2(r);
-  fEllipse->SetX1(x0);
-  fEllipse->SetY1(y0);
-  fEllipse->SetPhimin(0);
-  fEllipse->SetPhimax(2*M_PI*180);
-  fEllipse->SetTheta(0);
-
-  fEllipse->SetFillStyle(0);
-  fEllipse->SetFillColor(0);
-  fEllipse->SetLineColor(2);
-  fEllipse->PaintEllipse(x0,y0,r,r,0,2*M_PI*180,0);
+//-----------------------------------------------------------------------------
+void TEvdTrack::PaintVRZ(Option_t* Option) {
+  fLineZY->Paint();
 }
 
 //-----------------------------------------------------------------------------
 void TEvdTrack::PaintRZ(Option_t* Option) {
-
 ////   double            flen, zwire[2], ds, rdrift, zt[4], rt[4], zw, rw;
 ////   CLHEP::Hep3Vector tdir;
 ////   HepPoint          tpos;
@@ -327,6 +369,11 @@ Int_t TEvdTrack::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
 //_____________________________________________________________________________
 Int_t TEvdTrack::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
+  return 9999;
+}
+
+//_____________________________________________________________________________
+Int_t TEvdTrack::DistancetoPrimitiveVRZ(Int_t px, Int_t py) {
   return 9999;
 }
 

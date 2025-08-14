@@ -26,6 +26,7 @@ public:
   
 protected:
   int                fID;
+  int                fMnID;             // panel Minnesota ID
   int                fVisible;
   int                fNLayers;
   TObjArray*         fListOfStraws;
@@ -46,6 +47,7 @@ public:
 // accessors
 //-----------------------------------------------------------------------------
   int          NLayers     () { return fNLayers;    }
+  int          MnID        () { return fMnID;       }
   int          NStraws     () { return fListOfStraws->GetEntriesFast(); }
   int          Visible     () { return fVisible;    }
 
@@ -58,6 +60,8 @@ public:
 // modifiers
 //-----------------------------------------------------------------------------
   void SetVisible(int YesNo) { fVisible = YesNo; }
+  void SetMnID   (int ID   ) { fMnID    = ID;    }
+  
   //  virtual void  Draw    (Option_t* option = "");
 
   virtual void  Paint   (Option_t* option = "");
