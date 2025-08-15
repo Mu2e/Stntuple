@@ -124,6 +124,7 @@ protected:
 
   int                 fDisplayHelices; 
   int                 fDisplayTracks; 
+  int                 fDisplayCosmicSeeds;  // 0 by default
   int                 fDisplaySimParticles; 
   int                 fDisplayOnlyTCHits;   // will be useless longer term, as the time cluster should 
                                             // include all hits within the time interval, 
@@ -165,7 +166,8 @@ public:
   stntuple::TEvdTimeCluster*  SelectedTimeCluster() { return fSelectedTimeCluster; }
   stntuple::TEvdTimeCluster*  SelectedPhiCluster () { return fSelectedPhiCluster;  }
 
-  float          MbTime() { return fMbTime; }
+  float          MbTime  () { return fMbTime  ; }
+  float          EWLength() { return fEWLength; }
 
   void           GetTimeWindow(float& TMin, float& TMax) {
     TMin = fTMin;
@@ -178,6 +180,7 @@ public:
   int            DisplayStrawDigiMC () const { return fDisplayStrawDigiMC ; }
   int            DisplayStrawHitsXY () const { return fDisplayStrawHitsXY ; }
   int            DisplayTracks      () const { return fDisplayTracks      ; }
+  int            DisplayCosmicSeeds () const { return fDisplayCosmicSeeds ; }
   
   int            IgnoreComptonHits  () const { return fIgnoreComptonHits  ; }
   int            IgnoreProtonHits   () const { return fIgnoreProtonHits   ; }
@@ -203,6 +206,7 @@ public:
   void           SetDisplayStrawHitsXY (int Flag) { fDisplayStrawHitsXY  = Flag; }
   void           SetDisplayHelices     (int Flag) { fDisplayHelices      = Flag; }
   void           SetDisplayTracks      (int Flag) { fDisplayTracks       = Flag; }
+  void           SetDisplayCosmicSeeds (int Flag) { fDisplayCosmicSeeds  = Flag; }
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
   void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
 

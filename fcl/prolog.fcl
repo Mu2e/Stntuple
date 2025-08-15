@@ -243,6 +243,8 @@ MuHitDisplay: { module_type: MuHitDisplay                 ## class name;
 	displayStrawDigiMC : 1
 	displayStrawHitsXY : 1
 	debugLevel         : 0
+        evdPanelDebugLevel : 0        ## 
+        stnViewDebugLevel  : 1        ## 
         ewLength           : 1800     # with some margin
 	tMin               : 0.
 	tMax               : 2000.    # for extracted position, needs to be overriden

@@ -78,6 +78,8 @@ public:
     fhicl::Atom<float>       maxEDep            {Name("maxEDep"            )    , Comment("maxEDep"     ) };
     fhicl::Atom<std::string> defaultView        {Name("defaultView"        )    , Comment("defaultView" ) };
     fhicl::Sequence<int>     visibleStations    {Name("visibleStations"    )    , Comment("list of visible stations" ) };
+    fhicl::Atom<int>         evdPanelDebugLevel {Name("evdPanelDebugLevel" )    , Comment("TEvdPanel::fgDebugLevel"  ) };
+    fhicl::Atom<int>         stnViewDebugLevel  {Name("stnViewDebugLevel"  )    , Comment("TStnView::fgDebugLevel"   ) };
   };
                                         // Geometry Manager configuration
   struct GmConfig {

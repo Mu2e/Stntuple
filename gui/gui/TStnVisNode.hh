@@ -48,8 +48,6 @@ public:
 
   // void SetSectionToDisplay(int Section) { fSectionToDisplay= Section; }
 
-  void SetDebugLevel(int Level) { fDebugLevel = Level; }
-
   ClassDef(TStnVisNode,0)
 };
 

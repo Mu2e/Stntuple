@@ -27,23 +27,17 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-// #include "BTrk/TrkBase/HelixParams.hh"
-// #include "BTrk/TrkBase/HelixTraj.hh"
-
 #include "Offline/RecoDataProducts/inc/KalSegment.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
-// #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
 #include "Stntuple/gui/TEvdTrack.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TStnGeoManager.hh"
-// #include "Stntuple/gui/TEvdTrkStrawHit.hh"
-// #include "Stntuple/base/TObjHandle.hh"
 
 // #include "CLHEP/Vector/ThreeVector.h"
 
@@ -110,6 +104,7 @@ TEvdTrack::TEvdTrack(): TObject() {
     fEllipse->SetLineColor(2);
   }
   else {
+    
     KinKal::KinematicLine kline = fKSeed->segments().back().kinematicLine();
     KinKal::VEC3 pos = kline.pos0();
     KinKal::VEC3 dir = kline.direction();
@@ -120,14 +115,14 @@ TEvdTrack::TEvdTrack(): TObject() {
 
     double x1 = (y1-pos.y())/dydx + pos.x();
     double x2 = (y2-pos.y())/dydx + pos.x();
-    
+                                        // global reference frame
     fLineXY   = new TLine(x1,y1,x2,y2);
     // fLineXY->SetLineColor(color);
 
     double dydz = dir.y()/dir.z();
     double z1 = (y1-pos.y())/dydz + pos.z();
     double z2 = (y2-pos.y())/dydz + pos.z();
-    
+                                        // in the global reference frame
     fLineZY   = new TLine(z1,y1,z2,y2);
   }
 
@@ -151,7 +146,7 @@ void TEvdTrack::Paint(Option_t* Option) {
 
   if      (view == TStnVisManager::kXY ) PaintXY (Option);
   else if (view == TStnVisManager::kRZ ) PaintRZ (Option);
-  else if (view == TStnVisManager::kVRZ) PaintRZ (Option);
+  else if (view == TStnVisManager::kVRZ) PaintVRZ(Option);
   else if (view == TStnVisManager::kCal) {
 //-----------------------------------------------------------------------------
 // calorimeter-specific view: do not draw tracks
@@ -186,7 +181,34 @@ void TEvdTrack::PaintXY(Option_t* Option) {
 
 //-----------------------------------------------------------------------------
 void TEvdTrack::PaintVRZ(Option_t* Option) {
-  fLineZY->Paint();
+  KinKal::KinematicLine kline = fKSeed->segments().back().kinematicLine();
+  ROOT::Math::XYZVector pos   = kline.pos0();
+  ROOT::Math::XYZVector dir   = kline.direction();
+  // rotate to the view frame
+  
+  TStnVisManager* vm = TStnVisManager::Instance();
+  TGeoCombiTrans* gt = vm->GetCurrentView()->GetCombiTrans();
+
+  double posm[3], posl[3], dirm[3], dirl[3];
+  posm[0] = pos.x();
+  posm[1] = pos.y();
+  posm[2] = pos.z();
+  gt->MasterToLocalVect(posm, posl);
+  
+  dirm[0] = dir.x();
+  dirm[1] = dir.y();
+  dirm[2] = dir.z();
+  gt->MasterToLocalVect(dirm, dirl);
+ 
+  double y1(1000.), y2(-1000.);
+
+  double dydz_l = dirl[1]/dirl[2];
+  double z1 = (y1-posl[1])/dydz_l + posl[2];
+  double z2 = (y2-posl[1])/dydz_l + posl[2];
+  
+  TLine ln;
+  ln.SetLineColor(kRed+1);
+  ln.PaintLine(z1,y1,z2,y2);
 }
 
 //-----------------------------------------------------------------------------

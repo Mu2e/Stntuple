@@ -127,8 +127,10 @@ TEvdFrame::TEvdFrame(const char*  Name,
 // PRINT menu item on top 
 //-----------------------------------------------------------------------------
   fMenuPrint = new TGPopupMenu(gClient->GetRoot());
-  fMenuPrint->AddEntry("Print &Straw Hits",  M_PRINT_STRAW_H);
-  fMenuPrint->AddEntry("Print &Combo Hits",  M_PRINT_COMBO_H);
+  fMenuPrint->AddEntry("Print &Straw Hits"  ,  M_PRINT_STRAW_H);
+  fMenuPrint->AddEntry("Print &Combo Hits"  ,  M_PRINT_COMBO_H);
+  fMenuPrint->AddEntry("Print &Tracks"      ,  M_PRINT_TRACKS );
+  fMenuPrint->AddEntry("Print &TimeClusters",  M_PRINT_TIME_CLUSTERS );
 //-----------------------------------------------------------------------------
 // define menu handlers
 //-----------------------------------------------------------------------------
@@ -244,6 +246,10 @@ TEvdFrame::TEvdFrame(const char*  Name,
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
   cbtn = new TGCheckButton(frame, "TC-only", kDisplayOnlyTCHits);
+  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  cbtn = new TGCheckButton(frame, "CosmicSeeds", kDisplayCosmicSeeds);
   cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 

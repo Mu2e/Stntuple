@@ -7,9 +7,10 @@
 class TVisNode: public TObject {
 protected:
   TString    fName;
-  int        fDebugLevel;
   TObject*   fClosestObject;
   int        fDist;
+
+  static int fgDebugLevel;
 public:
 					// ****** constructors and destructor
   TVisNode(const char* name = "TVisNode");
@@ -21,7 +22,7 @@ public:
   
   virtual const char* GetName() const    { return fName.Data(); }
 
-  int                 DebugLevel()       { return fDebugLevel; }
+  static int          DebugLevel()       { return fgDebugLevel; }
 
 					// generic print callback. to be overloaded, if needed
 
@@ -31,7 +32,7 @@ public:
 
   virtual int         InitEvent() = 0;
 
-  void                SetDebugLevel(int Level) { fDebugLevel = Level; }
+  static  void        SetDebugLevel(int Level) { fgDebugLevel = Level; }
 
   void                SetClosestObject(TObject* Obj, int Dist) {
     fClosestObject = Obj;

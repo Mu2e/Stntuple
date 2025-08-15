@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// clang-format off
 ///////////////////////////////////////////////////////////////////////////////
 #include "TROOT.h"
 #include "TInterpreter.h"
@@ -64,6 +64,7 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fSelectedPhiCluster  = nullptr;
 
   fDisplayHelices      = 0;
+  fDisplayCosmicSeeds  = 0;
   fDisplayTracks       = 1;
   fDisplayOnlyTCHits   = 0;
   fDisplaySimParticles = 0;                    // dont' want all of them by default
@@ -997,7 +998,7 @@ Int_t TStnVisManager::OpenVRZView() {
 //-----------------------------------------------------------------------------
 // display 12 panels together
 // VRZ: a plane has 6 panels, each panel has a view and is displayed on a separate pad
-// need tracekr as we need position of the panel
+// need tracker as we need position of the panel
 //-----------------------------------------------------------------------------
   TStnGeoManager* gm = TStnGeoManager::Instance();
   stntuple::TEvdTracker* vt    = gm->GetTracker();
@@ -1009,10 +1010,15 @@ Int_t TStnVisManager::OpenVRZView() {
       int ipad = 6*iy+ix; // for now, assume one station , otherwise 12*station + ...
       p1->cd(ipad+1);
       stntuple::TEvdPanel* panel = vt->Station(0)->Plane(iy)->Panel(ix);
-
+//-----------------------------------------------------------------------------
+// this assumes that we are displaying in the local reference frame of the panel
+// less sure about the rotation..
+// in which frame do we want to display ? need to transform tracks 
+//-----------------------------------------------------------------------------
       gPad->Range(panel->Pos()->Z()-40., 350., panel->Pos()->Z()+40., 700.);
       TStnView* v = (TStnView*) FindView(TStnVisManager::kVRZ,ipad);
       if (v) {
+        if (v->GetCombiTrans() == nullptr) v->CloneCombiTrans(panel->GetCombiTrans());
         v->Draw();
         gPad->Modified();
       }
@@ -1266,6 +1272,7 @@ void TStnVisManager::DoCheckButton() {
   else if (id == kDisplayTracks      ) SetDisplayTracks      (status);
   else if (id == kDisplaySimParticles) SetDisplaySimParticles(status);
   else if (id == kDisplayOnlyTCHits  ) SetDisplayOnlyTCHits  (status);
+  else if (id == kDisplayCosmicSeeds ) SetDisplayCosmicSeeds (status);
   else if (id == kDisplaySH          ) SetDisplayStrawHitsXY (status);
   else if (id == kIgnoreComptonHits  ) SetIgnoreComptonHits  (status);
   else if (id == kIgnoreProtonHits   ) SetIgnoreProtonHits   (status);

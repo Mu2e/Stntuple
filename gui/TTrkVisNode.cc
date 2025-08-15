@@ -663,12 +663,14 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       evd_trk = GetEvdTrack(i);
       evd_trk->Paint(Option);
     }
+  }
 
+  if (vm->DisplayCosmicSeeds()) {
     stntuple::TEvdCosmicTrack* evd_ctrk;
-                                        // tracks
+                                        // cosmic seeds
     int nctrk(0);
     if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
-
+    
     for (int i=0; i<nctrk; i++ ) {
       evd_ctrk = GetEvdCosmicTrack(i);
       evd_ctrk->PaintXY(Option);
@@ -1013,25 +1015,28 @@ void TTrkVisNode::PaintVRZ(Option_t* Option) {
     //     }
     //   }
     }
+
+    if (vm->DisplayCosmicSeeds()) {
 //-----------------------------------------------------------------------------
 // cosmic tracks (?) seeds (?)
 //-----------------------------------------------------------------------------
-    int nctrk(0);
-    if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
+      int nctrk(0);
+      if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
 
-    for (int i=0; i<nctrk; i++ ) {
-      stntuple::TEvdCosmicTrack* evd_ctrk = (stntuple::TEvdCosmicTrack*) fListOfCosmicTracks->At(i);
-      evd_ctrk->PaintVRZ(Option);
+      for (int i=0; i<nctrk; i++ ) {
+        stntuple::TEvdCosmicTrack* evd_ctrk = (stntuple::TEvdCosmicTrack*) fListOfCosmicTracks->At(i);
+        evd_ctrk->PaintVRZ(Option);
 
-      // int nhits = evd_ctrk->NHits();
-      // for (int ih=0; ih<nhits; ih++) {
-      //   stntuple::TEvdTrkStrawHit* hit = evd_ctrk->Hit(ih);
-      //   float time = hit->TrkStrawHitSeed()->hitTime();
-      //   float edep = hit->TrkStrawHitSeed()->energyDep();
-      //   if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
-      //     hit->PaintRZ(Option);
-      //   }
-      // }
+        // int nhits = evd_ctrk->NHits();
+        // for (int ih=0; ih<nhits; ih++) {
+        //   stntuple::TEvdTrkStrawHit* hit = evd_ctrk->Hit(ih);
+        //   float time = hit->TrkStrawHitSeed()->hitTime();
+        //   float edep = hit->TrkStrawHitSeed()->energyDep();
+        //   if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
+        //     hit->PaintRZ(Option);
+        //   }
+        // }
+      }
     }
   }
 

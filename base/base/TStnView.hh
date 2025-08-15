@@ -18,9 +18,9 @@ protected:
   int                 fType;  // view type
   int                 fIndex; // for calorimeter - 2 views, for example
 
-  int                 fDebugLevel;
+  static int          fgDebugLevel;
   
-  TGeoCombiTrans      fCombiTrans;   // rotate, then translate
+  TGeoCombiTrans*     fCombiTrans;   // rotate, then translate
   TVector3            fUDir;         // temporary
   TVector3            fVDir;
   TVector3            fWDir;
@@ -60,8 +60,9 @@ public:
 //-----------------------------------------------------------------------------
   int           Type () { return fType;  }
   int           Index() { return fIndex; }
-
-  TGeoCombiTrans*  GetCombiTrans() { return &fCombiTrans; }
+  void          CloneCombiTrans(const TGeoCombiTrans* T);
+  
+  TGeoCombiTrans* GetCombiTrans() { return fCombiTrans; }
 
   int           GetNNodes()      { return fListOfNodes->GetEntriesFast(); }
   TVisNode*     GetNode  (int I) { return (TVisNode*) fListOfNodes->UncheckedAt(I);   }

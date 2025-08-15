@@ -3,12 +3,15 @@
 
 ClassImp(TVisNode)
 
+
+int TVisNode::fgDebugLevel(0);
+
 //_____________________________________________________________________________
 TVisNode::TVisNode(const char* name):
   fName(name)
 {
   fClosestObject = NULL;
-  fDebugLevel    = 0;
+  fgDebugLevel    = 0;
 }
 
 

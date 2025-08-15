@@ -33,6 +33,7 @@
 #include "Stntuple/gui/TTrkVisNode.hh"
 #include "Stntuple/gui/TEvdHelixVisNode.hh"
 #include "Stntuple/gui/TEvdTimeClusterVisNode.hh"
+#include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPanelVisNode.hh"
 
 #include "Stntuple/gui/TMcTruthVisNode.hh"
@@ -43,7 +44,6 @@
 
 #include "Stntuple/mod/MuHitDisplay_module.hh"
 
-// #include "Stntuple/obj/AbsEvent.hh"
 #include "Stntuple/obj/TSimpBlock.hh"
 #include "Stntuple/mod/InitSimpBlock.hh"
 
@@ -113,6 +113,37 @@ MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
   fLastRun              = -1;
 
   fSimpBlock            = new TSimpBlock;
+
+  TStnVisManager* vm = TStnVisManager::Instance();
+//-----------------------------------------------------------------------------
+// parse the VM configuration parameters
+//-----------------------------------------------------------------------------
+  vm->SetDebugLevel(_vmConfig.debugLevel());
+    
+  stntuple::TEvdPanel::SetDebugLevel(_vmConfig.evdPanelDebugLevel());
+  // TStnView::SetDebugLevel (_vmConfig.stnViewDebugLevel ());
+    
+  int display_straw_digi_mc = _vmConfig.displayStrawDigiMC();
+  vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
+
+  int display_straw_hits_xy = _vmConfig.displayStrawHitsXY();
+  vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
+
+  float ew_length = _vmConfig.ewLength();
+  vm->SetEWLength(ew_length);
+
+  _defaultView           = _vmConfig.defaultView();
+  _listOfVisibleStations = _vmConfig.visibleStations();
+
+  float tmin   = _vmConfig.tMin();
+  float tmax   = _vmConfig.tMax();
+  vm->SetTimeWindow(tmin,tmax);
+
+  float emin = _vmConfig.minEDep();
+  float emax = _vmConfig.maxEDep();
+  vm->SetMinEDep(emin);
+  vm->SetMaxEDep(emax);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -194,6 +225,16 @@ void MuHitDisplay::beginRun(const art::Run& Run) {
       fGeoManager->AddDetector(t);
     }
   }
+
+//-----------------------------------------------------------------------------
+// init VisManager - failed to do it in beginJob - what is the right place for doing it?
+// get event data and initialize data blocks
+//-----------------------------------------------------------------------------
+  if (fFirstCall == 1) {
+    fFirstCall = 0;
+    InitGeoManager();
+    InitVisManager();
+  }
   
   TModule::beginRun(Run);
 }
@@ -229,38 +270,10 @@ void MuHitDisplay::InitVisManager() {
   sprintf(oname,"%s:%s",moduleDescription().moduleLabel().data(),"InitVisManager");
 
   TStnVisManager* vm = TStnVisManager::Instance();
-
   vm->SetTitleNode(new THeaderVisNode("HeaderVisNode", fHeaderBlock));
-//-----------------------------------------------------------------------------
-// parse the VM configuration parameters
-//-----------------------------------------------------------------------------
-  int debug_level = _vmConfig.debugLevel();
-  vm->SetDebugLevel(debug_level);
-    
-  int display_straw_digi_mc = _vmConfig.displayStrawDigiMC();
-  vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
-
-  int display_straw_hits_xy = _vmConfig.displayStrawHitsXY();
-  vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
-
-  float ew_length = _vmConfig.ewLength();
-  vm->SetEWLength(ew_length);
-
-  _defaultView = _vmConfig.defaultView();
-
-  float tmin   = _vmConfig.tMin();
-  float tmax   = _vmConfig.tMax();
-  vm->SetTimeWindow(tmin,tmax);
-
-  float emin = _vmConfig.minEDep();
-  float emax = _vmConfig.maxEDep();
-  vm->SetMinEDep(emin);
-  vm->SetMaxEDep(emax);
 //-----------------------------------------------------------------------------
 // set station visibility
 //-----------------------------------------------------------------------------
-  _listOfVisibleStations = _vmConfig.visibleStations();
-
   TStnGeoManager* gm = TStnGeoManager::Instance();
   stntuple::TEvdTracker* t  = gm->GetTracker();
   
@@ -279,7 +292,7 @@ void MuHitDisplay::InitVisManager() {
 
   for (int i=0; i<6; i++) {
     view[i] = new TCrvView(i);
-    view[i]->SetTimeWindow(0, ew_length);
+    view[i]->SetTimeWindow(0, vm->EWLength());
   }
 
   node  = new TCrvVisNode("CrvVisNode#0", 0);
@@ -438,7 +451,9 @@ void MuHitDisplay::InitVisManager() {
     for (int ipln=0; ipln<2; ++ipln) {
       for (int i=0; i<6; ++i) {
         int geo_id = 12*is+6*ipln+i;
-        TStnView* v = new TStnView(TStnVisManager::kVRZ,geo_id,"VRZView","VRZ View");
+        TStnView* v = new TStnView(TStnVisManager::kVRZ,geo_id,
+                                   "VRZView",
+                                   Form("panel %02i:%i",2*is+ipln,i));
 
         mu2e::StrawId sid(ipln,i,0);
         const mu2e::Panel* panel = &fTracker->getPanel(sid);
@@ -645,15 +660,6 @@ void MuHitDisplay::analyze(const art::Event& ArtEvent) {
   //    const char* oname = "MuHitDisplay::analyze";
 
   printf("[MuHitDisplay::%s] RUN: %10i EVENT: %10i\n", __func__, ArtEvent.run(), ArtEvent.event());
-//-----------------------------------------------------------------------------
-// init VisManager - failed to do it in beginJob - what is the right place for doing it?
-// get event data and initialize data blocks
-//-----------------------------------------------------------------------------
-  if (fFirstCall == 1) {
-    fFirstCall = 0;
-    InitGeoManager();
-    InitVisManager();
-  }
 
   getData(&ArtEvent);
   

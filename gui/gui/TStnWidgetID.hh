@@ -45,7 +45,9 @@ enum GuiCommandID {
   M_OPEN_VRZ,
 
   M_PRINT_STRAW_H,
-  M_PRINT_COMBO_H
+  M_PRINT_COMBO_H,
+  M_PRINT_TRACKS,
+  M_PRINT_TIME_CLUSTERS
 
 };
 
@@ -56,16 +58,18 @@ enum GuiButtonID {
   kDisplaySimParticles  =  7,
   kDisplayOnlyTCHits    =  8,
   kDisplaySH            =  9,
-  kIgnoreComptonHits    = 10,
-  kIgnoreProtonHits     = 11,
-  kIgnoreProtons        = 12,
+
+  kIgnoreComptonHits    = 30,
+  kIgnoreProtonHits     = 31,
+  kIgnoreProtons        = 32,
+  kDisplayCosmicSeeds   = 33,
 					// not sure what these are... but ...
                                         // they are needed for something
-  M_DISPLAY_SH          = 21,
-  M_DISPLAY_CH          = 22,
-  M_IGNORE_COMPTON_HITS = 23,
-  M_IGNORE_PROTON_HITS  = 24,
-  M_IGNORE_PROTONS      = 25
+  M_DISPLAY_SH          = 51,
+  M_DISPLAY_CH          = 52,
+  M_IGNORE_COMPTON_HITS = 53,
+  M_IGNORE_PROTON_HITS  = 54,
+  M_IGNORE_PROTONS      = 55
 
 };
 
