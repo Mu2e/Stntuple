@@ -67,6 +67,12 @@ public:
   int           GetNNodes()      { return fListOfNodes->GetEntriesFast(); }
   TVisNode*     GetNode  (int I) { return (TVisNode*) fListOfNodes->UncheckedAt(I);   }
   TObjArray*    GetListOfNodes() { return fListOfNodes; }
+  int           GetPx1 ()        { return fPx1;  }
+  int           GetPx2 ()        { return fPx2;  }
+  int           GetPy1 ()        { return fPy1;  }
+  int           GetPy2 ()        { return fPy2;  }
+  double        GetYMin()        { return fYMin; }
+  double        GetYMax()        { return fYMax; }
 
   TVector3*     UDir() { return & fUDir; }
   TVector3*     VDir() { return & fVDir; }

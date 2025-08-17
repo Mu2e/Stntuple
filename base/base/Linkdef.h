@@ -36,8 +36,9 @@
 #pragma link C++ class TStnView;
 #pragma link C++ class TTriggerConditions;
 #pragma link C++ class TUsedSet;
-#pragma link C++ class  TVisManager;
-#pragma link C++ class  TVisNode;
+#pragma link C++ class TVisManager;
+#pragma link C++ class TVisNode;
+#pragma link C++ class TVisNodeA;
 
 #endif
 

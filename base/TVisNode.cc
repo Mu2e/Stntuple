@@ -1,25 +1,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/base/TVisNode.hh"
 
-ClassImp(TVisNode)
-
-
-int TVisNode::fgDebugLevel(0);
+// ClassImp(TVisNode)
 
 //_____________________________________________________________________________
-TVisNode::TVisNode(const char* name):
-  fName(name)
-{
+TVisNode::TVisNode(const char* name): fName(name) {
   fClosestObject = NULL;
-  fgDebugLevel    = 0;
+  fDebugLevel    = 0;
 }
-
 
 //_____________________________________________________________________________
 TVisNode::~TVisNode() {
 }
 
 //_____________________________________________________________________________
-void TVisNode::NodePrint(const void* Object, const char* ClassName) {
+int TVisNode::InitEvent() {
+  printf(">>> ERROR in TVisNode::%s: derived class TXXXNode::%s is not implemented\n",__func__,__func__);
 }
 
+//_____________________________________________________________________________
+void TVisNode::NodePrint(const void* Object, const char* ClassName) {
+  printf(">>> ERROR in TVisNode::%s: derived class TXXXNode::%s is not implemented\n",__func__,__func__);
+}

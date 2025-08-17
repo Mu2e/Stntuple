@@ -468,7 +468,7 @@ int TStnVisManager::OpenTrkTZView() {
   TString name1(name);
   name1 += "_1";
   TPad* p1 = (TPad*) c->FindObject(name1);
-  p1->Range(-1600., 0., 1600., fEWLength);
+  p1->Range(-1700.,0., 1700., fEWLength);
   p1->cd();
 
   TStnView* v = FindView(TStnVisManager::kTZ,-1);
@@ -500,8 +500,8 @@ int TStnVisManager::OpenTrkTZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t
   // try to preserve the aspect ratio
   Int_t   xsize, ysize;
 
-  xsize = x2-x1;
-  ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
+  xsize = Mother->GetPx2()-Mother->GetPx1();
+  ysize = Mother->GetPy2()-Mother->GetPy1() + 20;
 
   // TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kTZ, xsize+TEvdFrame::fGroupFrameWidth, ysize);
   xsize = (800./ysize)*xsize;

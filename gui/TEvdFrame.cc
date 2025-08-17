@@ -316,7 +316,7 @@ TEvdFrame::TEvdFrame(const char*  Name,
   //  sh->SetSelectedItem(fShutter02);
 
   // shutter->Resize(100,300);
-  shutter->MoveResize(10,140,120,400);
+  shutter->MoveResize(10,140,120,500);
 
   fGroupFrame->AddFrame(shutter, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 //-----------------------------------------------------------------------------

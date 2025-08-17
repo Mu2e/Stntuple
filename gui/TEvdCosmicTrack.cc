@@ -182,11 +182,11 @@ void TEvdCosmicTrack::PaintVRZ(Option_t* Option) {
   gt->MasterToLocalVect(posm, posl);
   
   dirm[0] = fCTSeed->_track.FitParams.A1;
-  dirm[1] = 1.;
+  dirm[1] = -1.;
   dirm[2] = fCTSeed->_track.FitParams.B1;
   gt->MasterToLocalVect(dirm, dirl);
  
-  double y1(1000.), y2(-1000.);
+  double y1(-1000.), y2(1000.);
 
   double dydz_l = dirl[1]/dirl[2];
   double z1 = (y1-posl[1])/dydz_l + posl[2];

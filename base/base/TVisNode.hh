@@ -1,5 +1,5 @@
-#ifndef Stntuple_base_TVisVode_hh
-#define Stntuple_base_TVisVode_hh
+#ifndef __Stntuple_base_TVisNode_hh__
+#define __Stntuple_base_TVisNode_hh__
 
 #include "TObject.h"
 #include "TString.h"
@@ -10,7 +10,7 @@ protected:
   TObject*   fClosestObject;
   int        fDist;
 
-  static int fgDebugLevel;
+  int        fDebugLevel;
 public:
 					// ****** constructors and destructor
   TVisNode(const char* name = "TVisNode");
@@ -22,7 +22,7 @@ public:
   
   virtual const char* GetName() const    { return fName.Data(); }
 
-  static int          DebugLevel()       { return fgDebugLevel; }
+  int                 DebugLevel()       { return fDebugLevel; }
 
 					// generic print callback. to be overloaded, if needed
 
@@ -30,16 +30,16 @@ public:
 
 				// called by TEvdManager::DisplayEvent. a must to overload
 
-  virtual int         InitEvent() = 0;
+  virtual int         InitEvent();
 
-  static  void        SetDebugLevel(int Level) { fgDebugLevel = Level; }
+  void        SetDebugLevel(int Level) { fDebugLevel = Level; }
 
   void                SetClosestObject(TObject* Obj, int Dist) {
     fClosestObject = Obj;
     fDist          = Dist;
   }
 
-  ClassDef(TVisNode,0)
+  //  ClassDef(TVisNode,0)
 };
 
 #endif

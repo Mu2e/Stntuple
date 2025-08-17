@@ -72,23 +72,21 @@ public:
 
   void  SetPickMode   (Int_t Mode) { fPickMode    = Mode; }
 
-  //  virtual void  Draw    (Option_t* option = "");
+  int InitEvent();
 
-  int InitEvent() override;
-
-  virtual void  PaintXY  (Option_t* option = "") override;
-  virtual void  PaintRZ  (Option_t* option = "") override;
-  virtual void  PaintTZ  (Option_t* option = "") override;
-  virtual void  PaintPhiZ(Option_t* option = "") override;
-  virtual void  PaintCal (Option_t* option = "") override;
-  virtual void  PaintVST (Option_t* option = "") override;
-  virtual void  PaintVRZ (Option_t* option = "") override;
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py) override;
-  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py) override;
-  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py) override;
+  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
