@@ -988,7 +988,7 @@ Int_t TStnVisManager::OpenVRZView() {
   sprintf(name, "vrz_view_%i", n);
   sprintf(title, "VRZ view number %i", n);
 
-  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 1400+TEvdFrame::fGroupFrameWidth,1000);
+  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 900+TEvdFrame::fGroupFrameWidth,850);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -1009,6 +1009,13 @@ Int_t TStnVisManager::OpenVRZView() {
     for (int ix=0; ix<6; ++ix) {
       int ipad = 6*iy+ix; // for now, assume one station , otherwise 12*station + ...
       p1->cd(ipad+1);
+//-----------------------------------------------------------------------------
+// display sequence: first, 3 panels of iz=0 view, then - iz=1 ...etc
+//-----------------------------------------------------------------------------
+      int zface  = ipad / 3;
+      int ipface = ipad % 3;
+      // pick up the panel by face and the panel number within the face...
+      ###
       stntuple::TEvdPanel* panel = vt->Station(0)->Plane(iy)->Panel(ix);
 //-----------------------------------------------------------------------------
 // this assumes that we are displaying in the local reference frame of the panel

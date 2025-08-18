@@ -128,8 +128,8 @@ void TEvdTimeCluster::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
 void TEvdTimeCluster::PaintTZ(Option_t* Option) {
 
-  auto vm = TStnVisManager::Instance();
-  auto cv  = vm->GetCurrentView();
+  // auto vm = TStnVisManager::Instance();
+  // auto cv  = vm->GetCurrentView();
   
   int py1  = gPad->YtoAbsPixel(fTMin);
   int py2  = gPad->YtoAbsPixel(fTMax);

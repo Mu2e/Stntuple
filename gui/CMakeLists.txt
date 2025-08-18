@@ -13,7 +13,8 @@ include_directories(
 
 set (include_files
   DisplayMu2eGeometry.hh TCalView.hh
-  TCalVisNode.hh TCalVisNodeA.hh
+  TCalVisNode.hh
+  # TCalVisNodeA.hh
   TCrvView.hh TCrvVisNode.hh
   TEvdCalSection.hh TEvdCluster.hh TEvdComboHit.hh TEvdCrvBar.hh TEvdCrvSection.hh
   TEvdCrystal.hh TEvdHelixSeed.hh TEvdHelixVisNode.hh TEvdMainFrame.hh
@@ -24,7 +25,7 @@ set (include_files
   TEvdTrkStrawHit.hh TEventDisplayUtils.hh THeaderVisNode.hh TMcTruthVisNode.hh
   TMu2eBField.hh TEvdFrame.hh TStnGeoManager.hh TStnVisManager.hh
   TStnVisNode.hh
-  TStnVisNodeA.hh
+#  TStnVisNodeA.hh
   TTrkVisNode.hh
   TEvdPanelVisNode.hh
 )
@@ -35,7 +36,8 @@ set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 set (source_files
   DisplayMu2eGeometry.cc
-  TCalView.cc TCalVisNode.cc TCalVisNodeA.cc
+  TCalView.cc TCalVisNode.cc
+  # TCalVisNodeA.cc
   TCrvView.cc TCrvVisNode.cc
   TEvdCalSection.cc TEvdCluster.cc TEvdComboHit.cc TEvdCrvBar.cc TEvdCrvSection.cc
   TEvdCrystal.cc
@@ -49,7 +51,7 @@ set (source_files
   TEvdTrack.cc TEvdCosmicTrack.cc
   TMu2eBField.cc TEvdFrame.cc TStnGeoManager.cc TStnVisManager.cc
   TStnVisNode.cc
-  TStnVisNodeA.cc
+#  TStnVisNodeA.cc
   TTrkVisNode.cc
   TEvdPanelVisNode.cc
 )

@@ -989,31 +989,38 @@ void TTrkVisNode::PaintVST(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
-// VST view : display all straws 
+// VST view : display all straws in the local panel ref systems
+// display tracks and track hits - how to decide which hits should not be displayed in which view ?
+// hit "knows" its panel
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintVRZ(Option_t* Option) {
-
-//-----------------------------------------------------------------------------
-// display tracks and track hits
-//-----------------------------------------------------------------------------
   TStnVisManager* vm = TStnVisManager::Instance();
+  TStnView*       cv = vm->GetCurrentView();
+  
   if (vm->DisplayTracks()) {
     int ntrk(0);
     if (fListOfTracks != nullptr) ntrk = fListOfTracks->GetEntriesFast();
 
+    const mu2e::Panel* panel = (const mu2e::Panel*) cv->GetMother();
+    int pln = panel->id().getPlane();
+    int pnl = panel->id().getPanel();
+    
     for (int i=0; i<ntrk; i++ ) {
       stntuple::TEvdTrack* evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
       evd_trk->PaintVRZ(Option);
 
-    //   nhits = evd_trk->NHits();
-    //   for (int ih=0; ih<nhits; ih++) {
-    //     stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-    //     float time = hit->TrkStrawHitSeed()->hitTime();
-    //     float edep = hit->TrkStrawHitSeed()->energyDep();
-    //     if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
-    //       hit->PaintRZ(Option);
-    //     }
-    //   }
+      int nhits = evd_trk->NHits();
+      for (int ih=0; ih<nhits; ih++) {
+        stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
+        //     float time = hit->TrkStrawHitSeed()->hitTime();
+        //     float edep = hit->TrkStrawHitSeed()->energyDep();
+        // if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
+        const mu2e::TrkStrawHitSeed* hs = hit->TrkStrawHitSeed();
+        if ((hs->strawId().getPlane() == pln) and (hs->strawId().getPanel() == pnl)) {
+          hit->PaintRZ(Option);
+        }
+        //     }
+      }
     }
 
     if (vm->DisplayCosmicSeeds()) {

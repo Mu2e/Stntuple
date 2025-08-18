@@ -38,7 +38,7 @@
 #pragma link C++ class TUsedSet;
 #pragma link C++ class TVisManager;
 #pragma link C++ class TVisNode;
-#pragma link C++ class TVisNodeA;
+// .. #pragma link C++ class TVisNodeA;
 
 #endif
 

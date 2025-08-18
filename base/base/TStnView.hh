@@ -15,13 +15,14 @@
 
 class TStnView: public TNamed {
 protected:
-  int                 fType;  // view type
-  int                 fIndex; // for calorimeter - 2 views, for example
+  int                 fType;            // view type
+  int                 fIndex;           // for calorimeter - 2 views, for example
+  void*               fMother;          // non-null. if in the local ref system of some object
 
   static int          fgDebugLevel;
   
-  TGeoCombiTrans*     fCombiTrans;   // rotate, then translate
-  TVector3            fUDir;         // temporary
+  TGeoCombiTrans*     fCombiTrans;      // rotate, then translate
+  TVector3            fUDir;            // temporary
   TVector3            fVDir;
   TVector3            fWDir;
   
@@ -64,6 +65,7 @@ public:
   
   TGeoCombiTrans* GetCombiTrans() { return fCombiTrans; }
 
+  void*         GetMother()      { return fMother; }
   int           GetNNodes()      { return fListOfNodes->GetEntriesFast(); }
   TVisNode*     GetNode  (int I) { return (TVisNode*) fListOfNodes->UncheckedAt(I);   }
   TObjArray*    GetListOfNodes() { return fListOfNodes; }
@@ -82,14 +84,15 @@ public:
 //-----------------------------------------------------------------------------
 // setters
 //-----------------------------------------------------------------------------
-  void          SetType       (int Type ) { fType  = Type;  } 
+  void          SetDebugLevel (int Level);               // *MENU*
   void          SetIndex      (int Index) { fIndex = Index; } 
 
-  void          SetTimeWindow (float TMin, float TMax);  // *MENU* 
   void          SetMinEDep    (float E);                 // *MENU* 
   void          SetMaxEDep    (float E);                 // *MENU* 
+  void          SetMother     (void* Mother) { fMother = Mother; };
   void          SetStations   (int I1, int I2);          // *MENU* 
-  void          SetDebugLevel (int Level);               // *MENU*
+  void          SetTimeWindow (float TMin, float TMax);  // *MENU* 
+  void          SetType       (int Type ) { fType  = Type;  } 
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------

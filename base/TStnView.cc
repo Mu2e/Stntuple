@@ -17,6 +17,7 @@ int TStnView::fgDebugLevel(0);
 TStnView::TStnView(int Type, int Index): TNamed("",""), fCombiTrans(nullptr) {
   fType        = Type;
   fIndex       = Index;
+  fMother      = nullptr;
   fCenter      = nullptr;
   fListOfNodes = nullptr;
 
@@ -30,6 +31,7 @@ TStnView::TStnView(int Type, int Index, const char* Name, const char* Title):
   fCombiTrans(nullptr) {
   fType        = Type;
   fIndex       = Index;
+  fMother      = nullptr;
 
   fCenter      = new TMarker(0.,0,kPlus);
   fCenter->SetMarkerColor(kBlue);

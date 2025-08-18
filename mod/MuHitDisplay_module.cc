@@ -450,13 +450,15 @@ void MuHitDisplay::InitVisManager() {
   for (int is=0; is<ns; ++is) {
     for (int ipln=0; ipln<2; ++ipln) {
       for (int i=0; i<6; ++i) {
+        mu2e::StrawId sid(ipln,i,0);
+        const mu2e::Panel* panel = &fTracker->getPanel(sid);
         int geo_id = 12*is+6*ipln+i;
+
         TStnView* v = new TStnView(TStnVisManager::kVRZ,geo_id,
                                    "VRZView",
                                    Form("panel %02i:%i",2*is+ipln,i));
 
-        mu2e::StrawId sid(ipln,i,0);
-        const mu2e::Panel* panel = &fTracker->getPanel(sid);
+        v->SetMother((void*) panel);
 
         auto hept = panel->dsToPanel();
           
@@ -465,21 +467,12 @@ void MuHitDisplay::InitVisManager() {
         CLHEP::Hep3Vector  const& vDir = panel->vDirection();
         CLHEP::Hep3Vector  const& wDir = panel->wDirection();
 
-        // ROOT uses angles in degrees
-        // double phi   = 0.; //rot.getPhi  ()*180./M_PI;
-        // double psi   = 0.; //rot.getPsi  ()*180./M_PI;
-        // double theta = 0.; //rot.getTheta()*180./M_PI;
-        
-        // v->GetCombiTrans()->SetTranslation(disp.x(),disp.y(),disp.z());
-        // v->GetCombiTrans()->GetRotation()->SetAngles(phi,theta,0);
         v->UDir()->SetXYZ(uDir.x(),uDir.y(),uDir.z());
         v->VDir()->SetXYZ(vDir.x(),vDir.y(),vDir.z());
         v->WDir()->SetXYZ(wDir.x(),wDir.y(),wDir.z());
         vrz_view[is][ipln][i] = v;
         vrz_view[is][ipln][i]->AddNode(vp_node[is][ipln][i]);
         vrz_view[is][ipln][i]->AddNode(trk_vis_node);
-        // vrz_view[i]->AddNode(vpd_node[i]);
-        // vrz_view[i]->AddNode(trk_node);
       }
     }
   }

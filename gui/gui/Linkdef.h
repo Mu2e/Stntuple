@@ -9,7 +9,7 @@
 #pragma link C++ class DisplayMu2eGeometry;
 #pragma link C++ class TCalView;
 #pragma link C++ class TCalVisNode;
-#pragma link C++ class TCalVisNodeA;
+// #pragma link C++ class TCalVisNodeA;
 #pragma link C++ class TCrvView;
 #pragma link C++ class TCrvVisNode;
 #pragma link C++ class TEvdCalSection;
@@ -42,7 +42,7 @@
 #pragma link C++ class TStnGeoManager;
 #pragma link C++ class TStnVisManager;
 #pragma link C++ class TStnVisNode;
-#pragma link C++ class TStnVisNodeA;
+// #pragma link C++ class TStnVisNodeA;
 #pragma link C++ class TStrawHitVisNode;
 #pragma link C++ class TTrkVisNode;
 

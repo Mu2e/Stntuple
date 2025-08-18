@@ -17,7 +17,8 @@ ROOT_GENERATE_DICTIONARY(${dict}
   TCdf2RunSections.hh THexIndex.hh TMatrix33.hh TMatrix55.hh TNamedHandle.hh TObjHandle.hh
   TOffscl.hh TSetRunMaps.hh TStnArrayF.hh TStnArrayI.hh TStnDataset.hh TStnFileset.hh TStnHexagon.hh
   TStnRunRecord.hh TStnShape.hh TStnSquare.hh TStnUtils.hh TStnView.hh TTriggerConditions.hh
-  TUsedSet.hh TVisManager.hh TVisNode.hh TVisNodeA.hh
+  TUsedSet.hh TVisManager.hh TVisNode.hh
+#  TVisNodeA.hh
   LINKDEF base/Linkdef.h)
 
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
@@ -30,7 +31,8 @@ add_library(${lib} SHARED
   TCalibData.cc TCalibTable.cc     TCdf2RunSections.cc TNamedHandle.cc
   TStnArrayF.cc   TStnHexagon.cc    TStnUtils.cc   TVisManager.cc TCalibManager.cc
   TCdf2Files.cc THexIndex.cc  TObjHandle.cc TStnArrayI.cc   TStnRunRecord.cc
-  TStnView.cc    TVisNode.cc TVisNodeA.cc
+  TStnView.cc    TVisNode.cc
+#  TVisNodeA.cc
   ${dict}.cxx
 )
 
