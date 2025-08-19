@@ -424,10 +424,6 @@ void TStnView::Print(Option_t* Option) const {
   printf(" fType = %i fIndex = %i\n",fType,fIndex);
   printf(" fPx1 fPy1 fPx2 fPy2 = %5i %5i %5i %5i\n",fPx1,fPy1,fPx2,fPy2);
 
-  printf("UDir: %10.4f  %10.4f  %10.4f \n",fUDir.X(),fUDir.Y(),fUDir.Z());
-  printf("VDir: %10.4f  %10.4f  %10.4f \n",fVDir.X(),fVDir.Y(),fVDir.Z());
-  printf("WDir: %10.4f  %10.4f  %10.4f \n",fWDir.X(),fWDir.Y(),fWDir.Z());
-  
   int n = v->GetNNodes();
 
   printf("--------------------- nodes\n");

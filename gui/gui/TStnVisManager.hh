@@ -156,7 +156,6 @@ public:
 
   TSubdetector*  GetClosestSubdetector() { return fClosestSubdetector; }
   TExtrapolator* GetExtrapolator() { return fExtrapolator; }
-
   TObjArray*     GetListOfDetectors() { return fListOfDetectors; }
 
   void           AddDetector(TObject* det) { fListOfDetectors->Add(det); }

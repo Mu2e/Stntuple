@@ -52,8 +52,8 @@ TEvdStation::TEvdStation(int ID, const mu2e::Tracker* Tracker): TObject() {
   fListOfPlanes = new TObjArray(fNPlanes);
 
   TStnGeoManager* gm          = TStnGeoManager::Instance();
-  mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(2*ID,0);  // first panel of the plane
-  if (tpm) fProductionID      = tpm->psid();                           // production station ID ("station_00")
+  const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(2*ID,0);  // first panel of the plane
+  if (tpm) fProductionID      = tpm->psid();                                 // production station ID ("station_00")
 
   for (int i=0; i<fNPlanes; i++) {
     id = 2*ID+i;

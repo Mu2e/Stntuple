@@ -22,9 +22,6 @@ protected:
   static int          fgDebugLevel;
   
   TGeoCombiTrans*     fCombiTrans;      // rotate, then translate
-  TVector3            fUDir;            // temporary
-  TVector3            fVDir;
-  TVector3            fWDir;
   
   Int_t               fPx1;
   Int_t               fPy1;
@@ -75,10 +72,6 @@ public:
   int           GetPy2 ()        { return fPy2;  }
   double        GetYMin()        { return fYMin; }
   double        GetYMax()        { return fYMax; }
-
-  TVector3*     UDir() { return & fUDir; }
-  TVector3*     VDir() { return & fVDir; }
-  TVector3*     WDir() { return & fWDir; }
 
   void          AddNode(TVisNode* Node) { fListOfNodes->Add(Node); }
 //-----------------------------------------------------------------------------

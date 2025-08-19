@@ -45,6 +45,8 @@ public:
   TEvdStation* Station  (int I) { 
     return (TEvdStation*) fListOfStations->UncheckedAt(I); 
   }
+  
+  static void  ConvertPanelGeoIndices(int Station, int ZFace, int IPFace, int& Plane, int& Panel);
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------

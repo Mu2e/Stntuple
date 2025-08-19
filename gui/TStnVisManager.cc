@@ -30,6 +30,7 @@
 #include "Stntuple/gui/TStnGeoManager.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TEvdStation.hh"
 
 #include "Stntuple/print/Stntuple_print_functions.hh"
@@ -988,7 +989,7 @@ Int_t TStnVisManager::OpenVRZView() {
   sprintf(name, "vrz_view_%i", n);
   sprintf(title, "VRZ view number %i", n);
 
-  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 900+TEvdFrame::fGroupFrameWidth,850);
+  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 500+TEvdFrame::fGroupFrameWidth,1050);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -1000,32 +1001,34 @@ Int_t TStnVisManager::OpenVRZView() {
 // VRZ: a plane has 6 panels, each panel has a view and is displayed on a separate pad
 // need tracker as we need position of the panel
 //-----------------------------------------------------------------------------
+  int station(0); // so far, just one for VST
   TStnGeoManager* gm = TStnGeoManager::Instance();
   stntuple::TEvdTracker* vt    = gm->GetTracker();
-  
-  p1->Divide(6, 2);
+  int nfaces  = 4; // 6
+  int np_face = 3; // 2
+  p1->Divide(nfaces, np_face);
 					// ranges in mm
-  for (int iy=0; iy<2; ++iy) {
-    for (int ix=0; ix<6; ++ix) {
-      int ipad = 6*iy+ix; // for now, assume one station , otherwise 12*station + ...
+  for (int face=0; face<nfaces; ++face) {
+    for (int ip=0; ip<np_face; ++ip) {
+      int ipad = nfaces*ip+face;              // for now, assume one station , otherwise 12*station + ...
       p1->cd(ipad+1);
 //-----------------------------------------------------------------------------
-// display sequence: first, 3 panels of iz=0 view, then - iz=1 ...etc
+// display sequence: first, 3 panels of zface=0 view, then - zface=1 ...etc
+// pick up the panel by face and the panel number within the face...
 //-----------------------------------------------------------------------------
-      int zface  = ipad / 3;
-      int ipface = ipad % 3;
-      // pick up the panel by face and the panel number within the face...
-      ###
-      stntuple::TEvdPanel* panel = vt->Station(0)->Plane(iy)->Panel(ix);
+      int ipln, ipnl;
+      stntuple::TEvdTracker::ConvertPanelGeoIndices(station,face,ip,ipln,ipnl);
+        
+      stntuple::TEvdPanel* panel = vt->Station(0)->Plane(ipln)->Panel(ipnl);
 //-----------------------------------------------------------------------------
 // this assumes that we are displaying in the local reference frame of the panel
 // less sure about the rotation..
 // in which frame do we want to display ? need to transform tracks 
 //-----------------------------------------------------------------------------
       gPad->Range(panel->Pos()->Z()-40., 350., panel->Pos()->Z()+40., 700.);
-      TStnView* v = (TStnView*) FindView(TStnVisManager::kVRZ,ipad);
+      int geo_id  = 12*station+6*ipln+ipnl;
+      TStnView* v = (TStnView*) FindView(TStnVisManager::kVRZ,geo_id);
       if (v) {
-        if (v->GetCombiTrans() == nullptr) v->CloneCombiTrans(panel->GetCombiTrans());
         v->Draw();
         gPad->Modified();
       }

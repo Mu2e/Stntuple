@@ -429,62 +429,58 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // VRZ: "VST RZ" view - one per panel, each VRZ view shows only one panel
 //-----------------------------------------------------------------------------
-  TStnView*                    vrz_view[18][2][6];
-  stntuple::TEvdPanelVisNode*  vp_node [18][2][6];
+  const int nfaces(4), np_face(3);
   
-  // TStnGeoManager* gm = TStnGeoManager::Instance();
-  // stntuple::TEvdTracker* evd_t = gm->GetTracker();
+  //  TStnView*                    vrz_view[18][nfaces][np_face];
+  stntuple::TEvdPanelVisNode*  vp_node [18][nfaces][np_face];
+  
+  //  TStnGeoManager* gm = TStnGeoManager::Instance();
+  stntuple::TEvdTracker* evd_tracker = gm->GetTracker();
 
   int ns = 1; // fTracker->nStations();
 
   for (int is=0; is<ns; ++is) {
-    for (int ipln=0; ipln<2; ++ipln) {
-      for (int i=0; i<6; ++i) {
+    for (int face=0; face<nfaces; ++face) {
+      for (int ip=0; ip<np_face; ++ip) {
         // int inode = 12*is+6*ipln+i;
-        stntuple::TEvdPanel* panel = t->Station(is)->Plane(ipln)->Panel(i);
-        vp_node [is][ipln][i] = new stntuple::TEvdPanelVisNode (Form("EvdPanel_VN_%02i_%i_%i",is,ipln,i),panel);
+        int ipln, ipnl;
+        stntuple::TEvdTracker::ConvertPanelGeoIndices(is,face,ip,ipln,ipnl);
+        stntuple::TEvdPanel* panel = t->Station(is)->Plane(ipln)->Panel(ipnl);
       }
     }
   }
 
   for (int is=0; is<ns; ++is) {
-    for (int ipln=0; ipln<2; ++ipln) {
-      for (int i=0; i<6; ++i) {
-        mu2e::StrawId sid(ipln,i,0);
-        const mu2e::Panel* panel = &fTracker->getPanel(sid);
-        int geo_id = 12*is+6*ipln+i;
+    for (int face=0; face<nfaces; ++face) {
+      for (int ip=0; ip<np_face; ++ip) {
+        int ipln, ipnl;
+        stntuple::TEvdTracker::ConvertPanelGeoIndices(is,face,ip,ipln,ipnl);
 
+        int geo_id  = 12*is+6*ipln+ipnl;
         TStnView* v = new TStnView(TStnVisManager::kVRZ,geo_id,
                                    "VRZView",
-                                   Form("panel %02i:%i",2*is+ipln,i));
+                                   Form("panel %02i:%i",2*is+ipln,ipnl));
 
+        mu2e::StrawId sid(ipln,ipnl,0);
+        const mu2e::Panel* panel = &fTracker->getPanel(sid);
         v->SetMother((void*) panel);
 
-        auto hept = panel->dsToPanel();
-          
-        CLHEP::Hep3Vector  const& disp = panel->origin();
-        CLHEP::Hep3Vector  const& uDir = panel->uDirection();
-        CLHEP::Hep3Vector  const& vDir = panel->vDirection();
-        CLHEP::Hep3Vector  const& wDir = panel->wDirection();
-
-        v->UDir()->SetXYZ(uDir.x(),uDir.y(),uDir.z());
-        v->VDir()->SetXYZ(vDir.x(),vDir.y(),vDir.z());
-        v->WDir()->SetXYZ(wDir.x(),wDir.y(),wDir.z());
-        vrz_view[is][ipln][i] = v;
-        vrz_view[is][ipln][i]->AddNode(vp_node[is][ipln][i]);
-        vrz_view[is][ipln][i]->AddNode(trk_vis_node);
+        stntuple::TEvdPanel* evd_panel = evd_tracker->Station(is)->Plane(ipln)->Panel(ipnl);
+        v->CloneCombiTrans(evd_panel->GetCombiTrans());
+//-----------------------------------------------------------------------------
+// create VisNode for this panel and, together with the TrkVisNode, add it to the view
+//-----------------------------------------------------------------------------
+        stntuple::TEvdPanelVisNode* vp_node = new stntuple::TEvdPanelVisNode (Form("EvdPanel_VN_%02i_%i_%i",is,ipln,ipnl),evd_panel);
+        v->AddNode(vp_node);
+        v->AddNode(trk_vis_node);
+//-----------------------------------------------------------------------------
+// finally, add the view to the VM's list of views
+//-----------------------------------------------------------------------------
+        vm->AddView(v);
       }
     }
   }
   
-  for (int is=0; is<ns; ++is) {
-    for (int ipln=0; ipln<2; ++ipln) {
-      for (int i=0; i<6; ++i) {
-        vm->AddView(vrz_view[is][ipln][i]);
-      }
-    }
-  }
- 
 //-----------------------------------------------------------------------------
 // upon startup, open either an XY or a VST view
 //-----------------------------------------------------------------------------

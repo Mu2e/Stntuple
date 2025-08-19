@@ -60,6 +60,31 @@ TEvdTracker::~TEvdTracker() {
 }
 
 //-----------------------------------------------------------------------------
+static void TEvdTracker::ConvertPanelGeoIndices(int Station, int ZFace, int IPFace, int& Plane, int& Panel) {
+  Plane = ZFace / 2;
+  if ((Station % 2) == 0) {
+//-----------------------------------------------------------------------------
+// even-numbered stations :
+// z-face 0: plane 0 panels 1,3,5
+//        1: plane 0 panels 0,2,4
+//        2: plane 1 panels 0,2,4
+//        3: plane 1 panels 1,3,5
+//-----------------------------------------------------------------------------
+    Panel = 2*IPFace+(ZFace+Plane+1) % 2;
+  }
+  else {
+//-----------------------------------------------------------------------------
+// odd-numbered stations:
+// z-face 0: plane 0 panels 0,2,4
+//        1: plane 0 panels 1,3,5
+//        2: plane 1 panels 1,3,5
+//        3: plane 1 panels 0,2,4
+//-----------------------------------------------------------------------------
+    Panel = 2*IPFace+(ZFace+Plane  ) % 2;
+  }
+}
+
+//-----------------------------------------------------------------------------
 void TEvdTracker::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
