@@ -295,15 +295,15 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
         mass   = part->Mass();
         energy = sqrt(px*px+py*py+pz*pz+mass*mass);
       }
-      helix->fMom1.SetPxPyPzE(px,py,pz,energy);
+      helix->fSimpMom1.SetPxPyPzE(px,py,pz,energy);
 
       CLHEP::Hep3Vector sp = simptr->startPosition();
-      helix->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
+      helix->fSimpOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
 
       if(verbose > 5 || (verbose > 1 && energy < 70.f && helix->P() > 85.f)) printf(" Simp1: PDG = %5i; (pT, pZ, p, E) = (%.1f, %.1f, %.1f %.1f); (x0, y0, r0, z0, t0) = (%.1f, %.1f, %.1f, %.1f, %.1f), N(hits) = %2i\n",
-                                                                                    helix->fSimpPDG1, helix->fMom1.Pt(), helix->fMom1.Pz(), helix->fMom1.P(), helix->fMom1.E(),
-                                                                                    helix->fOrigin1.X(), helix->fOrigin1.Y(), std::sqrt(std::pow(helix->fOrigin1.X()+3904.f,2) + std::pow(helix->fOrigin1.Y(),2)),
-                                                                                    helix->fOrigin1.Z(), helix->fOrigin1.T(), helix->fSimpId1Hits);
+                                                                                    helix->fSimpPDG1, helix->fSimpMom1.Pt(), helix->fSimpMom1.Pz(), helix->fSimpMom1.P(), helix->fSimpMom1.E(),
+                                                                                    helix->fSimpOrigin1.X(), helix->fSimpOrigin1.Y(), std::sqrt(std::pow(helix->fSimpOrigin1.X()+3904.f,2) + std::pow(helix->fSimpOrigin1.Y(),2)),
+                                                                                    helix->fSimpOrigin1.Z(), helix->fSimpOrigin1.T(), helix->fSimpId1Hits);
 
       //look for the second most frequent hit
       if (max != int(hits_simp_id.size()) ){  //nhits){
@@ -359,10 +359,10 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
               mass   = part->Mass();
               energy = sqrt(px*px+py*py+pz*pz+mass*mass);
             }
-            helix->fMom2.SetPxPyPzE(px,py,pz,energy);
+            helix->fSimpMom2.SetPxPyPzE(px,py,pz,energy);
 
             const CLHEP::Hep3Vector sp = simptr->startPosition();
-            helix->fOrigin2.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
+            helix->fSimpOrigin2.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
           }
         }
       }

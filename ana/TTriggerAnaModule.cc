@@ -425,10 +425,10 @@ void TTriggerAnaModule::FillHelixHistograms(HistBase_t* Hist, TStnHelix* Helix) 
 
   //MC info
   hist->fSimpPDG1->Fill(Helix->fSimpPDG1);
-  hist->fMCP->Fill(Helix->Mom1().P());
-  float deltaP = Helix->P() - Helix->Mom1().P();
+  hist->fMCP->Fill(Helix->SimpMom1().P());
+  float deltaP = Helix->P() - Helix->SimpMom1().P();
   hist->fDp->Fill(deltaP);
-  float deltaPt = Helix->Pt() - Helix->Mom1().Pt();
+  float deltaPt = Helix->Pt() - Helix->SimpMom1().Pt();
   hist->fDpt->Fill(deltaPt);  
   
 }

@@ -57,10 +57,10 @@ public:
 //-----------------------------------------------------------------------------
 // vectors, added in V3
 //-----------------------------------------------------------------------------
-  TLorentzVector            fMom1;  
-  TLorentzVector            fOrigin1;
-  TLorentzVector            fMom2;  
-  TLorentzVector            fOrigin2;
+  TLorentzVector            fSimpMom1;  
+  TLorentzVector            fSimpOrigin1;
+  TLorentzVector            fSimpMom2;  
+  TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -168,10 +168,10 @@ public:
   float   Chi2TZNDof    () { return fChi2TZNDof;   }
   float   HitRatio      () { return fHitRatio;     }
   
-  TLorentzVector  Mom1     () { return fMom1; }
-  TLorentzVector  Origin1  () { return fOrigin1; }
-  TLorentzVector  Mom2     () { return fMom2; }
-  TLorentzVector  Origin2  () { return fOrigin2; }
+  TLorentzVector  SimpMom1     () { return fSimpMom1; }
+  TLorentzVector  SimpOrigin1  () { return fSimpOrigin1; }
+  TLorentzVector  SimpMom2     () { return fSimpMom2; }
+  TLorentzVector  SimpOrigin2  () { return fSimpOrigin2; }
 
 //----------------------------------------------------------------------------
 // setters

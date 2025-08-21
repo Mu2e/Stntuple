@@ -61,11 +61,11 @@ void TStnHelix::ReadV1(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
 
-  fMom1.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin1.SetXYZT(0.,0.,0.,0.);
+  fSimpMom1.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin1.SetXYZT(0.,0.,0.,0.);
 
-  fMom2.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin2.SetXYZT(0.,0.,0.,0.);
+  fSimpMom2.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin2.SetXYZT(0.,0.,0.,0.);
 
 
   fNHits             = data.fNHits;	     
@@ -151,11 +151,11 @@ void TStnHelix::ReadV2(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
 
-  fMom1.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin1.SetXYZT(0.,0.,0.,0.);
+  fSimpMom1.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin1.SetXYZT(0.,0.,0.,0.);
 
-  fMom2.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin2.SetXYZT(0.,0.,0.,0.);
+  fSimpMom2.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin2.SetXYZT(0.,0.,0.,0.);
 
   fNHits             = data.fNHits;	     
   fAlgorithmID       = data.fAlgorithmID;    
@@ -198,10 +198,10 @@ void TStnHelix::ReadV3(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // vectors, added in V3, I believe
 //-----------------------------------------------------------------------------
-    TLorentzVector            fMom1;  
-    TLorentzVector            fOrigin1;
-    TLorentzVector            fMom2;  
-    TLorentzVector            fOrigin2;
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -251,10 +251,10 @@ void TStnHelix::ReadV3(TBuffer &R__b) {
   nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
   nwf      = ((float*) &data.fHelix         ) - &data.fT0;
     
-  fMom1.Streamer(R__b);
-  fOrigin1.Streamer(R__b);
-  fMom2.Streamer(R__b);
-  fOrigin2.Streamer(R__b);
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
 
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
@@ -300,10 +300,10 @@ void TStnHelix::ReadV4(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // vectors, added in V3, I believe
 //-----------------------------------------------------------------------------
-    TLorentzVector            fMom1;  
-    TLorentzVector            fOrigin1;
-    TLorentzVector            fMom2;  
-    TLorentzVector            fOrigin2;
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -354,10 +354,10 @@ void TStnHelix::ReadV4(TBuffer &R__b) {
   nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
   nwf      = ((float*) &data.fHelix         ) - &data.fT0;
     
-  fMom1.Streamer(R__b);
-  fOrigin1.Streamer(R__b);
-  fMom2.Streamer(R__b);
-  fOrigin2.Streamer(R__b);
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
 
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
@@ -406,10 +406,10 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // vectors, added in V3, I believe
 //-----------------------------------------------------------------------------
-    TLorentzVector            fMom1;  
-    TLorentzVector            fOrigin1;
-    TLorentzVector            fMom2;  
-    TLorentzVector            fOrigin2;
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -461,10 +461,10 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
   nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
   nwf      = ((float*) &data.fHelix         ) - &data.fT0;
     
-  fMom1.Streamer(R__b);
-  fOrigin1.Streamer(R__b);
-  fMom2.Streamer(R__b);
-  fOrigin2.Streamer(R__b);
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
 
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
@@ -517,10 +517,10 @@ void TStnHelix::ReadV6(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // vectors, added in V3, I believe
 //-----------------------------------------------------------------------------
-    TLorentzVector            fMom1;  
-    TLorentzVector            fOrigin1;
-    TLorentzVector            fMom2;  
-    TLorentzVector            fOrigin2;
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -576,10 +576,10 @@ void TStnHelix::ReadV6(TBuffer &R__b) {
   nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
   nwf      = ((float*) &data.fHelix         ) - &data.fT0;
     
-  fMom1.Streamer(R__b);
-  fOrigin1.Streamer(R__b);
-  fMom2.Streamer(R__b);
-  fOrigin2.Streamer(R__b);
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
 
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
@@ -645,10 +645,10 @@ void TStnHelix::Streamer(TBuffer& R__b) {
     else if (R__v == 5) ReadV5 (R__b);
     else if (R__v == 6) ReadV6 (R__b);
     else {
-      fMom1.Streamer(R__b);
-      fOrigin1.Streamer(R__b);
-      fMom2.Streamer(R__b);
-      fOrigin2.Streamer(R__b);
+      fSimpMom1.Streamer(R__b);
+      fSimpOrigin1.Streamer(R__b);
+      fSimpMom2.Streamer(R__b);
+      fSimpOrigin2.Streamer(R__b);
 					// current version: V7
       R__b.ReadFastArray(&fNHits, nwi);
       R__b.ReadFastArray(&fT0   , nwf);
@@ -656,10 +656,10 @@ void TStnHelix::Streamer(TBuffer& R__b) {
   }
   else {
     R__b.WriteVersion(TStnHelix::IsA());
-    fMom1.Streamer(R__b);
-    fOrigin1.Streamer(R__b);
-    fMom2.Streamer(R__b);
-    fOrigin2.Streamer(R__b);
+    fSimpMom1.Streamer(R__b);
+    fSimpOrigin1.Streamer(R__b);
+    fSimpMom2.Streamer(R__b);
+    fSimpOrigin2.Streamer(R__b);
 
     R__b.WriteFastArray(&fNHits, nwi);
     R__b.WriteFastArray(&fT0   , nwf);
@@ -669,11 +669,11 @@ void TStnHelix::Streamer(TBuffer& R__b) {
 //-----------------------------------------------------------------------------
 TStnHelix::TStnHelix(int Number) {
 
-  fMom1.SetPxPyPzE(1e6,1e6,1e6,1e6);
-  fOrigin1.SetXYZT(0.,0.,0.,0.);
+  fSimpMom1.SetPxPyPzE(1e6,1e6,1e6,1e6);
+  fSimpOrigin1.SetXYZT(0.,0.,0.,0.);
   
-  fMom2.SetPxPyPzE(1e6,1e6,1e6,1e6);
-  fOrigin2.SetXYZT(0.,0.,0.,0.);
+  fSimpMom2.SetPxPyPzE(1e6,1e6,1e6,1e6);
+  fSimpOrigin2.SetXYZT(0.,0.,0.,0.);
   
   fNumber           = Number;
   fNHits            =  0;
