@@ -49,7 +49,7 @@ class TStnHelix : public TObject {
     kNFreeIntsV6   =  3,	        // v6: added TZSlope, TZSlope error, TZChi2NDof, hitRatio (expected/collected)
     kNFreeFloatsV6 =  5,		// 
 
-    kNFreeInts     =  2,	        // v7: added propDir
+    kNFreeInts     =  1,	        // v7: added propDir, sim 1 ID
     kNFreeFloats   =  5			// 
   };
 
@@ -76,7 +76,8 @@ public:
   int                       fSimpPDGM2;         // added in v3
   int                       fSimpId2Hits;       // added in v3
   int                       fHelicity;          // added in v4
-  int                       fPropDir;           // added in v7: -1,0,1 stand for upstream, ambigous an downstream respectively
+  int                       fPropDir;           // added in v7: -1,0,1 stand for upstream, ambigous and downstream respectively
+  int                       fSimpID1;           // added in v7: ID for sim with the most hits
   int                       fInt[kNFreeInts];   // provision for future I/O expansion
 //-----------------------------------------------------------------------------
 // floats
@@ -193,7 +194,7 @@ public:
   void ReadV5(TBuffer& R__b);   // 2024-03-07 G.P.
   void ReadV6(TBuffer& R__b);   // 2024-10-17 G.P.
 
-  ClassDef(TStnHelix,6);
+  ClassDef(TStnHelix,7);
 };
 
 #endif

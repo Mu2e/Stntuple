@@ -109,7 +109,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
   const mu2e::Tracker* trackerGeom = th.get();
 
   const int verbose(fVerbose);
-  if(verbose > 3) printf("InitHelixBlock %s: Printing helix collection info: N(helices) = %2i\n", Block->GetName(), nhelices);
+  if(verbose > 3) printf("InitHelixBlock %s: Printing helix collection info: N(helices) = %2i\n", fHSeedCollTag.encode().c_str(), nhelices);
   for (int i=0; i<nhelices; i++) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;
 
@@ -250,6 +250,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
     helix->fSimpId2Hits = -1;
     helix->fSimpPDGM1   = -1;
     helix->fSimpPDGM2   = -1;
+    helix->fSimpID1     = mostvalue;
 
     if (hits_simp_id.size()>0) {
       if ( (mostvalueindex != hits_simp_index[id_max]) ){

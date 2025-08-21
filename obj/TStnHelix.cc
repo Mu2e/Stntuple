@@ -79,6 +79,8 @@ void TStnHelix::ReadV1(TBuffer &R__b) {
   fSimpPDGM2         = -1;         // added in v3
   fSimpId2Hits       = -1;         // added in v3
   fHelicity          =  0;         // added in V4
+  fPropDir           =  0;         // added in V7
+  fSimpID1           = -1;         // added in v7
 
 
   fT0                = data.fT0;    	  
@@ -166,6 +168,8 @@ void TStnHelix::ReadV2(TBuffer &R__b) {
   fSimpPDGM2         = -1;         // added in v3
   fSimpId2Hits       = -1;         // added in v3
   fHelicity          =  0;         // added in V4
+  fPropDir           =  0;         // added in V7
+  fSimpID1           = -1;         // added in v7
 
   fT0                = data.fT0;    	  
   fT0Err             = data.fT0Err; 	  
@@ -267,6 +271,8 @@ void TStnHelix::ReadV3(TBuffer &R__b) {
   fSimpPDGM2         = data.fSimpPDGM2  ;
   fSimpId2Hits       = data.fSimpId2Hits;
   fHelicity          =  0               ;         // added in V4
+  fPropDir           =  0;         // added in V7
+  fSimpID1           = -1               ;         // added in v7
 
   fT0                = data.fT0;    	  
   fT0Err             = data.fT0Err; 	  
@@ -387,6 +393,9 @@ void TStnHelix::ReadV4(TBuffer &R__b) {
   fClusterY          = data.fClusterY;    
   fClusterZ          = data.fClusterZ;    
   fNLoops            = 0.;                  //added in V5
+  fPropDir           =  0;                  // added in V7
+  fSimpID1           = -1;                  // added in v7
+
 }
 
 
@@ -473,6 +482,8 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
   fSimpId2Hits       = data.fSimpId2Hits;
   fHelicity          = data.fHelicity   ;         
   fNLoops            = data.fNLoops;
+  fPropDir           =  0;                  // added in V7
+  fSimpID1           = -1;                  // added in v7
 
   fT0                = data.fT0;    	  
   fT0Err             = data.fT0Err; 	  
@@ -586,6 +597,8 @@ void TStnHelix::ReadV6(TBuffer &R__b) {
   fSimpId2Hits       = data.fSimpId2Hits;
   fHelicity          = data.fHelicity   ;         
   fNLoops            = data.fNLoops;
+  fPropDir           =  0;                  // added in V7
+  fSimpID1           = -1;                  // added in v7
 
   fT0                = data.fT0;    	  
   fT0Err             = data.fT0Err; 	  
@@ -636,7 +649,7 @@ void TStnHelix::Streamer(TBuffer& R__b) {
       fOrigin1.Streamer(R__b);
       fMom2.Streamer(R__b);
       fOrigin2.Streamer(R__b);
-					// current version: V3
+					// current version: V7
       R__b.ReadFastArray(&fNHits, nwi);
       R__b.ReadFastArray(&fT0   , nwf);
     }
@@ -676,6 +689,8 @@ TStnHelix::TStnHelix(int Number) {
   fSimpPDGM2    = 0; 
   fSimpId2Hits  = 0;
   fHelicity     = 0;
+  fPropDir      = 0;
+  fSimpID1      =-1;
 
   for (int i=0; i<kNFreeInts; i++) fInt[i] = 0;
 
