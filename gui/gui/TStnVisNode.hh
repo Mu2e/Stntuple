@@ -30,6 +30,7 @@ public:
   virtual void  PaintCrv (Option_t* option = "");
   virtual void  PaintVST (Option_t* option = "");
   virtual void  PaintVRZ (Option_t* option = "");
+  virtual void  PaintVYZ (Option_t* option = "");
 
   virtual int   DistancetoPrimitive    (Int_t px, Int_t py);
   virtual int   DistancetoPrimitiveXY  (Int_t px, Int_t py);
@@ -40,6 +41,7 @@ public:
   virtual int   DistancetoPrimitiveCrv (Int_t px, Int_t py);
   virtual int   DistancetoPrimitiveVST (Int_t px, Int_t py);
   virtual int   DistancetoPrimitiveVRZ (Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveVYZ (Int_t px, Int_t py);
 };
 
 #endif

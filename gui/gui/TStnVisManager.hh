@@ -42,7 +42,8 @@ public:
     kCal       =  5,
     kCrv       =  6,
     kVST       =  7,			// VST view
-    kVRZ       =  8			// VST RZ view
+    kVRZ       =  8,                    // VST RZ view
+    kVYZ       =  9			// VST YZ view
   };
 
 //-----------------------------------------------------------------------------
