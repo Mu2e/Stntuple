@@ -81,7 +81,7 @@ class TStnTrack : public TObject {
     kNFreeFloats2V15= 20,
 
     kNFreeInts     =  1,     //         V16: add ST/IPA/OPA intersection counts
-    kNFreeFloats   =  3,
+    kNFreeFloats   =  2,
     kNFreeFloats2  = 20,
   };
 
@@ -193,6 +193,7 @@ public:
   float                     fC0;	          // curvature at Z0
   float                     fPhi0;	          // phi0 at Z0 **specify in V8 , no I/O changes***
   float                     fTrkQual;             // ** added in V11
+  float                     fTFront;              // time at tracker front, added in V17
   float                     fFloat[kNFreeFloats]; // provision for future I/O expansion
 
   InterData_t               fDisk [kNDisks];      // track intersections with disks
@@ -300,6 +301,7 @@ public:
   float  TCH_HitLen () const { if (fVTCH) { return fTrkCaloHit.fPath;} else {return -1.e6;} }
 
   float  TBack    () const { return fTBack; }
+  float  TFront   () const { return fTFront; }
 
   float  EleLogLHCal() const { return fEleLogLHCal; }
   float  MuoLogLHCal() const { return fMuoLogLHCal; }
@@ -368,7 +370,7 @@ public:
   void ReadV9 (TBuffer& R__b);
   void ReadV10(TBuffer& R__b);
 
-  ClassDef(TStnTrack,16)
+  ClassDef(TStnTrack,17)
 
 };
 

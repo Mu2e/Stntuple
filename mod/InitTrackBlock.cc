@@ -35,6 +35,7 @@
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeedAssns.hh"
+#include "Offline/RecoDataProducts/inc/TrkFitFlag.hh"
 
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 #include "Offline/BTrkData/inc/TrkCaloHit.hh"
@@ -195,11 +196,12 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
   const int verbose(fVerbose); //control output level for debugging
 
-  int                       ntrk(0), nassns(0), ev_number, rn_number;
+  int                       ntrk(0), nassns(0), ev_number, sr_number, rn_number;
   TStnTrack*                track;
   TStnTrackBlock            *data(0);
 
   ev_number = AnEvent->event();
+  sr_number = AnEvent->subRun();
   rn_number = AnEvent->run();
 
   if (Block->Initialized(ev_number,rn_number)) {
@@ -427,12 +429,18 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     // Decide which intersection to use for the defaults, using the front if available (only Mid available for Online tracks)
     const mu2e::KalIntersection* kinter((kinter_front) ? kinter_front : (kinter_mid) ? kinter_mid : nullptr);
+    const mu2e::KalSegment* kseg(nullptr); // only in cases where the intersection isn't found
     if(!kinter) {
-      printf("%s::%s: KalSeedCollection %s track %2i: No tracker front/middle intersection found! Unable to define the track information...\n",
-             typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
+      printf("InitTrackBlock::%s: %i:%i:%i: KalSeedCollection %s track %2i: No tracker front/middle intersection!\n",
+             __func__, rn_number, sr_number, ev_number, fKFFCollTag.encode().c_str(), itrk);
+      double t0;
+      auto seg = kffs->t0Segment(t0);
+      if(seg != kffs->segments().end()) kseg = &(*seg);
+      else printf("InitTrackBlock::%s: %i:%i:%i: KalSeedCollection %s track %2i: --> No t0 KalSegment either!\n",
+                  __func__, rn_number, sr_number, ev_number, fKFFCollTag.encode().c_str(), itrk);
     }
-    KinKal::VEC3 fitmom = (kinter) ? kinter->momentum3() : KinKal::VEC3();
-    KinKal::VEC3 pos    = (kinter) ? kinter->position3() : KinKal::VEC3();
+    KinKal::VEC3 fitmom = (kinter) ? kinter->momentum3() : (kseg) ? kseg->momentum3() : KinKal::VEC3();
+    KinKal::VEC3 pos    = (kinter) ? kinter->position3() : (kseg) ? kseg->position3() : KinKal::VEC3();
 
     track->fX1 = pos.x();
     track->fY1 = pos.y();
@@ -446,8 +454,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // track parameters in the first point
 //-----------------------------------------------------------------------------
     track->Momentum()->SetXYZM(px,py,pz,0.511);
-    track->fP         = (kinter) ? kinter->mom()    : 0.f;
-    track->fFitMomErr = (kinter) ? kinter->momerr() : 0.f;
+    track->fP         = (kinter) ? kinter->mom()    : (kseg) ? kseg->mom()    : 0.f;
+    track->fFitMomErr = (kinter) ? kinter->momerr() : (kseg) ? kseg->momerr() : 0.f;
     track->fPt        = track->Momentum()->Pt();
     track->fChi2      = kffs->chisquared();
     track->fFitCons   = kffs->fitConsistency();
@@ -455,6 +463,12 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       track->fT0 = kinter_mid->time();
       track->fT0Err = std::sqrt(kinter_mid->loopHelix().paramVar(KinKal::LoopHelix::t0_));
       // track->fFitMomErr = kinter_mid->momerr();
+    } else if(kinter) { // use the default intersection if the middle isn't available
+      track->fT0 = kinter->time();
+      track->fT0Err = std::sqrt(kinter->loopHelix().paramVar(KinKal::LoopHelix::t0_));
+    } else if(kseg) { // use the KalSegment if no intersection was found
+      track->fT0 = kseg->t0Val();
+      track->fT0Err = std::sqrt(kseg->t0Var(mu2e::TrkFitFlag(mu2e::TrkFitFlag::KKLoopHelix)));
     } else {
       track->fT0    = -1.e6;
       track->fT0Err = -1.e6;
@@ -462,6 +476,12 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                         typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
     }
 
+    if(kinter_front) {
+      track->fTFront = kinter_front->time();
+    }
+    if(kinter_back) {
+      track->fTBack = kinter_back->time();
+    }
 //-----------------------------------------------------------------------------
 // determine, approximately, 'sz0' - flight length corresponding to the
 // virtual detector at the tracker front
@@ -505,9 +525,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // double     zback      = vd_tt_back.z();
     // double     szb        = s_at_given_z(kffs,zback);
 
-    const float tback = -1.f; //FIXME
-    // rename later
-    track->fTBack         = tback;
 //-----------------------------------------------------------------------------
 // the total number of planes is 36, use 50 for simplicity
 //-----------------------------------------------------------------------------

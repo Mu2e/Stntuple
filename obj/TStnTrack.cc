@@ -1767,12 +1767,14 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       fPTrackerMiddle   = 0.f;
       fPTrackerExit     = 0.f;
     }
-    else if (R__v == 15 || R__v == 16){
+    else if (R__v >= 15) {
 //-----------------------------------------------------------------------------
 // version - v15
 // adding second second of floats to read
 // version - v16
 // add intersection counts
+// version - v17
+// add T(tracker front)
 //-----------------------------------------------------------------------------
       fMomentum.Streamer(R__b);
       fHitMask.Streamer(R__b);
@@ -1804,8 +1806,8 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 
       fVTCH = &fTrkCaloHit;
 
-      // Set the intersection counts to 0 for V15
-      if(R__v == 15) fInterCounts = 0;
+      if(R__v == 15) fInterCounts = 0; // Set the intersection counts to 0 for V15
+      if(R__v  < 17) fTFront = 0.; // added in V17
     } else {
       printf(" >>> ERROR: TStnTrack::Streamer unknown read version = %i. BAIL OUT\n",R__v);
     }
@@ -1952,6 +1954,11 @@ void TStnTrack::Clear(Option_t* Opt) {
   fDx               = 0.0;
   fDy               = 0.0;
   fDz               = 0.0;
+  fT0               = 0.0;
+  fTBack            = 0.0;
+  fTFront           = 0.0;
+  fFitMomErr        = 0.0;
+  fT0Err            = 0.0;
 
   fTrkCaloHit.fID           = -1;
   fTrkCaloHit.fClusterIndex = -1;
