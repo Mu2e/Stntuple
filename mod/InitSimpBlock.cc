@@ -261,8 +261,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
         found |= is_pbar                                             ; // save pbar for reweighting
 
         // Check if this is a relevant particle for tracking studies
-        const bool relevant_track = nhits > 12 && sim->startMomentum().vect().mag() > 70. && (std::abs(pdg_code) == 11 ||
-                                                                                              std::abs(pdg_code) == 13);
+        constexpr float min_relevant_mom = 30.; // the point at which we may reconstruct the track
+        const bool relevant_track = (nhits > 12 &&
+                                     sim->startMomentum().vect().mag() > min_relevant_mom
+                                     && (std::abs(pdg_code) == 11 || std::abs(pdg_code) == 13 || std::abs(pdg_code) == 211));
         if(verbose && !found && relevant_track)
           printf("InitSimpBlock::%s: Relevant Trk SIM: ID = %4i, PDG = %5i, Code = %s\n",
                  __func__, id, pdg_code, sim->creationCode().name().c_str());
