@@ -149,7 +149,7 @@ public:
   int                       fHelixIndex;      // added in V12
   int                       fSeedIndex;
   int                       fMcDirection;     // -1 for upstream, +1 for downstream
-  int                       fInterCounts;     // ST/IPA/OPA intersection (packed)
+  int                       fInterCounts;     // ST/IPA/OPA/TSdA intersection (packed)
   int                       fInt[kNFreeInts]; // provision for future I/O expansion
   
   float                     fChi2;
@@ -251,9 +251,10 @@ public:
   int    NMat         () const { return (fNMatSites      ) & 0xffff; }
   int    NMatActive   () const { return (fNMatSites >> 16) & 0xffff; }
 
-  int    NSTIntersections () const { return (fInterCounts      ) & 0xff;}
-  int    NIPAIntersections() const { return (fInterCounts >>  8) & 0xff;}
-  int    NOPAIntersections() const { return (fInterCounts >> 16) & 0xff;}
+  int    NSTIntersections ()  const { return (fInterCounts      ) & 0xff;}
+  int    NIPAIntersections()  const { return (fInterCounts >>  8) & 0xff;}
+  int    NOPAIntersections()  const { return (fInterCounts >> 16) & 0xff;}
+  int    NTSdAIntersections() const { return (fInterCounts >> 24) & 0xff;}
 
   int    NClusters();
   int    NMcStrawHits() const { return fNMcStrawHits; }

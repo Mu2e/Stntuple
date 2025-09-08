@@ -378,8 +378,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     std::vector<const mu2e::KalIntersection *> kinter_st_foils;
 
     // count relevant intersections along the track extrapolation
-    int nst_inters(0), nipa_inters(0), nopa_inters(0);
-    // Take the first intersection (in time) for each surface (for the ST foil, take the highest Z foil)
+    int nst_inters(0), nipa_inters(0), nopa_inters(0), ntsda_inters(0);
+    // Take the last intersection (in time) for each surface
     for(size_t ikinter = 0; ikinter < kffs->intersections().size(); ++ikinter) {
       auto const& kinter = kffs->intersections()[ikinter];
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::ST_Front) {
@@ -404,6 +404,9 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::OPA) { // count OPA intersections
         ++nopa_inters;
       }
+      if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TSDA) { // count TSdA intersections
+        ++ntsda_inters;
+      }
       if (kinter.surfaceId() == mu2e::SurfaceIdDetail::TT_Front) {
         if(!kinter_front || kinter_front->time() < kinter.time()) kinter_front = &kinter;
       }
@@ -425,7 +428,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     if     (kinter_front   ) { track->fPTrackerEntrance = kinter_front   ->mom(); }
     if     (kinter_mid     ) { track->fPTrackerMiddle   = kinter_mid     ->mom(); }
     if     (kinter_back    ) { track->fPTrackerExit     = kinter_back    ->mom(); }
-    track->fInterCounts = nst_inters | (nipa_inters << 8) | (nopa_inters << 16);
+    track->fInterCounts = nst_inters | (nipa_inters << 8) | (nopa_inters << 16) | (ntsda_inters << 24);
 
     // Decide which intersection to use for the defaults, using the front if available (only Mid available for Online tracks)
     const mu2e::KalIntersection* kinter((kinter_front) ? kinter_front : (kinter_mid) ? kinter_mid : nullptr);
