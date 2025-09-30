@@ -42,8 +42,8 @@ public:
 protected:
 					// backward pointers to the reconstruction objects
 
-  const mu2e::ComboHit*             fHit;
-  const mu2e::StrawDigiMC*          fStrawDigiMC;
+  const mu2e::ComboHit*    fHit;        // "single-straw" combo hit
+  const mu2e::StrawDigiMC* fSdmc;
 
   TEvdStraw*  fStraw;                 // pointer to the straw -  geometry
 
@@ -66,7 +66,7 @@ public:
 
   TEvdStrawHit(const mu2e::ComboHit*        Hit,
 	       TEvdStraw*                   Straw,
-	       const mu2e::StrawDigiMC*     StrawDigiMC,
+	       const mu2e::StrawDigiMC*     Sdmc,
 	       double X, double Y, double Z, 
 	       double                       Wx,
 	       double                       Wy,
@@ -82,7 +82,7 @@ public:
   TVector3*                    Pos()         { return &fPos; }
   TVector2*                    Dir()         { return &fDir; }
   const mu2e::ComboHit*        StrawHit()    { return fHit;  }
-  const mu2e::StrawDigiMC*     StrawDigiMC() { return fStrawDigiMC; }
+  const mu2e::StrawDigiMC*     Sdmc()        { return fSdmc; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------

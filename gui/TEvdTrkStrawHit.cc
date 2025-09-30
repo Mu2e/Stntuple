@@ -28,8 +28,8 @@ ClassImp(stntuple::TEvdTrkStrawHit)
 
 namespace stntuple {
 //_____________________________________________________________________________
-  TEvdTrkStrawHit::TEvdTrkStrawHit(const mu2e::TrkStrawHitSeed* Hit, const mu2e::Straw* Straw): TObject() {
-  fHit = Hit;
+  TEvdTrkStrawHit::TEvdTrkStrawHit(const mu2e::TrkStrawHitSeed* Tshs, const mu2e::Straw* Straw): TObject() {
+  fTshs = Tshs;
 
   fLineW.SetX1(fPos.X()-fStrawDir.X()*fSigW);
   fLineW.SetY1(fPos.Y()-fStrawDir.Y()*fSigW);
@@ -44,7 +44,7 @@ namespace stntuple {
   double zw     = Straw->getMidPoint().z();
   double rw     = Straw->getMidPoint().perp();
 
-  double rdrift = fHit->driftRadius(); // 4.0 ; //
+  double rdrift = fTshs->driftRadius(); // 4.0 ; //
 
   fEllipse.SetX1(zw);
   fEllipse.SetY1(rw);
@@ -83,11 +83,13 @@ void TEvdTrkStrawHit::PaintXY(Option_t* Option) {
 //_____________________________________________________________________________
 void TEvdTrkStrawHit::PaintRZ(Option_t* Option) {
 
-  // if (fHit->isActive()) fEllipse.SetFillColor(kRed-9 );
-  // else                  fEllipse.SetFillColor(kBlue+2);
-
-  fEllipse.SetFillColor(kBlue+2);
-
+  if (fTshs->flag().hasAllProperties(mu2e::StrawHitFlag::active)) {
+    fEllipse.SetFillColor(kBlue-10);
+  }
+  else {
+    fEllipse.SetFillColor(kRed-10);
+  }
+  fEllipse.SetFillStyle(3001);
   fEllipse.Paint(Option);
 }
 

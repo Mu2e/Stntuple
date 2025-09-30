@@ -155,8 +155,8 @@ int TEvdTimeClusterVisNode::InitEvent() {
         int nsh = hit->nStrawHits();
         nshtot += nsh;
         for (int ish=0; ish<nsh; ish++) {
-          int shind = hit->index(ish);
-          const mu2e::ComboHit* sh = &fSschColl->at(shind);
+          // int shind = hit->index(ish);
+          // const mu2e::ComboHit* sh = &fSschColl->at(shind);
           float time = hit->correctedTime();
           if (time < tmin) tmin = time;
           if (time > tmax) tmax = time;

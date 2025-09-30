@@ -134,7 +134,8 @@ void TEvdStraw::PaintRZ(Option_t* Option) {
 
   nhits = fListOfHits->GetEntriesFast();
 //-----------------------------------------------------------------------------
-// the hit drift time is unknown, so just change the color of the straw circle
+// withour a reconstructed track, 
+// the straw hit drift time is unknown, so just change the color of the straw circle
 //-----------------------------------------------------------------------------
   fArc->SetLineColor(1);
   fArc->SetLineWidth(1);
@@ -158,12 +159,15 @@ void TEvdStraw::PaintRZ(Option_t* Option) {
 
   fArc->SetFillStyle(style);
   fArc->Paint(Option);
-
-  if (vm->DisplayStrawDigiMC()) {
-    for (int i=0; i<nhits; i++) {
-      Hit(i)->PaintRZ(Option);
-    }
-  }
+//-----------------------------------------------------------------------------
+// not sure why this is here - the drift time still is not known and one cant do
+// better than just mark the straw as "a straw with hits" (done above)
+//-----------------------------------------------------------------------------
+  // if (vm->DisplayStrawDigiMC()) {
+  //   for (int i=0; i<nhits; i++) {
+  //     Hit(i)->PaintRZ(Option);
+  //   }
+  //  }
 }
 
 //_____________________________________________________________________________
