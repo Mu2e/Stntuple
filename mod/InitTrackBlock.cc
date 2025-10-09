@@ -1092,15 +1092,20 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // define E/P by the first intersection, if it exists, the second in the
 // high-occupancy environment may be unreliable
 //----------------------------------------------------
-    track->fClusterE = -track->fP;
+    track->fClusterE = -1.f;
+    track->fEp       = -1.f;
     track->fDt       = -1.e12;
     track->fDx       = -1.e12;
     track->fDy       = -1.e12;
     track->fDz       = -1.e12;
+    track->fDiskID   = -1;
 
     const mu2e::CaloCluster* calo_cluster = kffs->caloHit().caloCluster().get();
-    if (calo_cluster) track->fClusterE = calo_cluster->energyDep();
-    track->fEp = track->fClusterE/track->fP2;
+    if (calo_cluster) {
+      track->fClusterE = calo_cluster->energyDep();
+      track->fEp = track->fClusterE/track->fP2;
+      track->fDiskID = calo_cluster->diskID();
+    }
 
     const bool use_calo_hit(true); // use calo-hit info vs. intersections
 
