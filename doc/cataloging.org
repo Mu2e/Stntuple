@@ -71,7 +71,7 @@ Use files in /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stnuple/cafdfc/mdc
 - create a github repo , store your catalog there
 - add  https://raw.githubusercontent.com/<username>/<repo_name>/refs/heads/main to the list of Stntuple catalogs in .rootrc 
 - this is it
-- see example at https://Pugithub.com/pavel1murat/data_catalog 
+- see example at https://github.com/pavel1murat/data_catalog 
 ** catalog metadata:                                                         
 
 #+begin_src
