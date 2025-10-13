@@ -20,8 +20,8 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("#-----------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
-    printf("#   I nsh   SID   Flags  Stn:Pln:Pnl:Str     X       Y       Z      Phi   Time    TCorr     E(keV)");
-    printf("  DrTime  PrTime  TRes    WDist     WRes simID      p        pz         PDG     PDG(M) GenID\n");
+    printf("#   i nsh   sid   flags  stn pln pnl str     x       y       z      phi   time    tcorr     e(keV)");
+    printf("  drtime  prtime  tres    wdist     wres simid      p        pz         pdg     pdgm   genid\n");
     printf("#-----------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
   }

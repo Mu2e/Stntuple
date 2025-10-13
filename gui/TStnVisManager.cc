@@ -989,7 +989,7 @@ Int_t TStnVisManager::OpenVRZView() {
   sprintf(name, "vrz_view_%i", n);
   sprintf(title, "VRZ view number %i", n);
 
-  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 500+TEvdFrame::fGroupFrameWidth,1050);
+  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 300+TEvdFrame::fGroupFrameWidth,1050);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
