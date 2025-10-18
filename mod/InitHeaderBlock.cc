@@ -19,6 +19,7 @@
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
 
 // #include "Stntuple/mod/THistModule.hh"
 #include "Offline/MCDataProducts/inc/ProtonBunchIntensity.hh"
@@ -99,6 +100,20 @@ int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
     if (chcH.isValid()) {
       chColl = chcH.product();
       data->fNComboHits = chColl->size();
+    }
+  }
+//-----------------------------------------------------------------------------
+// number of calo hits
+//-----------------------------------------------------------------------------
+  art::Handle< mu2e::CaloHitCollection> calHitsH;
+  const mu2e::CaloHitCollection*        calHits(nullptr);
+
+  if (! fCalHitCollTag.empty()) {
+    AnEvent->getByLabel(fCalHitCollTag,calHitsH);
+
+    if (calHitsH.isValid()) {
+      calHits = calHitsH.product();
+      data->fNCaloHits = calHits->size();
     }
   }
 //-----------------------------------------------------------------------------
