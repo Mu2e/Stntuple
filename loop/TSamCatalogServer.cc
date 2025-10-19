@@ -69,7 +69,7 @@ int TSamCatalogServer::FindDataset(const char* Book, const char* Dataset) {
   cmd = Form("samweb list-definitions --group=mu2e | grep %s | grep .stn$ | grep %s ",Book,Dataset);
   cmd += " | wc -l";
 
-  if (fPrintLevel > 0) printf("FindDataset cmd= %s\n",cmd.Data());
+  if (fPrintLevel > 0) printf("TSamCatalogServer::%s cmd= %s\n", __func__, cmd.Data());
 
   FILE* pipe = gSystem->OpenPipe(cmd.Data(),"r");
   fscanf(pipe,"%i",&nlines);
@@ -77,7 +77,7 @@ int TSamCatalogServer::FindDataset(const char* Book, const char* Dataset) {
   gSystem->ClosePipe(pipe);
   
   found = (nlines > 0);
-  
+  if (fPrintLevel > 0) printf("--> Found = %i\n", found);
   return found;
 }
 
@@ -261,9 +261,10 @@ int TSamCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
 // read AAA_CATALOG.html
 // skip comment, html and empty lines, 
 //-----------------------------------------------------------------------------
-  TString sam_defname = Form("nts.mu2e.%s.%s.stn",Dataset->GetName(),Dataset->GetBook());
-
-  cmd = Form("samweb list-file-locations --dimensions 'dh.dataset %s'",sam_defname.Data());
+  // TString sam_defname = Form("nts.mu2e.%s.%s.stn",Dataset->GetName(),Dataset->GetBook());
+  TString sam_defname = Form("nts.${USER}.%s.%s.stn",Dataset->GetName(),Dataset->GetBook());
+  cmd = Form("DATASET=`samweb list-definitions --group=mu2e | grep %s | grep .stn$ | grep %s | tail -n 1`; ",Dataset->GetBook(),Dataset->GetName());
+  cmd += Form("samweb list-file-locations --dimensions \"dh.dataset ${DATASET}\""); //,sam_defname.Data());
 
   if (fPrintLevel > 0) {
     printf(" DEBUG FILESETS: Retrieving data with: %s\n",cmd.Data());
@@ -274,7 +275,7 @@ int TSamCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
   s_fileset  = Fileset;
   // s_file     = File;
     
-  ListOfFilesets->Add(new TObjString("InitListOfFilesets_fake_fileset")); 
+  ListOfFilesets->Add(new TObjString("InitListOfFilesets_fake_fileset sam ./")); 
   
   FILE* pipe = gSystem->OpenPipe(cmd.Data(),"r");
     
@@ -286,7 +287,10 @@ int TSamCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
     if (fPrintLevel > 0) {
       printf(" DEBUG 1FS: fileset: %s -> %s\n",s_fileset.Data(),fs);
     }
-    
+    // strcat(buf, " sam");
+    if (fPrintLevel > 0) {
+      printf(" DEBUG 1FS: fs = %s, buf = %s\n", fs, buf);
+    }
     ListOfFiles->Add(new TObjString(buf)); 
   }
   gSystem->ClosePipe(pipe);
@@ -427,11 +431,12 @@ int TSamCatalogServer::InitDataset(TStnDataset*     Dataset,
 // retrieve list of filesets and also files in non-Oracle filesets...
 //-----------------------------------------------------------------------------
   TObjArray filesets(100);
-  TObjArray files   (100);
+  TObjArray files   (1000);
 
   InitListOfFilesets(Dataset,Fileset,File,MinRun,MaxRun,&filesets,&files);
 
   n_filesets  = filesets.GetEntries();
+  if (fPrintLevel > 0) printf(" DEBUG inDS: N(filesets) = %i\n", n_filesets);
   //  int n_files = files.GetEntriesFast();
 //-----------------------------------------------------------------------------
 // loop again over the fileset definition lines and parse the information
@@ -445,6 +450,7 @@ int TSamCatalogServer::InitDataset(TStnDataset*     Dataset,
 //  new fileset, make sure we are not adding it twice - loop over the filesets
 //-----------------------------------------------------------------------------
     if (fPrintLevel > 0) {
+      printf(" DEBUG inDS: unparsed line: %s\n", line);
       printf(" DEBUG inDS: line: %s at %s in %s\n",fs,server,directory);
     }
 
@@ -557,6 +563,22 @@ int TSamCatalogServer::InitDataset(TStnDataset*     Dataset,
       } // end loop over files
     }
     else if (strcmp(server,"sam") == 0) {
+      // Test replacing the query with a simple samweb call
+      for(auto o : files) {
+        // line = (char*) ((TObjString*) o)->String().Data();
+        TString line = TString(((TObjString*) o)->String());
+        TString name = line(line.Index(":")+1,line.Sizeof()).Data();
+        name.Replace(name.Index("\t"), 1, "/");
+        size = TString(name(name.Index("\t")+1, name.Sizeof())).Atoi();
+        name = name(0, name.Index("\t"));
+        status = 0;
+        if(fPrintLevel > 0) printf("Line = %s, Name = %s, size = %f\n", line.Data(),
+                                   name.Data(), size);
+        Dataset->AddFile(name.Data(),fs,size,nev,loevt,lorun,hievt,hirun,status);
+      }
+
+    }
+    else if (strcmp(server,"sam") == 0) {
 //-----------------------------------------------------------------------------
 // query Oracle, directory = 
 //-----------------------------------------------------------------------------
@@ -598,7 +620,7 @@ int TSamCatalogServer::InitDataset(TStnDataset*     Dataset,
 	cmd += Form("      and 'tape' in sl.location_type and substr(sl.full_path,1,20) = '/pnfs/cdfen/filesets'\n");
       }
       cmd += Form(";\nEOF\n");
-      
+
       bool queryOk = false;
       int nTries = 0;
 
@@ -678,7 +700,7 @@ int TSamCatalogServer::InitDataset(TStnDataset*     Dataset,
 	  printf("End query output\n");
 	}
 
-	if(!queryOk) sleep(30);
+	if(!queryOk) sleep(1);
 
 	nTries++;
       } // end while loop to get correct query
