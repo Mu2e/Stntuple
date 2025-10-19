@@ -276,8 +276,9 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
 	if (!found)                                     continue;
       }
-      if(verbose) printf("InitSimpBlock::%s: Accepting SIM: ID = %4i, PDG = %5i, Code = %s\n",
-                         __func__, id, pdg_code, sim->creationCode().name().c_str());
+      if(verbose) printf("InitSimpBlock::%s: Accepting SIM: ID = %4i, PDG = %5i, Code = %s, N(hits) = %2i, p(start) = %6.1f, t(start) = %7.1f, t(end) = %7.1f\n",
+                         __func__, id, pdg_code, sim->creationCode().name().c_str(), nhits,
+                         sim->startMomentum().vect().mag(), std::fmod(sim->startGlobalTime(), 1695), std::fmod(sim->endGlobalTime(), 1695));
 
 //-----------------------------------------------------------------------------
 // if primary particle is not defined, or defined incorrectly (!) 
