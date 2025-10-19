@@ -119,6 +119,8 @@ protected:
   string                   fSdwfCollTag;
   art::InputTag            fSdmcCollTag;
 
+  art::InputTag            fCaloHitCollTag;
+
   string                   fCrvRecoPulseCollTag;            //
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
@@ -272,6 +274,8 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fStrawDigiCollTag        (PSet.get<string>        ("strawDigiCollTag"    ))
   , fSdwfCollTag             (PSet.get<string>        ("sdwfCollTag"         ))
   , fSdmcCollTag             (PSet.get<art::InputTag> ("strawDigiMCCollTag"  ))
+
+  , fCaloHitCollTag          (PSet.get<art::InputTag> ("caloHitCollTag"      ))
 
   , fCrvRecoPulseCollTag         (PSet.get<string>    ("crvRecoPulseCollTag"         ))
   , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
@@ -464,6 +468,7 @@ void StntupleMaker::beginJob() {
   fInitHeaderBlock->SetPbiTag(fPbiTag);
   fInitHeaderBlock->SetChCollTag(fChCollTag);
   fInitHeaderBlock->SetShCollTag(fShCollTag);
+  fInitHeaderBlock->SetCalHitCollTag(fCaloHitCollTag);
 
   AddDataBlock("HeaderBlock","TStnHeaderBlock",
 	       fInitHeaderBlock,
