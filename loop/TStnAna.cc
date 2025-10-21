@@ -60,13 +60,13 @@ TStnAna::TStnAna(const char* Filename, const char* Mode) :
 
   Init();
   
-
+  if(fPrintLevel > 1) printf("TStnAna::TStnAna: Filename = %s, Mode = %s\n", Filename, Mode);
   fInputModule = NULL;
   if      (fMode == "run2") {
     TString fn(Filename);
     if( fn.CompareTo("sam",TString::kIgnoreCase)==0  ) {
       // #ifdef STNTUPLE_NOSAM
-      printf("ERROR: SAM requested, but SAM input module is not linked.\n");
+      throw std::runtime_error("ERROR: SAM requested, but SAM input module is not linked.\n");
       // #else
       //       fInputModule = new TStnSamInputModule();
       // #endif
@@ -118,6 +118,7 @@ TStnAna::TStnAna(TStnDataset* Dataset, const char* Mode)  :
 
   Init();
 
+  printf("TStnAna::TStnAna: Dataset = %s, Mode = %s\n", Dataset->GetName(), Mode);
   if      (fMode == "run2") {
     fInputModule = new TStnRun2InputModule(Dataset);
     fInputModule->SetAna(this);
@@ -238,6 +239,7 @@ Int_t TStnAna::SetSplit(Int_t ind, Int_t tot) {
 Int_t TStnAna::AddDataset(TStnDataset* d) {
   int rc(0);
   if(TStnInputModule* inp = GetInputModule()) {
+    if(fPrintLevel > 1) printf("TStnAna::AddDataset: Adding dataset %s\n", d->GetName());
     inp->AddDataset(d);
   } 
   else {

@@ -10,6 +10,10 @@
 #include "TSystem.h"
 #include "TObjArray.h"
 #include "TObjString.h"
+#include "TFile.h"
+#include "TString.h"
+
+#include <set>
 
 #include "Stntuple/base/TCdf2Files.hh"
 #include "Stntuple/base/TStnFileset.hh"
@@ -278,6 +282,7 @@ int TSamCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
   ListOfFilesets->Add(new TObjString("InitListOfFilesets_fake_fileset sam ./")); 
   
   FILE* pipe = gSystem->OpenPipe(cmd.Data(),"r");
+  std::set<TString> found_files;
     
   while (fgets(buf,1000,pipe)) {
     sscanf(buf,"%s",fs);
@@ -291,6 +296,15 @@ int TSamCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
     if (fPrintLevel > 0) {
       printf(" DEBUG 1FS: fs = %s, buf = %s\n", fs, buf);
     }
+    TString name(buf);
+    name.ReplaceAll("enstore:", "");
+    name.ReplaceAll(":", "");
+    name.ReplaceAll("\t", "");
+    if(found_files.contains(name)) {
+      if(fPrintLevel > 0) printf("TSamCatalogServer::%s: Duplicate file found! Name = %s\n", __func__, name.Data());
+      continue;
+    }
+    found_files.insert(name);
     ListOfFiles->Add(new TObjString(buf)); 
   }
   gSystem->ClosePipe(pipe);
@@ -563,18 +577,28 @@ int TSamCatalogServer::InitDataset(TStnDataset*     Dataset,
       } // end loop over files
     }
     else if (strcmp(server,"sam") == 0) {
+      if(fPrintLevel > 0) printf("N(HTML entries) = %i\n", int(fAAAFilesHtml.GetEntries()));
+      loevt = 0; lorun = 0; hievt = 0; hirun = 0; // FIXME: Get from catalog
       // Test replacing the query with a simple samweb call
       for(auto o : files) {
-        // line = (char*) ((TObjString*) o)->String().Data();
         TString line = TString(((TObjString*) o)->String());
         TString name = line(line.Index(":")+1,line.Sizeof()).Data();
+        name.ReplaceAll(":", "");
         name.Replace(name.Index("\t"), 1, "/");
         size = TString(name(name.Index("\t")+1, name.Sizeof())).Atoi();
         name = name(0, name.Index("\t"));
         status = 0;
         if(fPrintLevel > 0) printf("Line = %s, Name = %s, size = %f\n", line.Data(),
                                    name.Data(), size);
-        Dataset->AddFile(name.Data(),fs,size,nev,loevt,lorun,hievt,hirun,status);
+        TFile* f    = TFile::Open(name, "READ"); // FIXME: This info should be from the catalog
+        if(!f) printf("TSamCatalogServer::%s: Failed to open file %s!\n", __func__, name.Data());
+        else {
+          TTree* tree = (TTree*) f->Get("STNTUPLE");
+          nev         = int(tree->GetEntries());
+          f->Close();
+          delete f;
+          Dataset->AddFile(name.Data(),fs,size,nev,loevt,lorun,hievt,hirun,status);
+        }
       }
 
     }
