@@ -274,8 +274,8 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 240, 240,"apr_TwoTrkDe_80m70p_D0200"   ,1));
     trigger_table->AddTrigger(new TStnTrigger( 250, 250,"apr_TwoTrkDe_50"             ,1));
     trigger_table->AddTrigger(new TStnTrigger( 260, 260,"apr_TrkDe_50_D0200"          ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 265, 265,"apr_HlxDe_50"                ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 266, 266,"apr_HlxDe_30"                ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 265, 265,"apr_Hlx_50"                  ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 266, 266,"apr_Hlx_30"                  ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 275, 275,"mpr_TrkDe_80m70p_D0200"      ,1));
 
