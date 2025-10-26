@@ -759,7 +759,8 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
       nhits = evd_trk->NHits();
       for (int ih=0; ih<nhits; ih++) {
 	stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-	float time = hit->TrkStrawHitSeed()->hitTime();
+	// float time = hit->TrkStrawHitSeed()->hitTime();
+	float time = hit->TrkStrawHitSeed()->time();
         float edep = hit->TrkStrawHitSeed()->energyDep();
 	if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
 	  hit->PaintRZ(Option);

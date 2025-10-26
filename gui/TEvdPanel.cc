@@ -33,7 +33,7 @@
 
 #include "Offline/TrackerGeom/inc/Panel.hh"
 //#include "TTrackerGeom/inc/ZLayer.hh"
-#include "Offline/DAQ/inc/TrkPanelMap_t.hh"
+// #include "Offline/DAQ/inc/TrkPanelMap_t.hh"
 
 ClassImp(stntuple::TEvdPanel)
 
