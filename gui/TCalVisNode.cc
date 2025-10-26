@@ -40,9 +40,9 @@
 #include "Offline/CalorimeterGeom/inc/Crystal.hh"
 #include "Offline/CalorimeterGeom/inc/Disk.hh"
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
+// #include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
-ClassImp(TCalVisNode)
+// ClassImp(TCalVisNode)
 
 using namespace stntuple;
 //-----------------------------------------------------------------------------

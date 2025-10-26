@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// 
+// clang-format off
 ///////////////////////////////////////////////////////////////////////////////
 #include "TROOT.h"
 #include "TInterpreter.h"
@@ -30,6 +30,7 @@
 #include "Stntuple/gui/TStnGeoManager.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TEvdStation.hh"
 
 #include "Stntuple/print/Stntuple_print_functions.hh"
@@ -59,12 +60,12 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fTMin                = 0;
   fTMax                = 1.e5;
   fEvent               = nullptr;
-  fBField              = 1.0;                   // in Tesla
 
   fSelectedTimeCluster = nullptr;
   fSelectedPhiCluster  = nullptr;
 
   fDisplayHelices      = 0;
+  fDisplayCosmicSeeds  = 0;
   fDisplayTracks       = 1;
   fDisplayOnlyTCHits   = 0;
   fDisplaySimParticles = 0;                    // dont' want all of them by default
@@ -468,7 +469,7 @@ int TStnVisManager::OpenTrkTZView() {
   TString name1(name);
   name1 += "_1";
   TPad* p1 = (TPad*) c->FindObject(name1);
-  p1->Range(-1600., 0., 1600., fEWLength);
+  p1->Range(-1700.,0., 1700., fEWLength);
   p1->cd();
 
   TStnView* v = FindView(TStnVisManager::kTZ,-1);
@@ -500,8 +501,8 @@ int TStnVisManager::OpenTrkTZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t
   // try to preserve the aspect ratio
   Int_t   xsize, ysize;
 
-  xsize = x2-x1;
-  ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
+  xsize = Mother->GetPx2()-Mother->GetPx1();
+  ysize = Mother->GetPy2()-Mother->GetPy1() + 20;
 
   // TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kTZ, xsize+TEvdFrame::fGroupFrameWidth, ysize);
   xsize = (800./ysize)*xsize;
@@ -988,7 +989,7 @@ Int_t TStnVisManager::OpenVRZView() {
   sprintf(name, "vrz_view_%i", n);
   sprintf(title, "VRZ view number %i", n);
 
-  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 1400+TEvdFrame::fGroupFrameWidth,1000);
+  TEvdFrame* win = new TEvdFrame(name, title, this, TStnVisManager::kVRZ, 300+TEvdFrame::fGroupFrameWidth,1050);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -998,21 +999,35 @@ Int_t TStnVisManager::OpenVRZView() {
 //-----------------------------------------------------------------------------
 // display 12 panels together
 // VRZ: a plane has 6 panels, each panel has a view and is displayed on a separate pad
-// need tracekr as we need position of the panel
+// need tracker as we need position of the panel
 //-----------------------------------------------------------------------------
+  int station(0); // so far, just one for VST
   TStnGeoManager* gm = TStnGeoManager::Instance();
   stntuple::TEvdTracker* vt    = gm->GetTracker();
-  
-  p1->Divide(6, 2);
+  int nfaces  = 4; // 6
+  int np_face = 3; // 2
+  p1->Divide(nfaces, np_face);
 					// ranges in mm
-  for (int iy=0; iy<2; ++iy) {
-    for (int ix=0; ix<6; ++ix) {
-      int ipad = 6*iy+ix; // for now, assume one station , otherwise 12*station + ...
+  for (int face=0; face<nfaces; ++face) {
+    for (int ip=0; ip<np_face; ++ip) {
+      int ipad = nfaces*ip+face;              // for now, assume one station , otherwise 12*station + ...
       p1->cd(ipad+1);
-      stntuple::TEvdPanel* panel = vt->Station(0)->Plane(iy)->Panel(ix);
-
+//-----------------------------------------------------------------------------
+// display sequence: first, 3 panels of zface=0 view, then - zface=1 ...etc
+// pick up the panel by face and the panel number within the face...
+//-----------------------------------------------------------------------------
+      int ipln, ipnl;
+      stntuple::TEvdTracker::ConvertPanelGeoIndices(station,face,ip,ipln,ipnl);
+        
+      stntuple::TEvdPanel* panel = vt->Station(0)->Plane(ipln)->Panel(ipnl);
+//-----------------------------------------------------------------------------
+// this assumes that we are displaying in the local reference frame of the panel
+// less sure about the rotation..
+// in which frame do we want to display ? need to transform tracks 
+//-----------------------------------------------------------------------------
       gPad->Range(panel->Pos()->Z()-40., 350., panel->Pos()->Z()+40., 700.);
-      TStnView* v = (TStnView*) FindView(TStnVisManager::kVRZ,ipad);
+      int geo_id  = 12*station+6*ipln+ipnl;
+      TStnView* v = (TStnView*) FindView(TStnVisManager::kVRZ,geo_id);
       if (v) {
         v->Draw();
         gPad->Modified();
@@ -1267,6 +1282,7 @@ void TStnVisManager::DoCheckButton() {
   else if (id == kDisplayTracks      ) SetDisplayTracks      (status);
   else if (id == kDisplaySimParticles) SetDisplaySimParticles(status);
   else if (id == kDisplayOnlyTCHits  ) SetDisplayOnlyTCHits  (status);
+  else if (id == kDisplayCosmicSeeds ) SetDisplayCosmicSeeds (status);
   else if (id == kDisplaySH          ) SetDisplayStrawHitsXY (status);
   else if (id == kIgnoreComptonHits  ) SetIgnoreComptonHits  (status);
   else if (id == kIgnoreProtonHits   ) SetIgnoreProtonHits   (status);

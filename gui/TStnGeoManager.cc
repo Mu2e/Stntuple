@@ -6,8 +6,6 @@
 // dmg->fGm->GetVolume("HallAir")->Draw("ogl")
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "TGeoManager.h"
-
 #include "Stntuple/gui/TEvdCrvSection.hh"
 #include "Stntuple/gui/TStnGeoManager.hh"
 
@@ -54,7 +52,8 @@ TStnGeoManager::TStnGeoManager(const char* Name, const char* Fn, int UseOriginal
   fListOfDetectors = new TObjArray();
   fListOfDetectors->SetOwner(kTRUE);
 
-  fgInstance = this;
+  fgInstance   = this;
+  fBField      = 1.0;                   // in Tesla
 }
 
 //-----------------------------------------------------------------------------
@@ -935,6 +934,11 @@ int TStnGeoManager::InitCrvGeometry() {
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+const mu2e::TrkPanelMap::Row* TStnGeoManager::PanelMap(int PlaneID, int PanelID) {
+  return fTrackerPanelMap->panel_map_by_offline_ind(PlaneID,PanelID);
+  return nullptr;
+}
 
 //-----------------------------------------------------------------------------
 int TStnGeoManager::InitTrackerGeometry() {

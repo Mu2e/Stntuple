@@ -26,22 +26,24 @@
 // #include "TrackerGeom/inc/Sector.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
+#include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Offline/TrackerGeom/inc/Panel.hh"
 //#include "TTrackerGeom/inc/ZLayer.hh"
+#include "Offline/DAQ/inc/TrkPanelMap_t.hh"
 
 ClassImp(stntuple::TEvdPanel)
 
-namespace {
-  static int fgLocalDebug = 0;
-}
+int stntuple::TEvdPanel::fgDebugLevel(0);
 
 namespace stntuple {
 //_____________________________________________________________________________
 TEvdPanel::TEvdPanel(): TObject() {
   fVisible      = 0;
+  fMnID         = -1;
 }
 
 //_____________________________________________________________________________
@@ -51,32 +53,82 @@ TEvdPanel::TEvdPanel(): TObject() {
   fNLayers = Panel->nLayers();
   fPanel   = Panel;
   fVisible = 1;
+
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(Plane->ID(),ID); // plane ID : 0-35 (???)
+  if (tpm) fMnID              = tpm->mnid();
 					// assume that the number of straws is the same
   int id;
 
   int nst = Panel->nStraws();
   fListOfStraws = new TObjArray(nst);
 
-
+  mu2e::StrawId pid = Panel->id();
+  if (TEvdPanel::fgDebugLevel != 0) {
+    printf("--- station, plane, panel: %3i %3i %3i\n",
+           pid.getStation(),pid.getPlane(),pid.getPanel());
+  } 
   for (uint16_t ist=0; ist<nst; ist++) {
     const mu2e::Straw* straw = &Panel->getStraw(ist);
 
     id           = straw->id().asUint16();
-    
     int ill      = straw->id().getLayer();
     int iss      = straw->id().getStraw();
-    int ipp      = straw->id().getPanel();
-    int istation = straw->id().getStation();
 
-    if (fgLocalDebug != 0) {
-      printf(" station, panel, layer, straw, z : %3i %3i %3i %3i %10.3f\n",
-	     istation, ipp, ill, iss, straw->getMidPoint().z());
+    if (TEvdPanel::fgDebugLevel & 0x1) {
+      printf(" layer, straw, z : %3i %3i %10.3f\n",ill,iss,straw->getMidPoint().z());
     }
 
     TEvdStraw* evd_straw = new TEvdStraw(id,straw,this,Tracker);
     fListOfStraws->Add(evd_straw);
   }
 
+  if (TEvdPanel::fgDebugLevel & 0x2) {
+//-----------------------------------------------------------------------------
+// print rotation matrix and offset ?
+//-----------------------------------------------------------------------------
+    printf("origin: %10.4f  %10.4f  %10.4f \n",
+           Panel->origin().x(),Panel->origin().y(),Panel->origin().z());
+      
+    printf("udir: %10.4f  %10.4f  %10.4f \n",
+           Panel->uDirection().x(),Panel->uDirection().y(),Panel->uDirection().z());
+      
+    printf("vdir: %10.4f  %10.4f  %10.4f \n",
+           Panel->vDirection().x(),Panel->vDirection().y(),Panel->vDirection().z());
+      
+    printf("wdir: %10.4f  %10.4f  %10.4f \n",
+           Panel->wDirection().x(),Panel->wDirection().y(),Panel->wDirection().z());
+  }
+//-----------------------------------------------------------------------------
+// build the transformation matrix
+//-----------------------------------------------------------------------------
+  double phiy   = atan2(Panel->vDirection().y(),Panel->vDirection().x())*180./M_PI;
+  double phix   = phiy-90;
+  double phiz   = 0;
+  double thetax = 90;
+  double thetay = 90;
+  double thetaz =  0;
+  if (Panel->wDirection().z() < 0) {
+    phix   = phix+180;
+  }
+
+  // if ((pid.getPlane() % 2) == 1) {
+  //   if ((pid.getPanel() % 2) == 0) {
+  //     phix   = phix+180;
+  //     phiy   = phiy+180;
+  //   }
+  // }
+  // else {
+  //   if ((pid.getPanel() % 2) == 1) {
+  //     phix   = phix+180;
+  //     phiy   = phiy+180;
+  //   }
+  // }
+
+  TGeoRotation* r = new TGeoRotation("a",thetax,phix,thetay,phiy,thetaz,phiz);
+
+  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),0,0,0,r);
+  
   TVector3* p0  = Straw( 0)->Pos();
   TVector3* p95 = Straw(95)->Pos();
 

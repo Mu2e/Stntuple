@@ -22,8 +22,8 @@
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
-#include "Offline/TrackerConditions/inc/StrawResponse.hh"
+// #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+// #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/DataProducts/inc/StrawId.hh"
@@ -105,7 +105,9 @@ int TEvdTimeClusterVisNode::InitEvent() {
 							<< fPcCollTag << " not found";
     fPcColl = nullptr;
   }
-
+//-----------------------------------------------------------------------------
+// combo hit and single straw combo hit collections
+//-----------------------------------------------------------------------------
   art::Handle<mu2e::ComboHitCollection> chcH;
   event->getByLabel(art::InputTag(fChCollTag), chcH);
   if (chcH.isValid()) fChColl = chcH.product();
@@ -116,15 +118,15 @@ int TEvdTimeClusterVisNode::InitEvent() {
     fChColl = nullptr;
   }
 
-  // art::Handle<mu2e::StrawHitFlagCollection> chfcH;
-  // event->getByLabel(art::InputTag(fChfCollTag), chfcH);
-  // if (chfcH.isValid()) fChfColl = chfcH.product();
-  // else {
-  //   mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
-  //       						<< " : mu2e::StrawHitFlagHitCollection " 
-  //       						<< fChfCollTag << " not found";
-  //   fChfColl = nullptr;
-  // }
+  art::Handle<mu2e::ComboHitCollection> sschcH;
+  event->getByLabel(art::InputTag(fSschCollTag), sschcH);
+  if (sschcH.isValid()) fSschColl = sschcH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::ComboHitCollection " 
+							<< fSschCollTag << " not found";
+    fSschColl = nullptr;
+  }
 //-----------------------------------------------------------------------------
 // initialize time clusters
 //-----------------------------------------------------------------------------
@@ -139,9 +141,10 @@ int TEvdTimeClusterVisNode::InitEvent() {
     tc    = &fTcColl->at(i);
 //-----------------------------------------------------------------------------
 // time clusters are made out of combo hits, define tmax, tmin
+// however, define TMin and TMax by the combined straw hits 
 //-----------------------------------------------------------------------------
-    int nch = tc->nhits();
-    
+    int nch    = tc->nhits();
+    int nshtot = 0;
     double t0(-1.), tmin(1.e6), tmax(-1), zmin(1.e6), zmax(-1.), phimin(1.e6), phimax(-1.e6);
 
     if (fChColl != nullptr) {
@@ -149,18 +152,24 @@ int TEvdTimeClusterVisNode::InitEvent() {
       for (int ih=0; ih<nch; ih++) {
 	int ind = tc->hits().at(ih);
 	const mu2e::ComboHit* hit = &fChColl->at(ind);
-	float time = hit->correctedTime();
-	if (time < tmin) tmin = time;
-	if (time > tmax) tmax = time;
+        int nsh = hit->nStrawHits();
+        nshtot += nsh;
+        for (int ish=0; ish<nsh; ish++) {
+          // int shind = hit->index(ish);
+          // const mu2e::ComboHit* sh = &fSschColl->at(shind);
+          float time = hit->correctedTime();
+          if (time < tmin) tmin = time;
+          if (time > tmax) tmax = time;
 
-        sumt += time;
+          sumt += time;
+        }
 
 	float z = hit->pos().z();
 	if (z < zmin) zmin = z;
 	if (z > zmax) zmax = z;
       }
 
-      t0 = sumt/(nch+1e-12);
+      t0 = sumt/(nshtot+1e-12);
     }
     else {
       tmin =     0;

@@ -12,7 +12,10 @@ include_directories(
 # link_directories($ENV{ROOTSYS}/lib)
 
 set (include_files
-  DisplayMu2eGeometry.hh TCalView.hh TCalVisNode.hh TCrvView.hh TCrvVisNode.hh
+  DisplayMu2eGeometry.hh TCalView.hh
+  TCalVisNode.hh
+  # TCalVisNodeA.hh
+  TCrvView.hh TCrvVisNode.hh
   TEvdCalSection.hh TEvdCluster.hh TEvdComboHit.hh TEvdCrvBar.hh TEvdCrvSection.hh
   TEvdCrystal.hh TEvdHelixSeed.hh TEvdHelixVisNode.hh TEvdMainFrame.hh
   TEvdPanel.hh TEvdPanelVisNode.hh TEvdPlane.hh
@@ -21,7 +24,9 @@ set (include_files
   TEvdTrack.hh TEvdCosmicTrack.hh
   TEvdTrkStrawHit.hh TEventDisplayUtils.hh THeaderVisNode.hh TMcTruthVisNode.hh
   TMu2eBField.hh TEvdFrame.hh TStnGeoManager.hh TStnVisManager.hh
-  TStnVisNode.hh TTrkVisNode.hh
+  TStnVisNode.hh
+#  TStnVisNodeA.hh
+  TTrkVisNode.hh
   TEvdPanelVisNode.hh
 )
 
@@ -30,7 +35,10 @@ ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 set (source_files
-  DisplayMu2eGeometry.cc TCalView.cc TCalVisNode.cc TCrvView.cc TCrvVisNode.cc
+  DisplayMu2eGeometry.cc
+  TCalView.cc TCalVisNode.cc
+  # TCalVisNodeA.cc
+  TCrvView.cc TCrvVisNode.cc
   TEvdCalSection.cc TEvdCluster.cc TEvdComboHit.cc TEvdCrvBar.cc TEvdCrvSection.cc
   TEvdCrystal.cc
   TEvdHelixSeed.cc TEvdHelixVisNode.cc
@@ -41,7 +49,9 @@ set (source_files
   TEvdTrkStrawHit.cc TEventDisplayUtils.cc THeaderVisNode.cc TMcTruthVisNode.cc
   TEvdTimeCluster.cc TEvdTimeClusterVisNode.cc
   TEvdTrack.cc TEvdCosmicTrack.cc
-  TMu2eBField.cc TEvdFrame.cc TStnGeoManager.cc TStnVisManager.cc TStnVisNode.cc
+  TMu2eBField.cc TEvdFrame.cc TStnGeoManager.cc TStnVisManager.cc
+  TStnVisNode.cc
+#  TStnVisNodeA.cc
   TTrkVisNode.cc
   TEvdPanelVisNode.cc
 )

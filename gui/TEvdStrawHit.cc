@@ -41,7 +41,7 @@ TEvdStrawHit::TEvdStrawHit() {
 //-----------------------------------------------------------------------------
 TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
 			   TEvdStraw*               Straw,
-			   const mu2e::StrawDigiMC* StrawDigiMC,
+			   const mu2e::StrawDigiMC* Sdmc,
 			   double X, double Y, double Z, 
 			   double                   Wx,
 			   double                   Wy,
@@ -51,7 +51,7 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
 			   int                      Color): 
   TObject(),
   fHit(Hit),
-  fStrawDigiMC(StrawDigiMC),
+  fSdmc(Sdmc),
   fStraw(Straw),
   fPos(X,Y,Z),
   fDir(Wx,Wy),
@@ -89,12 +89,12 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
   const CLHEP::Hep3Vector* mid_point = &fStraw->GetStraw()->getMidPoint();
   
   double rdrift(0.);
-  if (fStrawDigiMC) {
-    if (fStrawDigiMC->wireEndTime(mu2e::StrawEnd::cal) < fStrawDigiMC->wireEndTime(mu2e::StrawEnd::hv)) {
-      rdrift = 5.; // fStrawDigiMC->driftDistance(mu2e::StrawEnd::cal);
+  if (fSdmc) {
+    if (fSdmc->wireEndTime(mu2e::StrawEnd::cal) < fSdmc->wireEndTime(mu2e::StrawEnd::hv)) {
+      rdrift = 5.; // fSdmc->driftDistance(mu2e::StrawEnd::cal);
     }
     else {
-      rdrift = 5.; // fStrawDigiMC->driftDistance(mu2e::StrawEnd::hv);
+      rdrift = 5.; // fSdmc->driftDistance(mu2e::StrawEnd::hv);
     }
   }
       
@@ -103,8 +103,8 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
   fEllipse.SetR1(rdrift);
   fEllipse.SetR2(rdrift);
   fEllipse.SetFillStyle(3003);
-  fEllipse.SetFillColor(kBlue+2);
-  fEllipse.SetLineColor(kBlue+2);
+  fEllipse.SetFillColor(kBlue-10);
+  fEllipse.SetLineColor(kBlue-10);
 }
 
 //-----------------------------------------------------------------------------
@@ -138,8 +138,13 @@ void TEvdStrawHit::PaintXY(Option_t* Option) {
 
 //_____________________________________________________________________________
 void TEvdStrawHit::PaintRZ(Option_t* Option) {
-  fEllipse.SetFillColor(kBlue+2);
-  fEllipse.SetFillStyle(3001);
+  if (fHit->flag().hasAllProperties(mu2e::StrawHitFlag::active)) {
+    fEllipse.SetFillColor(kBlue-10);
+  }
+  else {
+    fEllipse.SetFillColor(kRed-10);
+  }
+  fEllipse.SetFillStyle(3004);
   fEllipse.Paint(Option);
 }
 
@@ -181,11 +186,13 @@ void TEvdStrawHit::Print(Option_t* Option) const {
 
   const mu2e::StrawGasStep* step(nullptr);
 
-  if (fStrawDigiMC->wireEndTime(mu2e::StrawEnd::cal) < fStrawDigiMC->wireEndTime(mu2e::StrawEnd::hv)) {
-    step = fStrawDigiMC->strawGasStep(mu2e::StrawEnd::cal).get();
-  }
-  else {
-    step = fStrawDigiMC->strawGasStep(mu2e::StrawEnd::hv ).get();
+  if (fSdmc) { 
+    if (fSdmc->wireEndTime(mu2e::StrawEnd::cal) < fSdmc->wireEndTime(mu2e::StrawEnd::hv)) {
+      step = fSdmc->strawGasStep(mu2e::StrawEnd::cal).get();
+    }
+    else {
+      step = fSdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
+    }
   }
 
   int flags = *((int*) &fHit->flag());

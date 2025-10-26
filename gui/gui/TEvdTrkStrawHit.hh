@@ -12,7 +12,7 @@
 #include "TVector2.h"
 #include "TLine.h"
 
-#include "canvas/Persistency/Provenance/ProductID.h"
+// #include "canvas/Persistency/Provenance/ProductID.h"
 
 #include "Offline/TrackerGeom/inc/Straw.hh"
 
@@ -31,7 +31,7 @@ public:
 
 protected:
 
-  const mu2e::TrkStrawHitSeed* fHit;
+  const mu2e::TrkStrawHitSeed* fTshs;
   TEvdStraw*                   fStraw;
 
   int        fMask;			// hit mask
@@ -49,13 +49,13 @@ public:
 // constructors and destructor
 //-----------------------------------------------------------------------------
   TEvdTrkStrawHit() {}
-  TEvdTrkStrawHit(const mu2e::TrkStrawHitSeed* Hit, const mu2e::Straw* Straw);
+  TEvdTrkStrawHit(const mu2e::TrkStrawHitSeed* Tshs, const mu2e::Straw* Straw);
 
   virtual ~TEvdTrkStrawHit();
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  const mu2e::TrkStrawHitSeed*  TrkStrawHitSeed() { return fHit; }
+  const mu2e::TrkStrawHitSeed*  TrkStrawHitSeed() { return fTshs; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------

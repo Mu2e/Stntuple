@@ -5,11 +5,12 @@
 #define Stntuple_gui_TEvdPanel_hh
 
 #include "Gtypes.h"
-#include "TClonesArray.h"
-#include "TH1.h"
-#include "TPad.h"
-#include "TArc.h"
+// #include "TClonesArray.h"
+// #include "TH1.h"
+// #include "TPad.h"
+// #include "TArc.h"
 #include "TVector3.h"
+#include "TGeoMatrix.h"
 
 namespace mu2e {
   class Panel;
@@ -26,6 +27,7 @@ public:
   
 protected:
   int                fID;
+  int                fMnID;             // panel Minnesota ID
   int                fVisible;
   int                fNLayers;
   TObjArray*         fListOfStraws;
@@ -34,6 +36,9 @@ protected:
   TEvdPlane*         fPlane; 		// backward pointer
   const mu2e::Panel* fPanel;
 
+  TGeoCombiTrans*    fCombiTrans;       // rotate, then translate
+
+  static int         fgDebugLevel;
 public:
 //-----------------------------------------------------------------------------
 // constructors and destructor
@@ -45,19 +50,23 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  int          NLayers     () { return fNLayers;    }
-  int          NStraws     () { return fListOfStraws->GetEntriesFast(); }
-  int          Visible     () { return fVisible;    }
+  TGeoCombiTrans* GetCombiTrans() { return fCombiTrans; }
+  int             NLayers      () { return fNLayers;    }
+  int             MnID         () { return fMnID;       }
+  int             NStraws      () { return fListOfStraws->GetEntriesFast(); }
+  int             Visible      () { return fVisible;    }
 
-  TEvdStraw* Straw  (int I) { 
-    return (TEvdStraw*) fListOfStraws->UncheckedAt(I); 
-  }
+  TEvdStraw* Straw  (int I) { return (TEvdStraw*) fListOfStraws->UncheckedAt(I); }
 
-  TVector3*    Pos() { return &fPos; };         // position of the center
+  TVector3*  Pos() { return &fPos; };         // position of the panel center
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
+  static void SetDebugLevel(int Level) { fgDebugLevel = Level; }
+  
   void SetVisible(int YesNo) { fVisible = YesNo; }
+  void SetMnID   (int ID   ) { fMnID    = ID;    }
+  
   //  virtual void  Draw    (Option_t* option = "");
 
   virtual void  Paint   (Option_t* option = "");

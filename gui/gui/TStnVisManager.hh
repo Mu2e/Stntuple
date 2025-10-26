@@ -42,7 +42,8 @@ public:
     kCal       =  5,
     kCrv       =  6,
     kVST       =  7,			// VST view
-    kVRZ       =  8			// VST RZ view
+    kVRZ       =  8,                    // VST RZ view
+    kVYZ       =  9			// VST YZ view
   };
 
 //-----------------------------------------------------------------------------
@@ -119,14 +120,12 @@ protected:
   float               fEWLength;        // event window length, ns 
   float               fMbTime;
 
-  float               fBField;          // by defautl , 1 T, but could be less. Need to know to display straight
-                                        // cosmics
-
   int                 fDisplayStrawDigiMC;
   int                 fDisplayStrawHitsXY;
 
   int                 fDisplayHelices; 
   int                 fDisplayTracks; 
+  int                 fDisplayCosmicSeeds;  // 0 by default
   int                 fDisplaySimParticles; 
   int                 fDisplayOnlyTCHits;   // will be useless longer term, as the time cluster should 
                                             // include all hits within the time interval, 
@@ -134,6 +133,8 @@ protected:
   int                 fIgnoreComptonHits;   // 1: do not show hits marked as 'compton'(flag='bgr')
   int                 fIgnoreProtonHits;    // 1: do not show hits marked as 'proton' (no 'energysel' flag)
   int                 fIgnoreProtons;       // 1: do not show trajectories of MC proton (too many)
+
+  std::vector<int>    fListOfVisibleStations; // length should be 18
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -156,7 +157,6 @@ public:
 
   TSubdetector*  GetClosestSubdetector() { return fClosestSubdetector; }
   TExtrapolator* GetExtrapolator() { return fExtrapolator; }
-
   TObjArray*     GetListOfDetectors() { return fListOfDetectors; }
 
   void           AddDetector(TObject* det) { fListOfDetectors->Add(det); }
@@ -166,8 +166,8 @@ public:
   stntuple::TEvdTimeCluster*  SelectedTimeCluster() { return fSelectedTimeCluster; }
   stntuple::TEvdTimeCluster*  SelectedPhiCluster () { return fSelectedPhiCluster;  }
 
-  float          MbTime() { return fMbTime; }
-  float          BField() { return fBField; }
+  float          MbTime  () { return fMbTime  ; }
+  float          EWLength() { return fEWLength; }
 
   void           GetTimeWindow(float& TMin, float& TMax) {
     TMin = fTMin;
@@ -180,6 +180,7 @@ public:
   int            DisplayStrawDigiMC () const { return fDisplayStrawDigiMC ; }
   int            DisplayStrawHitsXY () const { return fDisplayStrawHitsXY ; }
   int            DisplayTracks      () const { return fDisplayTracks      ; }
+  int            DisplayCosmicSeeds () const { return fDisplayCosmicSeeds ; }
   
   int            IgnoreComptonHits  () const { return fIgnoreComptonHits  ; }
   int            IgnoreProtonHits   () const { return fIgnoreProtonHits   ; }
@@ -205,6 +206,7 @@ public:
   void           SetDisplayStrawHitsXY (int Flag) { fDisplayStrawHitsXY  = Flag; }
   void           SetDisplayHelices     (int Flag) { fDisplayHelices      = Flag; }
   void           SetDisplayTracks      (int Flag) { fDisplayTracks       = Flag; }
+  void           SetDisplayCosmicSeeds (int Flag) { fDisplayCosmicSeeds  = Flag; }
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
   void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
 
@@ -231,7 +233,6 @@ public:
   void   SetMaxEDep(float E) override { fMaxEDep = E; }
 
   void  SetMbTime(float MbTime) { fMbTime = MbTime; } // *FIXME* almost the same meaning with EWLength
-  void  SetBField(float BField) { fBField = BField; }
 //-----------------------------------------------------------------------------
 // print functions
 //-----------------------------------------------------------------------------

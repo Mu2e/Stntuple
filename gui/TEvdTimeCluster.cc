@@ -42,7 +42,7 @@
 #include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "CLHEP/Vector/ThreeVector.h"
+// #include "CLHEP/Vector/ThreeVector.h"
 
 ClassImp(stntuple::TEvdTimeCluster)
 
@@ -123,16 +123,21 @@ void TEvdTimeCluster::PaintXY(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
-// make sure the width is not too small, so one could click and select a cluster
+// make sure the time cluster width is never too small to click on it
+// 6 pixels should be enough
 //-----------------------------------------------------------------------------
 void TEvdTimeCluster::PaintTZ(Option_t* Option) {
 
-  int y1  = gPad->YtoAbsPixel(fTMin);
-  int y2  = gPad->YtoAbsPixel(fTMax);
-  if (fabs(y1-y2) < 5) {
-    float scale = fabs(fTMax-fTMin)/(fabs(y1-y2)+1.e-12);
-    float t1 = (fTMin+fTMax)/2.-2.5*scale;
-    float t2 = (fTMin+fTMax)/2.+2.5*scale;
+  int py1  = gPad->YtoAbsPixel(fTMin);
+  int py2  = gPad->YtoAbsPixel(fTMax);
+  if (fabs(py1-py2) < 6) {
+                                        // scale of the view
+    double tmean = (fTMin+fTMax)/2.;
+    py1  = gPad->YtoAbsPixel(tmean-1000);
+    py2  = gPad->YtoAbsPixel(tmean+1000);
+    double scale = 2000/(fabs(py2-py1)+1.e-12);
+    double t1    = (fTMin+fTMax)/2.-3*scale;
+    double t2    = (fTMin+fTMax)/2.+3*scale;
     fBox->SetY1(t1);
     fBox->SetY2(t2);
   }

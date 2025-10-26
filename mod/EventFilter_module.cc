@@ -27,6 +27,7 @@ namespace mu2e {
   class EventFilter : public art::EDFilter {
   protected: 
     vector<int>       _eventList;  // 3 numbers per event: [run, subrun, event]
+    int               _diagLevel;
     int               _printFreq;
 
     int               _nevents;
@@ -45,10 +46,20 @@ namespace mu2e {
   EventFilter::EventFilter(fhicl::ParameterSet const& pset)
     : art::EDFilter(pset),
       _eventList(pset.get<vector<int>>("eventList")),
+      _diagLevel(pset.get<int>        ("diagLevel")),
       _printFreq(pset.get<int>        ("printFreq"))
   {
-    _nevents = _eventList.size()/3;
     _npassed = 0;
+    _nevents = _eventList.size()/3;
+    if (_diagLevel & 0x1) {
+      uint32_t run, srn,evt;
+      for (int i=0; i<_nevents; i++) {
+	run    = _eventList[3*i+0];
+	srn    = _eventList[3*i+1];
+	evt    = _eventList[3*i+2];
+        printf("run:subrun:event: %06i:%06i:%08i\n",run,srn,evt);
+      }
+    }
   }
 
 

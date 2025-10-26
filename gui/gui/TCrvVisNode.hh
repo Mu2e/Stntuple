@@ -76,20 +76,22 @@ public:
   void	SetMinPulsePEs(float minPulsePEs){ fMinPulsePEs = minPulsePEs; }
   void	SetTimeWindow(float timeLow, float timeHigh);
 //-----------------------------------------------------------------------------
+// Overloaded methods of TStnVisNode
+//-----------------------------------------------------------------------------
+  virtual void  PaintCrv(Option_t* option = "");
+  
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
+//-----------------------------------------------------------------------------
 // Overloaded methods of TVisNode
 //-----------------------------------------------------------------------------
   virtual int   InitEvent();
   void	        UpdateEvent();
-  
-  virtual void  PaintCrv(Option_t* option = "") override;
-  
-  virtual void  PaintXY  (Option_t* option = "") override;
-  virtual void  PaintRZ  (Option_t* option = "") override;
-  virtual void  PaintTZ  (Option_t* option = "") override;
-  virtual void  PaintPhiZ(Option_t* option = "") override;
-  virtual void  PaintCal (Option_t* option = "") override;
-  virtual void  PaintVST (Option_t* option = "") override;
-  virtual void  PaintVRZ (Option_t* option = "") override;
 //-----------------------------------------------------------------------------
 // Overloaded methods of TObject
 //-----------------------------------------------------------------------------

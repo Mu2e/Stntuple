@@ -79,18 +79,18 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TVisNode
 //-----------------------------------------------------------------------------
-  virtual int  InitEvent() override;
+  virtual int  InitEvent();
 
   virtual void NodePrint(const void* Object, const char* ClassName) ;
 
-  virtual void  PaintCal (Option_t* option = "") override;
-  virtual void  PaintCrv (Option_t* option = "") override;
-  virtual void  PaintPhiZ(Option_t* option = "") override;
-  virtual void  PaintRZ  (Option_t* option = "") override;
-  virtual void  PaintTZ  (Option_t* option = "") override;
-  virtual void  PaintVST (Option_t* option = "") override;
-  virtual void  PaintVRZ (Option_t* option = "") override;
-  virtual void  PaintXY  (Option_t* option = "") override;
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintCrv (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "");
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

@@ -27,14 +27,14 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+// #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/DataProducts/inc/StrawId.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
-#include "Offline/RecoDataProducts/inc/KalSegment.hh"
+// #include "Offline/RecoDataProducts/inc/KalSegment.hh"
 #include "Offline/RecoDataProducts/inc/CosmicTrackSeed.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
@@ -241,7 +241,7 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // CosmicTrackSeeds
 //-----------------------------------------------------------------------------
-  fKsColl = nullptr;
+//  fKsColl = nullptr;
   // an empty coll tag is not worth a warning
   if (fCtsCollTag != "") {
     art::Handle<mu2e::CosmicTrackSeedCollection> ctscH;
@@ -663,12 +663,14 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       evd_trk = GetEvdTrack(i);
       evd_trk->Paint(Option);
     }
+  }
 
+  if (vm->DisplayCosmicSeeds()) {
     stntuple::TEvdCosmicTrack* evd_ctrk;
-                                        // tracks
+                                        // cosmic seeds
     int nctrk(0);
     if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
-
+    
     for (int i=0; i<nctrk; i++ ) {
       evd_ctrk = GetEvdCosmicTrack(i);
       evd_ctrk->PaintXY(Option);
@@ -987,50 +989,61 @@ void TTrkVisNode::PaintVST(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
-// VST view : display all straws 
+// VST view : display all straws in the local panel ref systems
+// display tracks and track hits - how to decide which hits should not be displayed in which view ?
+// hit "knows" its panel
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintVRZ(Option_t* Option) {
-
-//-----------------------------------------------------------------------------
-// display tracks and track hits
-//-----------------------------------------------------------------------------
   TStnVisManager* vm = TStnVisManager::Instance();
+  TStnView*       cv = vm->GetCurrentView();
+  
   if (vm->DisplayTracks()) {
-    // int ntrk(0);
-    // if (fListOfTracks != nullptr) ntrk = fListOfTracks->GetEntriesFast();
+    int ntrk(0);
+    if (fListOfTracks != nullptr) ntrk = fListOfTracks->GetEntriesFast();
 
-    // for (int i=0; i<ntrk; i++ ) {
-    //   stntuple::TEvdTrack* evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
-    //   evd_trk->Paint(Option);
+    const mu2e::Panel* panel = (const mu2e::Panel*) cv->GetMother();
+    int pln = panel->id().getPlane();
+    int pnl = panel->id().getPanel();
+    
+    for (int i=0; i<ntrk; i++ ) {
+      stntuple::TEvdTrack* evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
+      evd_trk->PaintVRZ(Option);
 
-    //   nhits = evd_trk->NHits();
-    //   for (int ih=0; ih<nhits; ih++) {
-    //     stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-    //     float time = hit->TrkStrawHitSeed()->hitTime();
-    //     float edep = hit->TrkStrawHitSeed()->energyDep();
-    //     if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
-    //       hit->PaintRZ(Option);
-    //     }
-    //   }
-    // }
-    // cosmic tracks
+      int nhits = evd_trk->NHits();
+      for (int ih=0; ih<nhits; ih++) {
+        stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
+        //     float time = hit->TrkStrawHitSeed()->hitTime();
+        //     float edep = hit->TrkStrawHitSeed()->energyDep();
+        // if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
+        const mu2e::TrkStrawHitSeed* hs = hit->TrkStrawHitSeed();
+        if ((hs->strawId().getPlane() == pln) and (hs->strawId().getPanel() == pnl)) {
+          hit->PaintRZ(Option);
+        }
+        //     }
+      }
+    }
 
-    int nctrk(0);
-    if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
+    if (vm->DisplayCosmicSeeds()) {
+//-----------------------------------------------------------------------------
+// cosmic tracks (?) seeds (?)
+//-----------------------------------------------------------------------------
+      int nctrk(0);
+      if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
 
-    for (int i=0; i<nctrk; i++ ) {
-      stntuple::TEvdCosmicTrack* evd_ctrk = (stntuple::TEvdCosmicTrack*) fListOfCosmicTracks->At(i);
-      evd_ctrk->PaintVRZ(Option);
+      for (int i=0; i<nctrk; i++ ) {
+        stntuple::TEvdCosmicTrack* evd_ctrk = (stntuple::TEvdCosmicTrack*) fListOfCosmicTracks->At(i);
+        evd_ctrk->PaintVRZ(Option);
 
-      // int nhits = evd_ctrk->NHits();
-      // for (int ih=0; ih<nhits; ih++) {
-      //   stntuple::TEvdTrkStrawHit* hit = evd_ctrk->Hit(ih);
-      //   float time = hit->TrkStrawHitSeed()->hitTime();
-      //   float edep = hit->TrkStrawHitSeed()->energyDep();
-      //   if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
-      //     hit->PaintRZ(Option);
-      //   }
-      // }
+        // int nhits = evd_ctrk->NHits();
+        // for (int ih=0; ih<nhits; ih++) {
+        //   stntuple::TEvdTrkStrawHit* hit = evd_ctrk->Hit(ih);
+        //   float time = hit->TrkStrawHitSeed()->hitTime();
+        //   float edep = hit->TrkStrawHitSeed()->energyDep();
+        //   if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
+        //     hit->PaintRZ(Option);
+        //   }
+        // }
+      }
     }
   }
 

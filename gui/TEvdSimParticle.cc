@@ -27,14 +27,14 @@
 #include "TDatabasePDG.h"
 
 
-#include "BTrk/KalmanTrack/KalRep.hh"
+// #include "BTrk/KalmanTrack/KalRep.hh"
 
-#include "art/Framework/Principal/Handle.h"
+// #include "art/Framework/Principal/Handle.h"
 
-#include "BTrk/KalmanTrack/KalRep.hh"
+// #include "BTrk/KalmanTrack/KalRep.hh"
 
-#include "BTrk/TrkBase/HelixParams.hh"
-#include "BTrk/TrkBase/HelixTraj.hh"
+// #include "BTrk/TrkBase/HelixParams.hh"
+// #include "BTrk/TrkBase/HelixTraj.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
@@ -48,8 +48,9 @@
 #include "Stntuple/obj/TSimParticle.hh"
 
 #include "Stntuple/gui/TEvdSimParticle.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
-#include "Stntuple/gui/TEvdTrkStrawHit.hh"
+// #include "Stntuple/gui/TEvdTrkStrawHit.hh"
 
 #include "Stntuple/print/TAnaDump.hh"
 
@@ -85,6 +86,7 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   fS2     = S2;
 
   TStnVisManager* vm = TStnVisManager::Instance();
+  TStnGeoManager* gm = TStnGeoManager::Instance();
 
   TDatabasePDG* pdb = TDatabasePDG::Instance();
 
@@ -112,10 +114,10 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   x0 = fS1->startPosition().x();	// in mm
   y0 = fS1->startPosition().y();
 
-  if (vm->BField() != 0) {
+  if (gm->BField() != 0) {
 					// rely on particle traveling along the Z axis
     pt = fS1->momentum().Rho();
-    r  = pt/2.9979*10/vm->BField();	//    10^10/c, in mm
+    r  = pt/2.9979*10/gm->BField();	//    10^10/c, in mm
 
     phi0 = fS1->momentum().Phi();
 
@@ -215,8 +217,8 @@ void TEvdSimParticle::Paint(Option_t* Option) {
 // of the tracker, at s=0
 //-----------------------------------------------------------------------------
 void TEvdSimParticle::PaintXY(Option_t* Option) {
-  TStnVisManager* vm = TStnVisManager::Instance();
-  if (vm->BField() != 0) fEllipse->Paint();
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  if (gm->BField() != 0) fEllipse->Paint();
   else                   fLineXY->Paint();
 }
 
@@ -369,9 +371,9 @@ int TEvdSimParticle::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
   int    dist(9999), dpy(10);
 
-  TStnVisManager* vm = TStnVisManager::Instance();
+  TStnGeoManager* gm = TStnGeoManager::Instance();
 
-  if (vm->BField() != 0) {
+  if (gm->BField() != 0) {
 
 
     double x1 = gPad->PixeltoX(px);

@@ -14,7 +14,6 @@
 # GEN_ID needs to be redefined once again in the job top-level FCL file, as it 
 #        is set to "CeEndpoint" in EventGenerator/fcl/prolog.fcl
 #------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
 #include "Offline/fcl/standardServices.fcl"
 #include "Offline/fcl/TrkCaloDt.fcl"
 #------------------------------------------------------------------------------
@@ -43,6 +42,7 @@
 #include "Offline/CalPatRec/fcl/prolog_common.fcl"
 #include "Offline/CosmicReco/fcl/prolog.fcl"
 #include "Offline/CRVReco/fcl/prolog.fcl"
+#include "Offline/DAQ/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------

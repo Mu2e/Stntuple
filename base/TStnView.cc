@@ -3,6 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "TObjArray.h"
 #include "TVirtualX.h"
+#include "TText.h"
 
 #include "Stntuple/base/TStnView.hh"
 #include "Stntuple/base/TVisNode.hh"
@@ -10,22 +11,27 @@
 
 ClassImp(TStnView)
 
+int TStnView::fgDebugLevel(0);
+
 //-----------------------------------------------------------------------------
-TStnView::TStnView(int Type, int Index): TNamed("","") {
+TStnView::TStnView(int Type, int Index): TNamed("",""), fCombiTrans(nullptr) {
   fType        = Type;
   fIndex       = Index;
+  fMother      = nullptr;
   fCenter      = nullptr;
   fListOfNodes = nullptr;
-  fDebugLevel  = 0;
 
   fXAxis       = nullptr;
   fYAxis       = nullptr;
 }
 
 //-----------------------------------------------------------------------------
-TStnView::TStnView(int Type, int Index, const char* Name, const char* Title): TNamed(Name,Title) {
+TStnView::TStnView(int Type, int Index, const char* Name, const char* Title):
+  TNamed(Name,Title),
+  fCombiTrans(nullptr) {
   fType        = Type;
   fIndex       = Index;
+  fMother      = nullptr;
 
   fCenter      = new TMarker(0.,0,kPlus);
   fCenter->SetMarkerColor(kBlue);
@@ -52,6 +58,12 @@ TStnView::~TStnView() {
 
   delete fXAxis;
   delete fYAxis;
+  delete fCombiTrans;
+}
+
+//-----------------------------------------------------------------------------
+void TStnView::CloneCombiTrans(const TGeoCombiTrans* T) {
+  fCombiTrans = new TGeoCombiTrans(*T);
 }
 
 //-----------------------------------------------------------------------------
@@ -101,7 +113,7 @@ void TStnView::ExecuteEvent(Int_t event, Int_t px, Int_t py) {
 
   TVisManager* vm = TVisManager::Instance();
 
-  if (vm->DebugLevel() > 0) {
+  if (fgDebugLevel > 0) {
     printf(" >>>>>>  TStnView::ExecuteEvent event = %i px:%4i py:%4i\n",event,px,py);
   }
 //-----------------------------------------------------------------------------
@@ -135,7 +147,7 @@ void TStnView::ExecuteEvent(Int_t event, Int_t px, Int_t py) {
 
   case kButton1Down:
 
-    if (vm->DebugLevel() > 0) printf(" TStnView::ExecuteEvent  kButton1Down\n");
+    if (fgDebugLevel > 0) printf(" TStnView::ExecuteEvent  kButton1Down\n");
 
     fPx1 = px;
     fPy1 = py;
@@ -179,7 +191,7 @@ void TStnView::ExecuteEvent(Int_t event, Int_t px, Int_t py) {
     gPad->Update();
     break;
   case kKeyPress:
-    if (vm->DebugLevel() > 0) printf(" TStnView::ExecuteEvent kKeyPress: px=%3i py:%i\n",px,py);
+    if (TStnView::fgDebugLevel > 0) printf(" TStnView::ExecuteEvent kKeyPress: px=%3i py:%i\n",px,py);
 
     if (px == py) {
       gPad->GetRange(x1,y1,x2,y2);
@@ -203,16 +215,16 @@ void TStnView::ExecuteEvent(Int_t event, Int_t px, Int_t py) {
     }
     break;
   case kButton2Up:
-    if (vm->DebugLevel() > 0) printf(" TStnView::ExecuteEvent kButton2Up\n");
+    if (TStnView::fgDebugLevel > 0) printf(" TStnView::ExecuteEvent kButton2Up\n");
     break;
   case kButton2Down:
-    if (vm->DebugLevel() > 0) printf("TStnView::ExecuteEvent  kButton2Down\n");
+    if (TStnView::fgDebugLevel > 0) printf("TStnView::ExecuteEvent  kButton2Down\n");
     break;
   case kButton3Up:
-    if (vm->DebugLevel() > 0) printf(" TStnView::ExecuteEvent kButton3Up\n");
+    if (TStnView::fgDebugLevel > 0) printf(" TStnView::ExecuteEvent kButton3Up\n");
     break;
   case kButton3Down:
-    if (vm->DebugLevel() > 0) printf(" TStnView::ExecuteEvent kButton3Down\n");
+    if (TStnView::fgDebugLevel > 0) printf(" TStnView::ExecuteEvent kButton3Down\n");
     break;
   case kButton1Up:
     printf(" TStnView::ExecuteEvent kButton1Up px,py= %5i %5i\n",px,py);
@@ -244,7 +256,7 @@ void TStnView::ExecuteEvent(Int_t event, Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
 // arrow key pressed 
 //-----------------------------------------------------------------------------
-    if (vm->DebugLevel() > 0) printf("TStnView: ARROW key pressed  = %3i  py = %3i\n",px,py);
+    if (TStnView::fgDebugLevel > 0) printf("TStnView: ARROW key pressed  = %3i  py = %3i\n",px,py);
     fCursorX = px;
     fCursorY = py;
 //     gPad->GetRange(x1,y1,x2,y2);
@@ -255,7 +267,7 @@ void TStnView::ExecuteEvent(Int_t event, Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
 // arrow key released
 //-----------------------------------------------------------------------------
-    if (vm->DebugLevel() > 0) printf("TStnView: ARROW key released px = %3i  py = %3i\n",px,py);
+    if (TStnView::fgDebugLevel > 0) printf("TStnView: ARROW key released px = %3i  py = %3i\n",px,py);
 
     gPad->GetRange(x1,y1,x2,y2);
 
@@ -320,6 +332,10 @@ void TStnView::Paint(Option_t* Option) {
 
   vm->SetCurrentView(this);
 
+  TText txt;
+  txt.SetTextFont(52);
+  txt.DrawTextNDC(0.75,0.97,GetTitle());
+
   fCenter->Paint(Option);
 //-----------------------------------------------------------------------------
 // draw nodes
@@ -327,6 +343,9 @@ void TStnView::Paint(Option_t* Option) {
   Int_t n = GetNNodes();
   for (int i=0; i<n; i++) {
     TVisNode* node = GetNode(i);
+    if (TStnView::fgDebugLevel != 0) {
+      printf("TStnView::%s:%5i node:%s\n",__func__, __LINE__,node->GetName());
+    }
     node->Paint(Option);
   }
 //-----------------------------------------------------------------------------
@@ -392,7 +411,7 @@ void    TStnView::SetMaxEDep(float E) {
 
 //-----------------------------------------------------------------------------
 void TStnView::SetDebugLevel(int Level) {
-  fDebugLevel = Level;
+  TStnView::fgDebugLevel = Level;
 }
 
 //-----------------------------------------------------------------------------
@@ -405,10 +424,6 @@ void TStnView::Print(Option_t* Option) const {
   printf(" fType = %i fIndex = %i\n",fType,fIndex);
   printf(" fPx1 fPy1 fPx2 fPy2 = %5i %5i %5i %5i\n",fPx1,fPy1,fPx2,fPy2);
 
-  printf("UDir: %10.4f  %10.4f  %10.4f \n",fUDir.X(),fUDir.Y(),fUDir.Z());
-  printf("VDir: %10.4f  %10.4f  %10.4f \n",fVDir.X(),fVDir.Y(),fVDir.Z());
-  printf("WDir: %10.4f  %10.4f  %10.4f \n",fWDir.X(),fWDir.Y(),fWDir.Z());
-  
   int n = v->GetNNodes();
 
   printf("--------------------- nodes\n");

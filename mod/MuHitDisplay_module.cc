@@ -20,6 +20,7 @@
 #include "Offline/GlobalConstantsService/inc/PhysicsParams.hh"
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/ProditionsService/inc/ProditionsHandle.hh"
 
 #include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TEvdStation.hh"
@@ -32,6 +33,7 @@
 #include "Stntuple/gui/TTrkVisNode.hh"
 #include "Stntuple/gui/TEvdHelixVisNode.hh"
 #include "Stntuple/gui/TEvdTimeClusterVisNode.hh"
+#include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPanelVisNode.hh"
 
 #include "Stntuple/gui/TMcTruthVisNode.hh"
@@ -42,7 +44,6 @@
 
 #include "Stntuple/mod/MuHitDisplay_module.hh"
 
-#include "Stntuple/obj/AbsEvent.hh"
 #include "Stntuple/obj/TSimpBlock.hh"
 #include "Stntuple/mod/InitSimpBlock.hh"
 
@@ -85,7 +86,8 @@ MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
   _showCRVOnly                 (config().showCRVOnly()),
   _showTracks                  (config().showTracks ()),
 
-  _vmConfig                    (config().visManager())
+  _vmConfig                    (config().visManager()),
+  _gmConfig                    (config().geoManager())
 {
 
   fApplication = 0;
@@ -107,9 +109,41 @@ MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
 
   // fFolder->Add(fDarHandle);
 
-  _firstCall            = 1;
+  fFirstCall            = 1;
+  fLastRun              = -1;
 
-  fSimpBlock     = new TSimpBlock;
+  fSimpBlock            = new TSimpBlock;
+
+  TStnVisManager* vm = TStnVisManager::Instance();
+//-----------------------------------------------------------------------------
+// parse the VM configuration parameters
+//-----------------------------------------------------------------------------
+  vm->SetDebugLevel(_vmConfig.debugLevel());
+    
+  stntuple::TEvdPanel::SetDebugLevel(_vmConfig.evdPanelDebugLevel());
+  // TStnView::SetDebugLevel (_vmConfig.stnViewDebugLevel ());
+    
+  int display_straw_digi_mc = _vmConfig.displayStrawDigiMC();
+  vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
+
+  int display_straw_hits_xy = _vmConfig.displayStrawHitsXY();
+  vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
+
+  float ew_length = _vmConfig.ewLength();
+  vm->SetEWLength(ew_length);
+
+  _defaultView           = _vmConfig.defaultView();
+  _listOfVisibleStations = _vmConfig.visibleStations();
+
+  float tmin   = _vmConfig.tMin();
+  float tmax   = _vmConfig.tMax();
+  vm->SetTimeWindow(tmin,tmax);
+
+  float emin = _vmConfig.minEDep();
+  float emax = _vmConfig.maxEDep();
+  vm->SetMinEDep(emin);
+  vm->SetMaxEDep(emax);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -165,16 +199,43 @@ void MuHitDisplay::beginJob() {
 
 //-----------------------------------------------------------------------------
 void MuHitDisplay::beginRun(const art::Run& Run) {
+  
   mu2e::GeomHandle<mu2e::Tracker> handle;
   fTracker = handle.get();
 
   float mbtime = GlobalConstantsHandle<PhysicsParams>()->getNominalDRPeriod();
 
-  TStnVisManager* vm = TStnVisManager::Instance();
-  vm->SetMbTime(mbtime);
-  vm->SetMinSimpMomentum(_minSimpMomentum);
-  vm->SetMaxSimpMomentum(_maxSimpMomentum);
+  fVisManager->SetMbTime(mbtime);
+  fVisManager->SetMinSimpMomentum(_minSimpMomentum);
+  fVisManager->SetMaxSimpMomentum(_maxSimpMomentum);
+//-----------------------------------------------------------------------------
+// if run changes, update tracker panel map - it might have changed
+// this should be true for any calibration table
+// make sure the tracker is initialized after the tracekr panel map got defined
+//-----------------------------------------------------------------------------
+  if (fLastRun != (int) Run.run()) {
+    ProditionsHandle<TrackerPanelMap> tpm_h;
+    art::EventID eid(Run.run(),0,0);    // begin run
+    fTrkPanelMap = &tpm_h.get(eid);
+    fLastRun     = Run.run();
+    fGeoManager->SetTrackerPanelMap(fTrkPanelMap);
 
+    if (fGeoManager->GetTracker() == nullptr) {
+      stntuple::TEvdTracker* t = new stntuple::TEvdTracker(fTracker);
+      fGeoManager->AddDetector(t);
+    }
+  }
+
+//-----------------------------------------------------------------------------
+// init VisManager - failed to do it in beginJob - what is the right place for doing it?
+// get event data and initialize data blocks
+//-----------------------------------------------------------------------------
+  if (fFirstCall == 1) {
+    fFirstCall = 0;
+    InitGeoManager();
+    InitVisManager();
+  }
+  
   TModule::beginRun(Run);
 }
 
@@ -196,57 +257,33 @@ void MuHitDisplay::endRun(const art::Run& Run) {
 //-----------------------------------------------------------------------------
 void MuHitDisplay::InitGeoManager() {
 
-  mu2e::GeomHandle<mu2e::Tracker> handle;
-
-  const mu2e::Tracker* mu2e_tracker = handle.get();
-
-  TStnGeoManager* gm = TStnGeoManager::Instance();
-
-  stntuple::TEvdTracker* t = new stntuple::TEvdTracker(mu2e_tracker);
-  gm->AddDetector(t);
-  
   return;
 }
 
 //-----------------------------------------------------------------------------
 // initialize the visualization manager
 // TStnVisManager is responsible for deleting all nodes created here
+// assume geometry is already initialized
 //-----------------------------------------------------------------------------
 void MuHitDisplay::InitVisManager() {
   char oname [100];
   sprintf(oname,"%s:%s",moduleDescription().moduleLabel().data(),"InitVisManager");
 
   TStnVisManager* vm = TStnVisManager::Instance();
-
   vm->SetTitleNode(new THeaderVisNode("HeaderVisNode", fHeaderBlock));
 //-----------------------------------------------------------------------------
-// parse the VM configuration parameters
+// set station visibility
 //-----------------------------------------------------------------------------
-  int debug_level = _vmConfig.debugLevel();
-  vm->SetDebugLevel(debug_level);
-    
-  int display_straw_digi_mc = _vmConfig.displayStrawDigiMC();
-  vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  stntuple::TEvdTracker* t  = gm->GetTracker();
+  
+  for (int i=0; i<18; ++i) {
+    int vis = _listOfVisibleStations.at(i);
+    t->Station(i)->SetVisible(vis);
+  }
 
-  int display_straw_hits_xy = _vmConfig.displayStrawHitsXY();
-  vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
-
-  float bfield = _vmConfig.bField();
-  vm->SetBField(bfield);
-
-  float ew_length = _vmConfig.ewLength();
-  vm->SetEWLength(ew_length);
-
-  _defaultView = _vmConfig.defaultView();
-
-  float tmin   = _vmConfig.tMin();
-  float tmax   = _vmConfig.tMax();
-  vm->SetTimeWindow(tmin,tmax);
-
-  float emin = _vmConfig.minEDep();
-  float emax = _vmConfig.maxEDep();
-  vm->SetMinEDep(emin);
-  vm->SetMaxEDep(emax);
+  float bfield = _gmConfig.bField();
+  gm->SetBField(bfield);
 //-----------------------------------------------------------------------------
 // init CRV views - 6 of those
 //-----------------------------------------------------------------------------
@@ -255,7 +292,7 @@ void MuHitDisplay::InitVisManager() {
 
   for (int i=0; i<6; i++) {
     view[i] = new TCrvView(i);
-    view[i]->SetTimeWindow(0, ew_length);
+    view[i]->SetTimeWindow(0, vm->EWLength());
   }
 
   node  = new TCrvVisNode("CrvVisNode#0", 0);
@@ -351,6 +388,7 @@ void MuHitDisplay::InitVisManager() {
   tc_node->SetTcCollTag  (_timeClusterCollTag);
   tc_node->SetPcCollTag  (_phiClusterCollTag );
   tc_node->SetChCollTag  (_comboHitCollTag   );
+  tc_node->SetSschCollTag(_shCollTag   );
   tc_node->SetSdmcCollTag(_sdmcCollTag       );
 //-----------------------------------------------------------------------------
 // nodes are defined, now come views
@@ -391,67 +429,58 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // VRZ: "VST RZ" view - one per panel, each VRZ view shows only one panel
 //-----------------------------------------------------------------------------
-  TStnView*                    vrz_view[18][2][6];
-  stntuple::TEvdPanelVisNode*  vp_node [18][2][6];
+  const int nfaces(4), np_face(3);
   
-  TStnGeoManager* gm = TStnGeoManager::Instance();
-  stntuple::TEvdTracker* evd_t = gm->GetTracker();
+  //  TStnView*                    vrz_view[18][nfaces][np_face];
+  stntuple::TEvdPanelVisNode*  vp_node [18][nfaces][np_face];
+  
+  //  TStnGeoManager* gm = TStnGeoManager::Instance();
+  stntuple::TEvdTracker* evd_tracker = gm->GetTracker();
 
   int ns = 1; // fTracker->nStations();
 
   for (int is=0; is<ns; ++is) {
-    for (int ipln=0; ipln<2; ++ipln) {
-      for (int i=0; i<6; ++i) {
+    for (int face=0; face<nfaces; ++face) {
+      for (int ip=0; ip<np_face; ++ip) {
         // int inode = 12*is+6*ipln+i;
-        stntuple::TEvdPanel* panel = evd_t->Station(is)->Plane(ipln)->Panel(i);
-        vp_node [is][ipln][i] = new stntuple::TEvdPanelVisNode (Form("EvdPanel_VN_%02i_%i_%i",is,ipln,i),panel);
+        int ipln, ipnl;
+        stntuple::TEvdTracker::ConvertPanelGeoIndices(is,face,ip,ipln,ipnl);
+        stntuple::TEvdPanel* panel = t->Station(is)->Plane(ipln)->Panel(ipnl);
       }
     }
   }
 
   for (int is=0; is<ns; ++is) {
-    for (int ipln=0; ipln<2; ++ipln) {
-      for (int i=0; i<6; ++i) {
-        int geo_id = 12*is+6*ipln+i;
-        TStnView* v = new TStnView(TStnVisManager::kVRZ,geo_id,"VRZView","VRZ View");
+    for (int face=0; face<nfaces; ++face) {
+      for (int ip=0; ip<np_face; ++ip) {
+        int ipln, ipnl;
+        stntuple::TEvdTracker::ConvertPanelGeoIndices(is,face,ip,ipln,ipnl);
 
-        mu2e::StrawId sid(ipln,i,0);
+        int geo_id  = 12*is+6*ipln+ipnl;
+        TStnView* v = new TStnView(TStnVisManager::kVRZ,geo_id,
+                                   "VRZView",
+                                   Form("panel %02i:%i",2*is+ipln,ipnl));
+
+        mu2e::StrawId sid(ipln,ipnl,0);
         const mu2e::Panel* panel = &fTracker->getPanel(sid);
+        v->SetMother((void*) panel);
 
-        auto hept = panel->dsToPanel();
-          
-        CLHEP::Hep3Vector  const& disp = panel->origin();
-        CLHEP::Hep3Vector  const& uDir = panel->uDirection();
-        CLHEP::Hep3Vector  const& vDir = panel->vDirection();
-        CLHEP::Hep3Vector  const& wDir = panel->wDirection();
-
-        // ROOT uses angles in degrees
-        // double phi   = 0.; //rot.getPhi  ()*180./M_PI;
-        // double psi   = 0.; //rot.getPsi  ()*180./M_PI;
-        // double theta = 0.; //rot.getTheta()*180./M_PI;
-        
-        // v->GetCombiTrans()->SetTranslation(disp.x(),disp.y(),disp.z());
-        // v->GetCombiTrans()->GetRotation()->SetAngles(phi,theta,0);
-        v->UDir()->SetXYZ(uDir.x(),uDir.y(),uDir.z());
-        v->VDir()->SetXYZ(vDir.x(),vDir.y(),vDir.z());
-        v->WDir()->SetXYZ(wDir.x(),wDir.y(),wDir.z());
-        vrz_view[is][ipln][i] = v;
-        vrz_view[is][ipln][i]->AddNode(vp_node[is][ipln][i]);
-        vrz_view[is][ipln][i]->AddNode(trk_vis_node);
-        // vrz_view[i]->AddNode(vpd_node[i]);
-        // vrz_view[i]->AddNode(trk_node);
+        stntuple::TEvdPanel* evd_panel = evd_tracker->Station(is)->Plane(ipln)->Panel(ipnl);
+        v->CloneCombiTrans(evd_panel->GetCombiTrans());
+//-----------------------------------------------------------------------------
+// create VisNode for this panel and, together with the TrkVisNode, add it to the view
+//-----------------------------------------------------------------------------
+        stntuple::TEvdPanelVisNode* vp_node = new stntuple::TEvdPanelVisNode (Form("EvdPanel_VN_%02i_%i_%i",is,ipln,ipnl),evd_panel);
+        v->AddNode(vp_node);
+        v->AddNode(trk_vis_node);
+//-----------------------------------------------------------------------------
+// finally, add the view to the VM's list of views
+//-----------------------------------------------------------------------------
+        vm->AddView(v);
       }
     }
   }
   
-  for (int is=0; is<ns; ++is) {
-    for (int ipln=0; ipln<2; ++ipln) {
-      for (int i=0; i<6; ++i) {
-        vm->AddView(vrz_view[is][ipln][i]);
-      }
-    }
-  }
- 
 //-----------------------------------------------------------------------------
 // upon startup, open either an XY or a VST view
 //-----------------------------------------------------------------------------
@@ -462,14 +491,14 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // get data from the event record
 //-----------------------------------------------------------------------------
-int MuHitDisplay::getData(const art::Event* Evt) {
+int MuHitDisplay::getData(const art::Event* ArtEvent) {
   char oname[100];
   sprintf(oname,"%s::%s",moduleDescription().moduleLabel().data(),"getData");
 //-----------------------------------------------------------------------------
 //  CRV pulse information
 //-----------------------------------------------------------------------------
   art::Handle<CrvRecoPulseCollection> pulsesHandle;
-  Evt->getByLabel(_crvRecoPulseCollTag, pulsesHandle);
+  ArtEvent->getByLabel(_crvRecoPulseCollTag, pulsesHandle);
     
   if (pulsesHandle.isValid()) {
     const mu2e::CrvRecoPulseCollection* fCrvPulseColl = (CrvRecoPulseCollection*) pulsesHandle.product();
@@ -519,7 +548,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 //  MC truth - gen particles
 //-----------------------------------------------------------------------------
     art::Handle<GenParticleCollection> gensHandle;
-    Evt->getByLabel(_genpCollTag, gensHandle);
+    ArtEvent->getByLabel(_genpCollTag, gensHandle);
 
     if (gensHandle.isValid()) _genpColl = gensHandle.product();
     else {
@@ -531,7 +560,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 //  StepPointMCs - on virtual detectors
 //-----------------------------------------------------------------------------
     art::Handle<StepPointMCCollection> vdStepsHandle;
-    Evt->getByLabel(_spmcCollTag, vdStepsHandle);
+    ArtEvent->getByLabel(_spmcCollTag, vdStepsHandle);
     
     if (vdStepsHandle.isValid()) _spmcColl = vdStepsHandle.product();
     else                         _spmcColl = NULL;
@@ -539,7 +568,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 // SimParticle's
 //-----------------------------------------------------------------------------
     art::Handle<mu2e::SimParticleCollection> simpHandle;
-    Evt->getByLabel(_simpCollTag, simpHandle);
+    ArtEvent->getByLabel(_simpCollTag, simpHandle);
 
     if (simpHandle.isValid()) _simpColl = simpHandle.product();
     else                      _simpColl = NULL;
@@ -547,7 +576,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 //  straw hit information
 //-----------------------------------------------------------------------------
     art::Handle<StrawDigiCollection> sdcH;
-    Evt->getByLabel(_sdCollTag, sdcH);
+    ArtEvent->getByLabel(_sdCollTag, sdcH);
     if (sdcH.isValid()) _sdColl = sdcH.product();
     else {
       printf(">>> [%s] WARNING: StrawDigiCollection by %s is missing.\n",
@@ -556,7 +585,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     }
 
     art::Handle<StrawDigiADCWaveformCollection> swcH;
-    Evt->getByLabel(_swCollTag, swcH);
+    ArtEvent->getByLabel(_swCollTag, swcH);
     if (swcH.isValid()) _swColl = swcH.product();
     else {
       printf(">>> [%s] WARNING: StrawDigiADCWaveformCollection by %s is missing.\n",
@@ -565,7 +594,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     }
     
     art::Handle<StrawDigiMCCollection> sdmccH;
-    Evt->getByLabel(_sdmcCollTag, sdmccH);
+    ArtEvent->getByLabel(_sdmcCollTag, sdmccH);
     if (sdmccH.isValid()) {
       _sdmcColl = sdmccH.product();
       if (_sdmcColl->size() <= 0) {
@@ -582,7 +611,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 // calorimeter hit data
 //-----------------------------------------------------------------------------
     art::Handle<CaloHitCollection> calohit_ch;
-    Evt->getByLabel(_caloHitCollTag,calohit_ch);
+    ArtEvent->getByLabel(_caloHitCollTag,calohit_ch);
     
     if (calohit_ch.isValid()) {
       _caloHitColl = (CaloHitCollection*) calohit_ch.product();
@@ -596,7 +625,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 // calorimeter cluster data
 //-----------------------------------------------------------------------------
     art::Handle<CaloClusterCollection> calocluster_ch;
-    Evt->getByLabel(_caloClusterCollTag,calocluster_ch);
+    ArtEvent->getByLabel(_caloClusterCollTag,calocluster_ch);
     
     if (calocluster_ch.isValid()) {
       _caloClusterColl = calocluster_ch.product();
@@ -609,37 +638,28 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 //-----------------------------------------------------------------------------
 // finally, TSimpBlock. The second parameter, Mode, is not used
 //-----------------------------------------------------------------------------
-    fSimpBlock->Init((art::Event*)Evt,0);
+    fSimpBlock->Init((art::Event*)ArtEvent,0);
     
     return 0;
   }
 }
 
 //-----------------------------------------------------------------------------
-void MuHitDisplay::analyze(const art::Event& Evt) {
+void MuHitDisplay::analyze(const art::Event& ArtEvent) {
   //    const char* oname = "MuHitDisplay::analyze";
 
-  printf("[MuHitDisplay::%s] RUN: %10i EVENT: %10i\n", __func__, Evt.run(), Evt.event());
-//-----------------------------------------------------------------------------
-// init VisManager - failed to do it in beginJob - what is the right place for doing it?
-// get event data and initialize data blocks
-//-----------------------------------------------------------------------------
-  if (_firstCall == 1) {
-    _firstCall = 0;
-    InitGeoManager();
-    InitVisManager();
-  }
+  printf("[MuHitDisplay::%s] RUN: %10i EVENT: %10i\n", __func__, ArtEvent.run(), ArtEvent.event());
 
-  getData(&Evt);
+  getData(&ArtEvent);
   
-  fVisManager->SetEvent(&Evt);
+  fVisManager->SetEvent(&ArtEvent);
   fVisManager->DisplayEvent();
 //-----------------------------------------------------------------------------
 // go into interactive mode, 
 // fInteractiveMode = 1 : stop after each event (event display mode)
 // fInteractiveMode = 2 : stop only in the end of run, till '.q' is pressed
 //-----------------------------------------------------------------------------
-  TModule::analyze(Evt);
+  TModule::analyze(ArtEvent);
   return;
 } 
 
