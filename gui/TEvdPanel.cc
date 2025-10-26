@@ -110,8 +110,20 @@ TEvdPanel::TEvdPanel(): TObject() {
   double thetaz =  0;
   if (Panel->wDirection().z() < 0) {
     phix   = phix+180;
-    // thetaz = 180;
   }
+
+  // if ((pid.getPlane() % 2) == 1) {
+  //   if ((pid.getPanel() % 2) == 0) {
+  //     phix   = phix+180;
+  //     phiy   = phiy+180;
+  //   }
+  // }
+  // else {
+  //   if ((pid.getPanel() % 2) == 1) {
+  //     phix   = phix+180;
+  //     phiy   = phiy+180;
+  //   }
+  // }
 
   TGeoRotation* r = new TGeoRotation("a",thetax,phix,thetay,phiy,thetaz,phiz);
 
