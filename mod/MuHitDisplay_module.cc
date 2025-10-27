@@ -431,8 +431,8 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   const int nfaces(4), np_face(3);
   
-  //  TStnView*                    vrz_view[18][nfaces][np_face];
-  stntuple::TEvdPanelVisNode*  vp_node [18][nfaces][np_face];
+  // TStnView*                    vrz_view[18][nfaces][np_face];
+  // stntuple::TEvdPanelVisNode*  vp_node [18][nfaces][np_face];
   
   //  TStnGeoManager* gm = TStnGeoManager::Instance();
   stntuple::TEvdTracker* evd_tracker = gm->GetTracker();
@@ -445,7 +445,7 @@ void MuHitDisplay::InitVisManager() {
         // int inode = 12*is+6*ipln+i;
         int ipln, ipnl;
         stntuple::TEvdTracker::ConvertPanelGeoIndices(is,face,ip,ipln,ipnl);
-        stntuple::TEvdPanel* panel = t->Station(is)->Plane(ipln)->Panel(ipnl);
+        // stntuple::TEvdPanel* panel = t->Station(is)->Plane(ipln)->Panel(ipnl);
       }
     }
   }

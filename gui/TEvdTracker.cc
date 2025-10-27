@@ -60,7 +60,7 @@ TEvdTracker::~TEvdTracker() {
 }
 
 //-----------------------------------------------------------------------------
-static void TEvdTracker::ConvertPanelGeoIndices(int Station, int ZFace, int IPFace, int& Plane, int& Panel) {
+void TEvdTracker::ConvertPanelGeoIndices(int Station, int ZFace, int IPFace, int& Plane, int& Panel) {
   Plane = ZFace / 2;
   if ((Station % 2) == 0) {
 //-----------------------------------------------------------------------------

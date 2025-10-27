@@ -26,7 +26,6 @@
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TStnGeoManager.hh"
-// #include "Offline/DAQ/inc/TrkPanelMap_t.hh"
 
 ClassImp(stntuple::TEvdStation)
 
@@ -51,8 +50,8 @@ TEvdStation::TEvdStation(int ID, const mu2e::Tracker* Tracker): TObject() {
 
   fListOfPlanes = new TObjArray(fNPlanes);
 
-  TStnGeoManager* gm          = TStnGeoManager::Instance();
-  const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(2*ID,0);  // first panel of the plane
+  // TStnGeoManager* gm          = TStnGeoManager::Instance();
+  // const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(2*ID,0);  // first panel of the plane
   
   //  if (tpm) fProductionID      = tpm->psid();                                 // production station ID ("station_00")
 
@@ -73,9 +72,6 @@ TEvdStation::~TEvdStation() {
 
 //-----------------------------------------------------------------------------
 void TEvdStation::Paint(Option_t* option) {
-  // paints one disk (.. or vane, in the past), i.e. section
-
-				// parse option list
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 

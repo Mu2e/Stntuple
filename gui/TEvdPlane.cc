@@ -47,7 +47,6 @@ TEvdPlane::TEvdPlane(): TObject() {
 //_____________________________________________________________________________
   TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station, const mu2e::Tracker* Tracker): TObject() {
 
-    // int        id;
   TEvdPanel*  evd_panel;
 
   fID      = ID;
@@ -59,13 +58,12 @@ TEvdPlane::TEvdPlane(): TObject() {
   fListOfPanels = new TObjArray(fNPanels);
 
   TStnGeoManager* gm          = TStnGeoManager::Instance();
-  mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(ID,0);           // first panel of the plane
+  const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(ID,0);           // first panel of the plane
   if (tpm) fProductionID      = tpm->ppid();
 
   for (int i=0; i<fNPanels; i++) {
     const mu2e::Panel* panel = &fPlane->getPanel(i);
 
-    // id       = fNPanels*ID+i;
     evd_panel = new TEvdPanel(i,panel,this,Tracker);
 
     fListOfPanels->Add(evd_panel);

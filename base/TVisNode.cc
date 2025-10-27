@@ -16,6 +16,7 @@ TVisNode::~TVisNode() {
 //_____________________________________________________________________________
 int TVisNode::InitEvent() {
   printf(">>> ERROR in TVisNode::%s: derived class TXXXNode::%s is not implemented\n",__func__,__func__);
+  return 0;
 }
 
 //_____________________________________________________________________________

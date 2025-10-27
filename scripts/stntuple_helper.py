@@ -51,7 +51,8 @@ class stntuple_helper:
 #------------------------------------------------------------------------------
         list_of_linkdef_files = self._env.Glob(self.subdir+'/dict/*_linkdef.h', strings=True)
         if (self._debug):
-            print ("[stntuple_helper::handle_dictionaries] ["+self.dirname+"/"+self.subdir+"] handle_dictionaries: list_of_linkdef_files = ",list_of_linkdef_files)
+            print ("[stntuple_helper::handle_dictionaries] ["+self.dirname+"/"+self.subdir+"] handle_dictionaries: list_of_linkdef_files = ",
+                   list_of_linkdef_files,' skip_list:',skip_list)
             
         list_of_dict_files    = []
 
@@ -60,7 +61,7 @@ class stntuple_helper:
             linkdef_fn    = linkdef[len(linkdef)-1];
 
             if (self._debug): 
-                print ("[stntuple_helper::handle_dictionaries] linkdef_fn = ",linkdef_fn)
+                print ("[stntuple_helper::handle_dictionaries] linkdef_fn = ",linkdef_fn, '\n skip_list:',skip_list)
 
             if (not linkdef_fn in skip_list):
                 clname        = linkdef_fn.replace("_linkdef.h","");
@@ -78,6 +79,8 @@ class stntuple_helper:
 # compile dictionaries
 #------------------------------------------------------------------------------
         # list   = [];
+        if (self._debug): 
+            print ("[stntuple_helper::handle_dictionaries] list_of_dict_files = ",list_of_dict_files)
 
         for dict in list_of_dict_files:
             # print("----- dict : ",dict);
