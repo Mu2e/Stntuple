@@ -200,8 +200,8 @@ void MuHitDisplay::beginJob() {
 //-----------------------------------------------------------------------------
 void MuHitDisplay::beginRun(const art::Run& Run) {
   
-  mu2e::GeomHandle<mu2e::Tracker> handle;
-  fTracker = handle.get();
+  // mu2e::GeomHandle<mu2e::Tracker> handle;
+  // fTracker = &handle.get();
 
   float mbtime = GlobalConstantsHandle<PhysicsParams>()->getNominalDRPeriod();
 
@@ -214,14 +214,20 @@ void MuHitDisplay::beginRun(const art::Run& Run) {
 // make sure the tracker is initialized after the tracekr panel map got defined
 //-----------------------------------------------------------------------------
   if (fLastRun != (int) Run.run()) {
+
+    art::EventID eid  = art::EventID(Run.run(),1,1);
+
     ProditionsHandle<TrackerPanelMap> tpm_h;
-    art::EventID eid(Run.run(),0,0);    // begin run
     fTrkPanelMap = &tpm_h.get(eid);
     fLastRun     = Run.run();
     fGeoManager->SetTrackerPanelMap(fTrkPanelMap);
 
+    fAlignedTracker_h = mu2e::ProditionsHandle<mu2e::Tracker>();
+    fAlignedTracker   = fAlignedTracker_h.getPtr(eid).get();
+
     if (fGeoManager->GetTracker() == nullptr) {
-      stntuple::TEvdTracker* t = new stntuple::TEvdTracker(fTracker);
+      // stntuple::TEvdTracker* t = new stntuple::TEvdTracker(fTracker);
+      stntuple::TEvdTracker* t = new stntuple::TEvdTracker(fAlignedTracker);
       fGeoManager->AddDetector(t);
     }
   }
@@ -356,7 +362,7 @@ void MuHitDisplay::InitVisManager() {
 // add tracker node to two views - RZ and XY, also - to the panel VRZ
 // tracks are KalSeed's
 //-----------------------------------------------------------------------------
-  TTrkVisNode* trk_vis_node = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
+  TTrkVisNode* trk_vis_node = new TTrkVisNode ("TrkVisNode", fAlignedTracker, NULL);
 
   trk_vis_node->SetShCollTag       (_shCollTag      );
   trk_vis_node->SetChCollTag       (_comboHitCollTag);
@@ -439,16 +445,16 @@ void MuHitDisplay::InitVisManager() {
 
   int ns = 1; // fTracker->nStations();
 
-  for (int is=0; is<ns; ++is) {
-    for (int face=0; face<nfaces; ++face) {
-      for (int ip=0; ip<np_face; ++ip) {
-        // int inode = 12*is+6*ipln+i;
-        int ipln, ipnl;
-        stntuple::TEvdTracker::ConvertPanelGeoIndices(is,face,ip,ipln,ipnl);
-        // stntuple::TEvdPanel* panel = t->Station(is)->Plane(ipln)->Panel(ipnl);
-      }
-    }
-  }
+  // for (int is=0; is<ns; ++is) {
+  //   for (int face=0; face<nfaces; ++face) {
+  //     for (int ip=0; ip<np_face; ++ip) {
+  //       // int inode = 12*is+6*ipln+i;
+  //       int ipln, ipnl;
+  //       stntuple::TEvdTracker::ConvertPanelGeoIndices(is,face,ip,ipln,ipnl);
+  //       // stntuple::TEvdPanel* panel = t->Station(is)->Plane(ipln)->Panel(ipnl);
+  //     }
+  //   }
+  // }
 
   for (int is=0; is<ns; ++is) {
     for (int face=0; face<nfaces; ++face) {
@@ -462,7 +468,7 @@ void MuHitDisplay::InitVisManager() {
                                    Form("panel %02i:%i",2*is+ipln,ipnl));
 
         mu2e::StrawId sid(ipln,ipnl,0);
-        const mu2e::Panel* panel = &fTracker->getPanel(sid);
+        const mu2e::Panel* panel = &fAlignedTracker->getPanel(sid);
         v->SetMother((void*) panel);
 
         stntuple::TEvdPanel* evd_panel = evd_tracker->Station(is)->Plane(ipln)->Panel(ipnl);

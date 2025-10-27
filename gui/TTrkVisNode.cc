@@ -121,8 +121,8 @@ int TTrkVisNode::InitEvent() {
 
   //  const char* oname = "TTrkVisNode::InitEvent";
 
-  mu2e::GeomHandle<mu2e::Tracker> ttHandle;
-  const mu2e::Tracker* tracker = ttHandle.get();
+  // mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+  const mu2e::Tracker* tracker = fTracker->GetMu2eTracker();
 
   TStnVisManager* vm      = TStnVisManager::Instance();
   const art::Event* event = vm->Event();

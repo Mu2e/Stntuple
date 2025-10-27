@@ -19,6 +19,7 @@
 #include "art/Framework/Principal/Event.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
+#include "Offline/ProditionsService/inc/ProditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
@@ -218,7 +219,10 @@ private:
 
   TStnTrackID*           fTrackID;
 
-  const Tracker*         fTracker;    // straw tracker geometry
+  ProditionsHandle<Tracker> fAlignedTracker_h;
+
+  const Tracker*            fTracker;        // straw tracker geometry
+  const Tracker*            fAlignedTracker; // straw tracker geometry
 
   // DoubletAmbigResolver*  fDar;
 //-----------------------------------------------------------------------------
