@@ -179,10 +179,73 @@ void TEvdStraw::PaintVST(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
-// RZ view of the straw is the same, just keep the namning scheme
+// VRZ view of the straw is the same, just keep the namning scheme - in the local coordinate frame of the panel
 //-----------------------------------------------------------------------------
 void TEvdStraw::PaintVRZ(Option_t* Option) {
-  PaintRZ(Option);
+  int    nhits, color(0), style(0);
+  double xstraw, ystraw, x1, x2, y1, y2;
+
+  TStnVisManager* vm = TStnVisManager::Instance();
+  float tmin = vm->TMin(); 
+  float tmax = vm->TMax();
+  stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
+  if (etcl) {
+    tmin = etcl->TMin(); // FIXME!
+    tmax = etcl->TMax(); // FIXME!
+  }
+//-----------------------------------------------------------------------------
+// do not even attempt to paint straws outside the visible range
+//-----------------------------------------------------------------------------
+  gPad->GetRange(x1,y1,x2,y2);
+
+  // find local coordinate
+  // TGeoCombiTrans* gt = vm->GetCurrentView()->GetCombiTrans();
+
+  // double posm[3], posl[3];
+  // posm[0] = fStraw->getMidPoint().x();
+  // posm[1] = fStraw->getMidPoint().y();
+  // posm[2] = fStraw->getMidPoint().z();
+  // gt->MasterToLocalVect(posm, posl);
+
+  const mu2e::Panel* panel     = (const mu2e::Panel*) vm->GetCurrentView()->GetMother();
+  const mu2e::HepTransform& ht = panel->dsToPanel();
+  CLHEP::Hep3Vector pos_l = ht*fStraw->getMidPoint();
+
+  xstraw = pos_l[2];
+  ystraw = pos_l[1];
+
+  if ((xstraw < x1) || (xstraw > x2) || (ystraw < y1) || (ystraw > y2)) return;
+
+  nhits = fListOfHits->GetEntriesFast();
+//-----------------------------------------------------------------------------
+// withour a reconstructed track, 
+// the straw hit drift time is unknown, so just change the color of the straw circle
+//-----------------------------------------------------------------------------
+  TArc arc(*fArc);
+  arc.SetX1(xstraw);
+  arc.SetY1(ystraw);
+  arc.SetLineColor(1);
+  arc.SetLineWidth(1);
+
+  for (int i=0; i<nhits; ++i) {
+    stntuple::TEvdStrawHit* evd_sh = Hit(i);
+    const mu2e::ComboHit*   sch    = evd_sh->StrawHit();
+    float t = sch->correctedTime();
+    if ((t >= tmin) and (t <= tmax)) {    
+      int ok = 1;
+      if (etcl and vm->DisplayOnlyTCHits()) { 
+        ok = etcl->TCHit(sch->index());
+      }
+      if (ok) {
+        color = kRed;
+        arc.SetLineColor(color+1);
+        arc.SetLineWidth(2);
+      }
+    }
+  }
+
+  arc.SetFillStyle(style);
+  arc.Paint(Option);
 }
 
 //_____________________________________________________________________________

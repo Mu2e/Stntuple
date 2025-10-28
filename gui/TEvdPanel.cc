@@ -77,16 +77,9 @@ TEvdPanel::TEvdPanel(): TObject() {
 //-----------------------------------------------------------------------------
 // build the transformation matrix
 //-----------------------------------------------------------------------------
-  const mu2e::HepTransform& ds_to_panel = Panel->dsToPanel();
-  const HepRotation&  hr          = ds_to_panel.rotation();
-  const Hep3Vector&   ht          = ds_to_panel.displacement();
-
-  double r[9];
-  for (int i=0; i<3; i++) {
-    for (int j=0; j<3; j++) {
-      r[3*i+j] = hr[i][j];
-    }
-  }
+  const mu2e::HepTransform& ds_to_p = Panel->dsToPanel();
+  const HepRotation&  hr            = ds_to_p.rotation();
+  const Hep3Vector&   ht            = ds_to_p.displacement();
 
   double phix = hr.phiX  ()*180./M_PI;
   double phiy = hr.phiY  ()*180./M_PI;
@@ -95,30 +88,35 @@ TEvdPanel::TEvdPanel(): TObject() {
   double thty = hr.thetaY()*180./M_PI;
   double thtz = hr.thetaZ()*180./M_PI;
 
-  double dx   = ht.x();
-  double dy   = ht.y();
-  double dz   = ht.z();
+  double disp[3], disp1[3];
+  disp[0]  = ht.x();
+  disp[1]  = ht.y();
+  disp[2]  = ht.z();
 
-  if (hr.zz() < 0) {
-  }
-  else {
-    thtx += 180;
-    thty += 180;
-    dx    = -dx;
-    dy    = -dy;
-    dz    = -dz;
-  }
+  // if (hr.zz() > 0) {
+  //   // thtx    = thtx+180;
+  //   // thty    = thty+180;
+  //   disp[0] = -disp[0];
+  //   disp[1] = -disp[1];
+  //   disp[2] = -disp[2];
+  // }
+
   TGeoRotation* gr = new TGeoRotation(Form("rot_%02i_%i",pid.getPlane(),pid.getPanel()),thtx,phix,thty,phiy,thtz,phiz);
   //  gr->SetMatrix(r);
 
-  //  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),ht.x(),ht.y(),ht.z(),gr);
-  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),0,0,0,gr);
+  gr->MasterToLocal(disp,disp1);
+
+  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),-disp1[0], -disp1[1], -disp1[2],gr);
+  //  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),0,0,0,gr);
   
-  fPos.SetXYZ(dx,dy,dz);
+  //  fPos.SetXYZ(disp[0],disp[1], disp[2]);
+  fPos.SetXYZ(0,0,0); // fPos[3] is used in TStnVisManager.cc:OpenVRZView
 
   if (TEvdPanel::fgDebugLevel & 0x2) {
     printf("panel fCombiTrans:\n");
     fCombiTrans->Print();
+    printf("mu2e::Panel HepTransform Panel->DS:\n");
+    std::cout << Panel->panelToDS() << std::endl;
     printf("mu2e::Panel HepTransform DS->Panel:\n");
     std::cout << Panel->dsToPanel() << std::endl;
   }

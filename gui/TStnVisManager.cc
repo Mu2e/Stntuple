@@ -1025,7 +1025,8 @@ Int_t TStnVisManager::OpenVRZView() {
 // less sure about the rotation..
 // in which frame do we want to display ? need to transform tracks 
 //-----------------------------------------------------------------------------
-      gPad->Range(panel->Pos()->Z()-40., 350., panel->Pos()->Z()+40., 700.);
+//      gPad->Range(panel->Pos()->Z()-40., 350., panel->Pos()->Z()+40., 700.);
+      gPad->Range(-40,-200, 40,200);
       int geo_id  = 12*station+6*ipln+ipnl;
       TStnView* v = (TStnView*) FindView(TStnVisManager::kVRZ,geo_id);
       if (v) {

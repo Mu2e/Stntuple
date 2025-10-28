@@ -38,8 +38,7 @@
 #include "Stntuple/gui/TEvdTrack.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TStnGeoManager.hh"
-
-// #include "CLHEP/Vector/ThreeVector.h"
+#include "CLHEP/Vector/ThreeVector.h"
 
 ClassImp(stntuple::TEvdTrack)
 
@@ -187,25 +186,29 @@ void TEvdTrack::PaintVRZ(Option_t* Option) {
   // rotate to the view frame
   
   TStnVisManager* vm = TStnVisManager::Instance();
-  TGeoCombiTrans* gt = vm->GetCurrentView()->GetCombiTrans();
+  const mu2e::Panel* panel = (const mu2e::Panel*) vm->GetCurrentView()->GetMother();
+  const mu2e::HepTransform&   ht = panel->dsToPanel();
 
-  double posm[3], posl[3], dirm[3], dirl[3];
-  posm[0] = pos.x();
-  posm[1] = pos.y();
-  posm[2] = pos.z();
-  gt->MasterToLocalVect(posm, posl);
-  
-  dirm[0] = dir.x();
-  dirm[1] = dir.y();
-  dirm[2] = dir.z();
-  gt->MasterToLocalVect(dirm, dirl);
+  double dirl[3];
+
+  CLHEP::Hep3Vector pos_m(pos.x(),pos.y(),pos.z());
+  CLHEP::Hep3Vector pos_l = ht*pos_m;
  
-  double y1(1000.), y2(-1000.);
+  CLHEP::Hep3Vector dir_m(dir.x(),dir.y(),dir.z());
+  CLHEP::Hep3Vector dir_l = ht.rotation()*dir_m;
+  dirl[0] = dir_l.x();
+  dirl[1] = dir_l.y();
+  dirl[2] = dir_l.z();
+  
+  std::cout << "panel:" << panel->id().plane() << ":" << panel->id().panel() << " pos_l:" << pos_l << " dir_l:" << dir_l << std::endl;
+ 
+  double y1(200.), y2(-200.);           // in the local coordinate system
 
   double dydz_l = dirl[1]/dirl[2];
-  double z1 = (y1-posl[1])/dydz_l + posl[2];
-  double z2 = (y2-posl[1])/dydz_l + posl[2];
-  
+  double z1     = (y1-pos_l[1])/dydz_l + pos_l[2];
+  double z2     = (y2-pos_l[1])/dydz_l + pos_l[2];
+
+  std::cout << "y1,y2,z1,z2:" << std::setw(13) << y1 << std::setw(13) << y2 << std::setw(13) << z1 << std::setw(13) << z2 << std::endl;
   TLine ln;
   ln.SetLineColor(kRed+1);
   ln.PaintLine(z1,y1,z2,y2);

@@ -241,7 +241,6 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // CosmicTrackSeeds
 //-----------------------------------------------------------------------------
-//  fKsColl = nullptr;
   // an empty coll tag is not worth a warning
   if (fCtsCollTag != "") {
     art::Handle<mu2e::CosmicTrackSeedCollection> ctscH;
@@ -269,7 +268,8 @@ int TTrkVisNode::InitEvent() {
   for (int ihit=0; ihit<n_straw_hits; ihit++ ) {
 
     hit              = &fSchColl->at(ihit);
-    straw            = &tracker->getStraw(hit->strawId());
+    mu2e::StrawId sid = hit->strawId();
+    straw            = &tracker->getStraw(sid);
     color            = kBlack;
     intime           = 0;
     isFromConversion = false;
@@ -320,17 +320,16 @@ int TTrkVisNode::InitEvent() {
     if (intime          ) mask |= stntuple::TEvdStrawHit::kInTimeBit;
     if (isFromConversion) mask |= stntuple::TEvdStrawHit::kConversionBit;
     
-    int ist, ipl, ippl, /*ifc,*/ ipn, is;
+    int ist, ipl, ippl, ipnl, is;
 
-    ipl  = straw->id().getPlane();      // plane number here runs from 0 to 2*NStations-1
-    ist  = straw->id().getStation();
+    ipl  = sid.getPlane();      // plane number here runs from 0 to 2*NStations-1
+    ist  = sid.getStation();
     ippl = ipl % 2 ;                    // plane number within the station
-    ipn  = straw->id().getPanel();
-    // il   = straw->id().getLayer();
-    is   = straw->id().getStraw();
+    ipnl = sid.getPanel();
+    is   = sid.getStraw();
 
     w             = &straw->getDirection();
-    evd_straw     = fTracker->Station(ist)->Plane(ippl)->Panel(ipn)->Straw(is);
+    evd_straw     = fTracker->Station(ist)->Plane(ippl)->Panel(ipnl)->Straw(is);
     evd_straw_hit = new stntuple::TEvdStrawHit(hit,
 					       evd_straw,
 					       mcdigi,
@@ -421,12 +420,20 @@ int TTrkVisNode::InitEvent() {
 
     for (auto it=hits->begin(); it!=hits->end(); it++) {
       const mu2e::TrkStrawHitSeed* hit =  &(*it);
-      // track_hit = dynamic_cast<mu2e::TrkStrawHit*> (*it);
       if (hit == nullptr) continue;
       // need to find this hit in the list of TEvdStrawHits (already existing) ... later
 
-      const mu2e::Straw* straw = &tracker->straw(hit->strawId());
-      stntuple::TEvdTrkStrawHit* evd_hit = new stntuple::TEvdTrkStrawHit(hit,straw);
+      mu2e::StrawId sid = hit->strawId();
+      int ist, upl, pln, pnl, stn;
+
+      stn  = sid.getStation();
+      upl  = sid.getPlane();      // plane number here runs from 0 to 2*NStations-1
+      pln = upl % 2 ;                    // plane number within the station
+      pnl  = sid.getPanel();
+      ist  = sid.getStraw();
+
+      stntuple::TEvdStraw*       evd_straw = fTracker->Station(stn)->Plane(pln)->Panel(pnl)->Straw(ist);
+      stntuple::TEvdTrkStrawHit* evd_hit   = new stntuple::TEvdTrkStrawHit(hit,evd_straw);
       trk->AddHit(evd_hit);
     }
 
@@ -1018,7 +1025,7 @@ void TTrkVisNode::PaintVRZ(Option_t* Option) {
         // if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
         const mu2e::TrkStrawHitSeed* hs = hit->TrkStrawHitSeed();
         if ((hs->strawId().getPlane() == pln) and (hs->strawId().getPanel() == pnl)) {
-          hit->PaintRZ(Option);
+          hit->PaintVRZ(Option);
         }
         //     }
       }
