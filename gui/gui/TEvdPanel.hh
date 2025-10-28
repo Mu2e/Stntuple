@@ -56,6 +56,8 @@ public:
   TEvdStraw* Straw  (int I) { return (TEvdStraw*) fListOfStraws->UncheckedAt(I); }
 
   TVector3*  Pos() { return &fPos; };         // position of the panel center
+
+  const mu2e::Panel* GetMu2ePanel() { return fPanel; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
