@@ -1002,8 +1002,8 @@ Int_t TStnVisManager::OpenVRZView() {
 // need tracker as we need position of the panel
 //-----------------------------------------------------------------------------
   int station(0); // so far, just one for VST
-  TStnGeoManager* gm = TStnGeoManager::Instance();
-  stntuple::TEvdTracker* vt    = gm->GetTracker();
+  // TStnGeoManager* gm = TStnGeoManager::Instance();
+  // stntuple::TEvdTracker* vt    = gm->GetTracker();
   int nfaces  = 4; // 6
   int np_face = 3; // 2
   p1->Divide(nfaces, np_face);
@@ -1019,7 +1019,7 @@ Int_t TStnVisManager::OpenVRZView() {
       int ipln, ipnl;
       stntuple::TEvdTracker::ConvertPanelGeoIndices(station,face,ip,ipln,ipnl);
         
-      stntuple::TEvdPanel* panel = vt->Station(0)->Plane(ipln)->Panel(ipnl);
+      //      stntuple::TEvdPanel* panel = vt->Station(0)->Plane(ipln)->Panel(ipnl);
 //-----------------------------------------------------------------------------
 // this assumes that we are displaying in the local reference frame of the panel
 // less sure about the rotation..
