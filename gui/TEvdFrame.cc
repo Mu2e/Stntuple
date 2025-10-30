@@ -742,7 +742,7 @@ void TEvdFrame::DoTab(Int_t id) {
 //-----------------------------------------------------------------------------
 // Legend Auxilliaries
 //-----------------------------------------------------------------------------
-void TStnFrame::OpenLegendPopup() {
+void TEvdFrame::OpenLegendPopup() {
   // Create a top-level window
 
   TGMainFrame* legendWindow = new TGMainFrame(gClient->GetRoot(), 600, 700);
@@ -840,7 +840,7 @@ void TStnFrame::OpenLegendPopup() {
 }
 
 
-void TStnFrame::OpenLegendCalView() {
+void TEvdFrame::OpenLegendCalView() {
   // Create a top-level window
 
   TGMainFrame* legendWindow = new TGMainFrame(gClient->GetRoot(), 600, 700);
@@ -903,7 +903,7 @@ void TStnFrame::OpenLegendCalView() {
 }
 
 
-void TStnFrame::OpenLegendCrvView() {
+void TEvdFrame::OpenLegendCrvView() {
   TGMainFrame* legendWindow = new TGMainFrame(gClient->GetRoot(), 150, 600);
   legendWindow->SetWindowName("CRV Legend");
 
@@ -975,7 +975,7 @@ void TStnFrame::OpenLegendCrvView() {
 
 //-------------------------------------------------------------------------------
 
-void TStnFrame::PrintToPNG(TCanvas* running_canvas) {
+void TEvdFrame::PrintToPNG(TCanvas* running_canvas) {
   running_canvas->SaveAs("output.png");
   printf("\n Print command sent\n");
   

@@ -61,6 +61,7 @@ StntupleTHistModule : {
 StntupleMakerTemplate : { module_type:StntupleMaker
     THistModule          : {          ## defaults of the base class
         @table::StntupleTHistModule
+        module_label : "StntupleMaker"
     }
     processName          : undefined
 #------------------------------------------------------------------------------
@@ -303,11 +304,6 @@ Stntuple: {
 # downstream electrons - explicitly - the same as default
 #------------------------------------------------------------------------------
 	StntupleMaker     : { @table::StntupleMakerTemplate
-            module_type:StntupleMaker
-	    THistModule: { 
-                @table::StntupleTHistModule
-                module_label : "StntupleMaker"
-            }
         }
 
 	StntupleMakerCpr  : { @table::StntupleMakerTemplate 
