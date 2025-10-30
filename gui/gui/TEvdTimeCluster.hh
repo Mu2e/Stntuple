@@ -13,6 +13,7 @@
 namespace mu2e {
   class TimeCluster;
   class ComboHit;
+  class ComboHitCollection;
 }
 
 class TStnVisNode;
@@ -26,7 +27,8 @@ public:
   
 protected:
   int                       fNumber;
-  const mu2e::TimeCluster*  fTimeCluster;
+  const mu2e::TimeCluster*         fTimeCluster;
+  const mu2e::ComboHitCollection*  fChColl;
   TStnVisNode*              fVisNode;      // backward link to the note
 
   TObjArray*                fListOfHits;   // list of combo hits
@@ -46,7 +48,9 @@ public:
 //-----------------------------------------------------------------------------
   TEvdTimeCluster();
 
-  TEvdTimeCluster(int Number, const mu2e::TimeCluster* aTimeCluster,
+  TEvdTimeCluster(int Number,
+                  const mu2e::TimeCluster* aTimeCluster,
+                  const mu2e::ComboHitCollection* ChColl,
                   float T0,
 		  float TMin, float TMax, float ZMin, float ZMax,
                   float PhiMin, float PhiMax,
@@ -70,6 +74,8 @@ public:
 //-----------------------------------------------------------------------------
 					// Type: "ch" or "sh"
   int                      HitOK(const mu2e::ComboHit* Hit, const char* Type);
+
+  int TCHit(int Index);
 //-----------------------------------------------------------------------------
 // drawing functions
 //-----------------------------------------------------------------------------
@@ -84,7 +90,9 @@ public:
 //-----------------------------------------------------------------------------
   virtual void  Paint(Option_t* Opt = "");
   virtual void  Clear(Option_t* Opt = "");
-  virtual void  Print(Option_t* Opt = "") const ; // **MENU**
+
+  virtual void  PrintMe() const ; // **MENU**
+  virtual void  Print  (Option_t* Opt = "") const ; // **MENU**
 
   virtual int   DistancetoPrimitive(Int_t px, Int_t py);
   virtual void  ExecuteEvent       (int Event, int Px, int Py);	

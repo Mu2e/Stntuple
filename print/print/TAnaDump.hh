@@ -13,26 +13,32 @@
 #include "TH2F.h"
 #include "TF1.h"
 
-#ifndef __CINT__
+#ifndef __CLING__
 
+#include "fhiclcpp/types/Atom.h"
+#include "fhiclcpp/types/Table.h"
 #include "fhiclcpp/types/Name.h"
 #include "fhiclcpp/types/Comment.h"
+#include "fhiclcpp/ParameterSet.h"
 
 #include "art/Framework/Principal/Event.h"
-
-#include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"
-#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
-
-#include "Offline/RecoDataProducts/inc/ComboHit.hh"
-#include "Offline/RecoDataProducts/inc/HelixHit.hh"
-// #include "Offline/DataProducts/inc/XYZVec.hh"
 
 #else
 
 namespace art {
   class Event;
 }
+
+namespace fhicl {
+  class ParameterSet;
+}
 #endif
+
+#include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/HelixHit.hh"
 
 namespace mu2e {
 
@@ -41,7 +47,6 @@ namespace mu2e {
 #endif
 
   class StrawHit;
-  //  class StrawHitMCTruth;
   class CaloCluster;
   class CaloProtoCluster;
   class CrvDigi;
@@ -56,6 +61,7 @@ namespace mu2e {
   class TimeCluster;
   class KalSeed;
   class ComboHit;
+  class CosmicTrackSeed;
   class HelixSeed;
   class TrackClusterMatch;
   class TrkCaloHit;
@@ -67,14 +73,13 @@ class KalRep;
 
 class TAnaDump : public TObject {
 public:
-
-#ifndef __CINT__
+#ifndef __CLING__
   struct Config {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
-    // fhicl::Atom<int>                       interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
-    //    fhicl::Sequence<std::string>           rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
-    // fhicl::Table<fhicl::ParameterSet>      debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
+    fhicl::Atom<int>                   interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
+    fhicl::Atom<std::string>           rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
+    fhicl::Table<fhicl::ParameterSet>  debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
     // fhicl::Table<TrkReco>         printUtils    (Name("printUtils"       ), Comment("print Utils"   ) );
   };
 #endif
@@ -217,16 +222,26 @@ public:
 				double TMin = -1.e6,
 				double TMax =  1.e6);
  
+  void printCosmicTrackSeed    (const mu2e::CosmicTrackSeed* CTSeed    , 
+				const char* StrawHitCollTag            ,  // usually - "makeSH"
+				const char* StrawDigiCollTag = "makeSD",
+				const char* Opt              = ""      );
+
   void printHelixSeed          (const mu2e::HelixSeed*         Helix   , 
 				//				const char* HelixSeedCollTag           ,
 				const char* StrawHitCollTag            ,  // usually - "makeSH"
 				const char* StrawDigiCollTag = "makeSD",
 				const char* Opt              = ""      );
 
+  void printCosmicTrackSeedCollection(const char* CTSCollTag             ,  // always needed
+				int         PrintHits          = 0       ,
+				const char* StrawHitCollTag    = "makeSH",  // usually, "makeSH"
+				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // "makeSD" or "compressDigiMCs"
+
   void printHelixSeedCollection(const char* HelixSeedCollTag             ,  // always needed
 				int         PrintHits          = 0       ,
 				const char* StrawHitCollTag    = "makeSH",  // usually, "makeSH"
-				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // most often, "makeSD" or "compressDigiMCs"
+				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // "makeSD" or "compressDigiMCs"
 
   void printHelixHit      (const mu2e::HelixHit*     HelHit,
 			   const mu2e::ComboHit*     Hit, 
@@ -235,7 +250,12 @@ public:
 			   int                       INit  = -1,
 			   int                       Flags = -1);
   
-  void printKalSeed            (const mu2e::KalSeed* TrkSeed                      , 
+  void printKalSeed_Line        (const mu2e::KalSeed* Seed                   , 
+                                 const char* Opt         = ""                ,
+                                 const char* ShCollTag   = "makeSH"          ,
+                                 const char* SdmcCollTag = "compressDigiMCs"); // "makeSD" 
+
+  void printKalSeed            (const mu2e::KalSeed* Seed                      , 
 				const char* Opt                = ""               ,
 				const char* StrawHitCollTag    = "makeSH"         ,
 				const char* StrawDigiMCCollTag = "compressDigiMCs");

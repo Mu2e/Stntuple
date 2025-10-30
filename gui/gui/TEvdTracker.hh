@@ -10,54 +10,65 @@
 #include "TPad.h"
 #include "TArc.h"
 
-#ifndef __CINT__
-#include "Offline/RecoDataProducts/inc/StrawHitCollection.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitPositionCollection.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitFlagCollection.hh"
-#include "Offline/MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
-#else
 namespace mu2e {
-  class StrawHitCollection;
-  class StrawHitPositionCollection;
-  class StrawHitFlagCollection;
-  class PtrStepPointMCVectorCollection;
-};
-#endif
+  class Tracker;
+}
+  
+namespace stntuple {
 
-class TEvdTracker: public TObject {
+class TEvdStation;
+
+class TEvdTracker: public TNamed {
 public:
   
 protected:
+
+  int        fNStations;
+  TObjArray* fListOfStations;
+
+  const mu2e::Tracker*  fTracker;
 
 public:
 //-----------------------------------------------------------------------------
 // constructors and destructor
 //-----------------------------------------------------------------------------
-  TEvdTracker() {}
-  TEvdTracker(const char* Name); 
+  TEvdTracker(const mu2e::Tracker* Tracker = NULL);
+  //  TEvdTracker(const char* Name); 
 
   virtual ~TEvdTracker();
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
+  int          NStations     () { return fNStations;      }
+  TObjArray*   ListOfStations() { return fListOfStations; }
+
+  const mu2e::Tracker* GetMu2eTracker() { return fTracker; }
+
+  TEvdStation* Station  (int I) { 
+    return (TEvdStation*) fListOfStations->UncheckedAt(I); 
+  }
+  
+  static void  ConvertPanelGeoIndices(int Station, int ZFace, int IPFace, int& Plane, int& Panel);
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-
-  //  virtual void  Draw    (Option_t* option = "");
-
   virtual void  Paint   (Option_t* option = "");
+
+  void  PaintXY   (Option_t* option = "");
+  void  PaintRZ   (Option_t* option = "");
+  void  PaintVST  (Option_t* option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive   (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveXY (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveRZ (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveVST(Int_t px, Int_t py);
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdTracker,0)
+  ClassDef(stntuple::TEvdTracker,0)
 };
-
+}
 
 #endif

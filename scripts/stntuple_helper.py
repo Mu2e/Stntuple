@@ -51,7 +51,8 @@ class stntuple_helper:
 #------------------------------------------------------------------------------
         list_of_linkdef_files = self._env.Glob(self.subdir+'/dict/*_linkdef.h', strings=True)
         if (self._debug):
-            print ("[stntuple_helper::handle_dictionaries] ["+self.dirname+"/"+self.subdir+"] handle_dictionaries: list_of_linkdef_files = ",list_of_linkdef_files)
+            print ("[stntuple_helper::handle_dictionaries] ["+self.dirname+"/"+self.subdir+"] handle_dictionaries: list_of_linkdef_files = ",
+                   list_of_linkdef_files,' skip_list:',skip_list)
             
         list_of_dict_files    = []
 
@@ -60,7 +61,7 @@ class stntuple_helper:
             linkdef_fn    = linkdef[len(linkdef)-1];
 
             if (self._debug): 
-                print ("[stntuple_helper::handle_dictionaries] linkdef_fn = ",linkdef_fn)
+                print ("[stntuple_helper::handle_dictionaries] linkdef_fn = ",linkdef_fn, '\n skip_list:',skip_list)
 
             if (not linkdef_fn in skip_list):
                 clname        = linkdef_fn.replace("_linkdef.h","");
@@ -78,6 +79,8 @@ class stntuple_helper:
 # compile dictionaries
 #------------------------------------------------------------------------------
         # list   = [];
+        if (self._debug): 
+            print ("[stntuple_helper::handle_dictionaries] list_of_dict_files = ",list_of_dict_files)
 
         for dict in list_of_dict_files:
             # print("----- dict : ",dict);
@@ -126,7 +129,7 @@ class stntuple_helper:
         self._env.SharedLibrary(lib_name,self._list_of_object_files,LIBS = [libs])
 
 
-    def build_modules(self,list_of_module_files, skip_list, libs = []):
+    def build_modules(self,list_of_module_files, skip_list, skip_dict_list = [], libs = []):
         if (self._debug):
             print ("[Stntuple.build_modules]: list_of_module_files in Stntuple/"+self.subdir," : ",list_of_module_files)
 
@@ -137,16 +140,18 @@ class stntuple_helper:
                     
                 o = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+module.split('.')[0]+'.o'
                 self._env.SharedObject(o,module)
+                olist = [o];
 
                 # check for the presence of a dictionary
-                dict = self.dirname+'/'+self.subdir+'/'+self.subdir+'/dict/'+module.split('.')[0]+'_linkdef.h'
+                dict_bn = module.split('.')[0]+'_linkdef.h';
+                if (not dict_bn in  skip_dict_list):
+                    dict = self.dirname+'/'+self.subdir+'/'+self.subdir+'/dict/'+dict_bn;
 
-                olist = [o];
-                if (os.path.isfile(os.getenv("PWD")+'/'+dict)):
-                    odict = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+module.split('.')[0]+'_dict.o'
-                    olist.append(odict)
-                # else: 
-                #    print(" no ",dict ," found in",os.getenv('PWD'));
+                    if (os.path.isfile(os.getenv("PWD")+'/'+dict)):
+                        odict = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+module.split('.')[0]+'_dict.o'
+                        olist.append(odict)
+                    # else: 
+                        #    print(" no ",dict ," found in",os.getenv('PWD'));
 
                 mname = os.path.basename(module).split('.')[0];
                 lib   = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/lib/libmu2e_'+self.dirname+'_'+mname+'.so';

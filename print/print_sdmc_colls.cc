@@ -9,7 +9,7 @@
 // print all StrawDigiCollection's in the event
 //-----------------------------------------------------------------------------
 void print_sdmc_colls() {
-  printf("Available StrawDigiMCCollections: \n");
+  printf("Available StrawDigiMCCollections: ");
 
   const art::Event* event = TAnaDump::Instance()->Event();
 
@@ -17,6 +17,13 @@ void print_sdmc_colls() {
 
   auto vcoll = event->getMany<mu2e::StrawDigiMCCollection>(selector);
 
+  int ncoll = vcoll.size();
+  if (ncoll == 0) {
+    printf("none\n");
+    return;
+  }
+  printf("\n");
+  
   for (auto handle = vcoll.begin(); handle != vcoll.end(); handle++) {
     if (handle->isValid()) {
       const art::Provenance* prov = handle->provenance();

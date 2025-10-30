@@ -113,6 +113,8 @@ public:
   virtual void SetStations   (int IMin, int IMax);
 
   virtual void SetTimeWindow (float TMin, float TMax);
+  virtual void SetMinEDep    (float E);
+  virtual void SetMaxEDep    (float E);
 //-----------------------------------------------------------------------------
 // GUI comands / drawing functions
 //-----------------------------------------------------------------------------

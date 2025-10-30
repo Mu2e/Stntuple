@@ -4,12 +4,13 @@
 #ifndef TEvdTrack_hh
 #define TEvdTrack_hh
 
-#include "Gtypes.h"
-#include "TClonesArray.h"
-#include "TH1.h"
-#include "TPad.h"
-#include "TArc.h"
+// #include "Gtypes.h"
+#include "TObjArray.h"
+// #include "TH1.h"
+// #include "TPad.h"
+// #include "TArc.h"
 #include "TEllipse.h"
+#include "TLine.h"
 
 namespace mu2e {
   class KalSeed;
@@ -30,6 +31,8 @@ protected:
   TObjArray*            fListOfHits;
 
   TEllipse*             fEllipse;
+  TLine*                fLineXY;
+  TLine*                fLineZY;
 public:
 //-----------------------------------------------------------------------------
 // constructors and destructor
@@ -56,6 +59,7 @@ public:
 //-----------------------------------------------------------------------------
   virtual void  PaintXY  (Option_t* option = "");
   virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
   virtual void  PaintCal (Option_t* option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
@@ -63,6 +67,7 @@ public:
   virtual Int_t DistancetoPrimitive   (Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveXY (Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveVRZ(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveCal(Int_t px, Int_t py);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject

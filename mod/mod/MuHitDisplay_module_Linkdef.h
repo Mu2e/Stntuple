@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 #pragma link C++ nestedtypedefs;
 
-#pragma link C++ class TStnFrame;
+#pragma link C++  class  mu2e::MuHitDisplay;
 
 #endif
 

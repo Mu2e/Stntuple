@@ -5,9 +5,18 @@
 #include "TString.h"
 #include "TGeoManager.h"
 
-#include "Stntuple/geom/TStnTracker.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 
-class TEvdCrvSection;
+#include "Offline/DbTables/inc/TrkPanelMap.hh"
+#include "Offline/TrackerConditions/inc/TrackerPanelMap.hh"
+
+// namespace mu2e {
+//   class TrkPanelMap;
+//   class TrkPanelMap::Row;
+//   class TrkPanelMapEntity;
+//}
+
+class  TEvdCrvSection;
 
 class TStnGeoManager : public TNamed {
 protected:
@@ -30,11 +39,16 @@ public:
 
   TGeoManager*    fGeoManager;
 
-  TStnTracker*    fTracker;
+  stntuple::TEvdTracker*    fTracker;
 
   int             fTransp;
 
   TObjArray*      fListOfDetectors; 
+
+  const mu2e::TrackerPanelMap* fTrackerPanelMap;
+  
+  float            fBField;          // by defautl , 1 T, but could be less.
+                                     // Need to know to display straight cosmics
 
 private:
   TStnGeoManager(const char* Name, const char* Fn, int OriginalColors);
@@ -44,18 +58,23 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
+  float           BField() { return fBField; }
   TEvdCrvSection* CrvSection(int I) { return fCrvSection[I] ; }
 
 					// here I explicitly assume that the name is known
 
-  TStnTracker*    Tracker() const { return (TStnTracker*) fListOfDetectors->FindObject("tracker"); }
-  TObject*        Detector(const char* Name) const { return fListOfDetectors->FindObject(Name); }
+  stntuple::TEvdTracker*    GetTracker() const {
+    return (stntuple::TEvdTracker*) fListOfDetectors->FindObject("tracker");
+  }
+  
+  TObject*        GetDetector(const char* Name) const { return fListOfDetectors->FindObject(Name); }
 //-----------------------------------------------------------------------------
 // setters
 // from this point , TStnGeoManager owns detectors
 //-----------------------------------------------------------------------------
   void AddDetector(TObject* Detector); //  { fListOfDetectors->Add(Detector); }
 
+  void SetBField(float BField) { fBField = BField; }
   void SetRecursiveVisibility(TGeoVolume* Vol, int OnOff);
   void SetRecursiveVisibility(TGeoNode*   Vol, int OnOff);
 
@@ -73,6 +92,8 @@ public:
     
   void SetRecursiveVisibilityByName    (TGeoNode* Node, const char* NamePattern, int OnOff);
   void SetRecursiveVisibilityByMaterial(TGeoNode* Node, const char* Material   , int OnOff);
+
+  void SetTrackerPanelMap(const mu2e::TrackerPanelMap* Map) { fTrackerPanelMap = Map; }
 
   void HideTsCoils (int OriginalColors);
   void HideDsCoils (int OriginalColors);
@@ -100,27 +121,13 @@ public:
   int InitCalorimeterGeometry();
   int InitCrvGeometry();
   int InitTrackerGeometry();
-
+//-----------------------------------------------------------------------------
+// indexing
+//-----------------------------------------------------------------------------
+  const mu2e::TrkPanelMap::Row*  PanelMap(int PlaneID, int PanelID);
+  
   ClassDef(TStnGeoManager,0)
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif
 

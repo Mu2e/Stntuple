@@ -20,8 +20,8 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("#-----------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
-    printf("#   I nsh   SID   Flags  Stn:Pln:Pnl:Str     X       Y       Z      Phi    Time   TCorr     eDep");
-    printf("   DrTime  PrTime TRes    WDist     WRes simID       p        pz        PDG     PDG(M) GenID\n");
+    printf("#   i nsh   sid   flags  stn pln pnl str     x       y       z      phi   time    tcorr     e(keV)");
+    printf("  drtime  prtime  tres    wdist     wres simid      p        pz         pdg     pdgm   genid\n");
     printf("#-----------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
   }
@@ -65,7 +65,7 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
 
     printf(" %08x",Flags);
 
-    printf(" %3i %3i %3i %3i %7.2f %7.2f %8.2f %5.2f %7.2f %7.2f %8.5f %7.2f %7.2f %5.2f %8.3f %8.3f %5i %8.3f %8.3f %10i %10i %5i\n",
+    printf(" %3i %3i %3i %3i %7.2f %7.2f %8.2f %5.2f %8.2f %8.2f %8.4f %7.2f %7.2f %5.2f %8.3f %8.3f %5i %8.3f %8.3f %10i %10i %5i\n",
 	   Hit->strawId().station(),
 	   Hit->strawId().plane(),
 	   Hit->strawId().panel(),
@@ -74,7 +74,7 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
            Hit->pos().phi(),
 	   Hit->time(),
 	   Hit->correctedTime(),
-	   Hit->energyDep(),
+	   Hit->energyDep()*1e3,
 
 	   // (int) Hit->driftEnd(),
 	   Hit->driftTime(),
@@ -97,72 +97,55 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   , 
+void TAnaDump::printComboHitCollection(const char* ComboHitCollTag   , 
 				       const char* StrawDigiMCCollTag,
 				       double TMin, double TMax) {
-
-  //  const char* oname = "TAnaDump::printComboHitCollection";
 //-----------------------------------------------------------------------------
 // get straw hits
 //-----------------------------------------------------------------------------
-  art::Handle<mu2e::ComboHitCollection> shcH;
-  const mu2e::ComboHitCollection*       shc(nullptr);
-  fEvent->getByLabel(StrawHitCollTag,shcH);
+  art::Handle<mu2e::ComboHitCollection> chcH;
+  const mu2e::ComboHitCollection*       chc(nullptr);
+  fEvent->getByLabel(ComboHitCollTag,chcH);
 
-  if (shcH.isValid()) shc = shcH.product();
-  else {
-    printf("ERROR: cant find StrawHitCollection tag=%s, EXIT\n",StrawHitCollTag);
+  printf("printing ComboHitCollection tag:%s\n",ComboHitCollTag);
+  
+  if (not chcH.isValid()) {
+    printf("ERROR: cant find ComboHitCollection tag=%s, EXIT\n",ComboHitCollTag);
     print_sh_colls();
     return;
   }
 
-  // art::Handle<mu2e::StrawHitFlagCollection> shfcH;
-  // const mu2e::StrawHitFlagCollection*       shfc(nullptr);
-  // fEvent->getByLabel("FlagBkgHits:ComboHits",shfcH);
-
-  // if (shfcH.isValid()) shfc = shfcH.product();
-  // else {
-  //   printf("ERROR: cant find StrawHitFlagCollection tag=FlagBkgHits:ComboHits, EXIT\n");
-  //   print_shf_colls();
-  //   return;
-  // }
-
+  chc = chcH.product();
   art::InputTag sdmc_tag = StrawDigiMCCollTag;
   if (sdmc_tag == "") sdmc_tag = fSdmcCollTag;
 
   art::Handle<mu2e::StrawDigiMCCollection> mcdH;
   fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag,mcdH);
   const mu2e::StrawDigiMCCollection*  mcdigis(nullptr);
-  if (mcdH.isValid())   mcdigis = mcdH.product();
-  else {
-    printf("ERROR: cant find StrawDigiMCCollection tag=%s, EXIT\n",sdmc_tag.encode().data());
+  if (not mcdH.isValid()) {
+    printf("WARNING: cant find StrawDigiMCCollection tag=%s\n",sdmc_tag.encode().data());
     print_sdmc_colls();
-    return;
+  }
+  else {
+    mcdigis          = mcdH.product();
   }
 
-  int nhits = shc->size();
-
-  const mu2e::ComboHit* hit;
-
-  int flags;
-  
-  //  const mu2e::ComboHit* hit0 = &shc->at(0);
- 
   int banner_printed = 0;
-  for (int i=0; i<nhits; i++) {
-    hit         = &shc->at(i);
+  int nhits          = chc->size();
+  
+  for (int i=0; i<nhits; ++i) {
+    const mu2e::ComboHit* hit = &chc->at(i);
     int ind     = hit->index(0);
-    // size_t ish  = hit-hit0;
-    // vector<StrawDigiIndex> shids;
-    // shc->fillStrawDigiIndices(ish,shids);
 
-    const mu2e::StrawDigiMC*  sdmc = &mcdigis->at(ind);
-    const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
+    const mu2e::StrawGasStep* step(nullptr);
 
+    if (mcdigis) {
+      const mu2e::StrawDigiMC*  sdmc = &mcdigis->at(ind);
+      step = sdmc->earlyStrawGasStep().get();
+    }
                                         // flags back to a separate coll
                                         // and back again to the hit payload
-    //    flags = *((int*) &shfc->at(i));
-    flags = *((int*) &hit->flag());
+    int flags = *((int*) &hit->flag());
     if (banner_printed == 0) {
       printComboHit(hit, step, "banner");
       banner_printed = 1;

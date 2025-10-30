@@ -56,11 +56,17 @@ TCrvVisNode::TCrvVisNode(const char* Name, int SectionID) : TStnVisNode(Name) {
   fSectionID = SectionID;
   
   fListOfBars = new TObjArray();
-  
+
+  int ns = CRS->getCRSScintillatorShields().size(); // ????
+  int sh09( 9);
+  int sh13(13); // //
+  int sh14(14); // //
+ 
   switch (fSectionID) {
   case 0:
-    //Right
-    for (int shield = 0; shield <= 5; shield++) { // Loop over all the shields in right, but skip short section 
+    // Right
+    for (int shield = 0; shield <=5; shield++) { // Loop over all the shields in right, but skip short section
+      if (shield >= ns) continue;
       nmodules = CRS->getCRSScintillatorShield(shield).nModules();
       for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
 	nlayers = CRS->getCRSScintillatorShield(shield).getModule(module).nLayers();
@@ -81,6 +87,7 @@ TCrvVisNode::TCrvVisNode(const char* Name, int SectionID) : TStnVisNode(Name) {
   case 1:
     // Left
     for (int shield = 6; shield <= 8; shield++) { // Loop over all the shields in left
+      if (shield >= ns) continue;
       nmodules = CRS->getCRSScintillatorShield(shield).nModules();
       for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
 	nlayers = CRS->getCRSScintillatorShield(shield).getModule(module).nLayers();
@@ -100,6 +107,7 @@ TCrvVisNode::TCrvVisNode(const char* Name, int SectionID) : TStnVisNode(Name) {
 // Top DS
 //-----------------------------------------------------------------------------
     for (int shield = 10; shield <= 12; shield++) { // Loop over all the shields in Top DS
+      if (shield >= ns) continue;
       nmodules = CRS->getCRSScintillatorShield(shield).nModules();
       for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
 	nlayers = CRS->getCRSScintillatorShield(shield).getModule(module).nLayers();
@@ -118,21 +126,25 @@ TCrvVisNode::TCrvVisNode(const char* Name, int SectionID) : TStnVisNode(Name) {
 //-----------------------------------------------------------------------------
 // Downstream
 //-----------------------------------------------------------------------------
-    nmodules = CRS->getCRSScintillatorShield(13).nModules(); // Get downstream shield
-    for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
-      nlayers = CRS->getCRSScintillatorShield(13).getModule(module).nLayers();
-      for (int layer = 0; layer < nlayers; layer++) { // Loop over all the layers in the module
-	nbars = CRS->getCRSScintillatorShield(13).getModule(module).getLayer(layer).nBars();
-	for (int ib = 0; ib < nbars; ib++) {
-	  bar = new TEvdCrvBar(CRS->getCRSScintillatorShield(13).getModule(module).getLayer(layer).getBar(ib), fSectionID);
-	  fListOfBars->Add(bar);
-	}
+    if (sh13 < ns) {
+      nmodules = CRS->getCRSScintillatorShield(sh13).nModules(); // Get downstream shield
+      for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
+        const mu2e::CRSScintillatorModule& mod = CRS->getCRSScintillatorShield(sh13).getModule(module);
+        nlayers = mod.nLayers();
+        for (int layer = 0; layer < nlayers; layer++) { // Loop over all the layers in the module
+          nbars = mod.getLayer(layer).nBars();
+          for (int ib = 0; ib < nbars; ib++) {
+            bar = new TEvdCrvBar(mod.getLayer(layer).getBar(ib), fSectionID);
+            fListOfBars->Add(bar);
+          }
+        }
       }
     }
 //-----------------------------------------------------------------------------
 // Downstream lower sections - added 05/04/2015
 //-----------------------------------------------------------------------------
     for (int shield = 18; shield <= 20; shield++) {
+      if (shield >= ns) continue;
       nmodules = CRS->getCRSScintillatorShield(shield).nModules();
       for (int module = 0; module < nmodules; module++) {
 	nlayers = CRS->getCRSScintillatorShield(shield).getModule(module).nLayers();
@@ -149,15 +161,18 @@ TCrvVisNode::TCrvVisNode(const char* Name, int SectionID) : TStnVisNode(Name) {
     
   case 4:
     // Upstream
-    nmodules = CRS->getCRSScintillatorShield(14).nModules(); // Get usptream shield
-    for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
-      nlayers = CRS->getCRSScintillatorShield(14).getModule(module).nLayers();
-      for (int layer = 0; layer < nlayers; layer++) { // Loop over all the layers in the module
-	nbars = CRS->getCRSScintillatorShield(14).getModule(module).getLayer(layer).nBars();
-	for (int ib = 0; ib < nbars; ib++) { // Loop over all the bars in the layer
-	  bar = new TEvdCrvBar(CRS->getCRSScintillatorShield(14).getModule(module).getLayer(layer).getBar(ib), fSectionID);
-	  fListOfBars->Add(bar);
-	}
+    if (sh14 < ns) {
+      nmodules = CRS->getCRSScintillatorShield(sh14).nModules(); // Get usptream shield
+      for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
+        const mu2e::CRSScintillatorModule& mod = CRS->getCRSScintillatorShield(sh14).getModule(module);
+        nlayers = mod.nLayers();
+        for (int layer = 0; layer < nlayers; layer++) { // Loop over all the layers in the module
+          nbars = mod.getLayer(layer).nBars();
+          for (int ib = 0; ib < nbars; ib++) { // Loop over all the bars in the layer
+            bar = new TEvdCrvBar(mod.getLayer(layer).getBar(ib), fSectionID);
+            fListOfBars->Add(bar);
+          }
+        }
       }
     }
     break;
@@ -170,15 +185,18 @@ TCrvVisNode::TCrvVisNode(const char* Name, int SectionID) : TStnVisNode(Name) {
 
   case 8:
     // Top TS
-    nmodules = CRS->getCRSScintillatorShield(9).nModules(); // Get Top TS shield
-    for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
-      nlayers = CRS->getCRSScintillatorShield(9).getModule(module).nLayers();
-      for (int layer = 0; layer < nlayers; layer++) { // Loop over all the layers in the module
-	nbars = CRS->getCRSScintillatorShield(9).getModule(module).getLayer(layer).nBars();
-	for (int ib = 0; ib < nbars; ib++) {
-	  bar = new TEvdCrvBar(CRS->getCRSScintillatorShield(9).getModule(module).getLayer(layer).getBar(ib), fSectionID);
-	  fListOfBars->Add(bar);
-	}
+    if (sh09 < ns) {
+      nmodules = CRS->getCRSScintillatorShield(sh09).nModules(); // Get Top TS shield
+      for (int module = 0; module < nmodules; module++) { // Loop over all the modules in the shield
+        const mu2e::CRSScintillatorModule& mod = CRS->getCRSScintillatorShield(sh09).getModule(module);
+        nlayers = mod.nLayers();
+        for (int layer = 0; layer < nlayers; layer++) { // Loop over all the layers in the module
+          nbars = mod.getLayer(layer).nBars();
+          for (int ib = 0; ib < nbars; ib++) {
+            bar = new TEvdCrvBar(mod.getLayer(layer).getBar(ib), fSectionID);
+            fListOfBars->Add(bar);
+          }
+        }
       }
     }
     break;
@@ -293,6 +311,28 @@ void TCrvVisNode::PaintCrv(Option_t* Option) {
     TEvdCrvBar* bar = EvdBar(i);
     bar->Paint(Option);
   }
+}
+
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintXY(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintRZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintTZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintPhiZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintCal(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintVST(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintVRZ(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------

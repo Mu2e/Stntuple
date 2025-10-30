@@ -16,7 +16,7 @@ Primary: {
     MakeSS : {
       @table::CommonMC.MakeSS
       VDStepPointMCs : "g4run:virtualdetector"
-      IPAStepPointMCs : "g4run:protonabsorber"
+      AbsorberStepPointMCs : "g4run:protonabsorber"
       TargetStepPointMCs : "g4run:stoppingtarget"
     }
     compressDetStepMCs : {
@@ -28,8 +28,8 @@ Primary: {
       simParticleTags : [ "g4run" ]
       mcTrajectoryTag : "g4run"
       debugLevel : 0
-      # save StepPoints in VDs, ProtonAbsorber and ST
-      stepPointMCTags : [ "g4run:virtualdetector", "g4run:protonabsorber", "g4run:stoppingtarget" ]
+      # save StepPoints in VDs
+      stepPointMCTags : [ "g4run:virtualdetector"]
       compressionOptions : @local::DetStepCompression.standardCompression
     }
     FindMCPrimary : {
@@ -41,7 +41,7 @@ Primary: {
       module_type: NullMCPrimary
       ExtraSteps : [ "virtualdetector", "stoppingtarget", "protonabsorber" ] # these will be created but empty
     }
- }
+  }
 
   filters : {
     # basic step filter configuration: these can get refined for particular primaries
@@ -126,7 +126,7 @@ Primary: {
       }
     }
 
-    WireGammaStopResampler : {
+    GammaConversionResampler : {
       module_type: ResamplingMixer
       readMode            : sequential
       wrapFiles           : true
@@ -137,16 +137,32 @@ Primary: {
         debugLevel : 0
         products: {
           genParticleMixer: { mixingMap: [ [ "TargetStopResampler", "" ] ] }
-          simParticleMixer: { mixingMap: [ [ "WireStopFilter", "" ] ] }
-          stepPointMCMixer: { mixingMap: [ [ "WireStopFilter:virtualdetector", ":" ] ] }
+          simParticleMixer: { mixingMap: [ [ "GammasFilter", "" ] ] }
+          stepPointMCMixer: { mixingMap: [ [ "GammasFilter:virtualdetector", ":" ] ] }
           volumeInfoMixer: {
-            srInput: "compressPVWireStops"
+            srInput: "compressGammas"
             evtOutInstanceName: "eventlevel"
           }
         }
       }
     }
+
+    StopSelector : { module_type : NullProducer }
+
+    GammaConversionFilter : {
+      module_type : GammaConversionPoints
+      g4ModuleLabel : "g4run"
+      doFilter : true
+      rMin : 0.   # Include target and IPA
+      rMax : 500.
+      zMin : 5000.
+      zMax : 8000.
+      eMin : 1.5
+      verbosity : 0
+      saveTree : false
+    }
   }
+
   # sequence to create DetectorSteps
   DetStepSequence : [
     @sequence::TrackerMC.StepSim,
@@ -182,6 +198,43 @@ Primary: {
   }
   EndSequence : [ genCountLogger ]
 }
+
+# RMC information
+RMCInfo : {
+  kmaxMeasured : 90.1 # Measured as 90.1 +- 1.8
+  kmaxEndpoint : 101.9 # Maximum photon kinematically allowed on aluminum
+}
+
+# RPC information
+RPCInfo : {
+    minPionStopTime  : 350. # minimum pion stop time considered, in ns
+    pionStoppingCode : 78 # hBertiniCaptureAtRest
+}
+
+StopFilter : {
+
+  filters : {
+    @table::genFilters.filters
+  }
+
+  KeptProducts : ["keep mu2e::*_*_*_*"]
+
+  analyzers: {
+    genCountLogger: { module_type: GenEventCountReader makeHistograms: false }
+  }
+  StopFilterOutput : {
+    module_type : RootOutput
+    SelectEvents : [ StopFilterPath ]
+    fileName    : @nil
+  }
+
+  EndSequence : [genCountLogger ]
+}
+# define the main sequence
+StopFilter.StopFilterOutput.outputCommands : [ "drop *_*_*_*", @sequence::StopFilter.KeptProducts]
+StopFilter.EndPath : [ StopFilterOutput ]
+
+
 # define the main sequence
 Primary.PrimarySequence : [ @sequence::Primary.DetStepSequence, PrimaryFilter, @sequence::Primary.FinalizeSequence ]
 Primary.PrimaryOutput.outputCommands : [ "drop *_*_*_*",

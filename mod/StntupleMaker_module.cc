@@ -246,7 +246,7 @@ public:
 // constructors
 //------------------------------------------------------------------------------
 StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet): 
-  StntupleModule             (PSet,                   "StntupleMaker"         )
+  StntupleModule   (PSet.get<fhicl::ParameterSet>("THistModule"),"StntupleMaker")
   , fProcessName             (PSet.get<string>        ("processName"         ))
 
   , fMakeCalData             (PSet.get<int>           ("makeCalData"         ))

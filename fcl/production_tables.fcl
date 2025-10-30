@@ -51,299 +51,13 @@ production : {
 }
 
 #------------------------------------------------------------------------------
-# output event formats
-# 1. event format for mixing input
-#------------------------------------------------------------------------------
-production.gen_sim_output       : [ "drop    *_*_*_*"                                 ,
-				"keep    mu2e::EventWeight_*_*_*"                 ,
-				"keep    mu2e::EventWindowMarker_EWMProducer_*_*" ,
-				"keep    mu2e::FixedTimeMap_*_*_*"                ,
-				"keep    mu2e::GenEventCount_*_*_*"               ,
-				"keep    mu2e::GenParticles_*_*_*"                ,
-				"keep    *_g4run_*_*"                             ,
-				"drop    mu2e::StepPointMCs_g4run_calorimeter_*"  ,
-				"drop    mu2e::StepPointMCs_g4run_calorimeterRO_*",
-				"keep    mu2e::CaloShowerSteps_*_*_*"
-			       ]
-#------------------------------------------------------------------------------
-# 2. output format for digi files
-#------------------------------------------------------------------------------
-production.gen_sim_digi_output  : [ "drop    *_*_*_*"                                ,
-				"keep    *_compressDigiMCs_*_*"                  ,
-				"keep    mu2e::GenEventCount_*_*_*"              ,
-				"keep    mu2e::GenParticles_generate_photon_*"   ,
-				"keep    mu2e::StatusG4_g4run_*_*"               ,
-				"keep    mu2e::EventWeight_*_*_*"                ,
-				"keep    mu2e::EventWindowMarker_EWMProducer_*_*",
-				"keep    mu2e::FixedTimeMap_*_*_*"               ,
-				"keep    mu2e::CaloDigis_CaloDigiFromShower_*_*" ,
-				"keep    mu2e::CrvDigis_CrvDigi_*_*"             ,
-				"keep    mu2e::ProtonBunchIntensity_*_*_*"       ,
-				"keep    mu2e::StrawDigis_makeSD_*_*"            ,
-				"keep    art::TriggerResults_TriggerResults_*_*"
-			       ]
-#------------------------------------------------------------------------------
-# 2. output format for digi files after mixing
-#------------------------------------------------------------------------------
-production.mixing_output : [ "drop *_*_*_*"                               ,
-			 "keep *_compressDigiMCs_*_*"                 ,
-			 "keep mu2e::GenEventCount_*_*_*"             ,
-			 "keep mu2e::GenParticles_generate_photon_*"  ,
-			 "keep mu2e::EventWeight_*_*_*"               ,
-			 "keep mu2e::EventWindowMarker_*_*_*"         ,
-			 "keep mu2e::ProtonBunchIntensity_*_*_*"      ,
-			 "keep mu2e::StrawDigis_*_*_*"                ,
-			 "keep mu2e::CaloDigis_*_*_*"                 ,
-			 "keep mu2e::CrvDigis_*_*_*"                  ,
-			 "keep art::TriggerResults_TriggerResults_*_*"
-			]
-#------------------------------------------------------------------------------
-# module sequences - by functionality
-#------------------------------------------------------------------------------
-production.gen_g4              : [ generate, genCounter, g4run, g4status ]
-
-production.gen_g4_pbi          : [ generate, genCounter, g4run, protonBunchIntensity ]
-
-production.gen_g4_pbi_detFilter: [ generate, genCounter, g4run, protonBunchIntensity, filterStepPointMomentum ]
-
-production.pbi_ewm             : [ protonBunchIntensity, EWMProducer ]
-
-production.digis               : [ @sequence::TrackerMC.DigiSim, StrawDigiMCFilter, 
-				   ## FIXME @sequence::CaloDigiMC.DigiSim, 
-				   @sequence::CrvDAQPackage.CrvDAQSequence 
-				   # compressDigiMCs 
-				  ]
-
-production.digis_no_filter     : [ @sequence::TrackerMC.DigiSim, 
-			       # StrawDigiMCFilter, 
-				   ## FIXME @sequence::CaloDigiMC.DigiSim, 
-			       @sequence::CrvDAQPackage.CrvDAQSequence
-			       # compressDigiMCs 
-			      ]
-
-production.digisCaloFilter     : [ # FIXME @sequence::CaloDigiMC.DigiSim, 
-				   CaloShowerSimFilter,
-				   @sequence::TrackerMC.DigiSim, 
-				   @sequence::CrvDAQPackage.CrvDAQSequence 
-				   # compressDigiMCs 
-			      ]
-
-# calorimeter reconstruction
-production.calo_hit_reco        : [ CaloRecoDigiFromDigi ,CaloCrystalHitFromHit ]
-
-production.calo_cluster_reco    : [ CaloProtoClusterFromCrystalHit, CaloClusterFromProtoCluster ]
-
-production.calo_reco            : [ @sequence::production.calo_hit_reco,
-                                    @sequence::production.calo_cluster_reco ]
-
-# track hit reconstruction
-production.trk_hit_reco         : [ makeSH, makePH, FlagBkgHits]
-
-
-# CRV reconstruction
-production.crv_reco             : [ @sequence::CrvRecoMCPackage.CrvRecoMCSequence ]
-
-# downstream e+/e- helix reconstruction
-production.helix_reco_de : [
-			TimeClusterFinderDe, HelixFinderDe,                     # TrkPatRec
-			CalTimePeakFinder, DeltaFinder, CalHelixFinderDe,       # CalPatRec
-			MHFinderDe                                              # helix merging
-		       ]
-
-# upstream e+/e- helix reconstruction
-production.helix_reco_ue : [
-			TimeClusterFinderUe, HelixFinderUe,                     # TrkPatRec-only
-			CalTimePeakFinderUe, DeltaFinderUe, CalHelixFinderUe,   # CalPatRec
-			MHFinderUe                                              # helix merging
-		       ]
-
-# downstream electron reconstruction: e- and e+ combined
-production.trk_reco_de  : [
-		       TimeClusterFinderDe, HelixFinderDe,                     # TrkPatRec
-		       CalTimePeakFinder, DeltaFinder, CalHelixFinderDe,       # CalPatRec
-		       MHFinderDe,                                             # helix merging
-		       KSFDeMH,                                                # Seed fit (chisquared, no drift)
-		       KFFDeMHPar, KFFDeMHDar                                  # final Kalman filter fit with the Panel-based AR
-		      ]
-
-production.trk_reco_de_dar : [
-		       TimeClusterFinderDe, HelixFinderDe,                     # TrkPatRec
-		       CalTimePeakFinder, DeltaFinder, CalHelixFinderDe,       # CalPatRec
-		       MHFinderDe,                                             # helix merging
-		       KSFDeMH,                                                # Seed fit (chisquared, no drift)
-		       KFFDeMHDar                                              # final Kalman filter, DAR-only
-		      ]
-
-# downstream muon reconstruction: mu- and mi+ combined
-production.trk_reco_dmu : [
-		       TimeClusterFinderDmu, HelixFinderDmu,                   # TrkPatRec
-		       CalTimePeakFinderMu, DeltaFinderMu, CalHelixFinderDmu,  # CalPatRec
-		       MHFinderDmu,                                            # helix merging
-		       KSFDmuMH,                                               # Seed fit (chisquared, no drift)
-		       KFFDmuMHPar, KFFDmuMHDar                                # final Kalman filter fit with the panel-based AR
-		      ]
-
-production.trk_reco_dmu_dar : [
-		       TimeClusterFinderDmu, HelixFinderDmu,                   # TrkPatRec
-		       CalTimePeakFinderMu, DeltaFinderMu, CalHelixFinderDmu,  # CalPatRec
-		       MHFinderDmu,                                            # helix merging
-		       KSFDmuMH,                                               # Seed fit (chisquared, no drift)
-		       KFFDmuMHDar                                             # final Kalman filter fit, DAR-only
-		      ]
-
-# upstream electron reconstruction (e- and e+): standalone-only pattern recognition, 
-# calorimeter-seeded algorithm is designed to deal only with the downstream tracks
-production.trk_reco_ue  : [
-		       TimeClusterFinderUe, HelixFinderUe,   
-		       CalTimePeakFinderUe, DeltaFinderUe, CalHelixFinderUe,   # CalPatRec
-		       MHFinderUe,                                             # helix merging
-		       KSFUeMH,                                                # Seed fit (chisquared, no drift)
-		       KFFUeMHPar , KFFUeMHDar                                 # final Kalman filter fit
-		      ]
-
-# upstream electron reconstruction, DAR
-production.trk_reco_ue_dar : [
-		       TimeClusterFinderUe, HelixFinderUe,                     # TrkPatRec
-		       CalTimePeakFinderUe, DeltaFinderUe, CalHelixFinderUe,   # CalPatRec
-		       MHFinderUe,                                             # helix merging
-		       KSFUeMH,                                                # Seed fit (chisquared, no drift)
-		       KFFUeMHDar                                              # final Kalman filter, DAR-only
-		      ]
-
-# upstream muon reconstruction (mu- and mu+): standalone-only pattern recognition, 
-# calorimeter-seeded algorithm is designed to deal only with the downstream tracks
-production.trk_reco_umu : [
-		       TimeClusterFinderUmu, HelixFinderUmu,   
-		       MHFinderUmu,                                            # helix merging
-		       KSFUmuMH,                                               # Seed fit (chisquared, no drift)
-		       KFFUmuMHPar , KFFUeMHDar                                # final Kalman filter fit
-		      ]
-
-# tracks reconstructions: positive and negative charges separate
-# use sequecnes defined in JobConfig/reco/prolog.fcl
-production.trk_reco_sep  : [ # FIXME @sequence::Reconstruction.DeSequence,
-			     # @sequence::Reconstruction.UeSequence,
-			     # @sequence::Reconstruction.DmuSequence,
-			     # @sequence::Reconstruction.UmuSequence
-			    ]
-
-# MC compression at the end of reco, assume the pulse punch intensity to be present
-production.reco_compression : [ FindMCPrimary,        # find the primary particle
-				SelectRecoMC,         # identify the MC information we want to keep
-				compressRecoMCs       # compress
-			       ]
-
-# trigger paths considered, include into digi datasets
-production.triggers         : [
-			       tprSeedDeM_trigger    , cprSeedDeM_trigger    , tprSeedDeP_trigger    , cprSeedDeP_trigger    , 
-			       cprLowPSeedDeM_trigger, cprLowPSeedDeP_trigger, tprLowPSeedDeM_trigger, tprLowPSeedDeP_trigger, 
-			       tprHelixIPADeM_trigger
-			      ]
-#------------------------------------------------------------------------------
 # PRODUCTION paths
 #------------------------------------------------------------------------------
 production.paths : {
-#\\\\	@table::Trigger.paths
-#------------------------------------------------------------------------------
-# start from including the trigger paths
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 # gcl: an attempt to introduce a standard name for genCountLogger path
 #------------------------------------------------------------------------------
     gcl        : [ genCountLogger ]
-#------------------------------------------------------------------------------
-# p1  : MC generation, G4, digitization
-# p12 : MC generation, G4, filter events with at least one step point in the tracker of the calorimeter
-# p14 : prepare inputs for mixing
-#------------------------------------------------------------------------------
-    production_p1 : [ @sequence::production.gen_g4_pbi,           # includes protonBunchIntensity
-		      GammaFilter,                            # does nothing by default
-		      @sequence::CommonMC.DigiSim      ,      # adds EWMProducer (name - confusing)
-		      @sequence::production.digis          ,
-		      compressDigiMCs
-		     ]
-
-	# same as production_p1, but using a calo filter instead of straw digi filter
-    production_p1calo : [ @sequence::production.gen_g4_pbi     , 
-			  GammaFilter                      ,  # does nothing by default
-			  @sequence::CommonMC.DigiSim      ,  # EWMProducer
-			  @sequence::production.digisCaloFilter,
-			  compressDigiMCs
-			  
-			 ]
-
-    production_p10 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
-		       filterStepPointMomentum ,
-		       GammaFilter,                           # does nothing by default
-		       @sequence::CommonMC.DigiSim       ,    # adds EWMProducer (name - confusing)
-		       @sequence::production.digis_no_filter ,    # no StrawDigiMCFilter, for mixing
-		       compressDigiMCs
-		      ]
-
-    production_p11 : [ g4run, protonBunchIntensity,           # what's left of @sequence::production.gen_g4_time_map,
-		       @sequence::CommonMC.DigiSim, 
-		       GammaFilter                ,           # does nothing by default
-		       @sequence::production.digis    ,
-		       compressDigiMCs
-		     ]
-
-    production_p111 : [ @sequence::production.pbi_ewm   ,          # what's left of @sequence::production.gen_g4_time_map,
-			GammaFilter                 ,          # does nothing by default
-			@sequence::production.digis_no_filter,
-			compressDigiMCs
-		       ]
-
-    production_p12 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
-		       filterStepPointMomentum,               # 
-		       @sequence::CommonMC.DigiSim            # adds EWMProducer (name - confusing)
-		      ]
-
-
-    production_p13 : [ g4run , 
-		       filterStepPointMomentum,               # 
-		       @sequence::CommonMC.DigiSim            # adds EWMProducer (name - confusing)
-		      ]
-
-    production_p14_mustop : [ generate, genCounter, g4run, filterStepPointMomentum, 
-			      CaloShowerStepFromStepPt
-			     ]                                # path for producing mixing inputs from muon captures
-
-    production_p14_flash : [ g4run, filterStepPointMomentum
-			     # CaloShowerStepFromStepPt
-			    ]                                 # path for producing the mixing input from beam flash 
-
-    production_p15_flash : [
-			     filterStepPointMomentum ,        # filter again, now - on time, need step points...
-			     CaloShowerStepFromStepPt
-			    ]                                 # path for producing the mixing input from beam flash 
-#------------------------------------------------------------------------------
-# p2: read digis, do reconstruction: run downstream electron and muon reco paths
-#------------------------------------------------------------------------------
-    production_p2 : [ @sequence::production.calo_reco,        ## 
-		      @sequence::production.trk_hit_reco,
-		      @sequence::production.trk_reco_de ,
-		      @sequence::production.trk_reco_dmu , 
-		      @sequence::production.trk_reco_sep ,
-		      @sequence::production.reco_compression
-		     ]
-
-#------------------------------------------------------------------------------
-# p21: read digis, do reconstruction: run downstream electron and muon reco paths
-#------------------------------------------------------------------------------
-    production_p21 : [ @sequence::production.calo_reco,
-		       @sequence::production.trk_hit_reco,
-		       @sequence::production.trk_reco_de ,
-		       @sequence::production.trk_reco_dmu
-		      ]
-#------------------------------------------------------------------------------
-# p22: read digis, reconstruct helices - both directions, 
-#      2021-03-21: currently time clustering is currently not direction-symmetric
-#------------------------------------------------------------------------------
-    production_p22 : [ @sequence::production.calo_reco,
-		       @sequence::production.trk_hit_reco,
-		       @sequence::production.helix_reco_de,
-		       @sequence::production.helix_reco_ue
-		      ]
 #------------------------------------------------------------------------------
 # p20: default Production track reconstruction
 #------------------------------------------------------------------------------
@@ -351,12 +65,12 @@ production.paths : {
            @sequence::Reconstruction.CaloReco,  ##   @sequence::Reconstruction.CaloReco includes:
                                                 ##     @sequence::CaloReco.Reco
                                                 ##     @sequence::CaloCluster.Reco
-           @sequence::Reconstruction.TrkHitReco,##   @sequence::Reconstruction.TrkReco includes:
+           @sequence::Reconstruction.TrkHitReco,##   @sequence::Reconstruction.TrkHitReco includes:
                                                 ##     @sequence::TrkHitReco.PrepareHits includes:
-                                                ##       PBTFSD, makeSH, makePH, makeSTH, FlagBkgHits
+                                                ##       PBTFSD, makeSH, makePH, makeSTH, FlagPH
            @sequence::Reconstruction.CrvReco,   ##   @sequence::Reconstruction.CrvReco includes:
                                                 ##     @sequence::CrvRecoPackage.CrvRecoSequence
-           @sequence::Reconstruction.DeReco     ##   @sequence::Reconstruction.TrackReco includes:
+           @sequence::Reconstruction.OnSpillTrk ##   @sequence::Reconstruction.OnSpillTrk includes:
                                                 ##     @sequence::Reconstruction.DeReco includes: 
                                                 ##       TimeClusterFinderDe, HelixFinderDe,
                                                 ##       CalTimePeakFinder, CalHelixFinderDe,
@@ -386,19 +100,21 @@ production.paths : {
            @sequence::Reconstruction.CaloReco,  ##   @sequence::Reconstruction.CaloReco includes:
                                                 ##     @sequence::CaloReco.Reco
                                                 ##     @sequence::CaloCluster.Reco
-           @sequence::Reconstruction.TrkHitReco,##   @sequence::Reconstruction.TrkReco includes:
+           @sequence::Reconstruction.TrkHitReco,##   @sequence::Reconstruction.TrkHitReco includes:
                                                 ##     @sequence::TrkHitReco.PrepareHits includes:
-                                                ##       PBTFSD, makeSH, makePH, makeSTH, FlagBkgHits
+                                                ##       PBTFSD, makeSH, makePH, flagPH
            ## @sequence::Reconstruction.CrvReco,   ##   @sequence::Reconstruction.CrvReco includes:
                                                 ##     @sequence::CrvRecoPackage.CrvRecoSequence
            ## @sequence::Reconstruction.TrackReco  ##   @sequence::Reconstruction.TrackReco includes:
                                                 ##        @sequence::Reconstruction.DeReco # includes: 
-           TZClusterFinder,                     ##          TimeClusterFinderDe, 
+           TZClusterFinder,                     ##          TimeClusterFinderDe,
+           
+           AgnosticHelixFinder,
+
            HelixFinderDe,                       ##          HelixFinderDe,
            CalTimePeakFinder, CalHelixFinderDe, ##          CalTimePeakFinder, CalHelixFinderDe,
-           MHDeM, MHDeP,                        ##          MHDeM, MHDeP,
-           MHFinderDe  , 
-           KKDeMHPar   ,                        ##          KKDeM, KKDeP
+           MHDe,     
+           KKDePar   ,                          ##          KKDeM, KKDeP
                                                 ##     @sequence::Reconstruction.UeReco # includes
                                                 ##       TimeClusterFinderUe, HelixFinderUe,
                                                 ##       MHUeM, MHUeP,
@@ -406,89 +122,46 @@ production.paths : {
                                                 ##     @sequence::Reconstruction.DmuReco # includes:
            HelixFinderDmu,                      ##       TimeClusterFinderDmu, HelixFinderDmu,  # TrkPatRec
            CalTimePeakFinderMu, CalHelixFinderDmu, ##    CalTimePeakFinderMu, CalHelixFinderDmu,
-           MHDmuM, MHDmuP,                      ##       MHDmuM, MHDmuP,
-           MHFinderDmu   ,
-           KKDmuMHPar                           ##       KKDmuM, KKDmuP
+           MHDmu      ,
+           KKDmuPar                             ##       KKDmuM, KKDmuP
                                                 ##     @sequence::Reconstruction.UmuReco # includes:
                                                 ##       TimeClusterFinderUmu, HelixFinderUmu,
                                                 ##       MHUmuM, MHUmuP,
                                                 ##       KKUmuM, KKUmuP
           ]
 #------------------------------------------------------------------------------
-# p31: read digis, reconstruct helices - both directions, 
-#      assume muon-only reco (for ppbar events)
-#------------------------------------------------------------------------------
-    p31 : [ @sequence::Reconstruction.CaloReco, 
-            # @sequence::Reconstruction.TrkReco ,     # PBTFSD, makeSH, makePH, FlagBkgHits
-            @sequence::TrkHitReco.PrepareHits ,     # PBTFSD, makeSH, makePH, FlagBkgHits
-            # ------------ @sequence::Reconstruction.DmuReco  
-            # TimeClusterFinderDmu, 
-            TZClusterFinder, 
-            PhiClusterFinder,
-            CalTimePeakFinderMu,
-            HelixFinderDmu,                         		 
-            CalHelixFinderDmu
-            , MHDmuM , MHDmuP                       # 1st step: RobustHelixFinder(M/P)+CalHelixFinder(M/P)
-            , MHFinderDmu                           # 2nd step: MHDmuM + MHDmuP
-            , KSFDmu                                # Seed fit (chisquared, no drift)
-            , KFFDmu                                # final Kalman filter fit
-           ]
-#------------------------------------------------------------------------------
 # p32: use kinkal fit , read digis, reconstruct helices - both directions, 
-#      assume muon-only reco (for ppbar events)
-#      keep 'KKDmuMHPar' label to remember that the doublet ambig resolver so 
-#      far cant be used with the KinKal fit
+#      assume muon-only reco for ppbar events - thus PhiClusterFinder
+#      AgnosticHelixFinder and HelixFinderDmu to use time  clusters by PhiClusterFinder
+#      keep 'KKDmuPar' label as a reminder about the doublet ambig resolver
+#      so far cant be used with the KinKal fit
+#      the label KKDmuPar has to be defined in the top-level FCL KKDmuPar : { @table::KKDmu }
 #------------------------------------------------------------------------------
     p32 : [ @sequence::Reconstruction.CaloReco, 
-            # @sequence::Reconstruction.TrkReco ,     # PBTFSD, makeSH, makePH, FlagBkgHits
-            @sequence::TrkHitReco.PrepareHits ,     # PBTFSD, makeSH, makePH, FlagBkgHits
+            # @sequence::Reconstruction.TrkHitReco,         # PBTFSD, makeSH, makePH, flagPH
+            @sequence::TrkHitReco.PrepareHits ,             # PBTFSD, makeSH, makePH, flagPH
             # ------------ @sequence::Reconstruction.DmuReco  
             # TimeClusterFinderDmu, 
-            TZClusterFinder, 
-            PhiClusterFinder,
-            CalTimePeakFinderMu,
-            HelixFinderDmu,                         		 
-            CalHelixFinderDmu,
+            TZClusterFinder, PhiClusterFinder, AgnosticHelixFinder, HelixFinderDmu, 
             
-            MHDmuM, MHDmuP ,                        # 1st step: RobustHelixFinder(M/P)+CalHelixFinder(M/P)
-            MHFinderDmu                             # 2nd step: MHDmuM + MHDmuP
-            , KKDmuMHPar                            # Seed fit (chisquared, no drift)
-           ]
-#------------------------------------------------------------------------------
-# p33: reco path for pi+ --> e+ nu : read digis, reconstruct helices,
-#------------------------------------------------------------------------------
-    p33 : [ @sequence::Reconstruction.CaloReco, 
-            # @sequence::Reconstruction.TrkReco ,     # PBTFSD, makeSH, makePH, FlagBkgHits
-            @sequence::TrkHitReco.PrepareHits ,     # PBTFSD, makeSH, makePH, FlagBkgHits
-            # ------------ @sequence::Reconstruction.DmuReco  
-            # TimeClusterFinderDmu, 
-            TZClusterFinder, 
-            # PhiClusterFinder,
-            CalTimePeakFinder,
-            HelixFinderDe,                         		 
-            CalHelixFinderDe
-            , MHDeM , MHDeP                         # 1st step: RobustHelixFinder(M/P)+CalHelixFinder(M/P)
-            , MHFinderDe                            # 2nd step: MHDeM + MHDeP
-            , KSFDeMH                               # Seed fit (chisquared, no drift)
-            , KFFDeMHPar                            # final Kalman filter fit
+            CalTimePeakFinderDmu, CalHelixFinderDmu  , # CalPatRec
+
+            MHDmu                                      # 2nd step: MHDmuM + MHDmuP
+            , KKDmuPar                                 # Seed fit (chisquared, no drift)
            ]
 #------------------------------------------------------------------------------
 # p34: reco path for pi+ --> e+ nu : KinKal fits
+#      aim for one-track events, do not use PhiClusterFinder
 #------------------------------------------------------------------------------
     p34 : [ @sequence::Reconstruction.CaloReco, 
-            # @sequence::Reconstruction.TrkReco ,     # PBTFSD, makeSH, makePH, FlagBkgHits
-            @sequence::TrkHitReco.PrepareHits ,     # PBTFSD, makeSH, makePH, FlagBkgHits
-            # ------------ @sequence::Reconstruction.DmuReco  
-            # TimeClusterFinderDmu, 
-            TZClusterFinder, 
-            # PhiClusterFinder,
-            CalTimePeakFinder,
-            HelixFinderDe,                         		 
-            CalHelixFinderDe
-            , MHDeM , MHDeP                         # 1st step: RobustHelixFinder(M/P)+CalHelixFinder(M/P)
-            , MHFinderDe                            # 2nd step: MHDeM + MHDeP
-            # , KSFDeMH                               # Seed fit (chisquared, no drift)
-            , KKDeMHPar                             # final Kalman filter fit
+            # @sequence::Reconstruction.TrkHitReco ,   # PBTFSD, makeSH, makePH, flagPH
+            @sequence::TrkHitReco.PrepareHits ,        # PBTFSD, makeSH, makePH, flagPH
+            # ------------ @sequence::Reconstruction.DeReco  
+            TZClusterFinder    , AgnosticHelixFinder,  # AgnosticPatRec
+            CalTimePeakFinderDe, CalHelixFinderDe   ,  # CalPatRec
+            TimeClusterFinderDe, HelixFinderDe      ,  # TrkPatRec
+            MHDe,                                      # helix merging
+            KKDePar                                    # KinKal drift fits
            ]
 #------------------------------------------------------------------------------
 # p100: concatenation job, trigger path is empty

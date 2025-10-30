@@ -13,6 +13,7 @@ def local_build():
 
     rootlibs = local_env['ROOTLIBS']
     if ( not ("EG" in rootlibs)): rootlibs.insert(rootlibs.index("Physics")+1,"EG");
+    if ( not ("Geom" in rootlibs)): rootlibs.insert(rootlibs.index("Gpad")+1,"Geom");
 
     debug     = False; # True; 
     helper    = stntuple_helper(local_env,debug);

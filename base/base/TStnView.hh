@@ -8,15 +8,20 @@
 #include "TNamed.h"
 #include "TObjArray.h"
 #include "TGaxis.h"
+#include "TGeoMatrix.h"
+#include "TVector3.h"
 
 #include "Stntuple/base/TVisNode.hh"
 
 class TStnView: public TNamed {
 protected:
-  int                 fType;  // view type
-  int                 fIndex; // for calorimeter - 2 views, for example
+  int                 fType;            // view type
+  int                 fIndex;           // for calorimeter - 2 views, for example
+  void*               fMother;          // non-null. if in the local ref system of some object
 
-  int                 fDebugLevel;
+  static int          fgDebugLevel;
+  
+  TGeoCombiTrans*     fCombiTrans;      // rotate, then translate
   
   Int_t               fPx1;
   Int_t               fPy1;
@@ -53,21 +58,34 @@ public:
 //-----------------------------------------------------------------------------
   int           Type () { return fType;  }
   int           Index() { return fIndex; }
+  void          CloneCombiTrans(const TGeoCombiTrans* T);
+  
+  TGeoCombiTrans* GetCombiTrans() { return fCombiTrans; }
 
+  void*         GetMother()      { return fMother; }
   int           GetNNodes()      { return fListOfNodes->GetEntriesFast(); }
   TVisNode*     GetNode  (int I) { return (TVisNode*) fListOfNodes->UncheckedAt(I);   }
   TObjArray*    GetListOfNodes() { return fListOfNodes; }
+  int           GetPx1 ()        { return fPx1;  }
+  int           GetPx2 ()        { return fPx2;  }
+  int           GetPy1 ()        { return fPy1;  }
+  int           GetPy2 ()        { return fPy2;  }
+  double        GetYMin()        { return fYMin; }
+  double        GetYMax()        { return fYMax; }
 
   void          AddNode(TVisNode* Node) { fListOfNodes->Add(Node); }
 //-----------------------------------------------------------------------------
 // setters
 //-----------------------------------------------------------------------------
-  void          SetType       (int Type ) { fType  = Type;  } 
+  void          SetDebugLevel (int Level);               // *MENU*
   void          SetIndex      (int Index) { fIndex = Index; } 
 
-  void          SetTimeWindow (float TMin, float TMax);  // *MENU* 
+  void          SetMinEDep    (float E);                 // *MENU* 
+  void          SetMaxEDep    (float E);                 // *MENU* 
+  void          SetMother     (void* Mother) { fMother = Mother; };
   void          SetStations   (int I1, int I2);          // *MENU* 
-  void          SetDebugLevel (int Level);               // *MENU*
+  void          SetTimeWindow (float TMin, float TMax);  // *MENU* 
+  void          SetType       (int Type ) { fType  = Type;  } 
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------

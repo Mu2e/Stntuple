@@ -25,12 +25,12 @@ physics.producers.makeSH.minimumTime                         : @local::BLIND_TIM
 physics.producers.TimeClusterFindere.tmin                    : @erase
 physics.producers.TimeClusterFindere.tmin                    : @local::BLIND_TIME
 # 
-physics.filters.CalTimePeakFinder.minClusterTime             : @erase
-physics.filters.CalTimePeakFinder.minClusterTime             : @local::BLIND_TIME
+physics.producers.CalTimePeakFinder.minClusterTime             : @erase
+physics.producers.CalTimePeakFinder.minClusterTime             : @local::BLIND_TIME
 # 
 physics.producers.DeltaFinder.minimumTime                    : @erase
 physics.producers.DeltaFinder.minimumTime                    : @local::BLIND_TIME
 # 
-physics.filters.CalHelixFinderDe.HelixFinderAlg.minimumTime : @erase
-physics.filters.CalHelixFinderDe.HelixFinderAlg.minimumTime : @local::BLIND_TIME
+physics.producers.CalHelixFinderDe.HelixFinderAlg.minimumTime : @erase
+physics.producers.CalHelixFinderDe.HelixFinderAlg.minimumTime : @local::BLIND_TIME
 #------------------------------------------------------------------------------

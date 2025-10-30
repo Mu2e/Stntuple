@@ -43,8 +43,6 @@ public:
     kPickStrips   = 2
   };
 protected:
-  //  TObjArray**    fListOfClusters;
-
   const mu2e::CaloClusterCollection**     fListOfClusters;
   const mu2e::CaloHitCollection**         fListOfCrystalHits;
 
@@ -68,7 +66,7 @@ protected:
 public:
 					// ****** constructors and destructor
 
-  TCalVisNode() {}
+  TCalVisNode(): TStnVisNode() {}
   TCalVisNode(const char* Name, const mu2e::Disk* Disk, int SectionID); 
 
   virtual ~TCalVisNode();
@@ -121,13 +119,17 @@ public:
   //  void  Set(Int_t Side, Int_t Wedge) ; // **MENU**
 
 
-  int   InitEvent();
+  virtual int   InitEvent();
 
-  //  virtual void  Draw    (Option_t* option = "");
-  // virtual void  Paint   (Option_t* option = "");
-  virtual void  PaintXY (Option_t* option = "");
-  virtual void  PaintRZ (Option_t* option = "");
-  virtual void  PaintCal(Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintCrv (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
+
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
   //  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
@@ -140,7 +142,7 @@ public:
   virtual void   Clear(Option_t* Opt = "");
   virtual void   Print(Option_t* Opt = "") const ; // **MENU**
 
-  ClassDef(TCalVisNode,0)
+  //  ClassDef(TCalVisNode,0)
 };
 
 

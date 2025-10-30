@@ -1,8 +1,12 @@
 # -*- mode:tcl -*-
 #------------------------------------------------------------------------------
 # cloned Production/JobConfig/common/prolog.fcl minus includes
+#    dropped is the include of the Offline/Mu2eG4/fcl/prolog.fcl
+#    which is included independently by Stntuple/fcl/stntuple_external_prologs.fcl
+#    
 # common prolog for all production jobs.
-# common epilog.fcl is trivial and is absorbed by Stntuple/fcl/stntuple.fcl
+# common epilog.fcl is trivial and not needed:
+# it only deals with services, and is absorbed by Stntuple/fcl/stntuple_services.fcl
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
 Common: {

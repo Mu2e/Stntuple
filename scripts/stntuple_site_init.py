@@ -88,7 +88,7 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
 # The mechanism of failure is not understood.
 #------------------------------------------------------------------------------
     cmd = cmd+" export HOME="+os.environ["HOME"]+";";
-    cmd = cmd+" rootcint -f "+dict+" -c  -D_CODEGEN_ -DMU2E "+includes+" "+class_include+" "+linkdef+"; ";
+    cmd = cmd+" rootcint -f "+dict+" -c  -D__CLING__ -DMU2E "+includes+" "+class_include+" "+linkdef+"; ";
     cmd = cmd+'if [ ! -d '+lib_dir+' ] ; then mkdir '+lib_dir+' ; fi ; ';
     cmd = cmd+"mv "+pcm_file+" "+lib_dir+'/.'; 
     # print( "[stntuple_gen_rootcint] >>> cmd = %s"%cmd)

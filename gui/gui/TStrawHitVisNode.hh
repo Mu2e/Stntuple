@@ -13,18 +13,18 @@
 #include "Stntuple/base/TVisNode.hh"
 
 #ifndef __CINT__
-#include "Offline/RecoDataProducts/inc/StrawHitCollection.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitPositionCollection.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitFlagCollection.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitPosition.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
-#include "Offline/MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
+#include "Offline/MCDataProducts/inc/PtrStepPointMCVector.hh"
 
 #else
 namespace mu2e {
   class StrawHitCollection;
   class StrawHitPositionCollection;
   class StrawHitFlagCollection;
-  class PtrStepPointMCVectorCollection;
+  //  class PtrStepPointMCVectorCollection;
 };
 #endif
 
@@ -43,7 +43,7 @@ protected:
   const mu2e::StrawHitPositionCollection**     fStrawHitPosColl;  //
   const mu2e::StrawHitFlagCollection**         fStrawHitFlagColl; //
   const mu2e::TimeClusterCollection**          fTimeClusterColl;  //
-  const mu2e::PtrStepPointMCVectorCollection** fMcPtrColl; 
+  //  const mu2e::PtrStepPointMCVectorCollection** fMcPtrColl; 
  
   TArc*         fArc;
 
@@ -80,9 +80,9 @@ public:
     return *fStrawHitFlagColl;
   }
 
-  const mu2e::PtrStepPointMCVectorCollection* GetMcPtrColl() { 
-    return *fMcPtrColl;
-  }
+  // const mu2e::PtrStepPointMCVectorCollection* GetMcPtrColl() { 
+  //   return *fMcPtrColl;
+  // }
 
   int DisplayBackgroundHits() { return fDisplayBackgroundHits; }
 //-----------------------------------------------------------------------------
@@ -117,9 +117,14 @@ public:
   int InitEvent();
 
   virtual void  Paint   (Option_t* option = "");
-  virtual void  PaintXY (Option_t* option = "");
-  virtual void  PaintRZ (Option_t* option = "");
-  virtual void  PaintCal(Option_t* option = "");
+
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 

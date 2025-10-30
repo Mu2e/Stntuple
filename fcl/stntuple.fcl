@@ -1,5 +1,4 @@
 # -*- mode:tcl -*-
 #------------------------------------------------------------------------------
 #include "Stntuple/fcl/stntuple_prologs.fcl"
-#include "pbar2m/fcl/prolog.fcl"
 #include "Stntuple/fcl/stntuple_templates.fcl"

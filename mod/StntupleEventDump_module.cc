@@ -5,35 +5,8 @@
 // $Author: murat $
 // $Date: 2014/09/20 17:54:06 $
 //
-// Contact person:  Pavel Murat, Gianantonio Pezzulo
+// Contact person:  Pavel Murat
 //
-// What this event display shows: 2D view of the straw hits, tracks, and calorimeter clusters
-//
-// Straw hit display mode: 
-// -----------------------
-// displayBackgroundHits : false - respect hit flags set by FlagStrawHits_module (default)
-//                         the timing hit flag check is commented out - I didn't have a MC file
-//                         in hands to check
-//                       : true  - display all hits
-// useStereoHits         : true : displayed hit position errors are defined by the StrawHitPositionCollection
-//                       : false: semi-random assignment (sigr=5mm, sigp = strawTimeDivisionErr/2.)
-//
-// small black triangles: MC truth on the trajectory
-//
-// red   hits: hits on a track reconstructed as a downstream-moving conversion electron within the time window
-//             size of the timing window can be redefined via  talk-to (input .fcl file)
-// blue  hits: hits of the conversion electron track, which fall outside the time window
-// black hits: hits produced by anything, but the conversion electron
-//
-// a hit is displayed by a cross with the radial error bar of 5mm and the resolution 
-// along the straw of sigma(time division)/2, to better guide the eye
-//
-// green circles - contour of the disk-based calorimeter
-// clusters on the 1st disk are shown in red, on the second disk - in pink
-// 
-// there are few other features which we need to document
-//
-// .fcl file to use: Analyses/test/hitDisplay.fcl
 ///////////////////////////////////////////////////////////////////////////////
 
 // C++ includes.
@@ -98,9 +71,7 @@ namespace mu2e {
 
 //-----------------------------------------------------------------------------
   StntupleEventDump::StntupleEventDump(fhicl::ParameterSet const& pset) :
-    TModule(pset, "StntupleEventDump"),
-    _moduleLabel(pset.get<std::string>("module_label")),
-    _processName(pset.get<string>("processName", ""))
+    TModule(pset, "StntupleEventDump")
   {
     fApplication = 0;
   }

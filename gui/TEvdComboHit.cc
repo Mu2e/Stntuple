@@ -196,6 +196,16 @@ void TEvdComboHit::Print(Option_t* Option) const {
   // 	 fSimID,fPdgID,fMotherPdgID,fHit->time(),fPos.Z(),fHit->energyDep(),fP,fPz);
 }
 
+//_____________________________________________________________________________
+void TEvdComboHit::PrintMe() const {
+  Print("");
+}
+
+//_____________________________________________________________________________
+void TEvdComboHit::PrintHeader() const {
+  Print("banner");
+}
+
 // //-----------------------------------------------------------------------------
 // void TEvdComboHit::PaintCal(Option_t* option) {
 //   // nothing to draw...

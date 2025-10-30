@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
+// clang-format off
 // May 04 2013 P.Murat
 // 
 // in 'XY' mode draw calorimeter clusters as circles with different colors 
@@ -24,7 +25,7 @@
 #include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
-
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 ClassImp(stntuple::TEvdStation)
 
@@ -32,6 +33,8 @@ namespace stntuple {
 //_____________________________________________________________________________
 TEvdStation::TEvdStation(): TObject() {
   fListOfPlanes = NULL;
+  fVisible      = 0;
+  fProductionID = -1;
 }
 
 //_____________________________________________________________________________
@@ -41,15 +44,20 @@ TEvdStation::TEvdStation(int ID, const mu2e::Tracker* Tracker): TObject() {
   TEvdPlane*  evd_plane;
 
   fID      = ID;
+  fVisible = 1;
   //  fStation = Station;
   fNPlanes = 2; // was Station->nPlanes();
 
   fListOfPlanes = new TObjArray(fNPlanes);
 
+  // TStnGeoManager* gm          = TStnGeoManager::Instance();
+  // const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(2*ID,0);  // first panel of the plane
+  
+  //  if (tpm) fProductionID      = tpm->psid();                                 // production station ID ("station_00")
+
   for (int i=0; i<fNPlanes; i++) {
     id = 2*ID+i;
     const mu2e::Plane* plane = &Tracker->getPlane(id);
-
     evd_plane = new TEvdPlane(id,plane,this,Tracker);
 
     fListOfPlanes->Add(evd_plane);
@@ -64,9 +72,6 @@ TEvdStation::~TEvdStation() {
 
 //-----------------------------------------------------------------------------
 void TEvdStation::Paint(Option_t* option) {
-  // paints one disk (.. or vane, in the past), i.e. section
-
-				// parse option list
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 

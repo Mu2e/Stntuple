@@ -135,7 +135,9 @@ public:
   // virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   // virtual Int_t DistancetoPrimitiveTZ(Int_t px, Int_t py);
 
-  virtual void   Print(const char* Opt = "") const ;  // *MENU*
+  virtual void   PrintHeader()                 const ;  // *MENU*
+  virtual void   PrintMe()                     const ;  // *MENU*
+  virtual void   Print  (const char* Opt = "") const ;  // *MENU*
 
   ClassDef(stntuple::TEvdComboHit,0)
 };

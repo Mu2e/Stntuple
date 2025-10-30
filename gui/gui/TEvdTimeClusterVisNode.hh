@@ -28,15 +28,15 @@ protected:
   const mu2e::TimeClusterCollection*  fTcColl;
   const mu2e::TimeClusterCollection*  fPcColl;
   const mu2e::ComboHitCollection*     fChColl;
-  //  const mu2e::StrawHitFlagCollection* fChfColl;
+  const mu2e::ComboHitCollection*     fSschColl;
 
   TStnTimeClusterBlock*              fTcBlock;
 
-  std::string                        fTcCollTag;   // time cluster coll tag
-  std::string                        fPcCollTag;   // phi cluster coll tag (also time clusters)
-  std::string                        fChCollTag;   // combo hit collection
-  // std::string                        fChfCollTag;  // combo hit flag collection
+  art::InputTag                      fTcCollTag;   // time cluster coll tag
+  art::InputTag                      fPcCollTag;   // phi cluster coll tag (also time clusters)
+  art::InputTag                      fChCollTag;   // combo hit collection
   art::InputTag                      fSdmcCollTag; // straw digi collection
+  art::InputTag                      fSschCollTag; // single-straw combo hit collection
 
   Color_t                            fTcColor;
   Color_t                            fPcColor;
@@ -72,10 +72,10 @@ public:
     return (stntuple::TEvdTimeCluster*)    fListOfPhiClusters->At(I); 
   }
 
-  std::string& TcCollTag()   { return fTcCollTag   ; }
-  std::string& PcCollTag()   { return fPcCollTag   ; }
-  std::string& ChCollTag()   { return fChCollTag   ; }
-  //  std::string& ChfCollTag()  { return fChfCollTag  ; }
+  art::InputTag& TcCollTag()   { return fTcCollTag   ; }
+  art::InputTag& PcCollTag()   { return fPcCollTag   ; }
+  art::InputTag& ChCollTag()   { return fChCollTag   ; }
+  art::InputTag& SschCollTag() { return fSschCollTag ; }
   art::InputTag& SdmcCollTag() { return fSdmcCollTag ; }
 
   const mu2e::TimeClusterCollection*  TcColl () { return fTcColl; }
@@ -85,21 +85,27 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void SetChCollTag  (std::string& CollTag) { fChCollTag   = CollTag; }
-  //  void SetChfCollTag (std::string& CollTag) { fChfCollTag  = CollTag; }
+  void SetChCollTag  (art::InputTag& CollTag) { fChCollTag   = CollTag; }
+  void SetSschCollTag(art::InputTag& CollTag) { fSschCollTag = CollTag; }
   void SetSdmcCollTag(art::InputTag& CollTag) { fSdmcCollTag = CollTag; }
-  void SetTcCollTag  (std::string& CollTag) { fTcCollTag   = CollTag; }
-  void SetPcCollTag  (std::string& CollTag) { fPcCollTag   = CollTag; }
+  void SetTcCollTag  (art::InputTag& CollTag) { fTcCollTag   = CollTag; }
+  void SetPcCollTag  (art::InputTag& CollTag) { fPcCollTag   = CollTag; }
 
-  void SetTcColor    (Color_t      Color   ) { fTcColor    = Color;   }
-  void SetPcColor    (Color_t      Color   ) { fPcColor    = Color;   }
+  void SetTcColor    (Color_t       Color   ) { fTcColor    = Color;   }
+  void SetPcColor    (Color_t       Color   ) { fPcColor    = Color;   }
 //-----------------------------------------------------------------------------
 // overloaded methods of TVisNode
 //-----------------------------------------------------------------------------
   virtual int  InitEvent();
 
-  virtual void PaintXY (Option_t* option = "");
-  virtual void PaintTZ (Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintCrv (Option_t* option = "");
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

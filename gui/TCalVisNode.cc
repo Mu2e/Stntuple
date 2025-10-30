@@ -40,9 +40,9 @@
 #include "Offline/CalorimeterGeom/inc/Crystal.hh"
 #include "Offline/CalorimeterGeom/inc/Disk.hh"
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
+// #include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
-ClassImp(TCalVisNode)
+// ClassImp(TCalVisNode)
 
 using namespace stntuple;
 //-----------------------------------------------------------------------------
@@ -333,6 +333,22 @@ void TCalVisNode::PaintRZ(Option_t* option) {
 //   return min_dist;
 // }
 
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintCrv(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintPhiZ(Option_t* Option) {
+}
+
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintTZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintVST(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintVRZ(Option_t* Option) {
+}
 //-----------------------------------------------------------------------------
 Int_t TCalVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 

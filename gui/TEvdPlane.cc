@@ -25,8 +25,11 @@
 #include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Offline/TrackerGeom/inc/Plane.hh"
+
+// #include "Offline/DAQ/inc/TrkPanelMap_t.hh"
 
 
 ClassImp(stntuple::TEvdPlane)
@@ -37,26 +40,31 @@ TEvdPlane::TEvdPlane(): TObject() {
   fID           = -1;
   fListOfPanels = NULL;
   fNPanels      = 0;
+  fVisible      = 0;
+  fProductionID = -1;
 }
 
 //_____________________________________________________________________________
   TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station, const mu2e::Tracker* Tracker): TObject() {
 
-  int        id;
   TEvdPanel*  evd_panel;
 
   fID      = ID;
   fStation = Station;
   fPlane   = Plane;
   fNPanels  = Plane->nPanels();
+  fVisible  = 1;
 
   fListOfPanels = new TObjArray(fNPanels);
+
+  TStnGeoManager* gm          = TStnGeoManager::Instance();
+  const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(ID,0);           // first panel of the plane
+  if (tpm) fProductionID      = tpm->ppid();
 
   for (int i=0; i<fNPanels; i++) {
     const mu2e::Panel* panel = &fPlane->getPanel(i);
 
-    id       = -1; // fNPanels*Plane->id()+i;
-    evd_panel = new TEvdPanel(id,panel,this,Tracker);
+    evd_panel = new TEvdPanel(i,panel,this,Tracker);
 
     fListOfPanels->Add(evd_panel);
   }

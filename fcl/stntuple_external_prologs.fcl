@@ -1,4 +1,4 @@
- # -*- mode:tcl -*-
+# -*- mode:tcl -*-
 #------------------------------------------------------------------------------
 # STNTUPLE maker user FCL template - see read_reco.fcl
 # p1 : generate, simulate, reconstruct, stntuple
@@ -57,6 +57,8 @@ END_PROLOG
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
 #include "Offline/CosmicReco/fcl/prolog.fcl"
+#include "Offline/CRVReco/fcl/prolog.fcl"
+#include "Offline/DAQ/fcl/prolog.fcl"
 
 #------------------------------------------------------------------------------
 # trigger prologs

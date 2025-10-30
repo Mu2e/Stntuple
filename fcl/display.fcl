@@ -28,7 +28,7 @@ physics : {
 
     e1 : [ MuHitDisplay ]
 
-    trigger_paths : [ p1 ]
+    trigger_paths : [    ]  # p1 ]
     out           : [    ]  ## [detectorOutput] # defined in Stntuple/fcl/stntuple.fcl]
     end_paths     : [ e1 ]  # , out ]
 }

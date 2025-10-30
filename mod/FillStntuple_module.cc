@@ -60,7 +60,7 @@ public:
 // constructors
 //------------------------------------------------------------------------------
 FillStntuple::FillStntuple(fhicl::ParameterSet const& PSet): 
-  StntupleModule   (PSet,"FillStntuple")
+  StntupleModule   (PSet.get<fhicl::ParameterSet>("THistModule"),"FillStntuple")
 {
   fLastRun = -1;
   TTree::SetMaxTreeSize(8000000000LL);
@@ -278,6 +278,4 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
 
 } // end namespace mu2e
 
-using mu2e::FillStntuple;
-
-DEFINE_ART_MODULE(FillStntuple)
+DEFINE_ART_MODULE(mu2e::FillStntuple)

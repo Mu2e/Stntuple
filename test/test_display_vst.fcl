@@ -1,0 +1,67 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# run event display on the tracker VST data
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TRIGGER_PATHS : [ p1 ]
+END_PROLOG
+
+#include "Stntuple/fcl/stntuple.fcl"
+
+services : @local::Services.SimAndReco
+services.DbService : @local::DbEmpty
+services.SeedService.baseSeed         : 8
+services.SeedService.maxUniqueEngines : 100
+
+process_name : Display
+
+source       : { module_type : RootInput   }
+
+physics : {
+    producers  : { @table::stntuple.producers 
+        FlagBkgHits : { @table::stntuple.producers.DeltaFinder }
+    }
+    filters    : { @table::stntuple.filters   }
+    analyzers  : { @table::stntuple.analyzers }
+
+    p1 : [ @sequence::CaloReco.Reco,
+	   @sequence::CaloCluster.Reco,
+	   @sequence::TrkHitReco.PrepareHits   ## [ PBTFSD, makeSH, makePH, FlagBkgHits ] 
+                                               ##  see Offline/TrkHitReco/prolog.fcl
+           , TZClusterFinder
+	  ]
+
+    e1 : [ MuHitDisplay ]
+
+    trigger_paths : [    ]  # p1 ]
+    out           : [    ]  ## [detectorOutput] # defined in Stntuple/fcl/stntuple.fcl]
+    end_paths     : [ e1 ]  # , out ]
+}
+#------------------------------------------------------------------------------
+# uncomment the next 2 lines if you want the DST file to be written out
+#-----------------------------------------------------------------------------
+# physics.out                               : [ detectorOutput ]
+# outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem ]
+outputs.detectorOutput.fileName           : "sim.user.display.xxx.000001.art"
+#------------------------------------------------------------------------------
+# uncomment 'primaryParticleTag' line do display more particles
+# uncomment 'rootMacro' line to execute test macro
+# see https://github.com/Mu2e/Stntuple/blob/muse/doc/event_display.org for more details
+#------------------------------------------------------------------------------
+physics.analyzers.MuHitDisplay.primaryParticleTag   : ""
+physics.analyzers.MuHitDisplay.timeClusterCollTag   : "TZClusterFinder"
+physics.analyzers.MuHitDisplay.comboHitCollTag      : "makePH"  ## "FlagBkgHits"
+physics.analyzers.MuHitDisplay.strawHitCollTag      : "makeSH"  ## "FlagBkgHits"
+physics.analyzers.MuHitDisplay.visManager.ewLength  : 10000.
+physics.analyzers.MuHitDisplay.visManager.tMax      : 10000.
+# physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"
+
+physics.producers.StrawDigisFromArtdaqFragments.saveWaveforms :  1
+services.ProditionsService.alignedTracker.useDb : false
+services.ProditionsService.alignedTrackerSim.useDb : false
+services.ProditionsService.strawElectronics.useDb : false
+services.ProditionsService.fullReadoutStraw.useDb : false
+services.ProditionsService.strawDrift.useDb : false
+services.ProditionsService.strawPhysics.useDb : false
+services.ProditionsService.strawResponse.useDb : false
+services.ProditionsService.trackerStatus.Settings.useDb : false

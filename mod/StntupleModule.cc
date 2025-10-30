@@ -34,7 +34,7 @@ TFolder*         StntupleModule::fgStntupleFolder = 0;
 // constructors
 //-----------------------------------------------------------------------------
 StntupleModule::StntupleModule(fhicl::ParameterSet const& PSet, const char* Name): 
-  THistModule(PSet,Name) 
+  THistModule(PSet,PSet,Name) 
 {
   if (! fgEvent      ) {
     fgEvent       = new TStnEvent();

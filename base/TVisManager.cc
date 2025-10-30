@@ -143,6 +143,13 @@ void TVisManager::SetTimeWindow(float TMin, float TMax) {
 }
 
 //-----------------------------------------------------------------------------
+void TVisManager::SetMinEDep(float E) {
+}
+//-----------------------------------------------------------------------------
+void TVisManager::SetMaxEDep(float E) {
+}
+
+//-----------------------------------------------------------------------------
 // to be overloaded, if needed, and there already is a need for that
 //-----------------------------------------------------------------------------
 void TVisManager::InitEvent() { 

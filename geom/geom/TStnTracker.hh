@@ -11,8 +11,6 @@
 #include "TGeoTube.h"
 #include "TGeoVolume.h"
 
-//namespace murat {
-
 class TStnTracker : public TObject {
 public:
   struct GeomData_t {
@@ -49,8 +47,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void    Clear(Option_t* Opt = "") ;
-  void    Print(Option_t* Opt = "") const ;
+  void    Clear(Option_t* Opt = "") override ;
+  void    Print(Option_t* Opt = "") const override;
 
   ClassDef(TStnTracker,0)
 

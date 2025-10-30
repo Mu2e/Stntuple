@@ -21,67 +21,104 @@
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 
-// #include "TrackerGeom/inc/Layer.hh"
+#include "Offline/GeneralUtilities/inc/HepTransform.hh"
 #include "Offline/TrackerGeom/inc/Straw.hh"
-// #include "TrackerGeom/inc/Sector.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
+#include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Offline/TrackerGeom/inc/Panel.hh"
-//#include "TTrackerGeom/inc/ZLayer.hh"
+
+using namespace CLHEP;
 
 ClassImp(stntuple::TEvdPanel)
 
-namespace {
-  static int fgLocalDebug = 0;
-}
+int stntuple::TEvdPanel::fgDebugLevel(0);
 
 namespace stntuple {
 //_____________________________________________________________________________
 TEvdPanel::TEvdPanel(): TObject() {
+  fVisible      = 0;
+  fMnID         = -1;
 }
 
 //_____________________________________________________________________________
   TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane, const mu2e::Tracker* Tracker): TObject() {
 
-  TEvdStraw* evd_straw;
-
   fID      = ID;
   fNLayers = Panel->nLayers();
   fPanel   = Panel;
-					// assume that the number of straws is the same
-  int id;
+  fVisible = 1;
 
-  for (int il=0; il<fNLayers; il++) {
-    //    const mu2e::Layer* layer = &fPanel->getLayer(il);
-
-    fNStraws     [il] = Panel->nStraws()/2;
-    fListOfStraws[il] = new TObjArray(fNStraws[il]);
-  }
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(Plane->ID(),ID); // plane ID : 0-35 (???)
+  if (tpm) fMnID              = tpm->mnid();
 
   int nst = Panel->nStraws();
+  fListOfStraws = new TObjArray(nst);
+
+  mu2e::StrawId pid = Panel->id();
+  if (TEvdPanel::fgDebugLevel != 0) {
+    printf("--- station, plane, panel: %3i %3i %3i\n",
+           pid.getStation(),pid.getPlane(),pid.getPanel());
+  }
 
   for (uint16_t ist=0; ist<nst; ist++) {
     const mu2e::Straw* straw = &Panel->getStraw(ist);
 
-    //    const mu2e::Layer* layer = &fPanel->getLayer(il);
+    int id = straw->id().asUint16();
 
-    id        = straw->id().asUint16();
-    
-    int ill      = straw->id().getLayer();
-    int iss      = straw->id().getStraw();
-    int ipp      = straw->id().getPanel();
-    int istation = straw->id().getStation();
+    TEvdStraw* evd_straw = new TEvdStraw(id,straw,this, Tracker);
+    fListOfStraws->Add(evd_straw);
+  }
+//-----------------------------------------------------------------------------
+// build the transformation matrix
+//-----------------------------------------------------------------------------
+  const mu2e::HepTransform& ds_to_p = Panel->dsToPanel();
+  const HepRotation&  hr            = ds_to_p.rotation();
+  const Hep3Vector&   ht            = ds_to_p.displacement();
 
-    if (fgLocalDebug != 0) {
-      printf(" station, panel, layer, straw, z : %3i %3i %3i %3i %10.3f\n",
-	     istation, ipp, ill, iss, straw->getMidPoint().z());
-    }
+  double phix = hr.phiX  ()*180./M_PI;
+  double phiy = hr.phiY  ()*180./M_PI;
+  double phiz = hr.phiZ  ()*180./M_PI;
+  double thtx = hr.thetaX()*180./M_PI;
+  double thty = hr.thetaY()*180./M_PI;
+  double thtz = hr.thetaZ()*180./M_PI;
 
-    evd_straw = new TEvdStraw(id,straw,this,Tracker);
-    fListOfStraws[ill]->Add(evd_straw);
+  double disp[3], disp1[3];
+  disp[0]  = ht.x();
+  disp[1]  = ht.y();
+  disp[2]  = ht.z();
+
+  // if (hr.zz() > 0) {
+  //   // thtx    = thtx+180;
+  //   // thty    = thty+180;
+  //   disp[0] = -disp[0];
+  //   disp[1] = -disp[1];
+  //   disp[2] = -disp[2];
+  // }
+
+  TGeoRotation* gr = new TGeoRotation(Form("rot_%02i_%i",pid.getPlane(),pid.getPanel()),thtx,phix,thty,phiy,thtz,phiz);
+  //  gr->SetMatrix(r);
+
+  gr->MasterToLocal(disp,disp1);
+
+  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),-disp1[0], -disp1[1], -disp1[2],gr);
+  //  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),0,0,0,gr);
+  
+  //  fPos.SetXYZ(disp[0],disp[1], disp[2]);
+  fPos.SetXYZ(0,0,0); // fPos[3] is used in TStnVisManager.cc:OpenVRZView
+
+  if (TEvdPanel::fgDebugLevel & 0x2) {
+    printf("panel fCombiTrans:\n");
+    fCombiTrans->Print();
+    printf("mu2e::Panel HepTransform Panel->DS:\n");
+    std::cout << Panel->panelToDS() << std::endl;
+    printf("mu2e::Panel HepTransform DS->Panel:\n");
+    std::cout << Panel->dsToPanel() << std::endl;
   }
 }
 
@@ -90,13 +127,13 @@ TEvdPanel::~TEvdPanel() {
 }
 
 //-----------------------------------------------------------------------------
-void TEvdPanel::Paint(Option_t* option) {
+void TEvdPanel::Paint(Option_t* Option) {
 
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnVisManager::kXY) PaintXY (option);
-  else if (view == TStnVisManager::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY) PaintXY (Option);
+  else if (view == TStnVisManager::kRZ) PaintRZ (Option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));
@@ -106,15 +143,33 @@ void TEvdPanel::Paint(Option_t* option) {
 }
 
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
 void TEvdPanel::PaintXY(Option_t* Option) {
 }
 
-
-
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
 void TEvdPanel::PaintRZ(Option_t* option) {
   // draw straws
+}
+
+//-----------------------------------------------------------------------------
+  void TEvdPanel::PaintVST(Option_t* Option) {
+  // draw straws
+  int nstraws = NStraws();
+  for (int is=0; is<nstraws; is++) {
+    TEvdStraw* straw  = Straw(is);
+    straw->PaintVST(Option);
+  }
+}
+
+//-----------------------------------------------------------------------------
+  void TEvdPanel::PaintVRZ(Option_t* Option) {
+  // draw straws
+  int nstraws = NStraws();
+  for (int is=0; is<nstraws; is++) {
+    TEvdStraw* straw  = Straw(is);
+    straw->PaintVRZ(Option);
+  }
 }
 
 //_____________________________________________________________________________
@@ -139,6 +194,16 @@ Int_t TEvdPanel::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
 //_____________________________________________________________________________
 Int_t TEvdPanel::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
+  return 9999;
+}
+
+//_____________________________________________________________________________
+Int_t TEvdPanel::DistancetoPrimitiveVST(Int_t px, Int_t py) {
+  return 9999;
+}
+
+//_____________________________________________________________________________
+Int_t TEvdPanel::DistancetoPrimitiveVRZ(Int_t px, Int_t py) {
   return 9999;
 }
 

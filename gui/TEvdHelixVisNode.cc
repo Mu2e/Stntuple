@@ -17,9 +17,6 @@
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-// #include "art/Framework/Principal/Event.h"
-// #include "art/Framework/Principal/Handle.h"
-
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
@@ -37,7 +34,7 @@
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
-#include "Stntuple/gui/TEvdStrawTracker.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
@@ -279,6 +276,20 @@ void TEvdHelixVisNode::PaintVST(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintPhiZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintCal(Option_t *Option) {
+}
+//-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintCrv(Option_t *Option) {
+}
+
+//-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintVRZ(Option_t *Option) {
+}
+
+//------------------------------------
 int TEvdHelixVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
   static TVector3 global;
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
@@ -383,7 +394,7 @@ void TEvdHelixVisNode::NodePrint(const void* Object, const char* ClassName) {
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printHelixSeedCollection(fHsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
+      ad->printHelixSeedCollection(fHsCollTag.encode().data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
     }
   }
   else {

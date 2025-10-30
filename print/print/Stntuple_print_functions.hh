@@ -2,24 +2,25 @@
 #ifndef __Stntuple_print_functions_hh__
 #define __Stntuple_print_functions_hh__
 
-#ifndef __CINT__
+// #ifndef __CINT__
 
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#else
+// #else
 
-namespace art {
-  class Event;
-}
+// namespace art {
+//   class Event;
+// }
 
-#endif
+// #endif
 
 void     print_combo_hit_coll  (const char* ComboHitCollTag, const char* StrawHitCollTag = "makeSH");
 void     print_combo_hit_coll_2(const char* ComboHitCollTag, const char* StrawHitCollTag = "makeSH");
 
 void     print_calo_cluster_colls();   // print all CaloCluster collections
 void     print_ch_colls          ();   // print all ComboHit     collections
+void     print_cts_colls         ();   // 'cts' = CosmicTrack
 void     print_genp_colls        ();   // print all GenParticle  collections
 void     print_helix_seed_colls  ();   // print all HelixSeed    collections
 void     print_kalrep_colls      ();   // print all KalRep       collections

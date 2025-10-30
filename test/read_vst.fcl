@@ -1,0 +1,144 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# stntuple DIG file : make sure compressed coll tags are defined
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TRIGGER_PATHS       @protect_ignore: [ ] 
+END_PROLOG
+
+#include "Offline/DAQ/fcl/prolog.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
+
+process_name : S3StnDts
+
+source       : { module_type:RootInput fileNames:["undefined"] }
+
+physics : {
+
+    producers : {
+        @table::DAQ.producers
+
+        EWMProducer: { @table::CommonMC.DigiProducers.EWMProducer
+            SpillType:          0   ## offspill
+            RecoFromMCTruth: false  ## default
+            RecoFromMCTruthErr: 0   ## default
+            InitialPhaseShift:  0   ## optional, set it to zero just in case
+        }
+
+        makeSD: { module_type: StrawDigisFromArtdaqFragments
+            saveWaveforms : true
+            diagLevel     : 0                        ## not used yet
+            debugLevel    : 0                        ##
+            debugBits     : [ "bit0:0", "bit1:0" ]   ## 100 in total, configure printout details
+            geography     : []                       ## for now, a real job should include a real map
+        }
+
+        makeSH : { @table::TrkHitReco.producers.makeSH
+            module_type                       : StrawHitReco
+            MinimumTime                       : 0          ## 400.0 # ns configuration for OnSpill
+            MaximumTime                       : 100000.    ## 1710.0 # ns
+            MinimumEnergy                     : 0.0001 # MeV
+            MaximumEnergy                     : 0.005 # MeV
+            MinimumRadius                     : 350.0 # mm
+            MaximumRadius                     : 750.0 # mm
+            FitType                           : 1
+            FilterHits                        : false
+            WriteStrawHitCollection           : true
+            ProtonBunchTimeTag                : "EWMProducer"
+            StrawDigiCollectionTag            : "makeSD" ## "makeSD"
+            StrawDigiADCWaveformCollectionTag : "makeSD" ## "makeSD"
+            EventWindowMarker                 : "EWMProducer"
+            UseCalorimeter                    : false
+            clusterDt                         : 100.0 # ns
+            CaloClusterCollectionTag          : "notUsed"
+            FlagCrossTalk                     : false
+            crossTalkEnergy                   : 0.007 # MeV
+            crossTalkMinimumTime              : -1 # ns
+            crossTalkMaximumTime              : 100 # ns
+        }
+        
+        makePH : { @table::TrkHitReco.producers.makePH
+            ComboHitCollection    : "makeSH"
+            EventWindowMarker     : "EWMProducer"
+            StrawHitSelectionBits : ["EnergySelection", "TimeSelection", "RadiusSelection"]
+            StrawHitMask          : ["Dead"]
+            MaxDt                 : 45 # ns
+            UseTOT                : false               ## true
+            MaxWireDistDiffPull   : 10.                 ## 5.0
+            MaxDS                 : 10                  ## 3
+            UError                : 20.                 ## 10.0 # mm
+            MinimumTime           : 0                   ## 410.0 # ns
+            MaximumTime           : 100000              ## 1700.0 # ns
+            MinimumEnergy         : 0.00000             ## 0.0001 # MeV
+            MaximumEnergy         : 0.006               ## 0.0045 # MeV
+            MinimumRadius         : 300.                ## 380.0 # mm
+            MaximumRadius         : 1000.               ## 700.0 # mm
+            MinimumNHits          : 1
+            MaximumNHits          : 1                   ## 8
+            CheckWres             : false               ## true
+            Unsorted              : true                ## false # sim data are sorted, VST currently not
+        }
+
+        TZClusterFinder : { @table::CalPatRec.producers.TZClusterFinder
+            module_type                : TZClusterFinder
+            diagLevel                  : 0
+            debugLevel                 : 0
+            printFrequency             : 1000
+            runDisplay                 : 0
+            useCCs                     : 1
+            recoverCCs                 : 1
+            chCollLabel                : "makePH" ## "flagPH"
+            chCollLabel2               : "makeSH"
+            tcCollLabel                : "TimeClusterFinderDe"
+            ccCollLabel                : "CaloClusterMaker"
+            hitBkgBits                 : ["Noisy","Dead","Background"]
+            radSelect                  : 1
+            chunkSep                   : 5
+            chunkWindow                : 20.0
+            chunkThresh                : 3
+            combineWindow              : 30.0
+            maxCombineSep              : 2500.0
+            chunkFitThresh             : 8
+            recoverWindow              : 30.0
+            clusterThresh              : 15
+            minCaloSize                : 2
+            minCaloEnergy              : 50.0
+            caloDtMax                  : 30.0
+            caloTimeOffset             : @local::TrackCaloMatching.DtOffset
+            doRefine                   : 0
+
+            diagPlugin : { tool_type  : "TZClusterFinderDiag"
+                 mcTruth       : 1
+                 simIDThresh   : 15
+                 mcUtils       : { @table::TrkReco.McUtils }
+            }
+        }
+    }
+
+    analyzers  : { @table::stntuple.analyzers 
+	StntupleMaker: { @table::stntuple.analyzers.StntupleMaker
+#------------------------------------------------------------------------------
+# see defaults in Stntuple/fcl/prolog.fcl (turn off reco branches)
+#------------------------------------------------------------------------------
+            makeStrawHits         : 1
+            makeStrawHitWaveforms : 0
+	    makeClusters          : 0
+	    makeCrvClusters       : 0                       ## default: 1
+	    makePid               : 0
+
+	    makeTracks            : 0
+	    makeTrigger           : 0
+	}
+    }
+    
+    @table::stntuple.paths
+
+    p2 : [ EWMProducer, makeSD , makeSH ]
+
+    trigger_paths : [ "p2" ]
+    end_paths     : [ "p0"   ]  ## defined in Stntuple/fcl/stntuple_tables.fcl
+}
+#------------------------------------------------------------------------------
+# output files: 
+#-----------------------------------------------------------------------------
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.trk.vst00s000r000n002.xxx_yyy.stn"

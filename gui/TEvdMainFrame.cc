@@ -62,16 +62,16 @@ Bool_t TEvdMainFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 //-----------------------------------------------------------------------------
       default:
 	if (vm->DebugLevel() > 0) {
-	  printf(" *** TStnFrame::ProcessMessage msg: %li parm1: %li parm2: %li\n",
-		 msg, parm1, parm2);
+	  printf(" *** TEvdMainFrame::%s: msg: %li parm1: %li parm2: %li\n",
+		 __func__,msg, parm1, parm2);
 	}
 	break;
       }
       break;
     default:
       if (vm->DebugLevel() > 0) {
-	printf(" *** TStnFrame::ProcessMessage msg: %li parm1: %li parm2: %li\n",
-	       msg, parm1, parm2);
+	printf(" *** TEvdMainFrame::%s msg: %li parm1: %li parm2: %li\n",
+	       __func__,msg, parm1, parm2);
       }
       break;
     }

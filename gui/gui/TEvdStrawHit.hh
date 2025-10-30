@@ -9,6 +9,7 @@
 #include "TH1.h"
 #include "TPad.h"
 #include "TArc.h"
+#include "TMarker.h"
 #include "TVector2.h"
 #include "TVector3.h"
 #include "TLine.h"
@@ -41,8 +42,8 @@ public:
 protected:
 					// backward pointers to the reconstruction objects
 
-  const mu2e::ComboHit*             fHit;
-  const mu2e::StrawDigiMC*          fStrawDigiMC;
+  const mu2e::ComboHit*    fHit;        // "single-straw" combo hit
+  const mu2e::StrawDigiMC* fSdmc;
 
   TEvdStraw*  fStraw;                 // pointer to the straw -  geometry
 
@@ -52,6 +53,7 @@ protected:
   TVector2    fDir;                     // direction of the straw
   double      fSigW;      		// error in the wire direction
   double      fSigR;      		// error in radial direction
+  TMarker     fMarker;			// paint on XY view
   TLine       fLineW;			// paint on XY view
   TLine       fLineR;
   TEllipse    fEllipse;
@@ -64,7 +66,7 @@ public:
 
   TEvdStrawHit(const mu2e::ComboHit*        Hit,
 	       TEvdStraw*                   Straw,
-	       const mu2e::StrawDigiMC*     StrawDigiMC,
+	       const mu2e::StrawDigiMC*     Sdmc,
 	       double X, double Y, double Z, 
 	       double                       Wx,
 	       double                       Wy,
@@ -80,7 +82,7 @@ public:
   TVector3*                    Pos()         { return &fPos; }
   TVector2*                    Dir()         { return &fDir; }
   const mu2e::ComboHit*        StrawHit()    { return fHit;  }
-  const mu2e::StrawDigiMC*     StrawDigiMC() { return fStrawDigiMC; }
+  const mu2e::StrawDigiMC*     Sdmc()        { return fSdmc; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
@@ -110,7 +112,8 @@ public:
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 
-  virtual void  Print(const char* Opt = "") const ;               // *MENU*
+  virtual void  Print  (const char* Opt = "") const ;               // *MENU*
+  virtual void  PrintMe()                     const ;               // *MENU*
 
   ClassDef(stntuple::TEvdStrawHit,0)
 };

@@ -29,7 +29,7 @@ protected:
 
   const mu2e::HelixSeedCollection*  fHsColl;
 
-  std::string                       fHsCollTag;
+  art::InputTag                     fHsCollTag;
   art::InputTag                     fShCollTag;   // straw/combo hit collection
   art::InputTag                     fSdmcCollTag; // straw digi collection
 
@@ -63,13 +63,13 @@ public:
     return (stntuple::TEvdHelixSeed*)    fListOfHelixSeeds->At(I); 
   }
 
-  std::string&   HsCollTag  ()   { return fHsCollTag   ; }
+  art::InputTag& HsCollTag  () { return fHsCollTag   ; }
   art::InputTag& ShCollTag  () { return fShCollTag   ; }
   art::InputTag& SdmcCollTag() { return fSdmcCollTag ; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void SetHelixSeedCollTag (std::string& Tag) { fHsCollTag   = Tag; }
+  void SetHelixSeedCollTag (art::InputTag& Tag) { fHsCollTag   = Tag; }
   void SetSdmcCollTag      (art::InputTag& Tag) { fSdmcCollTag = Tag; }
   void SetShCollTag        (art::InputTag& Tag) { fShCollTag   = Tag; }
 
@@ -83,10 +83,14 @@ public:
 
   virtual void NodePrint(const void* Object, const char* ClassName) ;
 
-  virtual void PaintXY (Option_t* option = "");
-  virtual void PaintRZ (Option_t* option = "");
-  virtual void PaintTZ (Option_t* option = "");
-  virtual void PaintVST(Option_t* option = "");
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintCrv (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintVRZ (Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "");
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

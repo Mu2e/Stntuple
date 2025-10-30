@@ -43,7 +43,7 @@
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 
 // #include "Stntuple/print/TAnaDump.hh"
-#include "Stntuple/mod/mod/THistModule.hh"
+#include "Stntuple/mod/THistModule.hh"
 
 #include <iostream>
 #include <memory>

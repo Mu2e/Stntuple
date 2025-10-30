@@ -12,7 +12,7 @@ ClassImp(THeaderVisNode)
 
 //_____________________________________________________________________________
 THeaderVisNode::THeaderVisNode(const char* name, TStnHeaderBlock* h): 
-  TVisNode(name) 
+  TStnVisNode(name) 
 {
   fHeader = h;
   fText = new TText(0.1,0.1,"elki-palki");
@@ -31,13 +31,12 @@ int THeaderVisNode::InitEvent() {
   return 0;
 }
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
+// override Paint
+//-----------------------------------------------------------------------------
 void THeaderVisNode::Paint(Option_t* option) {
-  //
-				// parse option list
   PaintXY(option);
 }
-
 
 //_____________________________________________________________________________
 void THeaderVisNode::PaintXY(Option_t* option) {
@@ -62,7 +61,24 @@ void THeaderVisNode::PaintXY(Option_t* option) {
 //_____________________________________________________________________________
 void THeaderVisNode::PaintRZ(Option_t* option) {
 }
-
+//-----------------------------------------------------------------------------
+void THeaderVisNode::PaintTZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void THeaderVisNode::PaintPhiZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void THeaderVisNode::PaintCal(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void THeaderVisNode::PaintCrv(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void THeaderVisNode::PaintVST(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void THeaderVisNode::PaintVRZ(Option_t* Option) {
+}
 //_____________________________________________________________________________
 Int_t THeaderVisNode::DistancetoPrimitive(Int_t px, Int_t py) {
   return 9999;

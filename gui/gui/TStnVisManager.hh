@@ -44,7 +44,9 @@ public:
     kPhiZ      =  4,
     kCal       =  5,
     kCrv       =  6,
-    kVST       =  7			// VST view
+    kVST       =  7,			// VST view
+    kVRZ       =  8,                    // VST RZ view
+    kVYZ       =  9			// VST YZ view
   };
 
 //-----------------------------------------------------------------------------
@@ -113,22 +115,24 @@ protected:
   float               fTMin;
   float               fTMax;
 
+  float               fMinEDep;         // in MeV .. ???? what is the normalization
+  float               fMaxEDep;
+
   int                 fMinStation;
   int                 fMaxStation;
                                         // min and max momentum values for displayed MC particles
   float               fMinSimpMomentum;
   float               fMaxSimpMomentum;
 
+  float               fEWLength;        // event window length, ns 
   float               fMbTime;
-
-  float               fBField;          // by defautl , 1 T, but could be less. Need to know to display straight
-                                        // cosmics
 
   int                 fDisplayStrawDigiMC;
   int                 fDisplayStrawHitsXY;
 
   int                 fDisplayHelices; 
   int                 fDisplayTracks; 
+  int                 fDisplayCosmicSeeds;  // 0 by default
   int                 fDisplaySimParticles; 
   int                 fDisplayOnlyTCHits;   // will be useless longer term, as the time cluster should 
                                             // include all hits within the time interval, 
@@ -140,7 +144,7 @@ protected:
 //  Legend Map
   std::map<std::string, std::string> fLegendLabelMap;
 
-  
+  std::vector<int>    fListOfVisibleStations; // length should be 18
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -165,7 +169,6 @@ public:
 
   TSubdetector*  GetClosestSubdetector() { return fClosestSubdetector; }
   TExtrapolator* GetExtrapolator() { return fExtrapolator; }
-
   TObjArray*     GetListOfDetectors() { return fListOfDetectors; }
 
   void           AddDetector(TObject* det) { fListOfDetectors->Add(det); }
@@ -175,8 +178,8 @@ public:
   stntuple::TEvdTimeCluster*  SelectedTimeCluster() { return fSelectedTimeCluster; }
   stntuple::TEvdTimeCluster*  SelectedPhiCluster () { return fSelectedPhiCluster;  }
 
-  float          MbTime() { return fMbTime; }
-  float          BField() { return fBField; }
+  float          MbTime  () { return fMbTime  ; }
+  float          EWLength() { return fEWLength; }
 
   void           GetTimeWindow(float& TMin, float& TMax) {
     TMin = fTMin;
@@ -189,6 +192,7 @@ public:
   int            DisplayStrawDigiMC () const { return fDisplayStrawDigiMC ; }
   int            DisplayStrawHitsXY () const { return fDisplayStrawHitsXY ; }
   int            DisplayTracks      () const { return fDisplayTracks      ; }
+  int            DisplayCosmicSeeds () const { return fDisplayCosmicSeeds ; }
   
   int            IgnoreComptonHits  () const { return fIgnoreComptonHits  ; }
   int            IgnoreProtonHits   () const { return fIgnoreProtonHits   ; }
@@ -202,6 +206,9 @@ public:
 
   float          TMin               () const { return fTMin; }
   float          TMax               () const { return fTMax; }
+
+  float          MinEDep            () const { return fMinEDep; }
+  float          MaxEDep            () const { return fMaxEDep; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
@@ -211,8 +218,12 @@ public:
   void           SetDisplayStrawHitsXY (int Flag) { fDisplayStrawHitsXY  = Flag; }
   void           SetDisplayHelices     (int Flag) { fDisplayHelices      = Flag; }
   void           SetDisplayTracks      (int Flag) { fDisplayTracks       = Flag; }
+  void           SetDisplayCosmicSeeds (int Flag) { fDisplayCosmicSeeds  = Flag; }
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
   void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
+
+  void           SetEWLength           (float EWLength) { fEWLength   = EWLength; }
+
   void           SetIgnoreComptonHits  (int Flag) { fIgnoreComptonHits   = Flag; }
   void           SetIgnoreProtonHits   (int Flag) { fIgnoreProtonHits    = Flag; }
   void           SetIgnoreProtons      (int Flag) { fIgnoreProtons       = Flag; }
@@ -230,8 +241,10 @@ public:
     fTMax = TMax;
   }
 
-  void  SetMbTime(float MbTime) { fMbTime = MbTime; }
-  void  SetBField(float BField) { fBField = BField; }
+  void   SetMinEDep(float E) override { fMinEDep = E; }
+  void   SetMaxEDep(float E) override { fMaxEDep = E; }
+
+  void  SetMbTime(float MbTime) { fMbTime = MbTime; } // *FIXME* almost the same meaning with EWLength
 //-----------------------------------------------------------------------------
 // print functions
 //-----------------------------------------------------------------------------
@@ -278,6 +291,9 @@ public:
   
   Int_t   OpenVSTView();
   Int_t   OpenVSTView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
+  
+  Int_t   OpenVRZView();
+  Int_t   OpenVRZView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
   
   void    CloseWindow();
 //-----------------------------------------------------------------------------

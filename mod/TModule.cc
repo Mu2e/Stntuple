@@ -23,13 +23,16 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
-TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
+TModule::TModule(): art::EDAnalyzer(fhicl::ParameterSet{}), TNamed("","") {
+}
+
+  //-----------------------------------------------------------------------------
+TModule::TModule(const fhicl::ParameterSet& PSet, const fhicl::ParameterSet& TModulePSet, const char* Name):
   art::EDAnalyzer(PSet),
   TNamed(Name,Name)
 {
 
-  int    n, index;
+  int    n;
   static char* dummy[100];
 
   fFile   = 0;
@@ -37,24 +40,24 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
 
   memset(fDebugBit,0,kNDebugBits*sizeof(int));
 
-  fFclDebugBits    = PSet.get<fhicl::ParameterSet>("debugBits"      );
-  fInteractiveMode = PSet.get<int>                ("interactiveMode");
-  _rootMacro       = PSet.get<string>             ("rootMacro"      );
+  fFclDebugBits    = TModulePSet.get<fhicl::ParameterSet>("debugBits"      );
+  fInteractiveMode = TModulePSet.get<int>                ("interactiveMode");
+  _rootMacro       = TModulePSet.get<string>             ("rootMacro"      );
 
   fAnaRint         = TAnaRint::Instance(0,dummy);
 //-----------------------------------------------------------------------------
 // pass parameters to TAnaDump
 //-----------------------------------------------------------------------------
-  fhicl::ParameterSet tadPset = PSet.get<fhicl::ParameterSet>("TAnaDump");
+  fhicl::ParameterSet tadPset = TModulePSet.get<fhicl::ParameterSet>("TAnaDump");
   fDump                       = TAnaDump::Instance(&tadPset);
 
   const char* key;
                                         // a flag is an integer!
   n = fFclDebugBits.get_names().size();
   for (int i=0; i<n; i++) {
-    key                = fFclDebugBits.get_names().at(i).data();
-    sscanf(key,"bit%i" ,&index );
-
+    int index(0);
+    key               = fFclDebugBits.get_names().at(i).data();
+    sscanf(key,"bit%i",&index );
     fDebugBit[index]  = fFclDebugBits.get<int>(key);
 
     printf("... TModule: bit=%3i is set to %i \n",index,fDebugBit[index]);
@@ -88,70 +91,70 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
   }
 }
 
-// //-----------------------------------------------------------------------------
-// TModule::TModule(const art::EDAnalyzer::Table<Config>& config, const char* Name):
-//   art::EDAnalyzer(config),
-//   TNamed(Name,Name),
-//   fFclDebugBits   (config().debugBits()      ),
-//   fInteractiveMode(config().interactiveMode()),
-//   _rootMacro      (config().rootMacro()      )
-// {
+//-----------------------------------------------------------------------------
+TModule::TModule(const fhicl::Table<TModule::Config>& config, const char* Name):
+  art::EDAnalyzer(config.get_PSet()),
+  TNamed(Name,Name),
+  fFclDebugBits   (config().debugBits()      ),
+  fInteractiveMode(config().interactiveMode()),
+  _rootMacro      (config().rootMacro()      )
+{
 
-//   int    n, index;
-//   static char* dummy[100];
+  int    n, index;
+  static char* dummy[100];
 
-//   fFile   = 0;
-//   fFolder = new TFolder(GetName(),GetName());
+  fFile   = 0;
+  fFolder = new TFolder(GetName(),GetName());
 
-//   memset(fDebugBit,0,kNDebugBits*sizeof(int));
+  memset(fDebugBit,0,kNDebugBits*sizeof(int));
 
-//   fAnaRint         = TAnaRint::Instance(0,dummy);
-// //-----------------------------------------------------------------------------
-// // pass parameters to TAnaDump
-// //-----------------------------------------------------------------------------
-//   fhicl::ParameterSet tadPset = config().tanaDump();
+  fAnaRint         = TAnaRint::Instance(0,dummy);
+//-----------------------------------------------------------------------------
+// pass parameters to TAnaDump
+//-----------------------------------------------------------------------------
+  fhicl::ParameterSet tadPset = config().TAnaDump.get<fhicl::ParameterSet>();
 
-//   fDump                       = TAnaDump::Instance(&tadPset);
+  fDump = TAnaDump::Instance(&tadPset);
 
-//   const char* key;
-//                                         // a flag is an integer!
-//   n = fFclDebugBits.get_names().size();
-//   for (int i=0; i<n; i++) {
-//     key                = fFclDebugBits.get_names().at(i).data();
-//     sscanf(key,"bit%i" ,&index );
+  const char* key;
+                                        // a flag is an integer!
+  n = fFclDebugBits.get_names().size();
+  for (int i=0; i<n; i++) {
+    key                = fFclDebugBits.get_names().at(i).data();
+    sscanf(key,"bit%i" ,&index );
 
-//     fDebugBit[index]  = fFclDebugBits.get<int>(key);
+    fDebugBit[index]  = fFclDebugBits.get<int>(key);
 
-//     printf("... TModule: bit=%3i is set to %i \n",index,fDebugBit[index]);
-//   }
+    printf("... TModule: bit=%3i is set to %i \n",index,fDebugBit[index]);
+  }
 
-// //-----------------------------------------------------------------------------
-// // plugin initialization - figure out the function name
-// //-----------------------------------------------------------------------------
-//   fFunction = nullptr;
-//   if (_rootMacro.length() > 0) {
-//     TInterpreter::EErrorCode rc;
-//     TInterpreter* cint = gROOT->GetInterpreter();
+//-----------------------------------------------------------------------------
+// plugin initialization - figure out the function name
+//-----------------------------------------------------------------------------
+  fFunction = nullptr;
+  if (_rootMacro.length() > 0) {
+    TInterpreter::EErrorCode rc;
+    TInterpreter* cint = gROOT->GetInterpreter();
 
-//     cint->LoadMacro(_rootMacro.data(),&rc);
-//     if (rc != 0) {
-//       printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_rootMacro.data());
-//     }
-//     else {
-//       vector<string> res, r2;
-      
-//       boost::algorithm::split(res,_rootMacro, boost::is_any_of("/"));
+    cint->LoadMacro(_rootMacro.data(),&rc);
+    if (rc != 0) {
+      printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_rootMacro.data());
+    }
+    else {
+      vector<string> res, r2;
+   
+      boost::algorithm::split(res,_rootMacro, boost::is_any_of("/"));
 
-//       int n = res.size();
-// 					// last is the macro itself, strip the path
-//       string ww = res[n-1];
+      int n = res.size();
+					// last is the macro itself, strip the path
+      string ww = res[n-1];
 
-//       boost::algorithm::split(r2,ww, boost::is_any_of("."));
+      boost::algorithm::split(r2,ww, boost::is_any_of("."));
 
-//       fFunction = new TString(r2[0].data());
-//     }
-//   }
-// };
+      fFunction = new TString(r2[0].data());
+    }
+  }
+};
 
 //-----------------------------------------------------------------------------
 TModule::~TModule() {

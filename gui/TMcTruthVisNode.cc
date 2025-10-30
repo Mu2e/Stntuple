@@ -30,10 +30,11 @@
 
 #include <vector>
 
-ClassImp(TMcTruthVisNode)
+// ClassImp(stntuple::TMcTruthVisNode)
 
+namespace stntuple {    
 //_____________________________________________________________________________
-TMcTruthVisNode::TMcTruthVisNode(const char* name): TVisNode(name) {
+TMcTruthVisNode::TMcTruthVisNode(const char* name): TStnVisNode(name) {
   fArc                  = new TArc;
   fEventTime            = 0;
   fTimeWindow           = 1.e6;
@@ -52,21 +53,6 @@ TMcTruthVisNode::~TMcTruthVisNode() {
 //_____________________________________________________________________________
 int TMcTruthVisNode::InitEvent() {
   return 0;
-}
-
-
-//_____________________________________________________________________________
-void TMcTruthVisNode::Paint(Option_t* option) {
-  //
-				// parse option list
-  int view = TVisManager::Instance()->GetCurrentView()->Type();
-
-  if      (view == TStnVisManager::kXY ) PaintXY (option);
-  else if (view == TStnVisManager::kCal) PaintCal(option);
-  else {
-				// what is the default?
-    //    Warning("Paint",Form("Unknown option %s",option));
-  }
 }
 
 
@@ -208,6 +194,20 @@ void TMcTruthVisNode::PaintRZ(Option_t* option) {
   // draw calorimeter
 }
 
+//-----------------------------------------------------------------------------
+void TMcTruthVisNode::PaintTZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TMcTruthVisNode::PaintPhiZ(Option_t* Option) {
+}
+
+//-----------------------------------------------------------------------------
+void TMcTruthVisNode::PaintVST(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TMcTruthVisNode::PaintVRZ(Option_t* Option) {
+}
+
 //_____________________________________________________________________________
 Int_t TMcTruthVisNode::DistancetoPrimitive(Int_t px, Int_t py) {
   return 9999;
@@ -233,3 +233,4 @@ Int_t TMcTruthVisNode::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
   return 9999;
 }
 
+}

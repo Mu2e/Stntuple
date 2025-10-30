@@ -75,23 +75,19 @@ public:
   int          ProcessNewRun      (const art::Run* ARun);
   int          InitTriggerTable   (int RunNumber);
   // int       InitRunSummary     ();
-					// ****** setters
-  //  ClassDef(InitStntuple,0)
 };
 
 
 //------------------------------------------------------------------------------
 // constructors
 //------------------------------------------------------------------------------
-InitStntuple::InitStntuple(fhicl::ParameterSet const& Pset):
-  StntupleModule   (Pset,"InitStntuple")
-{
+InitStntuple::InitStntuple(fhicl::ParameterSet const& PSet): 
+  StntupleModule   (PSet.get<fhicl::ParameterSet>("THistModule"),"InitStntuple") {
 //-----------------------------------------------------------------------------
 // dont create subdirectories for the modules: they will have different folders
 //-----------------------------------------------------------------------------
-  THistModule::fgMakeSubdirs = 0;
-
-  fLastRun      = -1;
+  THistModule::fgMakeSubdirs =  0;
+  fLastRun                   = -1;
 }
 
 

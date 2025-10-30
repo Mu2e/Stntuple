@@ -2,7 +2,7 @@
 #
 # Script to build the files found in this directory.
 #------------------------------------------------------------------------------
-import os
+import os, subprocess
 # from stntuple_helper import *
 Import('stntuple_env')
 Import('stntuple_helper')
@@ -24,7 +24,27 @@ def local_build():
 
     debug = False
     helper = stntuple_helper(local_env,debug);
-    helper.handle_dictionaries();
+#------------------------------------------------------------------------------
+# work around a bug in fhiclcpp 4.19.00-4.19.01:
+# don't generate the ROOT dictionary for MuHitDisplay module for those versions
+#------------------------------------------------------------------------------
+    cmd = "spack find fhicl-cpp | grep fhicl-cpp | awk -F @ '{print $2}'"
+    p = subprocess.Popen(cmd,
+                         executable="/bin/bash",
+                         shell=True,
+                         stderr=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
+                         encoding="utf-8")
+    (out, err) = p.communicate();
+    fhiclcpp_ver=out.strip();
+    # print(f'out_2:{out} len(out):{len(out)} fhiclcpp_ver:{fhiclcpp_ver}')
+    
+    skip_dicts = []
+    if (fhiclcpp_ver == '4.19.00') or (fhiclcpp_ver == '4.19.01'):
+        skip_dicts.append('MuHitDisplay_module_linkdef.h')
+
+    
+    helper.handle_dictionaries(skip_list=skip_dicts);
 
     list_of_cc_files =  local_env.Glob('*.cc', strings=True);
     skip_list        = []
@@ -46,6 +66,7 @@ def local_build():
                          'mu2e_ConditionsService',
                          'mu2e_GeomPrimitives',
                          'mu2e_Mu2eUtilities',
+                         'mu2e_GeneralUtilities',
                          babarlibs,
                          'art_Framework_Core',
                          'art_Framework_Services_Registry',
@@ -69,7 +90,7 @@ def local_build():
                          'boost_system'
                      ];
 
-    helper.build_libs(list_of_cc_files, skip_list,libs);
+    helper.build_libs(list_of_cc_files,skip_list,libs=libs);
 #------------------------------------------------------------------------------
 local_build();
 

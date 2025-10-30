@@ -48,7 +48,19 @@
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
 * STNTUPLE [[file:how-tos.org][how-to's]]    
 * [[file:event_display.org][STNTUPLE event display]]  
-* STNTUPLE Offline modules and their parameters                              
+* STNTUPLE art modules and their parameters                                  
+- any Stntuple art module inherits from StntupleModule --> THistModule --> TModule classes
+- those provide layers of additional functionality
+** TModule
+*** debugBits : one can set up to 100 individual debug bits per module. Syntax:
+#+begin_src
+    debugBits : { 
+	bit0:1  
+	bit1:1 
+	bit51:1
+    }
+#+end_src
+example: file:../fcl/prolog.fcl::/debugBits/
 ** InitStntuple
 ** StntupleMaker                                                             
   - defines absolute majority of the configuration parameters
