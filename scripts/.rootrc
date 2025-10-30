@@ -31,8 +31,9 @@ Rint.History:            $(PWD)/.root_hist
 # STNTUPLE catalog servers (FCDFLNX2 is a fallback for FCDFLNX4, same disk,
 #                           ncdf131 is my private catalog server)
 #------------------------------------------------------------------------------
-Stntuple.Catalog   https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc 
+Stntuple.Catalog https://raw.githubusercontent.com/pavel1murat/data_catalog/refs/heads/main/bluearc
 
+# Stntuple.Catalog   https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc
 # Stntuple.Catalog   http://home.fnal.gov/~murat/cafdfc 
 # +Stntuple.Catalog   http://home.fnal.gov/~gianipez/cafdfc 
 # +Stntuple.Catalog   http://home.fnal.gov/~rdonghia/cafdfc 
