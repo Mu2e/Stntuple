@@ -90,7 +90,7 @@ def local_build():
                          'boost_system'
                      ];
 
-    helper.build_libs(list_of_cc_files,skip_list,skip_dict_list=skip_dicts,libs=libs);
+    helper.build_libs(list_of_cc_files,skip_list,libs=libs);
 #------------------------------------------------------------------------------
 local_build();
 
