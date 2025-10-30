@@ -46,6 +46,7 @@ int TStnInputModule::InitChain(const char* FileName, const char* TreeName)
   // assume that all the files in the directory should be chained
   void*   dir;
   TString filename(FileName);
+  if(fPrintLevel > 2) printf("TStnInputModule: FileName = %s, TreeName = %s\n", FileName, TreeName);
  
   fOwnChain = true;
   fChain    = new TChain(TreeName);
@@ -60,14 +61,16 @@ int TStnInputModule::InitChain(const char* FileName, const char* TreeName)
     const char* fn;
     while ((fn = gSystem->GetDirEntry(dir))) {
       if ((strcmp(fn,".") != 0) && (strcmp(fn,"..") != 0)) {
-	filename = dirName + TString("/") + TString(fn);
-	fChain->AddFile(filename.Data(),TChain::kBigNumber);
+        filename = dirName + TString("/") + TString(fn);
+        if(fPrintLevel > 1) printf("TStnInputModule::%s: Adding file %s\n", __func__, filename.Data());
+        fChain->AddFile(filename.Data(),TChain::kBigNumber);
       }
     }
   }
   else {
 				// this could be a single file
     // This is a single file ..
+    if(fPrintLevel > 1) printf("TStnInputModule::%s: Adding file %s\n", __func__, filename.Data());
     fChain->AddFile(filename.Data(),TChain::kBigNumber);
   }
   if (fPrintLevel != 0)
@@ -132,9 +135,16 @@ Int_t TStnInputModule::LoadEntry(Int_t Entry) {
   Int_t centry = fChain->LoadTree(Entry);
   if (centry < 0) {
     if (fPrintLevel > 0)
-      printf(" TStnInputModule::LoadEntry - LoadTree = %d loading Entry: %d\n",
-	     centry,Entry);
-    return centry;
+      printf(" TStnInputModule::LoadEntry - LoadTree = %d loading Entry: %d -- Waiting and trying again\n",
+             centry,Entry);
+    sleep(1); // wait a second and try again
+    centry = fChain->LoadTree(Entry);
+    if (centry < 0) {
+      if (fPrintLevel > 0)
+        printf(" TStnInputModule::LoadEntry - LoadTree = %d loading Entry: %d\n",
+               centry,Entry);
+      return centry;
+    }
   }
 
   Int_t itree = fChain->GetTreeNumber();

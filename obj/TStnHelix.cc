@@ -61,11 +61,11 @@ void TStnHelix::ReadV1(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
 
-  fMom1.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin1.SetXYZT(0.,0.,0.,0.);
+  fSimpMom1.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin1.SetXYZT(0.,0.,0.,0.);
 
-  fMom2.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin2.SetXYZT(0.,0.,0.,0.);
+  fSimpMom2.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin2.SetXYZT(0.,0.,0.,0.);
 
 
   fNHits             = data.fNHits;	     
@@ -79,6 +79,8 @@ void TStnHelix::ReadV1(TBuffer &R__b) {
   fSimpPDGM2         = -1;         // added in v3
   fSimpId2Hits       = -1;         // added in v3
   fHelicity          =  0;         // added in V4
+  fPropDir           =  0;         // added in V7
+  fSimpID1           = -1;         // added in v7
 
 
   fT0                = data.fT0;    	  
@@ -149,11 +151,11 @@ void TStnHelix::ReadV2(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
 
-  fMom1.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin1.SetXYZT(0.,0.,0.,0.);
+  fSimpMom1.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin1.SetXYZT(0.,0.,0.,0.);
 
-  fMom2.SetPxPyPzE(0.,0.,0.,0.);
-  fOrigin2.SetXYZT(0.,0.,0.,0.);
+  fSimpMom2.SetPxPyPzE(0.,0.,0.,0.);
+  fSimpOrigin2.SetXYZT(0.,0.,0.,0.);
 
   fNHits             = data.fNHits;	     
   fAlgorithmID       = data.fAlgorithmID;    
@@ -166,6 +168,8 @@ void TStnHelix::ReadV2(TBuffer &R__b) {
   fSimpPDGM2         = -1;         // added in v3
   fSimpId2Hits       = -1;         // added in v3
   fHelicity          =  0;         // added in V4
+  fPropDir           =  0;         // added in V7
+  fSimpID1           = -1;         // added in v7
 
   fT0                = data.fT0;    	  
   fT0Err             = data.fT0Err; 	  
@@ -194,10 +198,10 @@ void TStnHelix::ReadV3(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // vectors, added in V3, I believe
 //-----------------------------------------------------------------------------
-    TLorentzVector            fMom1;  
-    TLorentzVector            fOrigin1;
-    TLorentzVector            fMom2;  
-    TLorentzVector            fOrigin2;
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -247,10 +251,10 @@ void TStnHelix::ReadV3(TBuffer &R__b) {
   nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
   nwf      = ((float*) &data.fHelix         ) - &data.fT0;
     
-  fMom1.Streamer(R__b);
-  fOrigin1.Streamer(R__b);
-  fMom2.Streamer(R__b);
-  fOrigin2.Streamer(R__b);
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
 
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
@@ -267,6 +271,8 @@ void TStnHelix::ReadV3(TBuffer &R__b) {
   fSimpPDGM2         = data.fSimpPDGM2  ;
   fSimpId2Hits       = data.fSimpId2Hits;
   fHelicity          =  0               ;         // added in V4
+  fPropDir           =  0;         // added in V7
+  fSimpID1           = -1               ;         // added in v7
 
   fT0                = data.fT0;    	  
   fT0Err             = data.fT0Err; 	  
@@ -294,10 +300,10 @@ void TStnHelix::ReadV4(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // vectors, added in V3, I believe
 //-----------------------------------------------------------------------------
-    TLorentzVector            fMom1;  
-    TLorentzVector            fOrigin1;
-    TLorentzVector            fMom2;  
-    TLorentzVector            fOrigin2;
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -348,10 +354,10 @@ void TStnHelix::ReadV4(TBuffer &R__b) {
   nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
   nwf      = ((float*) &data.fHelix         ) - &data.fT0;
     
-  fMom1.Streamer(R__b);
-  fOrigin1.Streamer(R__b);
-  fMom2.Streamer(R__b);
-  fOrigin2.Streamer(R__b);
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
 
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
@@ -387,6 +393,9 @@ void TStnHelix::ReadV4(TBuffer &R__b) {
   fClusterY          = data.fClusterY;    
   fClusterZ          = data.fClusterZ;    
   fNLoops            = 0.;                  //added in V5
+  fPropDir           =  0;                  // added in V7
+  fSimpID1           = -1;                  // added in v7
+
 }
 
 
@@ -397,10 +406,10 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // vectors, added in V3, I believe
 //-----------------------------------------------------------------------------
-    TLorentzVector            fMom1;  
-    TLorentzVector            fOrigin1;
-    TLorentzVector            fMom2;  
-    TLorentzVector            fOrigin2;
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -452,10 +461,10 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
   nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
   nwf      = ((float*) &data.fHelix         ) - &data.fT0;
     
-  fMom1.Streamer(R__b);
-  fOrigin1.Streamer(R__b);
-  fMom2.Streamer(R__b);
-  fOrigin2.Streamer(R__b);
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
 
   R__b.ReadFastArray(&data.fNHits ,nwi);
   R__b.ReadFastArray(&data.fT0    ,nwf);
@@ -473,6 +482,8 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
   fSimpId2Hits       = data.fSimpId2Hits;
   fHelicity          = data.fHelicity   ;         
   fNLoops            = data.fNLoops;
+  fPropDir           =  0;                  // added in V7
+  fSimpID1           = -1;                  // added in v7
 
   fT0                = data.fT0;    	  
   fT0Err             = data.fT0Err; 	  
@@ -499,6 +510,123 @@ void TStnHelix::ReadV5(TBuffer &R__b) {
 }
 
 
+//--------------------------------------------------------------------------------
+void TStnHelix::ReadV6(TBuffer &R__b) {
+
+  struct TStnHelixDataV6_t {
+//-----------------------------------------------------------------------------
+// vectors, added in V3, I believe
+//-----------------------------------------------------------------------------
+    TLorentzVector            fSimpMom1;  
+    TLorentzVector            fSimpOrigin1;
+    TLorentzVector            fSimpMom2;  
+    TLorentzVector            fSimpOrigin2;
+//-----------------------------------------------------------------------------
+// integers
+//-----------------------------------------------------------------------------
+    int                       fNHits;
+    int                       fAlgorithmID;     // bit-packed : (alg_mask << 16 ) | best
+    int                       fTimeClusterIndex;
+    int                       fTrackSeedIndex;
+    int                       fNComboHits;     
+    int                       fSimpPDG1;          // added in v3
+    int                       fSimpPDGM1;         // added in v3
+    int                       fSimpId1Hits;       // added in v3
+    int                       fSimpPDG2;          // added in v3
+    int                       fSimpPDGM2;         // added in v3
+    int                       fSimpId2Hits;       // added in v3
+    int                       fHelicity;          // added in v4
+    int                       fInt[kNFreeIntsV6];
+//-----------------------------------------------------------------------------
+// floats
+//-----------------------------------------------------------------------------
+    float                     fT0;    
+    float                     fT0Err; 
+
+    float                     fRCent;   // radius of circle center
+    float                     fFCent;   // azimuth of circle center
+    float                     fRadius;  // transverse radius of the helix (mm).  Always positive
+    float                     fLambda;  // dz/dphi (mm/radian)
+    float                     fFZ0;     // azimuth (phi) at the center z position (radians)
+    float                     fD0;      // impact paramter 
+    float                     fChi2XYNDof;
+    float                     fChi2PhiZNDof;
+
+    float                     fClusterTime;   
+    float		      fClusterEnergy; 
+    float                     fClusterX;      
+    float		      fClusterY;      
+    float		      fClusterZ;      
+    float                     fNLoops;
+    float                     fTZSlope;
+    float                     fTZSlopeError;
+    float                     fChi2TZNDof;
+    float                     fHitRatio; 
+    float                     fFloat[kNFreeFloatsV6]; // provision for future I/O expansion
+//-----------------------------------------------------------------------------
+// transients
+//-----------------------------------------------------------------------------
+    const mu2e::HelixSeed*    fHelix;  //!
+ };
+
+  TStnHelixDataV6_t data;
+
+  int            nwi, nwf;
+  
+  nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
+  nwf      = ((float*) &data.fHelix         ) - &data.fT0;
+    
+  fSimpMom1.Streamer(R__b);
+  fSimpOrigin1.Streamer(R__b);
+  fSimpMom2.Streamer(R__b);
+  fSimpOrigin2.Streamer(R__b);
+
+  R__b.ReadFastArray(&data.fNHits ,nwi);
+  R__b.ReadFastArray(&data.fT0    ,nwf);
+
+  fNHits             = data.fNHits;	     
+  fAlgorithmID       = data.fAlgorithmID;    
+  fTimeClusterIndex  = data.fTimeClusterIndex;
+  fTrackSeedIndex    = data.fTrackSeedIndex;
+  fNComboHits        = data.fNComboHits ;
+  fSimpPDG1          = data.fSimpPDG1   ;
+  fSimpPDGM1         = data.fSimpPDGM1  ;
+  fSimpId1Hits       = data.fSimpId1Hits;
+  fSimpPDG2          = data.fSimpPDG2   ;
+  fSimpPDGM2         = data.fSimpPDGM2  ;
+  fSimpId2Hits       = data.fSimpId2Hits;
+  fHelicity          = data.fHelicity   ;         
+  fNLoops            = data.fNLoops;
+  fPropDir           =  0;                  // added in V7
+  fSimpID1           = -1;                  // added in v7
+
+  fT0                = data.fT0;    	  
+  fT0Err             = data.fT0Err; 	  
+                
+  fRCent             = data.fRCent;
+  fFCent             = data.fFCent;
+  fRadius            = data.fRadius;
+  fLambda            = data.fLambda;
+  fFZ0               = data.fFZ0;   
+  fD0                = data.fD0;    
+  fChi2XYNDof        = data.fChi2XYNDof;  
+  fChi2PhiZNDof      = data.fChi2PhiZNDof;
+                
+  fClusterTime       = data.fClusterTime; 
+  fClusterEnergy     = data.fClusterEnergy; 
+  fClusterX          = data.fClusterX;      
+  fClusterY          = data.fClusterY;    
+  fClusterZ          = data.fClusterZ;    
+
+  fTZSlope           = data.fTZSlope; 
+  fTZSlopeError      = data.fTZSlopeError; 
+  fChi2TZNDof        = data.fChi2TZNDof;
+  fHitRatio          = data.fHitRatio;
+
+  fPropDir           = 0; //added in v7
+}
+
+
 
 //-----------------------------------------------------------------------------
 void TStnHelix::Streamer(TBuffer& R__b) {
@@ -515,22 +643,23 @@ void TStnHelix::Streamer(TBuffer& R__b) {
     else if (R__v == 3) ReadV3 (R__b);
     else if (R__v == 4) ReadV4 (R__b);
     else if (R__v == 5) ReadV5 (R__b);
+    else if (R__v == 6) ReadV6 (R__b);
     else {
-      fMom1.Streamer(R__b);
-      fOrigin1.Streamer(R__b);
-      fMom2.Streamer(R__b);
-      fOrigin2.Streamer(R__b);
-					// current version: V3
+      fSimpMom1.Streamer(R__b);
+      fSimpOrigin1.Streamer(R__b);
+      fSimpMom2.Streamer(R__b);
+      fSimpOrigin2.Streamer(R__b);
+					// current version: V7
       R__b.ReadFastArray(&fNHits, nwi);
       R__b.ReadFastArray(&fT0   , nwf);
     }
   }
   else {
     R__b.WriteVersion(TStnHelix::IsA());
-    fMom1.Streamer(R__b);
-    fOrigin1.Streamer(R__b);
-    fMom2.Streamer(R__b);
-    fOrigin2.Streamer(R__b);
+    fSimpMom1.Streamer(R__b);
+    fSimpOrigin1.Streamer(R__b);
+    fSimpMom2.Streamer(R__b);
+    fSimpOrigin2.Streamer(R__b);
 
     R__b.WriteFastArray(&fNHits, nwi);
     R__b.WriteFastArray(&fT0   , nwf);
@@ -540,11 +669,11 @@ void TStnHelix::Streamer(TBuffer& R__b) {
 //-----------------------------------------------------------------------------
 TStnHelix::TStnHelix(int Number) {
 
-  fMom1.SetPxPyPzE(1e6,1e6,1e6,1e6);
-  fOrigin1.SetXYZT(0.,0.,0.,0.);
+  fSimpMom1.SetPxPyPzE(1e6,1e6,1e6,1e6);
+  fSimpOrigin1.SetXYZT(0.,0.,0.,0.);
   
-  fMom2.SetPxPyPzE(1e6,1e6,1e6,1e6);
-  fOrigin2.SetXYZT(0.,0.,0.,0.);
+  fSimpMom2.SetPxPyPzE(1e6,1e6,1e6,1e6);
+  fSimpOrigin2.SetXYZT(0.,0.,0.,0.);
   
   fNumber           = Number;
   fNHits            =  0;
@@ -560,6 +689,8 @@ TStnHelix::TStnHelix(int Number) {
   fSimpPDGM2    = 0; 
   fSimpId2Hits  = 0;
   fHelicity     = 0;
+  fPropDir      = 0;
+  fSimpID1      =-1;
 
   for (int i=0; i<kNFreeInts; i++) fInt[i] = 0;
 

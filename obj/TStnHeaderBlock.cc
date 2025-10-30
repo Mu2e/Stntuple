@@ -66,6 +66,7 @@ void TStnHeaderBlock::ReadV1(TBuffer &R__b) {
 
   fInstLum       = data.fInstLum    ;
   fMeanLum       = -1.              ;   // *** added in V2
+  fEventWeight   =  1.              ;   // *** added in V4
 
   fStnVersion    = "";
 }
@@ -85,10 +86,16 @@ void TStnHeaderBlock::Streamer(TBuffer &R__b)
     }
     else {
 //-----------------------------------------------------------------------------
-//  current version : 2
+//  current version : 4
 //-----------------------------------------------------------------------------
       R__b.ReadFastArray(&fVersion,nwi);
       R__b.ReadFastArray(&fInstLum,nwf);
+      if(R__v < 4) {
+        if(R__v < 3) {
+          fNComboHits = -1;
+        }
+        fEventWeight = 1.f;
+      }
     }
   } 
   else {
@@ -110,6 +117,7 @@ TStnHeaderBlock::TStnHeaderBlock() {
 
   fInstLum       = -1;
   fMeanLum       = -1;
+  fEventWeight   = 1.;
   fStnVersion    = "";
 
   for (int i=0; i<kNFreeInts  ; i++) fInt  [i] = -1;

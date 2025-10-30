@@ -73,6 +73,8 @@ TEvdHelixSeed::TEvdHelixSeed(): TObject() {
   // fEllipse->SetFillStyle(3001);		// make it transparent
     
   fEllipse->SetLineColor(kGreen+4);
+  fEllipse->SetLineStyle(4);
+  fEllipse->SetLineWidth(3);
 }
 
 //-----------------------------------------------------------------------------

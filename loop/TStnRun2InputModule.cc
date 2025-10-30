@@ -183,6 +183,7 @@ int TStnRun2InputModule::BeginJob() {
       }
     }
     int ntot = arr->GetEntries();
+    if(fPrintLevel > 1) printf("TStnRun2InputModule::%s: N(tot) = %i, N(tot ev) = %i\n", __func__, ntot, ntotev);
 
     fChain = new TChain("STNTUPLE");
     fCurrent = -1;
@@ -230,11 +231,17 @@ int TStnRun2InputModule::BeginJob() {
       printf("TStnRun2InputModule::BeginJob: Splitting, running on files %d to %d\n",ifirst,ilastp1-1);
     }
 
-    fChain = new TChain("STNTUPLE");
+    // fChain = new TChain("STNTUPLE");
     TObjArrayIter it(arr);
     int ind = 0;
     while (TChainElement* ce = (TChainElement*) it.Next()) {
       if(ind>=ifirst && ind<ilastp1) {
+        if(fPrintLevel > 1) printf("TStnRun2InputModule::%s: Adding file %s, N(entries) = %lld\n", __func__, ce->GetTitle(), ce->GetEntries());
+        if(TString(ce->GetTitle()) == "") {
+          if(fPrintLevel > 0) printf("TStnRun2InputModule::%s: Skipping empty string file!\n", __func__);
+          ind++;
+          continue;
+        }
 	fChain->AddFile(ce->GetTitle(),ce->GetEntries());
 	fNEntries += ce->GetEntries();
 	fNFiles++;
@@ -249,6 +256,8 @@ int TStnRun2InputModule::BeginJob() {
 
   printf("TStnRun2InputModule::BeginJob: chained %4d files, %9d events\n",
 	 fNFiles,fNEntries);
+  if(fPrintLevel > 2) printf("TStnRun2InputModule::BeginJob: chained %4i trees, %lld events\n", fChain->GetNtrees(), fChain->GetEntries()); // brute force evaluation
+
 
   fChain->UseCache(10);
 

@@ -37,6 +37,8 @@ int StntupleInitGenpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   const art::Provenance*                 prov;
   const art::Handle<mu2e::GenParticleCollection>* handle;
 
+  const int verbose(0);
+
   art::Selector  selector(art::ProductInstanceNameSelector(""));
 
   double px, py, pz, mass, energy;
@@ -106,11 +108,14 @@ int StntupleInitGenpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	gp       = ip.operator -> ();
 	gen_id   = (int) gp->generatorId().id();
 	pdg_code = (int) gp->pdgId();
+        if(verbose > 1) printf("InitGenpBlock::%s: Gen particle: PDG = %5i, gen_id = %3i\n", __func__, pdg_code, gen_id);
 //-----------------------------------------------------------------------------
 // conditionally. store only particles corresponding to the requested process
 //-----------------------------------------------------------------------------
 	if ((fGenProcessID > 0) && (gen_id   != fGenProcessID)) continue;
 	if ((fPdgID       != 0) && (pdg_code != fPdgID       )) continue;
+        if ((fPdgID == 0) && (pdg_code == 2212))                continue; // ignore POT unless requested
+        if(verbose > 0) printf("InitGenpBlock::%s: Accepted gen particle: PDG = %5i, gen_id = %3i\n", __func__, pdg_code, gen_id);
 
 	part     = pdg_db->GetParticle(pdg_code);
 

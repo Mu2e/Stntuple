@@ -46,7 +46,10 @@ class TStnHelix : public TObject {
     kNFreeIntsV5   =  3,	        // v5: added number of loops
     kNFreeFloatsV5 =  9,                //
 
-    kNFreeInts     =  3,	        // v6: added TZSlope, TZSlope error, TZChi2NDof, hitRatio (expected/collected)
+    kNFreeIntsV6   =  3,	        // v6: added TZSlope, TZSlope error, TZChi2NDof, hitRatio (expected/collected)
+    kNFreeFloatsV6 =  5,		// 
+
+    kNFreeInts     =  1,	        // v7: added propDir, sim 1 ID
     kNFreeFloats   =  5			// 
   };
 
@@ -54,10 +57,10 @@ public:
 //-----------------------------------------------------------------------------
 // vectors, added in V3
 //-----------------------------------------------------------------------------
-  TLorentzVector            fMom1;  
-  TLorentzVector            fOrigin1;
-  TLorentzVector            fMom2;  
-  TLorentzVector            fOrigin2;
+  TLorentzVector            fSimpMom1;  
+  TLorentzVector            fSimpOrigin1;
+  TLorentzVector            fSimpMom2;  
+  TLorentzVector            fSimpOrigin2;
 //-----------------------------------------------------------------------------
 // integers
 //-----------------------------------------------------------------------------
@@ -73,6 +76,8 @@ public:
   int                       fSimpPDGM2;         // added in v3
   int                       fSimpId2Hits;       // added in v3
   int                       fHelicity;          // added in v4
+  int                       fPropDir;           // added in v7: -1,0,1 stand for upstream, ambigous and downstream respectively
+  int                       fSimpID1;           // added in v7: ID for sim with the most hits
   int                       fInt[kNFreeInts];   // provision for future I/O expansion
 //-----------------------------------------------------------------------------
 // floats
@@ -128,6 +133,7 @@ public:
   int     PDG2            () { return fSimpPDG2; }
   int     PDGMother2      () { return fSimpPDGM2; }
   int     ComboHitsFrom2  () { return fSimpId2Hits; }
+  int     PropDir         () { return fPropDir;}
 
   float   T0         () { return  fT0;     }
   float   T0Err      () { return  fT0Err;  }
@@ -141,6 +147,7 @@ public:
   float   CenterY    () { return  fRCent*sin(fFCent);}
   float   D0         () { return  fD0;     }
 
+  float   Pz         () { return  fLambda*3./10;}//assumes 1T magnetic field!
   float   Pt         () { return  fRadius*3./10;}//assumes 1T magnetic field!
   float   P          () { return  sqrt(fRadius*fRadius + fLambda*fLambda)*3./10;}//assumes 1T magnetic field!
 
@@ -158,13 +165,13 @@ public:
   float   TZSlope       () { return fTZSlope;      }
   float   TZSlopeError  () { return fTZSlopeError; }
   float   TZSlopeSig    () { return std::fabs(fTZSlope/fTZSlopeError);      }
-  float   Chi2TZNDof(){ return fChi2TZNDof;   }
+  float   Chi2TZNDof    () { return fChi2TZNDof;   }
   float   HitRatio      () { return fHitRatio;     }
   
-  TLorentzVector  Mom1     () { return fMom1; }
-  TLorentzVector  Origin1  () { return fOrigin1; }
-  TLorentzVector  Mom2     () { return fMom2; }
-  TLorentzVector  Origin2  () { return fOrigin2; }
+  TLorentzVector  SimpMom1     () { return fSimpMom1; }
+  TLorentzVector  SimpOrigin1  () { return fSimpOrigin1; }
+  TLorentzVector  SimpMom2     () { return fSimpMom2; }
+  TLorentzVector  SimpOrigin2  () { return fSimpOrigin2; }
 
 //----------------------------------------------------------------------------
 // setters
@@ -185,8 +192,9 @@ public:
   void ReadV3(TBuffer& R__b);   // 2018-12-05 P.M.
   void ReadV4(TBuffer& R__b);   // 2019-02-27 G.P.
   void ReadV5(TBuffer& R__b);   // 2024-03-07 G.P.
+  void ReadV6(TBuffer& R__b);   // 2024-10-17 G.P.
 
-  ClassDef(TStnHelix,6);
+  ClassDef(TStnHelix,7);
 };
 
 #endif

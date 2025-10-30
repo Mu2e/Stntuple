@@ -183,19 +183,32 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   art::Handle<mu2e::PrimaryParticle> pp_handle;
   const mu2e::PrimaryParticle*       pp(nullptr);
   const mu2e::SimParticle*           primary(nullptr);
+  const int verbose(0);
 
   if (! fPrimaryParticleTag.empty()) {
     AnEvent->getByLabel(fPrimaryParticleTag,pp_handle);
 
     if (pp_handle.isValid()) {
       pp            = pp_handle.product();
-      if (pp->primarySimParticles().size() > 0) {
-	primary       = pp->primarySimParticles().front().get();
-	fGenProcessID = primary->creationCode();
-	fPdgID        = primary->pdgId();
+      if (!pp->primarySimParticles().empty()) {
+        auto front = pp->primarySimParticles().front();
+        if(front) {
+          primary       = front.get();
+          fGenProcessID = primary->creationCode();
+          fPdgID        = primary->pdgId();
+          if(verbose > 0) {
+            printf("Primary particles:\n");
+            for(auto sim : pp->primarySimParticles()) printf(" ProcessCode = %20s, PDG = %5i\n", sim->creationCode().name().c_str(), sim->pdgId());
+          }
+        } else {
+          printf("InitSimpBlock::%s: Primary particle (collection %s) sim particle is not valid\n", __func__, fPrimaryParticleTag.encode().c_str());
+          pp = nullptr;
+        }
       }
     }
   }
+
+  const bool is_rpc = primary && (fGenProcessID == mu2e::ProcessCode::mu2eExternalRPC || fGenProcessID == mu2e::ProcessCode::mu2eInternalRPC);
 
   if (simp_handle.isValid()) {
     simp_coll = simp_handle.product();
@@ -223,19 +236,50 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 // need to store e+ and e- from an external photon conversion
 // it is possible that will need to lop over the primary particles
 //-----------------------------------------------------------------------------
-      pdg_code         = (int) sim->pdgId();
-      process_id       = sim->creationCode();
+      pdg_code           = (int) sim->pdgId();
+      process_id         = sim->creationCode();
 
+      const bool is_pion = std::abs(pdg_code) == 211;
+      const bool is_pbar = pdg_code == -2212;
       if (pp != nullptr) {
-	int found = 0;
-	for (auto pr : pp->primarySimParticles()) {
-	  if (pr.get() == sim) {
-	    found = 1;
-	    break;
-	  }
-	}
-	if (found == 0)                                     continue;
+        bool found = 0;
+        for (auto pr : pp->primarySimParticles()) {
+          if (pr.get() == sim) {
+            found = true;
+            break;
+          }
+        }
+
+        // check a for important Process codes that may not get labeled "PrimaryParticle"
+        found |= process_id == mu2e::ProcessCode::mu2eGammaConversion;
+        found |= process_id == mu2e::ProcessCode::mu2eInternalRMC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eExternalRMC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eInternalRPC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eExternalRPC    ;
+        found |= process_id == mu2e::ProcessCode::mu2eFlatPhoton     ;
+        found |= is_pion && is_rpc                                   ; // save pions for reweighting RPC FIXME: Saving too many pions outside of RPC
+        found |= is_pbar                                             ; // save pbar for reweighting
+
+        // Check if this is a relevant particle for tracking studies
+        constexpr float min_relevant_mom = 30.; // the point at which we may reconstruct the track
+        const bool relevant_track = (nhits > 12 &&
+                                     sim->startMomentum().vect().mag() > min_relevant_mom
+                                     && (std::abs(pdg_code) == 11 || std::abs(pdg_code) == 13 || std::abs(pdg_code) == 211));
+        if(verbose && !found && relevant_track)
+          printf("InitSimpBlock::%s: Relevant Trk SIM: ID = %4i, PDG = %5i, Code = %s\n",
+                 __func__, id, pdg_code, sim->creationCode().name().c_str());
+        found |= relevant_track;
+
+
+        if(verbose > 1) printf("InitSimpBlock::%s: Checking SIM: ID = %4i, PDG = %5i, Code = %s --> found = %o\n",
+                               __func__, id, pdg_code, sim->creationCode().name().c_str(), found);
+
+	if (!found)                                     continue;
       }
+      if(verbose) printf("InitSimpBlock::%s: Accepting SIM: ID = %4i, PDG = %5i, Code = %s, N(hits) = %2i, p(start) = %6.1f, t(start) = %7.1f, t(end) = %7.1f\n",
+                         __func__, id, pdg_code, sim->creationCode().name().c_str(), nhits,
+                         sim->startMomentum().vect().mag(), std::fmod(sim->startGlobalTime(), 1695), std::fmod(sim->endGlobalTime(), 1695));
+
 //-----------------------------------------------------------------------------
 // if primary particle is not defined, or defined incorrectly (!) 
 // store all particles
@@ -249,7 +293,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       px               = sim->startMomentum().x();
       py               = sim->startMomentum().y();
       pz               = sim->startMomentum().z();
-      double ptot      = sim->startMomentum().vect().mag();
+      // double ptot      = sim->startMomentum().vect().mag();
       energy           = sim->startMomentum().e();
 //-----------------------------------------------------------------------------
 // more on parent ID
@@ -273,8 +317,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
       const CLHEP::Hep3Vector sp = sim->startPosition();
 
-      if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
-      if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
+      // if(!is_pion && !is_pbar) { //no additional requirements for pions needed for reweighting
+      //   if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
+      //   if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
+      // }
 
       simp   = simp_block->NewParticle(id, parent_id, pdg_code        , 
 				       creation_code, termination_code,

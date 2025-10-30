@@ -44,6 +44,11 @@ enum GuiCommandID {
   M_OPEN_VST,
   M_OPEN_VRZ,
 
+  M_OPEN_LEGEND_XY, // legend popup
+  M_OPEN_LEGEND_CAL,
+  M_OPEN_LEGEND_CRV,
+
+  M_PRINT_TO_PNG, // printing functionality
   M_PRINT_STRAW_H,
   M_PRINT_COMBO_H,
   M_PRINT_TRACKS,

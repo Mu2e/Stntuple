@@ -80,12 +80,15 @@ void TCrvClusterBlock::Print(Option_t* opt) const {
 
   TCrvClusterBlock* crv_block = (TCrvClusterBlock*) this;
 
-  for(int i=0; i<fNPulses; i++) {
+  for(int i=0; i<fListOfPulses->GetEntries(); i++) {
+    if(i >= fNPulses) break;
+    auto p = fListOfPulses->At(i);
+    if(!p) continue;
     if (! banner_printed) {
-      fListOfPulses->At(i)->Print("banner");
+      p->Print("banner");
       banner_printed = 1;
     }
-    fListOfPulses->At(i)->Print("data");
+    p->Print("data");
   }
 
   printf(" *** N(CRV coincidence clusters): %d\n",fNClusters);
@@ -98,11 +101,14 @@ void TCrvClusterBlock::Print(Option_t* opt) const {
     }
     const TCrvCoincidenceCluster* crvcc = crv_block->Cluster(i);
     crvcc->Print("data");
-    int np = crvcc->NPulses();
-    for (int ip=0; ip<np; ip++) {
-      int loc = ClusterPulseIndex(i,ip);
-      const TCrvRecoPulse* p =  crv_block->Pulse(loc);
-      p->Print("data");
+    if(fListOfPulses->GetEntries() > 0) {
+      int np = crvcc->NPulses();
+      for (int ip=0; ip<np; ip++) {
+        int loc = ClusterPulseIndex(i,ip);
+        const TCrvRecoPulse* p =  crv_block->Pulse(loc);
+        if(!p) continue;
+        p->Print("data");
+      }
     }
   }
 }

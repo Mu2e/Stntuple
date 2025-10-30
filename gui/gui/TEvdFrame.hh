@@ -87,6 +87,12 @@ public:
 
   virtual void CloseWindow();
 
+  void OpenLegendPopup();
+  void OpenLegendCalView();
+  void OpenLegendCrvView();
+
+  void PrintToPNG(TCanvas* running_canvas);
+
   ClassDef(TEvdFrame,1)
 };
 

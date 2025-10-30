@@ -86,12 +86,13 @@ TStnEvent::~TStnEvent()
 //_____________________________________________________________________________
 void TStnEvent::Clear(Option_t* opt) {
   // clear all the variables
-  TStnNode* node;
-  TIter     it(fListOfNodes);
-  while ((node = ((TStnNode*) it.Next()))) {
-    node->GetDataBlock()->Clear();
+  TStnNode* node = nullptr;
+  if(fListOfNodes) {
+    TIter     it(fListOfNodes);
+    while ((node = ((TStnNode*) it.Next()))) {
+      node->GetDataBlock()->Clear();
+    }
   }
-
   fListOfObjects->Clear();
   fListOfHptl->Clear();
 }

@@ -19,9 +19,11 @@
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
 
 // #include "Stntuple/mod/THistModule.hh"
 #include "Offline/MCDataProducts/inc/ProtonBunchIntensity.hh"
+#include "Offline/MCDataProducts/inc/EventWeight.hh"
 
 void stntuple_get_version(char* ver, char* test);
 
@@ -32,6 +34,7 @@ namespace stntuple {
 
 int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   const char oname []  = {"stntuple::InitHeaderBlock::InitDataBlock"};
+  const int verbose(0);
 
   TStnHeaderBlock* data = (TStnHeaderBlock*) Block;
 
@@ -99,6 +102,32 @@ int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
       data->fNComboHits = chColl->size();
     }
   }
+//-----------------------------------------------------------------------------
+// number of calo hits
+//-----------------------------------------------------------------------------
+  art::Handle< mu2e::CaloHitCollection> calHitsH;
+  const mu2e::CaloHitCollection*        calHits(nullptr);
+
+  if (! fCalHitCollTag.empty()) {
+    AnEvent->getByLabel(fCalHitCollTag,calHitsH);
+
+    if (calHitsH.isValid()) {
+      calHits = calHitsH.product();
+      data->fNCaloHits = calHits->size();
+    }
+  }
+//-----------------------------------------------------------------------------
+// event weight
+//-----------------------------------------------------------------------------
+  data->fEventWeight      = 1.f;
+
+  auto handles = AnEvent->getMany<mu2e::EventWeight>();
+  for(auto handle : handles) {
+    if(!handle || !handle.isValid()) continue;
+    if(verbose) std::cout << " Weight = " << handle->weight() << std::endl;
+    data->fEventWeight *= handle->weight();
+  }
+  if(verbose) std::cout << " Total Weight = " << data->fEventWeight << std::endl;
 
   return 0;
 }

@@ -74,8 +74,15 @@ class TStnTrack : public TObject {
     kNFreeIntsV12  =  3,     //         V12: add helix and seed indices, I/O doesn't change
     kNFreeFloatsV12=  3,
 
-    kNFreeInts     =  3,     //         V13: add interData for housing the TrkCaloHit info
-    kNFreeFloats   =  3
+                             //         V13: add interData for housing the TrkCaloHit info
+
+    kNFreeIntsV15  =  2,     //         V15: add additional track momentum sampling points and MC trajectory
+    kNFreeFloatsV15=  3,
+    kNFreeFloats2V15= 20,
+
+    kNFreeInts     =  1,     //         V16: add ST/IPA/OPA intersection counts
+    kNFreeFloats   =  2,
+    kNFreeFloats2  = 20,
   };
 
   //  enum { kMaxNLayers = 88 }; // 22x2*2
@@ -141,6 +148,8 @@ public:
   int                       fNDoublets;       // undefined before V9: nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nda << 24)
   int                       fHelixIndex;      // added in V12
   int                       fSeedIndex;
+  int                       fMcDirection;     // -1 for upstream, +1 for downstream
+  int                       fInterCounts;     // ST/IPA/OPA/TSdA intersection (packed)
   int                       fInt[kNFreeInts]; // provision for future I/O expansion
   
   float                     fChi2;
@@ -184,9 +193,21 @@ public:
   float                     fC0;	          // curvature at Z0
   float                     fPhi0;	          // phi0 at Z0 **specify in V8 , no I/O changes***
   float                     fTrkQual;             // ** added in V11
+  float                     fTFront;              // time at tracker front, added in V17
   float                     fFloat[kNFreeFloats]; // provision for future I/O expansion
 
   InterData_t               fDisk [kNDisks];      // track intersections with disks
+
+  // new floats added in v15
+  float fPSTFront; // momentum at the front of the stopping target
+  float fPSTBack; // at back
+  float fPTrackerEntrance; // momentum at tracker entrance (i.e. entering to stopping target)
+  float fPTrackerMiddle; // at middle
+  float fPTrackerExit; // at exit (i.e. exiting towards calorimeter)
+  float fFloat2[kNFreeFloats2]; // for future I/O expansion for versions > 15
+
+  // floats added 
+  
   InterData_t               fTrkCaloHit;          // TrkCaloHit info
 //-----------------------------------------------------------------------------
 //  transient data members, all persistent ones should go above
@@ -229,7 +250,12 @@ public:
 
   int    NMat         () const { return (fNMatSites      ) & 0xffff; }
   int    NMatActive   () const { return (fNMatSites >> 16) & 0xffff; }
-  
+
+  int    NSTIntersections ()  const { return (fInterCounts      ) & 0xff;}
+  int    NIPAIntersections()  const { return (fInterCounts >>  8) & 0xff;}
+  int    NOPAIntersections()  const { return (fInterCounts >> 16) & 0xff;}
+  int    NTSdAIntersections() const { return (fInterCounts >> 24) & 0xff;}
+
   int    NClusters();
   int    NMcStrawHits() const { return fNMcStrawHits; }
 
@@ -245,6 +271,8 @@ public:
 
   int    HelixIndex     () const { return fHelixIndex; }
   int    TrackSeedIndex () const { return fSeedIndex; }
+
+  int    McDirection () const { return fMcDirection;  }
 
   int    PDGCode() const { return fPdgCode; }
                                         // ID of the corresponding TSimParticle
@@ -274,6 +302,7 @@ public:
   float  TCH_HitLen () const { if (fVTCH) { return fTrkCaloHit.fPath;} else {return -1.e6;} }
 
   float  TBack    () const { return fTBack; }
+  float  TFront   () const { return fTFront; }
 
   float  EleLogLHCal() const { return fEleLogLHCal; }
   float  MuoLogLHCal() const { return fMuoLogLHCal; }
@@ -297,6 +326,12 @@ public:
   float  P () const { return fP; }
   float  Pt() const { return fPt; }
   Int_t  GetMomentum  (TLorentzVector* Momentum) ;
+  
+  float  PSTFront         () const { return fPSTFront; }
+  float  PSTBack          () const { return fPSTBack; }
+  float  PTrackerEntrance () const { return fPTrackerEntrance; }
+  float  PTrackerMiddle   () const { return fPTrackerMiddle; }
+  float  PTrackerExit     () const { return fPTrackerExit; }
   
   mu2e::KalSeed*   GetKalRep() { return fKalRep[0]; }
   
@@ -336,7 +371,7 @@ public:
   void ReadV9 (TBuffer& R__b);
   void ReadV10(TBuffer& R__b);
 
-  ClassDef(TStnTrack,14)
+  ClassDef(TStnTrack,17)
 
 };
 

@@ -18,6 +18,7 @@ protected:
   static Int_t       fgRunNumber;
   static Float_t     fgEventVertex;
 
+  TH1D*              fDioSpectrumHist;
   smooth*            fDioSpectrum;
 
   class  Cleaner {
@@ -45,6 +46,7 @@ public:
 // more details in mu2e-3281
 //-----------------------------------------------------------------------------
   double DioWeightAlFull(double P);
+  TH1D*  DioSpectrumHist() { return fDioSpectrumHist; }
 //-----------------------------------------------------------------------------
 // polynomial parameterization of the DIO spectrum on Al from 
 // Czarnecki et al, Phys.Rev.D84:013006,2011 (http://www.arxiv.org/abs/1106.4756)

@@ -38,7 +38,8 @@ public:
 
 					// number of links corresponding to the
 					// element number `i'
-  Int_t  NLinks (Int_t i) const { 
+  Int_t  NLinks (Int_t i) const {
+    if(NLinksTotal() == 0) return 0;    // empty block, ignore the array
     return fOffset.fArray[i+1]-fOffset.fArray[i];
   }
 					// index of the `j'-th match to `i'-th

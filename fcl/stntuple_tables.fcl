@@ -41,6 +41,7 @@ Stntuple : { @table::Stntuple
               ]
 
         p3  : [ @sequence::Stntuple.stnmaker_trig ]
+        p4  : [ @sequence::Stntuple.stnmaker_trig_tot ]
     }
 }
 #------------------------------------------------------------------------------

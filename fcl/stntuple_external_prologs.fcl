@@ -14,8 +14,23 @@
 # GEN_ID needs to be redefined once again in the job top-level FCL file, as it 
 #        is set to "CeEndpoint" in EventGenerator/fcl/prolog.fcl
 #------------------------------------------------------------------------------
+BEGIN_PROLOG
+  bgHitFiles          : @nil
+  INPUT_MODULE        : EmptyEvent
+  TRIGGER_PATHS       : []
+  END_PATHS           : []
+  PROCESS_NAME        : nil
+# BLIND_TIME          : 500                                  # default
+  STN_COMPRESS_MCS    : "compressDigiMCs"                    # "compressRecoMCs" looks dangerous
+  STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
+  PDG_ID              : 0                                    # 0: ignore PDG_ID
+  GEN_ID              : "particleGun"                        #    ignore GEN_ID check
+END_PROLOG
+
+#------------------------------------------------------------------------------
 #include "Offline/fcl/standardServices.fcl"
 #include "Offline/fcl/TrkCaloDt.fcl"
+
 #------------------------------------------------------------------------------
 # simulation prologs
 #------------------------------------------------------------------------------
@@ -28,9 +43,11 @@
 #include "Offline/EventMixing/fcl/prolog.fcl"
 #include "Offline/Filters/fcl/prolog.fcl"
 #include "Offline/Compression/fcl/prolog.fcl"
+
 #------------------------------------------------------------------------------
 # reconstruction prologs
 #------------------------------------------------------------------------------
+#include "Offline/TrkReco/fcl/Particle.fcl"
 #include "Offline/Mu2eKinKal/fcl/prolog.fcl"
 #include "Offline/TrkDiag/fcl/prolog.fcl"
 #include "Offline/TrkHitReco/fcl/prolog.fcl"
@@ -39,24 +56,22 @@
 #include "Offline/CaloReco/fcl/prolog.fcl"
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
-#include "Offline/CalPatRec/fcl/prolog_common.fcl"
 #include "Offline/CosmicReco/fcl/prolog.fcl"
 #include "Offline/CRVReco/fcl/prolog.fcl"
 #include "Offline/DAQ/fcl/prolog.fcl"
+
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------
 #include "mu2e-trig-config/core/trigProducers.fcl"
 #include "mu2e-trig-config/core/trigFilters.fcl"
 #include "mu2e-trig-config/core/trigRecoSequences.fcl"
-#------------------------------------------------------------------------------
-# this one is claimed as must to go after the digi_prolog ???? really ??
-#------------------------------------------------------------------------------
 #include "mu2e-trig-config/core/trigSequences.fcl"
+
 #------------------------------------------------------------------------------
-# include-less clones of Production fcls - does the sequence of inclusion matter ?
+# Production prologs
 #------------------------------------------------------------------------------
-#include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
-#include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
-#include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
-#include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
+#include "Production/JobConfig/common/prolog.fcl"
+#include "Production/JobConfig/primary/prolog.fcl"
+#include "Production/JobConfig/digitize/prolog.fcl"
+#include "Production/JobConfig/recoMC/prolog.fcl"

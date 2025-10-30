@@ -277,8 +277,8 @@ void TSimParticle::Print(Option_t* Opt) const {
     printf("------------------------------------------------------------------------------------------");
     printf("-----------------------------------------------------------------------------------------------\n");
     printf("   i name                      PDG  ID/Stg GenID Prnt");
-    printf("      p0x       p0y       p0z      p0    vol0     v0x        v0y      v0z      t0   t0p/tau");
-    printf("      p1x       p1y       p1z      p1    vol1     v1x        v1y      v1z      t1   t1p/tau Nsh\n");
+    printf("      p0x        p0y        p0z       p0     vol0     v0x        v0y      v0z      t0   t0p/tau");
+    printf("      p1x        p1y        p1z       p1     vol1     v1x        v1y      v1z      t1   t1p/tau Nsh\n");
     printf("-----------------------------------------------------");
     printf("------------------------------------------------------------------------------------------");
     printf("-----------------------------------------------------------------------------------------------\n");
@@ -298,27 +298,27 @@ void TSimParticle::Print(Option_t* Opt) const {
     printf("%4i/%2i",GetUniqueID(),SimStage());
     printf("%6i"   ,fGeneratorID);
     printf("%6i"   ,fParentID);
-    printf("%10.3f",fStartMom.Px());
-    printf("%10.3f",fStartMom.Py());
-    printf("%10.3f",fStartMom.Pz());
-    printf("%9.3f" ,fStartMom.P());
+    printf("%11.3f",fStartMom.Px());
+    printf("%11.3f",fStartMom.Py());
+    printf("%11.3f",fStartMom.Pz());
+    printf("%10.3f",fStartMom.P());
     printf("%6i"   ,fStartVolumeIndex);
     printf("%10.3f",fStartPos.X());
     printf("%10.3f",fStartPos.Y());
     printf("%10.3f",fStartPos.Z());
     printf("%10.3e",fStartPos.T());
     printf("%6.2f" ,fStartProperTime);
-    printf("%10.3f",fEndMom.Px());
-    printf("%10.3f",fEndMom.Py());
-    printf("%10.3f",fEndMom.Pz());
-    printf("%9.3f" ,fEndMom.P());
+    printf("%11.3f",fEndMom.Px());
+    printf("%11.3f",fEndMom.Py());
+    printf("%11.3f",fEndMom.Pz());
+    printf("%10.3f",fEndMom.P());
     printf("%6i"   ,fEndVolumeIndex);
     printf("%10.3f",fEndPos.X());
     printf("%10.3f",fEndPos.Y());
     printf("%10.3f",fEndPos.Z());
     printf("%10.3e",fEndPos.T());
     printf("%6.2f" ,fEndProperTime);
-    printf("%4i"  ,NStrawHits());
+    printf("%4i"   ,NStrawHits());
     printf("\n");
   }
 }
