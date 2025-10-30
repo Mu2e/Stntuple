@@ -10,7 +10,6 @@
 				// the include files
 
   gInterpreter->AddIncludePath("./build/include");
-  gInterpreter->AddIncludePath(gSystem->Getenv("CLHEP_INC"));
   gInterpreter->AddIncludePath(Form("%s/include",gSystem->Getenv("ROOTSYS")));
 
 
