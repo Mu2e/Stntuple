@@ -29,7 +29,7 @@ TStnCatalog::TStnCatalog(const char* name) :
 //-----------------------------------------------------------------------------
 // modify the default Rsh command?
 //-----------------------------------------------------------------------------
-  cmd  = "fgrep -s 'Stntuple.Catalog.Rsh'  $HOME/.rootrc $PWD/.rootrc ";
+  cmd  = "grep -F -s 'Stntuple.Catalog.Rsh'  $HOME/.rootrc $PWD/.rootrc ";
   cmd += " | sed 's/#.*//' | awk '{if(NF>1) print $0}'"; //remove comments
   cmd += " | cut -d' ' -f2-300 | uniq";
   FILE* f = gSystem->OpenPipe(cmd.Data(),"r");
@@ -43,7 +43,7 @@ TStnCatalog::TStnCatalog(const char* name) :
 //-----------------------------------------------------------------------------
 // browse through .rootrc files to find server
 //-----------------------------------------------------------------------------
-  cmd  = "fgrep -s 'Stntuple.Catalog ' $HOME/.rootrc  $PWD/.rootrc ";
+  cmd  = "grep -F -s 'Stntuple.Catalog ' $HOME/.rootrc  $PWD/.rootrc ";
   cmd += " | sed 's/#.*//' | awk '{if(NF>1) print $0}'"; //remove comments
   cmd += " | awk '{if ($3 == \"""\""") {x=\"txt\"} else {x=$3} {print $2 \" \" x}}' | uniq";
 

@@ -11,6 +11,7 @@
 // the script is not loaded. PWD is always defined
 //-----------------------------------------------------------------------------
 int load_stnana_scripts_Stntuple() {
+  const char* pkg{"Stntuple"};
   char        macro[200];
 
   const char* script[] = { 
@@ -31,14 +32,15 @@ int load_stnana_scripts_Stntuple() {
     0 
   };
 
-  TString work_dir = gEnv->GetValue("Stnana.TestReleaseDir",gSystem->Getenv("PWD"));
+  TString code_dir = gEnv->GetValue("Stnana.TestReleaseDir",gSystem->Getenv("PWD"));
 
   TInterpreter* cint = gROOT->GetInterpreter();
   
   for (int i=0; script[i] != 0; i+=2) {
     const char* dir = gSystem->Getenv(script[i+1]);
     if (dir) {
-      sprintf(macro,"%s/Stntuple/ana/scripts/%s",dir,script[i]);
+      if (strcmp(script[i+1],"PWD") == 0) sprintf(macro,"%s/%s/ana/scripts/%s",code_dir.Data(),pkg,script[i]);
+      else                                       sprintf(macro,"%s/%s/ana/scripts/%s",dir            ,pkg,script[i]);
       if (! cint->IsLoaded(macro)) cint->LoadMacro(macro);
     }
   }
