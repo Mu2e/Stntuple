@@ -103,7 +103,6 @@ TEvdTrack::TEvdTrack(): TObject() {
     fEllipse->SetLineColor(2);
   }
   else {
-    
     KinKal::KinematicLine kline = fKSeed->segments().back().kinematicLine();
     KinKal::VEC3 pos = kline.pos0();
     KinKal::VEC3 dir = kline.direction();
@@ -180,14 +179,17 @@ void TEvdTrack::PaintXY(Option_t* Option) {
 
 //-----------------------------------------------------------------------------
 void TEvdTrack::PaintVRZ(Option_t* Option) {
-  KinKal::KinematicLine kline = fKSeed->segments().back().kinematicLine();
-  ROOT::Math::XYZVector pos   = kline.pos0();
-  ROOT::Math::XYZVector dir   = kline.direction();
-  // rotate to the view frame
   
-  TStnVisManager* vm = TStnVisManager::Instance();
+  TStnVisManager*    vm    = TStnVisManager::Instance();
   const mu2e::Panel* panel = (const mu2e::Panel*) vm->GetCurrentView()->GetMother();
   const mu2e::HepTransform&   ht = panel->dsToPanel();
+
+  const CLHEP::Hep3Vector& o1 = panel->origin();
+  ROOT::Math::XYZVectorF   o2(o1.x(),o1.y(),o1.z()); 
+  KinKal::KinematicLine   kline = fKSeed-> nearestSegment(o2)->kinematicLine();
+  ROOT::Math::XYZVector   pos   = kline.pos0();
+  ROOT::Math::XYZVector   dir   = kline.direction();
+  // rotate to the view frame
 
   double dirl[3];
 

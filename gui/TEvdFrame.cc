@@ -355,7 +355,7 @@ TEvdFrame::TEvdFrame(const char*  Name,
   time_t t2 = time(0);
   tm* t22 = localtime(&t2);
   TText *text = new TText(0.05,0.3,asctime(t22));
-  text->SetTextFont(22);
+  text->SetTextFont(52);
   text->SetTextSize(0.4);
   text->Draw();
   p2->Modified();

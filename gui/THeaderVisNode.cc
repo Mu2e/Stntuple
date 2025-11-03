@@ -16,7 +16,7 @@ THeaderVisNode::THeaderVisNode(const char* name, TStnHeaderBlock* h):
 {
   fHeader = h;
   fText = new TText(0.1,0.1,"elki-palki");
-  fText->SetTextFont(22);
+  fText->SetTextFont(52);
 }
 
 //_____________________________________________________________________________
@@ -50,8 +50,8 @@ void THeaderVisNode::PaintXY(Option_t* option) {
   if (ev != nullptr) sprintf(text,"Event: %7i:%06i:%7i",ev->run(),ev->subRun(),ev->event());
   else               sprintf(text,"Event: %7i:%06i:%7i",0,0,0);
 
-  fText->SetTextSize(0.5);
-  fText->SetText(0.3,0.3,text);
+  fText->SetTextSize(0.4);
+  fText->SetText(0.02,0.3,text);
 
   fText->Paint(option);
   gPad->Modified();
