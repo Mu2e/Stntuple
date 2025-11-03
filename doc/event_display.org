@@ -18,20 +18,68 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
                               default = 1.0 (in Tesla)
    - visManager.debugLevel  : debugging optioin, default = 0
 
-** straw hit colors : see [[file:../gui/TEvdComboHit.cc::79]] (around line 79)   
+** Object colors, legends
+*** XY, TZ and PZ views:
+   - Combo Hit colors are defined by PDG ID in [[file:../gui/TEvdComboHit.cc::79]] (around line 79)
+   - Straw Hit colors are defined together by PDG ID in file:../gui/TTrkVisNode.cc::272 (around line 272)
+   - Sim Particle colors are defined by PDG ID in file:../gui/TEvdSimParticle.cc::97 (around line 97)
+   - For these objects:
+|-----------+-----------------|
+| color     | meaning         |
+|-----------+-----------------|
+| kRed      | e- P>20 MeV/c   |
+| kRed+2    | e- P<20 MeV/c   |
+|-----------+-----------------|
+| kBlue     | positrons       |
+| kBlue+2   | protons         |
+| kGreen+2  | muons           |
+| kGreen-2  | antimuons       |
+| kOrange-3 | +ve pions       |
+| kOrange+7 | -ve pions       |
+| kBlack    | everything else |
+|-----------+-----------------|
 
-|-----------+------------+-----------------|
-| color     | point size | meaning         |
-|-----------+------------+-----------------|
-| kRed      |            | e-              |
-|           |        0.8 | e- P>20 MeV/c   |
-|           |        0.4 | e- P<20 MeV/c   |
-|-----------+------------+-----------------|
-| blue      |        0.8 | positrons       |
-| dark blue |        1.0 | protons         |
-| green     |            | muons           |
-| magenta   |            | everything else |
-|-----------+------------+-----------------|
+   - Helices are depicted as a dash-dot line, and are always kGreen+4, as in file:../gui/TEvdHelixSeed.cc::75 (around line 75)
+   - Tracks are always kViolet, as in file:../gui/TEvdTrack.cc::135 (around line 135)  
+   - In XY view, Calorimeter clusters are depicted as red (disk 1) and magenta (disk 2) translucent circles
+   - This information can be viewed in Open -> Legend XY
+   - Functionality exists in TTrkVisNode only to support in-time versus out-of-time electrons, with out-of-time
+     being  kAzure+1. Since this is the only file with this functionality, the line is commented out as of this update.
+*** Cal view:
+   - In the calorimeter view:
+|-----------+-----------------------------|
+| color     | meaning                     |
+|-----------+-----------------------------|
+| kRed+2    | Hit in a cluster            |
+|           | >100 MeV/c                  |
+| kRed      | Hit in a cluster            |
+|           | >10 MeV/c                   |
+| kRed-9    | Hit in a cluster            |
+|           | >1 MeV/c                    |
+| kRed-10   | Hit in a cluster            |
+|           | <1 MeV/c                    |
+| kYellow-7 | Hit exceeding minimum       |
+|           | threshold energy, but       |
+|           | not part of any cluster     |
+| No color  | No hit of sufficient energy |
+|           | recorded in crystal         |
+|           |                             |
+|-----------+-----------------------------|
+   - This information can be viewed in Open -> Legend Cal
+   - Cluster energy colors are defined in file:../gui/TCalVisNode.cc::137 (around line 137)
+*** Cal view:
+   - In crv view, the color is a gradient of time of hit since start of timing
+   - Colors range from blue (earliest) to red (latest)
+   - There exists a slider which should set the time window and fit the color
+     gradient to this window. However (as of this update) the slider does not appear in the current
+     gui. The code for the slider exists in file:../gui/TStnVisManager.cc::165 (around line 165)
+   - A legend which uses the default timeframe (400-1695 ns) can be accessed with Open -> Legend CRV
+
+All legends are defined as functions and used in file:../gui/TStnFrame.cc, and should be manually changed
+if color or style changes are made to the event displays to keep them relevant (last updated 07/21/2025).
+Adding new legends will also require minor edits in  file:../gui/gui/TStnFrame.hh and file:../gui/gui/TStnWidgetID.hh
+     
+
 
 ** interactive commands                                                      
 
@@ -102,6 +150,8 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 - prints : under the "print" section of the shutter
 - right click on a view pops up a context sensitive menu, a TStnView print prints 
   all nodes (objects) displayed in the active view
+- "Print Canvas as PNG" creates n output of the open view in the home folder as "output.png".
+  This functionality is in file:../gui/TStnFrame.cc 
 
 ** quick notes about internals                                               
   - Several views : derived from TStnView - XYView, RZView, TZView

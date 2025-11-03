@@ -119,9 +119,13 @@ protected:
   string                   fSdwfCollTag;
   art::InputTag            fSdmcCollTag;
 
+  art::InputTag            fCaloHitCollTag;
+
   string                   fCrvRecoPulseCollTag;            //
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
+  string                   fCrvCoincidenceClusterMCCollTag; //
+  int                      fCrvClustersStorePulses;
 
   art::InputTag            fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
@@ -196,6 +200,12 @@ protected:
   string                   fCutHelixSeedCollTag; // helix collection to cut on
   int                      fMinNHelices        ; // min number of helices (for cosmics)
 
+//-----------------------------------------------------------------------------
+// debug parameters
+//-----------------------------------------------------------------------------
+  int                      fTrackVerbose; // verbosity by data block
+  int                      fHelixVerbose;
+
   TNamed*                  fVersion;
 
   TNamedHandle*            fDarHandle;
@@ -265,9 +275,13 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fSdwfCollTag             (PSet.get<string>        ("sdwfCollTag"         ))
   , fSdmcCollTag             (PSet.get<art::InputTag> ("strawDigiMCCollTag"  ))
 
+  , fCaloHitCollTag          (PSet.get<art::InputTag> ("caloHitCollTag"      ))
+
   , fCrvRecoPulseCollTag         (PSet.get<string>    ("crvRecoPulseCollTag"         ))
   , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
   , fCrvCoincidenceClusterCollTag(PSet.get<string>    ("crvCoincidenceClusterCollTag"))
+  , fCrvCoincidenceClusterMCCollTag(PSet.get<string>  ("crvCoincidenceClusterMCCollTag", ""))
+  , fCrvClustersStorePulses        (PSet.get<int>     ("crvClustersStorePulses", 1))
 
   , fVdhCollTag              (PSet.get<art::InputTag> ("vdHitsCollTag"       ))
   , fTClBlockName            (PSet.get<vector<string>>("timeClusterBlockName"))
@@ -308,7 +322,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCaloCrystalHitMaker     (PSet.get<string>        ("caloCrystalHitsMaker"))
   , fCaloClusterMaker        (PSet.get<string>        ("caloClusterMaker"    ))
 
-  , fGenId(GenId::findByName (PSet.get<std::string>   ("genId"               ),"unknown"))
+  , fGenId((PSet.get<std::string>("genId","unknown") == "unknown") ? GenId::findByName (PSet.get<std::string>("genId")) : GenId::unknown)
   , fPdgId                   (PSet.get<int>           ("pdgId"               ))
 
   , fMinTActive              (PSet.get<double>        ("minTActive"          ))
@@ -318,6 +332,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMinNStrawHits           (PSet.get<int>           ("minNStrawHits"       ))
   , fCutHelixSeedCollTag     (PSet.get<string>        ("cutHelixSeedCollTag" ))
   , fMinNHelices             (PSet.get<int>           ("minNHelices"         ))
+
+  , fTrackVerbose            (PSet.get<int>           ("trackVerbose", 0     ))
+  , fHelixVerbose            (PSet.get<int>           ("helixVerbose", 0     ))
 {
 
   char  ver[20], text[200];
@@ -451,6 +468,7 @@ void StntupleMaker::beginJob() {
   fInitHeaderBlock->SetPbiTag(fPbiTag);
   fInitHeaderBlock->SetChCollTag(fChCollTag);
   fInitHeaderBlock->SetShCollTag(fShCollTag);
+  fInitHeaderBlock->SetCalHitCollTag(fCaloHitCollTag);
 
   AddDataBlock("HeaderBlock","TStnHeaderBlock",
 	       fInitHeaderBlock,
@@ -512,6 +530,8 @@ void StntupleMaker::beginJob() {
     fInitCrvClusterBlock = new StntupleInitCrvClusterBlock();
     fInitCrvClusterBlock->SetCrvRecoPulseCollTag(fCrvRecoPulseCollTag);
     fInitCrvClusterBlock->SetCrvCoincidenceClusterCollTag(fCrvCoincidenceClusterCollTag);
+    fInitCrvClusterBlock->SetCrvCoincidenceClusterMCCollTag(fCrvCoincidenceClusterMCCollTag);
+    fInitCrvClusterBlock->SetStorePulses(fCrvClustersStorePulses);
 
     AddDataBlock("CrvClusterBlock","TCrvClusterBlock",
 		 fInitCrvClusterBlock,
@@ -525,7 +545,7 @@ void StntupleMaker::beginJob() {
   if (fMakeGenp) {
     fInitGenpBlock = new StntupleInitGenpBlock();
     fInitGenpBlock->SetGenpCollTag(fGenpCollTag);
-    fInitGenpBlock->SetGenProcessID (fGenId.id());
+    fInitGenpBlock->SetGenProcessID ((fGenId == GenId::unknown) ? -1 : fGenId.id());
     fInitGenpBlock->SetPdgID        (fPdgId     );
 
     AddDataBlock("GenpBlock","TGenpBlock",fInitGenpBlock,buffer_size,split_mode,compression_level);
@@ -554,6 +574,8 @@ void StntupleMaker::beginJob() {
         init_block->SetKsCollTag   (fHelixKsCollTag[i]);
         init_block->SetKsfBlockName(fKsfBlockName  [i]);
       }
+
+      init_block->fVerbose = fHelixVerbose;
 
       AddDataBlock(block_name,"TStnHelixBlock",init_block,
                    buffer_size,split_mode,compression_level);
@@ -734,6 +756,8 @@ void StntupleMaker::beginJob() {
       init_block->SetTrkQualCollTag     (fTrkQualCollTag[i]);
 
       init_block->SetDoubletAmbigResolver(fDar);
+
+      init_block->fVerbose = fTrackVerbose;
 
       TStnDataBlock* db = AddDataBlock(block_name,"TStnTrackBlock",init_block,
 				       buffer_size,split_mode,compression_level);

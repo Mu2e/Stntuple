@@ -260,7 +260,12 @@ TCanvas* TStnModule::NewSlide(const char* name,
 
 //_____________________________________________________________________________
 void     TStnModule::AddHistogram(TObject* hist, const char* FolderName) {
+  if(!hist) return;
   TFolder* fol = (TFolder*) fFolder->FindObject(FolderName);
+  if(!fol) {
+    printf("TStnModule::%s: Unable to find folder %s\n", __func__, FolderName);
+    return;
+  }
   fol->Add(hist); 
 }
 

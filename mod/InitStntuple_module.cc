@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------
 // Description:
 // -----------
-// Class InitStntuple : books tree and does other initializations 
+// Class InitStntuple : books tree and does other initializations
 //                            for STNTUPLE
 //
 // Nov 23 2000 P.Murat
@@ -129,7 +129,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
   // unsigned long trigger_table_tag;
   // int           trigger_id;
 
-				// delete all the previous definitions 
+				// delete all the previous definitions
 
   TStnDBManager* dbm = TStnDBManager::Instance();
   TStnTriggerTable* trigger_table;
@@ -138,7 +138,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
 
   trigger_table->Delete();
 //-----------------------------------------------------------------------------
-// data run, so far all trigger tags (versions) are set to 1, 
+// data run, so far all trigger tags (versions) are set to 1,
 // trigger bit assignment is arbitrary
 //-----------------------------------------------------------------------------
   if (RunNumber < 1200) {
@@ -159,11 +159,21 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
   }
   else if (RunNumber <= 1210) {
 //-----------------------------------------------------------------------------
-// runs 1200-1210: this may or may not be correct, consider the following 
+// runs 1200-1210: this may or may not be correct, consider the following
 // just an example
 //-----------------------------------------------------------------------------
     trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                     ,1));
     trigger_table->AddTrigger(new TStnTrigger(   1,   1,"p1"                          ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   2,   2,"recoDe"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   3,   3,"recoDeLeg"                   ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   4,   4,"recoDmu"                     ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger(   6,   6,"p2"                          ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   7,   7,"reco2Dmu"                    ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   8,   8,"reco2De"                     ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger(   9,   9,"recoUe"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger(  10,  10,"recoUmu"                     ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDe_highP_stopTarg"        ,1));
     trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDe_lowP_stopTarg"         ,1));
@@ -172,37 +182,113 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 130, 130,"tprHelixDe"                  ,1));
     trigger_table->AddTrigger(new TStnTrigger( 131, 131,"tprHelixUe"                  ,1));
     trigger_table->AddTrigger(new TStnTrigger( 150, 150,"cprDe_highP_stopTarg"        ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 151, 151,"cprDe_highP"                 ,1));
     trigger_table->AddTrigger(new TStnTrigger( 160, 160,"cprDe_lowP_stopTarg"         ,1));
     trigger_table->AddTrigger(new TStnTrigger( 170, 170,"cprHelixDe"                  ,1));
     trigger_table->AddTrigger(new TStnTrigger( 171, 171,"cprHelixUe"                  ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 180, 180,"apr_highP_stopTarg"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 181, 181,"apr_highP"                   ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 185, 185,"apr_ue_highP"                ,1));
     trigger_table->AddTrigger(new TStnTrigger( 190, 190,"apr_lowP_stopTarg"           ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 191, 191,"apr_lowP_stopTarg_multiTrk"  ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 195, 190,"aprHelix"                    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 191, 191,"apr_highP_stopTarg_multiTrk" ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 192, 192,"apr_lowP_multiHelix"         ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 195, 195,"aprHelix"                    ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
     trigger_table->AddTrigger(new TStnTrigger( 201, 201,"caloFast_MVANNCE"            ,1));
     trigger_table->AddTrigger(new TStnTrigger( 202, 202,"caloFast_cosmic"             ,1));
-    for (int i=203; i<220; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+    for (int i=203; i<210; ++i){
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
+    trigger_table->AddTrigger(new TStnTrigger( 210, 210,"mprDe_highP_stopTarg"        ,1));
+    for (int i=211; i<220; ++i){
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
     trigger_table->AddTrigger(new TStnTrigger( 220, 220,"caloFast_RMC"                ,1));
     for (int i=221; i<300; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
 
     trigger_table->AddTrigger(new TStnTrigger( 300, 300,"cst"                         ,1));
     trigger_table->AddTrigger(new TStnTrigger( 310, 310,"cstTimeCluster"              ,1));
     for (int i=311; i<400; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
 
     trigger_table->AddTrigger(new TStnTrigger( 400, 400,"minBias_SDCount"             ,1));
     for (int i=401; i<410; ++i){
-      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
-    }    
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));
+    }
     trigger_table->AddTrigger(new TStnTrigger( 410, 410,"minBias_CDCount"             ,1));
+
+  } else if (RunNumber <= 1220) {
+//-----------------------------------------------------------------------------
+// runs 1211-1220: Trigger bits/names were updated (Oct. 2025)
+//-----------------------------------------------------------------------------
+    // < 100 is for Offline/processing paths
+    trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                     ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   1,   1,"p1"                          ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   2,   2,"recoDe"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   3,   3,"recoDeLeg"                   ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   4,   4,"recoDmu"                     ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   6,   6,"p2"                          ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   7,   7,"reco2Dmu"                    ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   8,   8,"reco2De"                     ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   9,   9,"recoUe"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger(  10,  10,"recoUmu"                     ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tpr_TrkDe_80m70p_D0200"      ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tpr_TrkDe_80m70p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 125, 125,"tpr_TrkDe_50_D0200"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 130, 130,"tpr_HlxDe_70m50p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 131, 131,"tpr_HlxUe_50m30p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 140, 140,"tpr_HlxDe_30p_IPA"           ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 141, 141,"tpr_HlxDe_30p_IPAPhi"        ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 150, 150,"cpr_TrkDe_80m70p_D0200"      ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 151, 151,"cpr_TrkDe_75m70p_D0200"      ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 152, 152,"cpr_TrkDe_75_D0200"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 153, 153,"cpr_TrkDe_70_D0200"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 160, 160,"cpr_TrkDe_80m70p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 161, 161,"cpr_TrkDe_75m70p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 162, 162,"cpr_TrkDe_75"                ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 163, 163,"cpr_TrkDe_70"                ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 175, 175,"cpr_TrkDe_50_D0200"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 180, 180,"cpr_HlxDe_50"                ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 181, 181,"cpr_HlxUe_40"                ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 200, 200,"apr_TrkDe_80m70p_D0200"      ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 201, 201,"apr_TrkDe_75m70p_D0200"      ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 202, 202,"apr_TrkDe_75_D0200"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 203, 203,"apr_TrkDe_70_D0200"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 210, 210,"apr_TrkDe_80m70p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 211, 211,"apr_TrkDe_75m70p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 212, 212,"apr_TrkDe_75"                ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 213, 213,"apr_TrkDe_70"                ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 230, 230,"apr_TrkUe_80m70p"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 240, 240,"apr_TwoTrkDe_80m70p_D0200"   ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 250, 250,"apr_TwoTrkDe_50"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 260, 260,"apr_TrkDe_50_D0200"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 265, 265,"apr_Hlx_50"                  ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 266, 266,"apr_Hlx_30"                  ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 275, 275,"mpr_TrkDe_80m70p_D0200"      ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 400, 400,"calo_photon"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 401, 401,"calo_MVANNCE"                ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 402, 402,"calo_cosmic"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 420, 420,"calo_RMC"                    ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 500, 500,"cst_TimeCluster"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 520, 520,"cst_CosmicTrackSeed"         ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 600, 600,"minBias_SDCount"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 610, 610,"minBias_CDCount"             ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 700, 700,"calo_N0Source"               ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 800, 800,"lumiStream"                  ,1));
 
   }
   else {
@@ -245,7 +331,7 @@ void InitStntuple::beginRun(const art::Run&  aRun) {
 
 //------------------------------------------------------------------------------
 void InitStntuple::analyze(const AbsEvent& AnEvent) {
-  // event entry point: initialize all the registered data blocks with the event 
+  // event entry point: initialize all the registered data blocks with the event
   // data
   // it is assumed that the tree itself is filled in FillStntupleModule
   // order in which branches are filled may be important - for example,
@@ -275,7 +361,7 @@ void InitStntuple::analyze(const AbsEvent& AnEvent) {
   etime = (unsigned long)(gSystem->Now()) - etime;
 
   //compute avg inst lum
-  TStnHeaderBlock* fHeaderBlock = 
+  TStnHeaderBlock* fHeaderBlock =
     (TStnHeaderBlock*) Event()->GetDataBlock("HeaderBlock");
   if(fHeaderBlock) {
     float ilum = fHeaderBlock->InstLum()*1.0e-30;

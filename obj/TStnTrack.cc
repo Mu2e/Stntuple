@@ -45,25 +45,25 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
 
   struct TStnTrackDataV4_t {
     TLorentzVector            fMomentum;         // this assumes DELE fit hypothesis
-    
-    TBitset                   fHitMask;	       // bit #i: 1 if there is a hit 
+
+    TBitset                   fHitMask;	       // bit #i: 1 if there is a hit
     TBitset                   fExpectedHitMask;   // bit #i: 1 if expect to have a hit at this Z
 
     int                       fNumber;       // track index in the list of reconstructed tracks
     int                       fNHyp;          // number of hyp's with successfull fits
     int                       fBestHyp[2];    // hypothesis with the best chi2/ndof
     int                       fIDWord;	    // now - for selection "C"
-    
+
     int                       fNActive;	    // total number of hits
-    int                       fVaneID;	    // 
-    int                       fDiskID;	    // 
+    int                       fVaneID;	    //
+    int                       fDiskID;	    //
     int                       fPdgCode;       // PDF code of the particle produced most hits
     int                       fNGoodMcHits;   // Nhits produced by the associated MC particle
     int                       fPartID;        // MC particle ID (number in the list)
     int                       fNMcStrawHits;  // Nhits by associated particle in the straw tracker
     int                       fAlgorithmID;   // bit-packed : (alg_mask << 16 ) | best
     int                       fInt[kNFreeIntsV4];     // provision for future expension
-  
+
     float                     fChi2;
     float                     fChi2C;          // calculated...
     float                     fFitCons;
@@ -76,46 +76,46 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
     float                     fPt;	 // transverse momentum
     float                     fD0;
     float                     fZ0;
-    
-    float                     fPStOut;    // MC momentum in the VD ST_Out 
+
+    float                     fPStOut;    // MC momentum in the VD ST_Out
     float                     fPFront;    // MC momentum in the VD front of the tracker
-    
+
     float                     fClusterE;	// energy of the associated cluster
     float                     fDt;
     float                     fEp;
     float                     fDx;	// about 0 for vanes
-    float                     fDy;	// 
+    float                     fDy;	//
     float                     fDz;	// about 0 for disks
-    
+
     float                     fEleLogLHCal;  // log likelihood of the electron hypothesis
     float                     fMuoLogLHCal;	// log lilelihood of the muon     hypothesis
-    
+
     float                     fRSlope;	    // timing residual slope dres(T)/dZ
     float                     fRSlopeErr;
-    
+
     float                     fLogLHRXs;      // XSlope-only-based likelihood
-    
-    float                     fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based 
-    float                     fMuoLogLHDeDx;  // 
+
+    float                     fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based
+    float                     fMuoLogLHDeDx;  //
     float                     fX1;	    // momentum defined at Z1
     float                     fY1;
     float                     fZ1;
     float                     fP0;            // momentum defined at Z0
     float                     fP2;            // momentum defined at Z0
     float                     fFloat[kNFreeFloatsV4]; // provision for future I/O expansion
-    InterDataV4_t             fVane [kNVanesV4];      // intersection data are saved 
+    InterDataV4_t             fVane [kNVanesV4];      // intersection data are saved
   };
-  
+
   InterDataV4_t     vane;
 
   TStnTrackDataV4_t data;
-  
+
   int            nwi, nwf, nwf_vint, imins, imaxep;
-  
+
   nwi      = ((int*  ) &data.fChi2   ) - &data.fNumber;
   nwf      = ((float*) &data.fVane   ) - &data.fChi2  ;
   nwf_vint = ((float*) &vane.fCluster) - &vane.fTime  ;
-    
+
   fMomentum.Streamer(R__b);
   fHitMask.Streamer(R__b);
   fExpectedHitMask.Streamer(R__b);
@@ -129,16 +129,20 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fBestHyp[1]       = data.fBestHyp[1]  ;  // hypothesis with the best chi2/ndof
   fIDWord           = data.fIDWord      ;	    // now - for selection "C"
   fNActive          = data.fNActive     ;	    // total number of hits
-  //  fVaneID           = data.fVaneID      ;	    // 
+  //  fVaneID           = data.fVaneID      ;	    //
   fNMatSites         = 0;
-  fDiskID           = data.fDiskID      ;	    // 
+  fDiskID           = data.fDiskID      ;	    //
   fPdgCode          = data.fPdgCode     ;     // PDF code of the particle produced most hits
-  fNGoodMcHits      = data.fNGoodMcHits ; // 
+  fNGoodMcHits      = data.fNGoodMcHits ; //
   fPartID           = data.fPartID      ;          // MC particle ID (number in the list)
   fNMcStrawHits     = data.fNMcStrawHits;
   fAlgorithmID      = data.fAlgorithmID ;
   fNHits            = -1                ;   // added in V9
   fNDoublets        = -1                ;   // added in V9
+  fHelixIndex       = -1                ;   // added in V12
+  fSeedIndex        = -1                ;   // added in V12
+  fMcDirection      = 0                 ;   // added in v15
+  fInterCounts      = 0                 ;   // added in v16
 					      // floats
   fChi2             = data.fChi2        ;
   fTBack            = data.fChi2C       ;      // calculated...
@@ -152,21 +156,21 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fPt               = data.fPt          ;	 // transverse momentum
   fD0               = data.fD0          ;
   fZ0               = data.fZ0          ;
-  fPStOut           = data.fPStOut      ;    // MC momentum in the VD ST_Out 
+  fPStOut           = data.fPStOut      ;    // MC momentum in the VD ST_Out
   fPFront           = data.fPFront      ;    // MC momentum in the VD front of the tracker
   fClusterE         = data.fClusterE    ;	// energy of the associated cluster
   fDt               = data.fDt          ;
   fEp               = data.fEp          ;
   fDx               = data.fDx          ;  // about 0 for vanes
-  fDy               = data.fDy          ;  // 
+  fDy               = data.fDy          ;  //
   fDz               = data.fDz          ;  // about 0 for disks
   fEleLogLHCal      = data.fEleLogLHCal ;  // log likelihood of the electron hypothesis
   fMuoLogLHCal      = data.fMuoLogLHCal ;  // log lilelihood of the muon     hypothesis
   fRSlope           = data.fRSlope      ;  // timing residual slope dres(T)/dZ
   fRSlopeErr        = data.fRSlopeErr   ;
   fLogLHRXs         = data.fLogLHRXs    ;  // XSlope-only-based likelihood
-  fEleLogLHDeDx     = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based 
-  fMuoLogLHDeDx     = data.fMuoLogLHDeDx;  // 
+  fEleLogLHDeDx     = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based
+  fMuoLogLHDeDx     = data.fMuoLogLHDeDx;  //
   fX1               = data.fX1          ;  // momentum defined at Z1
   fY1               = data.fY1          ;
   fZ1               = data.fZ1          ;
@@ -175,8 +179,14 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
   fC0               = -1.e6             ;  // ** added in V7
   fPhi0             = -1.e6             ;  // ** added in V8
   fTrkQual          = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
-// read intersection info 
+// read intersection info
 //-----------------------------------------------------------------------------
   R__b >> imins;
   R__b >> imaxep;
@@ -185,7 +195,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
     R__b >> vane.fID;
     R__b.ReadFastArray(&vane.fTime,nwf_vint);
 
-    if (i < kNDisks) { 
+    if (i < kNDisks) {
 					 // there are only 2 disks anyway...for a long time
       fDisk[i].fID       = vane.fID    ; // = -1 if no intersection
       fDisk[i].fClusterIndex = -1.;
@@ -199,7 +209,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
       fDisk[i].fZCl      = vane.fZCl   ;
       fDisk[i].fDx       = vane.fDx    ; // TRK-CL
       fDisk[i].fDy       = vane.fDy    ; // TRK-CL
-      fDisk[i].fDz       = vane.fDz    ; // 
+      fDisk[i].fDz       = vane.fDz    ; //
       fDisk[i].fDt       = vane.fDt    ; // TRK-CL
       fDisk[i].fDu       = -1.e6       ; // added in V6
       fDisk[i].fDv       = -1.e6       ; // added in V6
@@ -219,7 +229,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
 
   if (imins >= 0) fVMinS = &fDisk[imins];
   else            fVMinS = NULL;
-  
+
   if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
   else             fVMaxEp = NULL;
 }
@@ -248,33 +258,33 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
     float        fNxTrk;		// track direction cosines in the intersection point
     float        fNyTrk;
     float        fNzTrk;
-    float        fChi2Match;		// track-cluster match chi&^2 
+    float        fChi2Match;		// track-cluster match chi&^2
     float        fPath;
     const mu2e::CaloCluster*       fCluster;
     const mu2e::TrkToCaloExtrapol* fExtrk;
   };
-    
+
   struct TStnTrackDataV5_t {
     TLorentzVector            fMomentum;         // this assumes DELE fit hypothesis
 
-    TBitset                   fHitMask;	       // bit #i: 1 if there is a hit 
+    TBitset                   fHitMask;	       // bit #i: 1 if there is a hit
     TBitset                   fExpectedHitMask;   // bit #i: 1 if expect to have a hit at this Z
 
     int                       fNumber;       // track index in the list of reconstructed tracks
     int                       fNHyp;          // number of hyp's with successfull fits
     int                       fBestHyp[2];    // hypothesis with the best chi2/ndof
     int                       fIDWord;	    // now - for selection "C"
-    
+
     int                       fNActive;	    // total number of hits
-    int                       fVaneID;	    // 
-    int                       fDiskID;	    // 
+    int                       fVaneID;	    //
+    int                       fDiskID;	    //
     int                       fPdgCode;       // PDF code of the particle produced most hits
     int                       fNGoodMcHits;   // Nhits produced by the associated MC particle
     int                       fPartID;        // MC particle ID (number in the list)
     int                       fNMcStrawHits;  // Nhits by associated particle in the straw tracker
     int                       fAlgorithmID;   // bit-packed : (alg_mask << 16 ) | best
     int                       fInt[kNFreeIntsV5];     // provision for future expension
-  
+
     float                     fChi2;
     float                     fChi2C;          // calculated...
     float                     fFitCons;
@@ -287,47 +297,47 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
     float                     fPt;	 // transverse momentum
     float                     fD0;
     float                     fZ0;
-    
-    float                     fPStOut;    // MC momentum in the VD ST_Out 
+
+    float                     fPStOut;    // MC momentum in the VD ST_Out
     float                     fPFront;    // MC momentum in the VD front of the tracker
-    
+
     float                     fClusterE;	// energy of the associated cluster
     float                     fDt;
     float                     fEp;
     float                     fDx;	// about 0 for vanes
-    float                     fDy;	// 
+    float                     fDy;	//
     float                     fDz;	// about 0 for disks
-    
+
     float                     fEleLogLHCal;  // log likelihood of the electron hypothesis
     float                     fMuoLogLHCal;	// log lilelihood of the muon     hypothesis
-    
+
     float                     fRSlope;	    // timing residual slope dres(T)/dZ
     float                     fRSlopeErr;
-    
+
     float                     fLogLHRXs;      // XSlope-only-based likelihood
-    
-    float                     fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based 
-    float                     fMuoLogLHDeDx;  // 
+
+    float                     fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based
+    float                     fMuoLogLHDeDx;  //
     float                     fX1;	    // momentum defined at Z1
     float                     fY1;
     float                     fZ1;
     float                     fP0;            // momentum defined at Z0
     float                     fP2;            // momentum defined at Z0
     float                     fFloat[kNFreeFloatsV5]; // provision for future I/O expansion
-    
-    InterDataV5_t             fVane[kNVanesV5];  // intersection data are saved 
+
+    InterDataV5_t             fVane[kNVanesV5];  // intersection data are saved
   };
 
   InterDataV5_t     vane;
 
   TStnTrackDataV5_t data;
-  
+
   int               nwi, nwf, nwf_vint, imins, imaxep;
-  
+
   nwi      = ((int*  ) &data.fChi2   ) - &data.fNumber;
   nwf      = ((float*) &data.fVane   ) - &data.fChi2  ;
   nwf_vint = ((float*) &vane.fCluster) - &vane.fTime  ;
-    
+
   fMomentum.Streamer(R__b);
   fHitMask.Streamer(R__b);
   fExpectedHitMask.Streamer(R__b);
@@ -336,57 +346,61 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fChi2  ,nwf);
 
 
-  fNumber       = data.fNumber      ; 
-  fNHyp         = data.fNHyp        ;          
+  fNumber       = data.fNumber      ;
+  fNHyp         = data.fNHyp        ;
   fBestHyp[0]   = data.fBestHyp[0]  ;
   fBestHyp[1]   = data.fBestHyp[1]  ;
-  fIDWord       = data.fIDWord      ;	
-		  	       
-  fNActive      = data.fNActive     ;	
-  //  fVaneID       = data.fVaneID      ;	
+  fIDWord       = data.fIDWord      ;
+
+  fNActive      = data.fNActive     ;
+  //  fVaneID       = data.fVaneID      ;
   fNMatSites     = 0;
-  fDiskID       = data.fDiskID      ;	
-  fPdgCode      = data.fPdgCode     ;       
-  fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
-  fNMcStrawHits = data.fNMcStrawHits;  
-  fAlgorithmID  = data.fAlgorithmID ;   
+  fDiskID       = data.fDiskID      ;
+  fPdgCode      = data.fPdgCode     ;
+  fNGoodMcHits  = data.fNGoodMcHits ;
+  fPartID       = data.fPartID      ;
+  fNMcStrawHits = data.fNMcStrawHits;
+  fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 					// floats
   fChi2         = data.fChi2        ;
-  fTBack        = data.fChi2C       ;         
+  fTBack        = data.fChi2C       ;
   fFitCons      = data.fFitCons     ;
   fT0           = data.fT0          ;
   fT0Err        = data.fT0Err       ;
   fFitMomErr    = data.fFitMomErr   ;
   fTanDip       = data.fTanDip      ;
-  fP            = data.fP           ;		
+  fP            = data.fP           ;
   fCharge       = data.fCharge      ;
-  fPt           = data.fPt          ;	 
+  fPt           = data.fPt          ;
   fD0           = data.fD0          ;
   fZ0           = data.fZ0          ;
-		  	       
-  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out 
+
+  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out
   fPFront       = data.fPFront      ;    // MC momentum in the VD front of the tracker
-  		  	       
+
   fClusterE     = data.fClusterE    ;	// energy of the associated cluster
   fDt           = data.fDt          ;
   fEp           = data.fEp          ;
   fDx           = data.fDx          ;	// about 0 for vanes
-  fDy           = data.fDy          ;	// 
+  fDy           = data.fDy          ;	//
   fDz           = data.fDz          ;	// about 0 for disks
-		  	       
+
   fEleLogLHCal  = data.fEleLogLHCal ;  // log likelihood of the electron hypothesis
   fMuoLogLHCal  = data.fMuoLogLHCal ;	// log lilelihood of the muon     hypothesis
-  		  	       
+
   fRSlope       = data.fRSlope      ;	    // timing residual slope dres(T)/dZ
   fRSlopeErr    = data.fRSlopeErr   ;
-  		  	       
+
   fLogLHRXs     = data.fLogLHRXs    ;      // XSlope-only-based likelihood
-		  	       
-  fEleLogLHDeDx = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based 
-  fMuoLogLHDeDx = data.fMuoLogLHDeDx;  // 
+
+  fEleLogLHDeDx = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based
+  fMuoLogLHDeDx = data.fMuoLogLHDeDx;  //
   fX1           = data.fX1          ;	    // momentum defined at Z1
   fY1           = data.fY1          ;
   fZ1           = data.fZ1          ;
@@ -395,8 +409,14 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
   fC0           = -1.e6             ;  // ** added in V7
   fPhi0         = -1.e6             ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
-// read intersection info 
+// read intersection info
 //-----------------------------------------------------------------------------
   R__b >> imins;
   R__b >> imaxep;
@@ -406,7 +426,7 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
     R__b.ReadFastArray(&vane.fTime,nwf_vint);
 
 					 // for a long time there are only 2 disks...
-    if (i < kNDisks) { 
+    if (i < kNDisks) {
       fDisk[i].fID       = vane.fID    ; // = -1 if no intersection
       fDisk[i].fClusterIndex = -1.;
       fDisk[i].fTime     = vane.fTime  ; // track time
@@ -439,7 +459,7 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
 
   if (imins >= 0) fVMinS   = &fDisk[imins];
   else            fVMinS   = NULL;
-  
+
   if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
   else             fVMaxEp = NULL;
 }
@@ -477,28 +497,28 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
     const mu2e::CaloCluster*       fCluster;
     const mu2e::TrkToCaloExtrapol* fExtrk;
   };
-    
+
   struct TStnTrackDataV6_t {
     TLorentzVector            fMomentum;         // this assumes DELE fit hypothesis
 
-    TBitset                   fHitMask;	       // bit #i: 1 if there is a hit 
+    TBitset                   fHitMask;	       // bit #i: 1 if there is a hit
     TBitset                   fExpectedHitMask;   // bit #i: 1 if expect to have a hit at this Z
 
     int                       fNumber;       // track index in the list of reconstructed tracks
     int                       fNHyp;          // number of hyp's with successfull fits
     int                       fBestHyp[2];    // hypothesis with the best chi2/ndof
     int                       fIDWord;	    // now - for selection "C"
-    
+
     int                       fNActive;	    // total number of hits
-    int                       fVaneID;	    // 
-    int                       fDiskID;	    // 
+    int                       fVaneID;	    //
+    int                       fDiskID;	    //
     int                       fPdgCode;       // PDF code of the particle produced most hits
     int                       fNGoodMcHits;   // Nhits produced by the associated MC particle
     int                       fPartID;        // MC particle ID (number in the list)
     int                       fNMcStrawHits;  // Nhits by associated particle in the straw tracker
     int                       fAlgorithmID;   // bit-packed : (alg_mask << 16 ) | best
     int                       fInt[kNFreeIntsV6];     // provision for future expension
-  
+
     float                     fChi2;
     float                     fChi2C;          // calculated...
     float                     fFitCons;
@@ -511,47 +531,47 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
     float                     fPt;	 // transverse momentum
     float                     fD0;
     float                     fZ0;
-    
-    float                     fPStOut;    // MC momentum in the VD ST_Out 
+
+    float                     fPStOut;    // MC momentum in the VD ST_Out
     float                     fPFront;    // MC momentum in the VD front of the tracker
-    
+
     float                     fClusterE;	// energy of the associated cluster
     float                     fDt;
     float                     fEp;
     float                     fDx;	// about 0 for vanes
-    float                     fDy;	// 
+    float                     fDy;	//
     float                     fDz;	// about 0 for disks
-    
+
     float                     fEleLogLHCal;  // log likelihood of the electron hypothesis
     float                     fMuoLogLHCal;	// log lilelihood of the muon     hypothesis
-    
+
     float                     fRSlope;	    // timing residual slope dres(T)/dZ
     float                     fRSlopeErr;
-    
+
     float                     fLogLHRXs;      // XSlope-only-based likelihood
-    
-    float                     fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based 
-    float                     fMuoLogLHDeDx;  // 
+
+    float                     fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based
+    float                     fMuoLogLHDeDx;  //
     float                     fX1;	    // momentum defined at Z1
     float                     fY1;
     float                     fZ1;
     float                     fP0;            // momentum defined at Z0
     float                     fP2;            // momentum defined at Z0
     float                     fFloat[kNFreeFloatsV6]; // provision for future I/O expansion
-    
-    InterDataV6_t             fVane[kNDisks];  // intersection data are saved 
+
+    InterDataV6_t             fVane[kNDisks];  // intersection data are saved
   };
 
   InterDataV6_t     disk;
 
   TStnTrackDataV6_t data;
-  
+
   int               nwi, nwf, nwf_vint, imins, imaxep;
-  
+
   nwi      = ((int*  ) &data.fChi2   ) - &data.fNumber;
   nwf      = ((float*) &data.fVane   ) - &data.fChi2  ;
   nwf_vint = ((float*) &disk.fCluster) - &disk.fTime  ;
-    
+
   fMomentum.Streamer(R__b);
   fHitMask.Streamer(R__b);
   fExpectedHitMask.Streamer(R__b);
@@ -560,57 +580,61 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fChi2  ,nwf);
 
 
-  fNumber       = data.fNumber      ; 
-  fNHyp         = data.fNHyp        ;          
+  fNumber       = data.fNumber      ;
+  fNHyp         = data.fNHyp        ;
   fBestHyp[0]   = data.fBestHyp[0]  ;
   fBestHyp[1]   = data.fBestHyp[1]  ;
-  fIDWord       = data.fIDWord      ;	
-		  	       
-  fNActive      = data.fNActive     ;	
-  //  fVaneID       = data.fVaneID      ;	
+  fIDWord       = data.fIDWord      ;
+
+  fNActive      = data.fNActive     ;
+  //  fVaneID       = data.fVaneID      ;
   fNMatSites     = 0;
-  fDiskID       = data.fDiskID      ;	
-  fPdgCode      = data.fPdgCode     ;       
-  fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
-  fNMcStrawHits = data.fNMcStrawHits;  
-  fAlgorithmID  = data.fAlgorithmID ;   
+  fDiskID       = data.fDiskID      ;
+  fPdgCode      = data.fPdgCode     ;
+  fNGoodMcHits  = data.fNGoodMcHits ;
+  fPartID       = data.fPartID      ;
+  fNMcStrawHits = data.fNMcStrawHits;
+  fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 					// floats
   fChi2         = data.fChi2        ;
-  fTBack        = data.fChi2C       ;         
+  fTBack        = data.fChi2C       ;
   fFitCons      = data.fFitCons     ;
   fT0           = data.fT0          ;
   fT0Err        = data.fT0Err       ;
   fFitMomErr    = data.fFitMomErr   ;
   fTanDip       = data.fTanDip      ;
-  fP            = data.fP           ;		
+  fP            = data.fP           ;
   fCharge       = data.fCharge      ;
-  fPt           = data.fPt          ;	 
+  fPt           = data.fPt          ;
   fD0           = data.fD0          ;
   fZ0           = data.fZ0          ;
-		  	       
-  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out 
+
+  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out
   fPFront       = data.fPFront      ;    // MC momentum in the VD front of the tracker
-  		  	       
+
   fClusterE     = data.fClusterE    ;	// energy of the associated cluster
   fDt           = data.fDt          ;
   fEp           = data.fEp          ;
   fDx           = data.fDx          ;	// about 0 for vanes
-  fDy           = data.fDy          ;	// 
+  fDy           = data.fDy          ;	//
   fDz           = data.fDz          ;	// about 0 for disks
-		  	       
+
   fEleLogLHCal  = data.fEleLogLHCal ;  // log likelihood of the electron hypothesis
   fMuoLogLHCal  = data.fMuoLogLHCal ;	// log lilelihood of the muon     hypothesis
-  		  	       
+
   fRSlope       = data.fRSlope      ;	    // timing residual slope dres(T)/dZ
   fRSlopeErr    = data.fRSlopeErr   ;
-  		  	       
+
   fLogLHRXs     = data.fLogLHRXs    ;      // XSlope-only-based likelihood
-		  	       
-  fEleLogLHDeDx = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based 
-  fMuoLogLHDeDx = data.fMuoLogLHDeDx;  // 
+
+  fEleLogLHDeDx = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based
+  fMuoLogLHDeDx = data.fMuoLogLHDeDx;  //
   fX1           = data.fX1          ;	    // momentum defined at Z1
   fY1           = data.fY1          ;
   fZ1           = data.fZ1          ;
@@ -619,8 +643,14 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
   fC0           = -1.e6             ;  // ** added in V7
   fPhi0         = -1.e6             ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
-// read intersection info 
+// read intersection info
 //-----------------------------------------------------------------------------
   R__b >> imins;
   R__b >> imaxep;
@@ -631,7 +661,7 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
     R__b.ReadFastArray(&disk.fTime,nwf_vint);
 
 					 // for a long time there are only 2 disks...
-    if (i < kNDisks) { 
+    if (i < kNDisks) {
       fDisk[i].fID       = disk.fID    ; // = -1 if no intersection
       fDisk[i].fClusterIndex = disk.fClusterIndex;
       fDisk[i].fTime     = disk.fTime  ; // track time
@@ -651,8 +681,8 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
       fDisk[i].fNxTrk    = disk.fNxTrk ; // track direction cosines in the intersection point
       fDisk[i].fNyTrk    = disk.fNyTrk ;
       fDisk[i].fNzTrk    = disk.fNzTrk ;
-      fDisk[i].fChi2Match= disk.fChi2Match; 
-      fDisk[i].fChi2Time = disk.fChi2Time; 
+      fDisk[i].fChi2Match= disk.fChi2Match;
+      fDisk[i].fChi2Time = disk.fChi2Time;
       fDisk[i].fPath     = disk.fPath  ;
       fDisk[i].fIntDepth = disk.fIntDepth;
       fDisk[i].fDr       = -1.e6       ; // undefined before V10
@@ -664,7 +694,7 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
 
   if (imins >= 0) fVMinS   = &fDisk[imins];
   else            fVMinS   = NULL;
-  
+
   if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
   else             fVMaxEp = NULL;
 }
@@ -706,18 +736,18 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
 
   struct TStnTrackDataV7_t {
     TLorentzVector            fMomentum;          // this assumes DELE fit hypothesis
-  
-    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit 
+
+    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit
     TBitset                   fExpectedHitMask;   // bit #i: 1 if expect to have a hit at this Z
 
     int                       fNumber;            // track index in the list of reconstructed tracks
     int                       fNHyp;              // number of hyp's with successfull fits
     int                       fBestHyp[2];        // hypothesis with the best chi2/ndof
     int                       fIDWord;	          // now - for selection "C"
-  
+
     int                       fNActive;	          // NWrong << 16 + NActive
-    int                       fVaneID;	          // 
-    int                       fDiskID;	          // 
+    int                       fVaneID;	          //
+    int                       fDiskID;	          //
     int                       fPdgCode;           // PDF code of the particle produced most hits
     int                       fNGoodMcHits;       // Nhits produced by the associated MC particle
     int                       fPartID;            // MC particle ID (number in the list)
@@ -725,9 +755,9 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
     int                       fAlgorithmID;       // bit-packed : (alg_mask << 16 ) | best
 
     int                       fInt[kNFreeIntsV7]; // provision for future expension
-  
+
     float                     fChi2;
-    float                     fChi2C;           // *NOT USED* 
+    float                     fChi2C;           // *NOT USED*
     float                     fFitCons;
     float                     fT0;
     float                     fT0Err;
@@ -739,16 +769,16 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
     float                     fD0;	      // at Z=Z0
     float                     fZ0;
 
-    float                     fPStOut;    // MC momentum in the VD ST_Out 
+    float                     fPStOut;    // MC momentum in the VD ST_Out
     float                     fPFront;    // MC momentum in the VD front of the tracker
 
     float                     fClusterE;	// energy of the associated cluster
     float                     fDt;
     float                     fEp;
     float                     fDx;	// about 0 for vanes
-    float                     fDy;	// 
+    float                     fDy;	//
     float                     fDz;	// about 0 for disks
-  
+
     float                     fEleLogLHCal;         // log likelihood of the electron hypothesis
     float                     fMuoLogLHCal;	  // log lilelihood of the muon     hypothesis
 
@@ -757,8 +787,8 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
 
     float                     fLogLHRXs;            // XSlope-only-based likelihood
 
-    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based 
-    float                     fMuoLogLHDeDx;        // 
+    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based
+    float                     fMuoLogLHDeDx;        //
     float                     fX1;	            // momentum defined at Z1
     float                     fY1;
     float                     fZ1;
@@ -766,20 +796,20 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
     float                     fP2;                    // momentum defined at Z0
     float                     fC0;	              // curvature at Z0, added in V7
     float                     fFloat[kNFreeFloatsV7]; // provision for future I/O expansion
-    
-    InterDataV7_t             fVane[kNDisks];     // intersection data are saved 
+
+    InterDataV7_t             fVane[kNDisks];     // intersection data are saved
   };
 
   InterDataV7_t     disk;
 
   TStnTrackDataV7_t data;
-  
+
   int               nwi, nwf, nwf_vint, imins, imaxep;
-  
+
   nwi      = ((int*  ) &data.fChi2   ) - &data.fNumber;
   nwf      = ((float*) &data.fVane   ) - &data.fChi2  ;
   nwf_vint = ((float*) &disk.fCluster) - &disk.fTime  ;
-    
+
   fMomentum.Streamer(R__b);
   fHitMask.Streamer (R__b);
   fExpectedHitMask.Streamer(R__b);
@@ -788,57 +818,61 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fChi2  ,nwf);
 
 
-  fNumber       = data.fNumber      ; 
-  fNHyp         = data.fNHyp        ;          
+  fNumber       = data.fNumber      ;
+  fNHyp         = data.fNHyp        ;
   fBestHyp[0]   = data.fBestHyp[0]  ;
   fBestHyp[1]   = data.fBestHyp[1]  ;
-  fIDWord       = data.fIDWord      ;	
-		  	       
-  fNActive      = data.fNActive     ;	
-  //  fVaneID       = data.fVaneID      ;	
+  fIDWord       = data.fIDWord      ;
+
+  fNActive      = data.fNActive     ;
+  //  fVaneID       = data.fVaneID      ;
   fNMatSites     = 0;
-  fDiskID       = data.fDiskID      ;	
-  fPdgCode      = data.fPdgCode     ;       
-  fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
-  fNMcStrawHits = data.fNMcStrawHits;  
-  fAlgorithmID  = data.fAlgorithmID ;   
+  fDiskID       = data.fDiskID      ;
+  fPdgCode      = data.fPdgCode     ;
+  fNGoodMcHits  = data.fNGoodMcHits ;
+  fPartID       = data.fPartID      ;
+  fNMcStrawHits = data.fNMcStrawHits;
+  fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 					// floats
   fChi2         = data.fChi2        ;
-  fTBack        = data.fChi2C       ;         
+  fTBack        = data.fChi2C       ;
   fFitCons      = data.fFitCons     ;
   fT0           = data.fT0          ;
   fT0Err        = data.fT0Err       ;
   fFitMomErr    = data.fFitMomErr   ;
   fTanDip       = data.fTanDip      ;
-  fP            = data.fP           ;		
+  fP            = data.fP           ;
   fCharge       = data.fCharge      ;
-  fPt           = data.fPt          ;	 
+  fPt           = data.fPt          ;
   fD0           = data.fD0          ;
   fZ0           = data.fZ0          ;
-		  	       
-  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out 
+
+  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out
   fPFront       = data.fPFront      ;    // MC momentum in the VD front of the tracker
-  		  	       
+
   fClusterE     = data.fClusterE    ;	// energy of the associated cluster
   fDt           = data.fDt          ;
   fEp           = data.fEp          ;
   fDx           = data.fDx          ;	// about 0 for vanes
-  fDy           = data.fDy          ;	// 
+  fDy           = data.fDy          ;	//
   fDz           = data.fDz          ;	// about 0 for disks
-		  	       
+
   fEleLogLHCal  = data.fEleLogLHCal ;  // log likelihood of the electron hypothesis
   fMuoLogLHCal  = data.fMuoLogLHCal ;	// log lilelihood of the muon     hypothesis
-  		  	       
+
   fRSlope       = data.fRSlope      ;	    // timing residual slope dres(T)/dZ
   fRSlopeErr    = data.fRSlopeErr   ;
-  		  	       
+
   fLogLHRXs     = data.fLogLHRXs    ;      // XSlope-only-based likelihood
-		  	       
-  fEleLogLHDeDx = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based 
-  fMuoLogLHDeDx = data.fMuoLogLHDeDx;  // 
+
+  fEleLogLHDeDx = data.fEleLogLHDeDx;  // dE/dX LH calculated by Vadim based
+  fMuoLogLHDeDx = data.fMuoLogLHDeDx;  //
   fX1           = data.fX1          ;	    // momentum defined at Z1
   fY1           = data.fY1          ;
   fZ1           = data.fZ1          ;
@@ -847,8 +881,14 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
   fC0           = data.fC0          ;  // ** added in V7
   fPhi0         = -1.e6;            ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
-// read intersection info 
+// read intersection info
 //-----------------------------------------------------------------------------
   R__b >> imins;
   R__b >> imaxep;
@@ -859,7 +899,7 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
     R__b.ReadFastArray(&disk.fTime,nwf_vint);
 
 					 // for a long time there are only 2 disks...
-    if (i < kNDisks) { 
+    if (i < kNDisks) {
       fDisk[i].fID       = disk.fID    ; // = -1 if no intersection
       fDisk[i].fClusterIndex = disk.fClusterIndex;
       fDisk[i].fTime     = disk.fTime  ; // track time
@@ -879,8 +919,8 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
       fDisk[i].fNxTrk    = disk.fNxTrk ; // track direction cosines in the intersection point
       fDisk[i].fNyTrk    = disk.fNyTrk ;
       fDisk[i].fNzTrk    = disk.fNzTrk ;
-      fDisk[i].fChi2Match= disk.fChi2Match; 
-      fDisk[i].fChi2Time = disk.fChi2Time; 
+      fDisk[i].fChi2Match= disk.fChi2Match;
+      fDisk[i].fChi2Time = disk.fChi2Time;
       fDisk[i].fPath     = disk.fPath  ;
       fDisk[i].fIntDepth = disk.fIntDepth;
       fDisk[i].fDr       = -1.e6       ; // undefined before V10
@@ -892,7 +932,7 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
 
   if (imins >= 0) fVMinS   = &fDisk[imins];
   else            fVMinS   = NULL;
-  
+
   if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
   else             fVMaxEp = NULL;
 }
@@ -935,18 +975,18 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
 
   struct TStnTrackDataV8_t {
     TLorentzVector            fMomentum;          // this assumes DELE fit hypothesis
-  
-    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit 
+
+    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit
     TBitset                   fExpectedHitMask;   // bit #i: 1 if expect to have a hit at this Z
 
     int                       fNumber;            // track index in the list of reconstructed tracks
     int                       fNHyp;              // number of hyp's with successfull fits
     int                       fBestHyp[2];        // hypothesis with the best chi2/ndof
     int                       fIDWord;	          // now - for selection "C"
-  
+
     int                       fNActive;	          // NWrong << 16 + NActive
-    int                       fVaneID;	          // 
-    int                       fDiskID;	          // 
+    int                       fVaneID;	          //
+    int                       fDiskID;	          //
     int                       fPdgCode;           // PDF code of the particle produced most hits
     int                       fNGoodMcHits;       // Nhits produced by the associated MC particle
     int                       fPartID;            // MC particle ID (number in the list)
@@ -954,9 +994,9 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
     int                       fAlgorithmID;       // bit-packed : (alg_mask << 16 ) | best
 
     int                       fInt[kNFreeIntsV8]; // provision for future expension
-  
+
     float                     fChi2;
-    float                     fChi2C;           // *NOT USED* 
+    float                     fChi2C;           // *NOT USED*
     float                     fFitCons;
     float                     fT0;
     float                     fT0Err;
@@ -968,16 +1008,16 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
     float                     fD0;	      // at Z=Z0
     float                     fZ0;
 
-    float                     fPStOut;    // MC momentum in the VD ST_Out 
+    float                     fPStOut;    // MC momentum in the VD ST_Out
     float                     fPFront;    // MC momentum in the VD front of the tracker
 
     float                     fClusterE;	// energy of the associated cluster
     float                     fDt;
     float                     fEp;
     float                     fDx;	// about 0 for vanes
-    float                     fDy;	// 
+    float                     fDy;	//
     float                     fDz;	// about 0 for disks
-  
+
     float                     fEleLogLHCal;         // log likelihood of the electron hypothesis
     float                     fMuoLogLHCal;	  // log lilelihood of the muon     hypothesis
 
@@ -986,8 +1026,8 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
 
     float                     fLogLHRXs;            // XSlope-only-based likelihood
 
-    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based 
-    float                     fMuoLogLHDeDx;        // 
+    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based
+    float                     fMuoLogLHDeDx;        //
     float                     fX1;	            // momentum defined at Z1
     float                     fY1;
     float                     fZ1;
@@ -996,20 +1036,20 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
     float                     fC0;	              // curvature at Z0, added in V7
     float                     fPhi0;	              // phi0 at Z0 **added in V8 , no I/O changes***
     float                     fFloat[kNFreeFloatsV8]; // provision for future I/O expansion
-    
-    InterData_t               fVane[kNDisks];     // intersection data are saved 
+
+    InterData_t               fVane[kNDisks];     // intersection data are saved
   };
 
   InterDataV8_t     disk;
 
   TStnTrackDataV8_t data;
-  
+
   int               nwi, nwf, nwf_vint, imins, imaxep;
-  
+
   nwi      = ((int*  ) &data.fChi2   ) - &data.fNumber;
   nwf      = ((float*) &data.fVane   ) - &data.fChi2  ;
   nwf_vint = ((float*) &disk.fCluster) - &disk.fTime  ;
-    
+
   fMomentum.Streamer(R__b);
   fHitMask.Streamer (R__b);
   fExpectedHitMask.Streamer(R__b);
@@ -1018,58 +1058,62 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fChi2  ,nwf);
 
 
-  fNumber       = data.fNumber      ; 
-  fNHyp         = data.fNHyp        ;          
+  fNumber       = data.fNumber      ;
+  fNHyp         = data.fNHyp        ;
   fBestHyp[0]   = data.fBestHyp[0]  ;
   fBestHyp[1]   = data.fBestHyp[1]  ;
-  fIDWord       = data.fIDWord      ;	
-		  	       
-  fNActive      = data.fNActive     ;	
-  //  fVaneID       = data.fVaneID      ;	
+  fIDWord       = data.fIDWord      ;
+
+  fNActive      = data.fNActive     ;
+  //  fVaneID       = data.fVaneID      ;
   fNMatSites     = 0;
-  fDiskID       = data.fDiskID      ;	
-  fPdgCode      = data.fPdgCode     ;       
-  fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
-  fNMcStrawHits = data.fNMcStrawHits;  
-  fAlgorithmID  = data.fAlgorithmID ;   
+  fDiskID       = data.fDiskID      ;
+  fPdgCode      = data.fPdgCode     ;
+  fNGoodMcHits  = data.fNGoodMcHits ;
+  fPartID       = data.fPartID      ;
+  fNMcStrawHits = data.fNMcStrawHits;
+  fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = -1                ;   // added in V9
   fNDoublets    = -1                ;   // added in V9
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 
 					// floats
   fChi2         = data.fChi2        ;
-  fTBack        = data.fChi2C       ;         
+  fTBack        = data.fChi2C       ;
   fFitCons      = data.fFitCons     ;
   fT0           = data.fT0          ;
   fT0Err        = data.fT0Err       ;
   fFitMomErr    = data.fFitMomErr   ;
   fTanDip       = data.fTanDip      ;
-  fP            = data.fP           ;		
+  fP            = data.fP           ;
   fCharge       = data.fCharge      ;
-  fPt           = data.fPt          ;	 
+  fPt           = data.fPt          ;
   fD0           = data.fD0          ;
   fZ0           = data.fZ0          ;
-		  	       
-  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out 
+
+  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out
   fPFront       = data.fPFront      ;    // MC momentum in the VD front of the tracker
-  		  	       
+
   fClusterE     = data.fClusterE    ;	// energy of the associated cluster
   fDt           = data.fDt          ;
   fEp           = data.fEp          ;
   fDx           = data.fDx          ;	// about 0 for vanes
-  fDy           = data.fDy          ;	// 
+  fDy           = data.fDy          ;	//
   fDz           = data.fDz          ;	// about 0 for disks
-		  	       
+
   fEleLogLHCal  = data.fEleLogLHCal ;  // log likelihood of the electron hypothesis
   fMuoLogLHCal  = data.fMuoLogLHCal ;	// log lilelihood of the muon     hypothesis
-  		  	       
+
   fRSlope       = data.fRSlope      ;	    // timing residual slope dres(T)/dZ
   fRSlopeErr    = data.fRSlopeErr   ;
-  		  	       
+
   fLogLHRXs     = data.fLogLHRXs    ;        // XSlope-only-based likelihood
-		  	       
-  fEleLogLHDeDx = data.fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based 
-  fMuoLogLHDeDx = data.fMuoLogLHDeDx;        // 
+
+  fEleLogLHDeDx = data.fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based
+  fMuoLogLHDeDx = data.fMuoLogLHDeDx;        //
   fX1           = data.fX1          ;	     // momentum defined at Z1
   fY1           = data.fY1          ;
   fZ1           = data.fZ1          ;
@@ -1078,8 +1122,14 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
   fC0           = data.fC0;         ;  // ** added in V7 ?
   fPhi0         = data.fPhi0;       ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
-// read intersection info 
+// read intersection info
 //-----------------------------------------------------------------------------
   R__b >> imins;
   R__b >> imaxep;
@@ -1090,7 +1140,7 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
     R__b.ReadFastArray(&disk.fTime,nwf_vint);
 
 					 // for a long time there are only 2 disks...
-    if (i < kNDisks) { 
+    if (i < kNDisks) {
       fDisk[i].fID       = disk.fID    ; // = -1 if no intersection
       fDisk[i].fClusterIndex = disk.fClusterIndex;
       fDisk[i].fTime     = disk.fTime  ; // track time
@@ -1110,13 +1160,13 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
       fDisk[i].fNxTrk    = disk.fNxTrk ; // track direction cosines in the intersection point
       fDisk[i].fNyTrk    = disk.fNyTrk ;
       fDisk[i].fNzTrk    = disk.fNzTrk ;
-      fDisk[i].fChi2Match= disk.fChi2Match; 
-      fDisk[i].fChi2Time = disk.fChi2Time; 
+      fDisk[i].fChi2Match= disk.fChi2Match;
+      fDisk[i].fChi2Time = disk.fChi2Time;
       fDisk[i].fPath     = disk.fPath  ;
       fDisk[i].fIntDepth = disk.fIntDepth;
       fDisk[i].fDr       = -1;           // undefined before V10
       fDisk[i].fSInt     = -1;           // undefined before V10
-      
+
       fDisk[i].fCluster  = NULL        ;
       fDisk[i].fExtrk    = NULL        ;
     }
@@ -1124,7 +1174,7 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
 
   if (imins >= 0) fVMinS   = &fDisk[imins];
   else            fVMinS   = NULL;
-  
+
   if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
   else             fVMaxEp = NULL;
 }
@@ -1164,32 +1214,32 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
 
   struct TStnTrackDataV9_t {
     TLorentzVector            fMomentum;          // this assumes DELE fit hypothesis
-  
-    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit 
+
+    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit
     TBitset                   fExpectedHitMask;   // bit #i: 1 if expect to have a hit at this Z
 
     int                       fNumber;            // track index in the list of reconstructed tracks
     int                       fNHyp;              // number of hyp's with successfull fits
     int                       fBestHyp[2];        // hypothesis with the best chi2/ndof
     int                       fIDWord;	          // now - for selection "C"
-  
+
     int                       fNActive;	          // NWrong << 16 + NActive
-    int                       fVaneID;	          // 
-    int                       fDiskID;	          // 
+    int                       fVaneID;	          //
+    int                       fDiskID;	          //
     int                       fPdgCode;           // PDF code of the particle produced most hits
     int                       fNGoodMcHits;       // Nhits produced by the associated MC particle
     int                       fPartID;            // MC particle ID (number in the list)
     int                       fNMcStrawHits;      // Nhits by associated particle in the straw tracker
     int                       fAlgorithmID;       // bit-packed : (alg_mask << 16 ) | best
     int                       fNHits;             // added in V9: total number of hits associated with the track
-    int                       fNDoublets;         // added in V9: 
+    int                       fNDoublets;         // added in V9:
                                                   //  number of opposite sign doublets
                                                   //  opposite signs << 4
                                                   //  number of hits with no ambiguity resolved << 16
     int                       fInt[kNFreeIntsV9]; // provision for future expension
-  
+
     float                     fChi2;
-    float                     fChi2C;           // *NOT USED* 
+    float                     fChi2C;           // *NOT USED*
     float                     fFitCons;
     float                     fT0;
     float                     fT0Err;
@@ -1201,16 +1251,16 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
     float                     fD0;	      // at Z=Z0
     float                     fZ0;
 
-    float                     fPStOut;    // MC momentum in the VD ST_Out 
+    float                     fPStOut;    // MC momentum in the VD ST_Out
     float                     fPFront;    // MC momentum in the VD front of the tracker
 
     float                     fClusterE;	// energy of the associated cluster
     float                     fDt;
     float                     fEp;
     float                     fDx;	// about 0 for vanes
-    float                     fDy;	// 
+    float                     fDy;	//
     float                     fDz;	// about 0 for disks
-  
+
     float                     fEleLogLHCal;         // log likelihood of the electron hypothesis
     float                     fMuoLogLHCal;	  // log lilelihood of the muon     hypothesis
 
@@ -1219,8 +1269,8 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
 
     float                     fLogLHRXs;            // XSlope-only-based likelihood
 
-    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based 
-    float                     fMuoLogLHDeDx;        // 
+    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based
+    float                     fMuoLogLHDeDx;        //
     float                     fX1;	            // momentum defined at Z1
     float                     fY1;
     float                     fZ1;
@@ -1229,20 +1279,20 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
     float                     fC0;	              // curvature at Z0
     float                     fPhi0;	              // phi0 at Z0 **specify in V8 , no I/O changes***
     float                     fFloat[kNFreeFloatsV9]; // provision for future I/O expansion
-    
-    InterDataV9_t             fVane[kNDisks];     // intersection data are saved 
+
+    InterDataV9_t             fVane[kNDisks];     // intersection data are saved
   };
 
   InterDataV9_t     disk;
 
   TStnTrackDataV9_t data;
-  
+
   int               nwi, nwf, nwf_vint, imins, imaxep;
-  
+
   nwi      = ((int*  ) &data.fChi2   ) - &data.fNumber;
   nwf      = ((float*) &data.fVane   ) - &data.fChi2  ;
   nwf_vint = ((float*) &disk.fCluster) - &disk.fTime  ;
-    
+
   fMomentum.Streamer(R__b);
   fHitMask.Streamer (R__b);
   fExpectedHitMask.Streamer(R__b);
@@ -1251,58 +1301,62 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fChi2  ,nwf);
 
 
-  fNumber       = data.fNumber      ; 
-  fNHyp         = data.fNHyp        ;          
+  fNumber       = data.fNumber      ;
+  fNHyp         = data.fNHyp        ;
   fBestHyp[0]   = data.fBestHyp[0]  ;
   fBestHyp[1]   = data.fBestHyp[1]  ;
-  fIDWord       = data.fIDWord      ;	
-		  	       
-  fNActive      = data.fNActive     ;	
-  //  fVaneID       = data.fVaneID      ;	
+  fIDWord       = data.fIDWord      ;
+
+  fNActive      = data.fNActive     ;
+  //  fVaneID       = data.fVaneID      ;
   fNMatSites     = 0;
-  fDiskID       = data.fDiskID      ;	
-  fPdgCode      = data.fPdgCode     ;       
-  fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
-  fNMcStrawHits = data.fNMcStrawHits;  
-  fAlgorithmID  = data.fAlgorithmID ;   
+  fDiskID       = data.fDiskID      ;
+  fPdgCode      = data.fPdgCode     ;
+  fNGoodMcHits  = data.fNGoodMcHits ;
+  fPartID       = data.fPartID      ;
+  fNMcStrawHits = data.fNMcStrawHits;
+  fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = data.fNHits       ;  // added in V9
   fNDoublets    = data.fNDoublets   ;  // added in V9
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                 ;   // added in v15
+  fInterCounts  = 0                   ; // added in v16
 
 					// floats
   fChi2         = data.fChi2        ;
-  fTBack        = data.fChi2C       ;         
+  fTBack        = data.fChi2C       ;
   fFitCons      = data.fFitCons     ;
   fT0           = data.fT0          ;
   fT0Err        = data.fT0Err       ;
   fFitMomErr    = data.fFitMomErr   ;
   fTanDip       = data.fTanDip      ;
-  fP            = data.fP           ;		
+  fP            = data.fP           ;
   fCharge       = data.fCharge      ;
-  fPt           = data.fPt          ;	 
+  fPt           = data.fPt          ;
   fD0           = data.fD0          ;
   fZ0           = data.fZ0          ;
-		  	       
-  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out 
+
+  fPStOut       = data.fPStOut      ;    // MC momentum in the VD ST_Out
   fPFront       = data.fPFront      ;    // MC momentum in the VD front of the tracker
-  		  	       
+
   fClusterE     = data.fClusterE    ;	// energy of the associated cluster
   fDt           = data.fDt          ;
   fEp           = data.fEp          ;
   fDx           = data.fDx          ;	// about 0 for vanes
-  fDy           = data.fDy          ;	// 
+  fDy           = data.fDy          ;	//
   fDz           = data.fDz          ;	// about 0 for disks
-		  	       
+
   fEleLogLHCal  = data.fEleLogLHCal ;  // log likelihood of the electron hypothesis
   fMuoLogLHCal  = data.fMuoLogLHCal ;	// log lilelihood of the muon     hypothesis
-  		  	       
+
   fRSlope       = data.fRSlope      ;	    // timing residual slope dres(T)/dZ
   fRSlopeErr    = data.fRSlopeErr   ;
-  		  	       
+
   fLogLHRXs     = data.fLogLHRXs    ;        // XSlope-only-based likelihood
-		  	       
-  fEleLogLHDeDx = data.fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based 
-  fMuoLogLHDeDx = data.fMuoLogLHDeDx;        // 
+
+  fEleLogLHDeDx = data.fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based
+  fMuoLogLHDeDx = data.fMuoLogLHDeDx;        //
   fX1           = data.fX1          ;	     // momentum defined at Z1
   fY1           = data.fY1          ;
   fZ1           = data.fZ1          ;
@@ -1311,8 +1365,14 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
   fC0           = data.fC0;         ;  // ** added in V7 ?
   fPhi0         = data.fPhi0;       ;  // ** added in V8
   fTrkQual      = -1.               ;  // ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
-// read intersection info 
+// read intersection info
 //-----------------------------------------------------------------------------
   R__b >> imins;
   R__b >> imaxep;
@@ -1323,7 +1383,7 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
     R__b.ReadFastArray(&disk.fTime,nwf_vint);
 
 					 // for a long time there are only 2 disks...
-    if (i < kNDisks) { 
+    if (i < kNDisks) {
       fDisk[i].fID       = disk.fID    ; // = -1 if no intersection
       fDisk[i].fClusterIndex = disk.fClusterIndex;
       fDisk[i].fTime     = disk.fTime  ; // track time
@@ -1343,13 +1403,13 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
       fDisk[i].fNxTrk    = disk.fNxTrk ; // track direction cosines in the intersection point
       fDisk[i].fNyTrk    = disk.fNyTrk ;
       fDisk[i].fNzTrk    = disk.fNzTrk ;
-      fDisk[i].fChi2Match= disk.fChi2Match; 
-      fDisk[i].fChi2Time = disk.fChi2Time; 
+      fDisk[i].fChi2Match= disk.fChi2Match;
+      fDisk[i].fChi2Time = disk.fChi2Time;
       fDisk[i].fPath     = disk.fPath  ;
       fDisk[i].fIntDepth = disk.fIntDepth;
       fDisk[i].fDr       = -1;           // added in V10
       fDisk[i].fSInt     = -1;           // added in V10
-      
+
       fDisk[i].fCluster  = NULL        ;
       fDisk[i].fExtrk    = NULL        ;
     }
@@ -1357,7 +1417,7 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
 
   if (imins >= 0) fVMinS   = &fDisk[imins];
   else            fVMinS   = NULL;
-  
+
   if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
   else             fVMaxEp = NULL;
 }
@@ -1399,32 +1459,32 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
 
   struct TStnTrackDataV10_t {
     TLorentzVector            fMomentum;          // this assumes DELE fit hypothesis
-  
-    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit 
+
+    TBitset                   fHitMask;	          // bit #i: 1 if there is a hit
     TBitset                   fExpectedHitMask;   // bit #i: 1 if expect to have a hit at this Z
 
     int                       fNumber;            // track index in the list of reconstructed tracks
     int                       fNHyp;              // number of hyp's with successfull fits
     int                       fBestHyp[2];        // hypothesis with the best chi2/ndof
     int                       fIDWord;	          // now - for selection "C"
-  
+
     int                       fNActive;	          // NWrong << 16 + NActive
-    int                       fVaneID;	          // 
-    int                       fDiskID;	          // 
+    int                       fVaneID;	          //
+    int                       fDiskID;	          //
     int                       fPdgCode;           // PDF code of the particle produced most hits
     int                       fNGoodMcHits;       // Nhits produced by the associated MC particle
     int                       fPartID;            // MC particle ID (number in the list)
     int                       fNMcStrawHits;      // Nhits by associated particle in the straw tracker
     int                       fAlgorithmID;       // bit-packed : (alg_mask << 16 ) | best
     int                       fNHits;             // added in V9: total number of hits associated with the track
-    int                       fNDoublets;         // added in V9: 
+    int                       fNDoublets;         // added in V9:
                                                   //  number of opposite sign doublets
                                                   //  opposite signs << 4
                                                   //  number of hits with no ambiguity resolved << 16
     int                       fInt[kNFreeIntsV10];// provision for future expension
-  
+
     float                     fChi2;
-    float                     fChi2C;             // *NOT USED* 
+    float                     fChi2C;             // *NOT USED*
     float                     fFitCons;
     float                     fT0;
     float                     fT0Err;
@@ -1436,16 +1496,16 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
     float                     fD0;	          // at Z=Z0
     float                     fZ0;
 
-    float                     fPStOut;            // MC momentum in the VD ST_Out 
+    float                     fPStOut;            // MC momentum in the VD ST_Out
     float                     fPFront;            // MC momentum in the VD front of the tracker
 
     float                     fClusterE;	  // energy of the associated cluster
     float                     fDt;
     float                     fEp;
     float                     fDx;	          // about 0 for vanes
-    float                     fDy;	          // 
+    float                     fDy;	          //
     float                     fDz;	          // about 0 for disks
-  
+
     float                     fEleLogLHCal;       // log likelihood of the electron hypothesis
     float                     fMuoLogLHCal;	  // log lilelihood of the muon     hypothesis
 
@@ -1454,8 +1514,8 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
 
     float                     fLogLHRXs;            // XSlope-only-based likelihood
 
-    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based 
-    float                     fMuoLogLHDeDx;        // 
+    float                     fEleLogLHDeDx;        // dE/dX LH calculated by Vadim based
+    float                     fMuoLogLHDeDx;        //
     float                     fX1;	            // momentum defined at Z1
     float                     fY1;
     float                     fZ1;
@@ -1464,20 +1524,20 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
     float                     fC0;	               // curvature at Z0
     float                     fPhi0;	               // phi0 at Z0 **specify in V8 , no I/O changes***
     float                     fFloat[kNFreeFloatsV10]; // provision for future I/O expansion
-    
-    InterDataV10_t            fDisk[kNDisks];          // intersection data are saved 
+
+    InterDataV10_t            fDisk[kNDisks];          // intersection data are saved
   };
 
   InterDataV10_t     disk;
 
   TStnTrackDataV10_t data;
-  
+
   int               nwi, nwf, nwf_vint, imins, imaxep;
-  
+
   nwi      = ((int*  ) &data.fChi2   ) - &data.fNumber;
   nwf      = ((float*) &data.fDisk   ) - &data.fChi2  ;
   nwf_vint = ((float*) &disk.fCluster) - &disk.fTime  ;
-    
+
   fMomentum.Streamer(R__b);
   fHitMask.Streamer (R__b);
   fExpectedHitMask.Streamer(R__b);
@@ -1485,58 +1545,62 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
   R__b.ReadFastArray(&data.fNumber,nwi);
   R__b.ReadFastArray(&data.fChi2  ,nwf);
 
-  fNumber       = data.fNumber      ; 
-  fNHyp         = data.fNHyp        ;          
+  fNumber       = data.fNumber      ;
+  fNHyp         = data.fNHyp        ;
   fBestHyp[0]   = data.fBestHyp[0]  ;
   fBestHyp[1]   = data.fBestHyp[1]  ;
-  fIDWord       = data.fIDWord      ;	
-		  	       
-  fNActive      = data.fNActive     ;	
-  //  fVaneID       = data.fVaneID      ;	
+  fIDWord       = data.fIDWord      ;
+
+  fNActive      = data.fNActive     ;
+  //  fVaneID       = data.fVaneID      ;
   fNMatSites    = 0;
-  fDiskID       = data.fDiskID      ;	
-  fPdgCode      = data.fPdgCode     ;       
-  fNGoodMcHits  = data.fNGoodMcHits ;   
-  fPartID       = data.fPartID      ;        
-  fNMcStrawHits = data.fNMcStrawHits;  
-  fAlgorithmID  = data.fAlgorithmID ;   
+  fDiskID       = data.fDiskID      ;
+  fPdgCode      = data.fPdgCode     ;
+  fNGoodMcHits  = data.fNGoodMcHits ;
+  fPartID       = data.fPartID      ;
+  fNMcStrawHits = data.fNMcStrawHits;
+  fAlgorithmID  = data.fAlgorithmID ;
   fNHits        = data.fNHits       ;	// ** added in V9
   fNDoublets    = data.fNDoublets   ;	// ** added in V9
+  fHelixIndex   = -1                ;   // added in V12
+  fSeedIndex    = -1                ;   // added in V12
+  fMcDirection  = 0                   ; // added in v15
+  fInterCounts  = 0                   ; // added in v16
 
 					// floats
   fChi2         = data.fChi2        ;
-  fTBack        = data.fChi2C       ;         
+  fTBack        = data.fChi2C       ;
   fFitCons      = data.fFitCons     ;
   fT0           = data.fT0          ;
   fT0Err        = data.fT0Err       ;
   fFitMomErr    = data.fFitMomErr   ;
   fTanDip       = data.fTanDip      ;
-  fP            = data.fP           ;		
+  fP            = data.fP           ;
   fCharge       = data.fCharge      ;
-  fPt           = data.fPt          ;	 
+  fPt           = data.fPt          ;
   fD0           = data.fD0          ;
   fZ0           = data.fZ0          ;
-		  	       
-  fPStOut       = data.fPStOut      ; // MC momentum in the VD ST_Out 
+
+  fPStOut       = data.fPStOut      ; // MC momentum in the VD ST_Out
   fPFront       = data.fPFront      ; // MC momentum in the VD front of the tracker
-  		  	       
+
   fClusterE     = data.fClusterE    ; // energy of the associated cluster
   fDt           = data.fDt          ;
   fEp           = data.fEp          ;
   fDx           = data.fDx          ; // about 0 for vanes
-  fDy           = data.fDy          ; // 
+  fDy           = data.fDy          ; //
   fDz           = data.fDz          ; // about 0 for disks
-		  	       
+
   fEleLogLHCal  = data.fEleLogLHCal ; // log likelihood of the electron hypothesis
   fMuoLogLHCal  = data.fMuoLogLHCal ; // log lilelihood of the muon     hypothesis
-  		  	       
+
   fRSlope       = data.fRSlope      ; // timing residual slope dres(T)/dZ
   fRSlopeErr    = data.fRSlopeErr   ;
-  		  	       
+
   fLogLHRXs     = data.fLogLHRXs    ; // XSlope-only-based likelihood
-		  	       
-  fEleLogLHDeDx = data.fEleLogLHDeDx; // dE/dX LH calculated by Vadim based 
-  fMuoLogLHDeDx = data.fMuoLogLHDeDx; // 
+
+  fEleLogLHDeDx = data.fEleLogLHDeDx; // dE/dX LH calculated by Vadim based
+  fMuoLogLHDeDx = data.fMuoLogLHDeDx; //
   fX1           = data.fX1          ; // momentum defined at Z1
   fY1           = data.fY1          ;
   fZ1           = data.fZ1          ;
@@ -1545,8 +1609,14 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
   fC0           = data.fC0;         ;	// ** added in V7 ?
   fPhi0         = data.fPhi0;       ;	// ** added in V8
   fTrkQual      = -1.               ;	// ** added in V11
+  // added in V15
+  fPSTFront         = 0.f;
+  fPSTBack          = 0.f;
+  fPTrackerEntrance = 0.f;
+  fPTrackerMiddle   = 0.f;
+  fPTrackerExit     = 0.f;
 //-----------------------------------------------------------------------------
-// read intersection info 
+// read intersection info
 //-----------------------------------------------------------------------------
   R__b >> imins;
   R__b >> imaxep;
@@ -1557,7 +1627,7 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
     R__b.ReadFastArray(&disk.fTime,nwf_vint);
 
 					 // for a long time there are only 2 disks...
-    if (i < kNDisks) { 
+    if (i < kNDisks) {
       fDisk[i].fID       = disk.fID    ; // = -1 if no intersection
       fDisk[i].fClusterIndex = disk.fClusterIndex;
       fDisk[i].fTime     = disk.fTime  ; // track time
@@ -1577,13 +1647,13 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
       fDisk[i].fNxTrk    = disk.fNxTrk ; // track direction cosines in the intersection point
       fDisk[i].fNyTrk    = disk.fNyTrk ;
       fDisk[i].fNzTrk    = disk.fNzTrk ;
-      fDisk[i].fChi2Match= disk.fChi2Match; 
-      fDisk[i].fChi2Time = disk.fChi2Time; 
+      fDisk[i].fChi2Match= disk.fChi2Match;
+      fDisk[i].fChi2Time = disk.fChi2Time;
       fDisk[i].fPath     = disk.fPath  ;
       fDisk[i].fIntDepth = disk.fIntDepth;
       fDisk[i].fDr       = disk.fDr    ; // ** added in V10
       fDisk[i].fSInt     = disk.fSInt  ; // ** added in V10
-      
+
       fDisk[i].fCluster  = NULL        ;
       fDisk[i].fExtrk    = NULL        ;
     }
@@ -1591,7 +1661,7 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
 
   if (imins >= 0) fVMinS   = &fDisk[imins];
   else            fVMinS   = NULL;
-  
+
   if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
   else             fVMaxEp = NULL;
 }
@@ -1601,17 +1671,18 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 void TStnTrack::Streamer(TBuffer& R__b) {
 
-  int nwi, nwf, nwf_vint, imins, imaxep;
+  int nwi, nwf, nwf_vint, imins, imaxep, nwf2; // nwf2 added in v15
 
   nwi      = ((int*  ) &fChi2            ) - &fNumber;
   nwf      = ((float*) &fDisk            ) - &fChi2;
   nwf_vint = ((float*) &fDisk[0].fCluster) - &fDisk[0].fTime;
+  nwf2     = ((float*) &fTrkCaloHit) - &fPSTFront;
 
   if (R__b.IsReading()) {
 //-----------------------------------------------------------------------------
 // read TStnTrack, Mu2e:V1
 //-----------------------------------------------------------------------------
-    Version_t R__v = R__b.ReadVersion(); 
+    Version_t R__v = R__b.ReadVersion();
 
     if      (R__v <  4) {
       printf(" >>> ERROR: TStnTrack::Streamer can't read old data version = %i. BAIL OUT\n",R__v);
@@ -1643,16 +1714,22 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 	R__b >> fDisk[i].fClusterIndex;
 	R__b.ReadFastArray(&fDisk[i].fTime,nwf_vint);
       }
-    
+
       if (imins >= 0) fVMinS = &fDisk[imins];
       else            fVMinS = NULL;
 
       if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
       else             fVMaxEp = NULL;
+
+      // added in v15
+      fPSTFront         = 0.f;
+      fPSTBack          = 0.f;
+      fPTrackerEntrance = 0.f;
+      fPTrackerMiddle   = 0.f;
+      fPTrackerExit     = 0.f;
     }
-    else {
+    else if ( (R__v == 13) || (R__v == 14)){
 //-----------------------------------------------------------------------------
-// current version - v14
 // V13 and V14 are different only by NDoF being packed into fNGoodMCHits
 //-----------------------------------------------------------------------------
       fMomentum.Streamer(R__b);
@@ -1670,18 +1747,69 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 	R__b >> fDisk[i].fClusterIndex;
 	R__b.ReadFastArray(&fDisk[i].fTime,nwf_vint);
       }
-    
+
       if (imins >= 0) fVMinS = &fDisk[imins];
       else            fVMinS = NULL;
 
       if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
       else             fVMaxEp = NULL;
-      
+
       R__b >> fTrkCaloHit.fID;
       R__b >> fTrkCaloHit.fClusterIndex;
       R__b.ReadFastArray(&fTrkCaloHit.fTime,nwf_vint);
 
       fVTCH = &fTrkCaloHit;
+
+      // added in v15
+      fPSTFront         = 0.f;
+      fPSTBack          = 0.f;
+      fPTrackerEntrance = 0.f;
+      fPTrackerMiddle   = 0.f;
+      fPTrackerExit     = 0.f;
+    }
+    else if (R__v >= 15) {
+//-----------------------------------------------------------------------------
+// version - v15
+// adding second second of floats to read
+// version - v16
+// add intersection counts
+// version - v17
+// add T(tracker front)
+//-----------------------------------------------------------------------------
+      fMomentum.Streamer(R__b);
+      fHitMask.Streamer(R__b);
+      fExpectedHitMask.Streamer(R__b);
+
+      R__b.ReadFastArray(&fNumber,nwi);
+      R__b.ReadFastArray(&fChi2,nwf);
+					// read intersection info
+      R__b >> imins;
+      R__b >> imaxep;
+
+      for (int i=0; i<kNDisks; i++) {
+	R__b >> fDisk[i].fID;
+	R__b >> fDisk[i].fClusterIndex;
+	R__b.ReadFastArray(&fDisk[i].fTime,nwf_vint);
+      }
+
+      if (imins >= 0) fVMinS = &fDisk[imins];
+      else            fVMinS = NULL;
+
+      if (imaxep >= 0) fVMaxEp = &fDisk[imaxep];
+      else             fVMaxEp = NULL;
+
+      R__b.ReadFastArray(&fPSTFront,nwf2);
+
+      R__b >> fTrkCaloHit.fID;
+      R__b >> fTrkCaloHit.fClusterIndex;
+      R__b.ReadFastArray(&fTrkCaloHit.fTime,nwf_vint);
+
+      fVTCH = &fTrkCaloHit;
+
+      if(R__v == 15) fInterCounts = 0; // Set the intersection counts to 0 for V15
+      if(R__v  < 17) fTFront = 0.; // added in V17
+    } else {
+      printf(" >>> ERROR: TStnTrack::Streamer unknown read version = %i. BAIL OUT\n",R__v);
     }
   }
   else {
@@ -1704,13 +1832,15 @@ void TStnTrack::Streamer(TBuffer& R__b) {
 
     R__b << imins;
     R__b << imaxep;
-    
+
     for (int i=0; i<kNDisks; i++) {
       R__b << fDisk[i].fID;
       R__b << fDisk[i].fClusterIndex;
       R__b.WriteFastArray(&fDisk[i].fTime,nwf_vint);
     }
-    
+
+    R__b.WriteFastArray(&fPSTFront,nwf2);
+
     R__b << fTrkCaloHit.fID;
     R__b << fTrkCaloHit.fClusterIndex;
     R__b.WriteFastArray(&fTrkCaloHit.fTime,nwf_vint);
@@ -1724,7 +1854,7 @@ TStnTrack::TStnTrack(Int_t Number) : TObject (),
 {
     // 'Number' can be -1 ...
 
-  
+
   Clear();
   fNumber = Number;
 }
@@ -1757,16 +1887,21 @@ void TStnTrack::Clear(Option_t* Opt) {
   fKalRep[1] = 0;
   fKalRep[2] = 0;
   fKalRep[3] = 0;
-  
+
   fExtrk              = NULL;
   fClosestCaloCluster = NULL;
   fCluster            = NULL;
-    
+
   fNHyp           = -1;
   fBestHyp[0]     = -1;
   fBestHyp[1]     = -1;
   fNHits          = -1;
   fNDoublets      = -1;
+  fHelixIndex     = -1;
+  fSeedIndex      = -1;
+  fMcDirection    = 0;
+  fInterCounts    = 0;
+  fPdgCode        = 0;
 
   for (int i=0; i<kNDisks; i++) {
     fDisk[i].fID           = -1;
@@ -1780,19 +1915,19 @@ void TStnTrack::Clear(Option_t* Opt) {
     fDisk[i].fNxTrk        = -1.e6;
     fDisk[i].fNyTrk        = -1.e6;
     fDisk[i].fNzTrk        = -1.e6;
-			   
+
     fDisk[i].fXCl          = -1.e6;
     fDisk[i].fYCl          = -1.e6;
     fDisk[i].fZCl          = -1.e6;
-			   
+
     fDisk[i].fDx           = -1.e6;
     fDisk[i].fDy           = -1.e6;
     fDisk[i].fDz           = -1.e6;
     fDisk[i].fDt           = -1.e6;
-			   
+
     fDisk[i].fDu           = -1.e6;
     fDisk[i].fDv           = -1.e6;
-			   
+
     fDisk[i].fChi2Match    = 1.e6;
     fDisk[i].fChi2Time     = 1.e6;
     fDisk[i].fPath         = 1.e6;
@@ -1802,9 +1937,28 @@ void TStnTrack::Clear(Option_t* Opt) {
     fDisk[i].fCluster      = NULL;
     fDisk[i].fExtrk        = NULL;
   }
-  
+
   fVMinS        = NULL;
   fVMaxEp       = NULL;
+
+  fP                = 0.0;
+  fPFront           = 0.0;
+  fPSTFront         = 0.0;
+  fPSTBack          = 0.0;
+  fPTrackerEntrance = 0.0;
+  fPTrackerMiddle   = 0.0;
+  fPTrackerExit     = 0.0;
+  fPStOut           = 0.0;
+  fClusterE         = 0.0;
+  fDt               = 0.0;
+  fDx               = 0.0;
+  fDy               = 0.0;
+  fDz               = 0.0;
+  fT0               = 0.0;
+  fTBack            = 0.0;
+  fTFront           = 0.0;
+  fFitMomErr        = 0.0;
+  fT0Err            = 0.0;
 
   fTrkCaloHit.fID           = -1;
   fTrkCaloHit.fClusterIndex = -1;
@@ -1817,19 +1971,19 @@ void TStnTrack::Clear(Option_t* Opt) {
   fTrkCaloHit.fNxTrk        = -1.e6;
   fTrkCaloHit.fNyTrk        = -1.e6;
   fTrkCaloHit.fNzTrk        = -1.e6;
-			   
+
   fTrkCaloHit.fXCl          = -1.e6;
   fTrkCaloHit.fYCl          = -1.e6;
   fTrkCaloHit.fZCl          = -1.e6;
-			   
+
   fTrkCaloHit.fDx           = -1.e6;
   fTrkCaloHit.fDy           = -1.e6;
   fTrkCaloHit.fDz           = -1.e6;
   fTrkCaloHit.fDt           = -1.e6;
-			   
+
   fTrkCaloHit.fDu           = -1.e6;
   fTrkCaloHit.fDv           = -1.e6;
-			   
+
   fTrkCaloHit.fChi2Match    = 1.e6;
   fTrkCaloHit.fChi2Time     = 1.e6;
   fTrkCaloHit.fPath         = 1.e6;
@@ -1868,25 +2022,25 @@ void TStnTrack::Print(Option_t* Option) const {
 // print banner
 //-----------------------------------------------------------------------------
     printf("------------------------------------------------------------------------------------------------");
-    printf("------------------------------------------------------\n");
+    printf("------------------------------------------------------------------\n");
     printf(" i  nh  na nw nosd nssd na0 ncl  alg_mask    id_word   q     p     momerr    T0     T0Err     D0");
-    printf("       Z0    TanDip   TBack   chi2/dof   fcon  TrkQual\n");
+    printf("       Z0    TanDip   TBack   chi2/dof   fcon  TrkQual p(MC front)\n");
     printf("------------------------------------------------------------------------------------------------");
-    printf("------------------------------------------------------\n");
+    printf("------------------------------------------------------------------\n");
   }
 
   if ((opt == "") || (opt.Index("data") >= 0)) {
     printf("%2i %3i %3i %2i %4i %4i %3i %3i 0x%08x",
-	   fNumber,t->NHits(), t->NActive(),t->NWrong(), 
+	   fNumber,t->NHits(), t->NActive(),t->NWrong(),
 	   t->NOSDoublets(), t->NSSDoublets(), t->NHitsAmbZero(),
 	   t->NClusters(),
 	   t->AlgorithmID());
 
-    printf(" 0x%08x %2.0f %8.3f %7.3f %8.3f %6.3f %8.3f %8.3f %7.4f %8.3f %8.2f %8.2e %7.3f",
+    printf(" 0x%08x %2.0f %8.3f %7.3f %8.3f %6.3f %8.3f %8.3f %7.4f %8.3f %8.2f %8.2e %6.3g %6.1f",
 	   t->fIDWord,
-	   fCharge, 
+	   fCharge,
 	   fP*fCharge, fFitMomErr, fT0, fT0Err, fD0, fZ0, fTanDip, TBack(),
-	   t->Chi2Dof(),t->FitCons(),t->DaveTrkQual());
+	   t->Chi2Dof(),t->FitCons(),t->DaveTrkQual(), t->fPFront);
     printf("\n");
   }
 }

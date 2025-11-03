@@ -61,6 +61,7 @@ StntupleTHistModule : {
 StntupleMakerTemplate : { module_type:StntupleMaker
     THistModule          : {          ## defaults of the base class
         @table::StntupleTHistModule
+        module_label : "StntupleMaker"
     }
     processName          : undefined
 #------------------------------------------------------------------------------
@@ -91,10 +92,11 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
 # default tags for CRV reco collections
 #------------------------------------------------------------------------------
-    crvRecoPulseCollTag          : "CrvRecoPulses"
-    crvCoincidenceCollTag        : "CrvCoincidence"
-    crvCoincidenceClusterCollTag : "CrvCoincidenceClusterFinder"
-#------------------------------------------------------------------------------
+    crvRecoPulseCollTag            : "CrvRecoPulses"
+    crvCoincidenceCollTag          : "CrvCoincidence"
+    crvCoincidenceClusterCollTag   : "CrvCoincidenceClusterFinder"
+    crvCoincidenceClusterMCCollTag : "CrvCoincidenceClusterMCAssns"
+    #------------------------------------------------------------------------------
 # sometimes may need to store multiple track blocks, thus - vectors
 # by default, always run MergePatRec, which, in case only one track reconstruction
 # module is running upstream, simply copies its output
@@ -302,11 +304,6 @@ Stntuple: {
 # downstream electrons - explicitly - the same as default
 #------------------------------------------------------------------------------
 	StntupleMaker     : { @table::StntupleMakerTemplate
-            module_type:StntupleMaker
-	    THistModule: { 
-                @table::StntupleTHistModule
-                module_label : "StntupleMaker"
-            }
         }
 
 	StntupleMakerCpr  : { @table::StntupleMakerTemplate 
@@ -670,20 +667,42 @@ Stntuple: {
 	    makeHelices            : 1
 	    makeTrackSeeds         : 0
 	    makeTracks             : 1
-	    timeClusterBlockName   : [ "TimeClusterBlockDeTpr"      , "TimeClusterBlockCprDe"      , "TimeClusterBlockApr", "TimeClusterBlockAprHighP"  , "TimeClusterBlockAprHighPStopTarg" , "TimeClusterBlockAprLowPStopTarg" , "TimeClusterBlockCprDeHighP" , "TimeClusterBlockCprDeHighPStopTarg" , "TimeClusterBlockCprDeLowPStopTarg" , "TimeClusterBlockCprDeLowPStopTarg" ]
-	    timeClusterCollTag     : [ "TTtimeClusterFinder"        , "TTCalTimePeakFinder"        , "TTTZClusterFinder"  , "aprHighPTriggerInfoMerger" , "aprHighPStopTargTriggerInfoMerger", "aprLowPStopTargTriggerInfoMerger", "cprDeHighPTriggerInfoMerger", "cprDeHighPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger"]
-	    helixBlockName         : [ "HelixBlockDeTpr"            , "HelixBlockCprDe"            , "HelixBlockApr"      , "HelixBlockAprHighP"        , "HelixBlockAprHighPStopTarg"       , "HelixBlockAprLowPStopTarg"       , "HelixBlockCprDeHighP"       , "HelixBlockCprDeHighPStopTarg"       , "HelixBlockCprDeLowPStopTarg"       , "HelixBlockCprDeLowPStopTarg"       ]
-	    helixCollTag           : [ "TTHelixMergerDe"            , "TTCalHelixMergerDe"         , "TTAprHelixMerger"   , "aprHighPTriggerInfoMerger" , "aprHighPStopTargTriggerInfoMerger", "aprLowPStopTargTriggerInfoMerger", "cprDeHighPTriggerInfoMerger", "cprDeHighPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger"]
-	    trackBlockName         : [ "TrackBlockDeTpr"            , "TrackBlockCprDe"            , "TrackBlockApr"      , "TrackBlockAprHighP"        , "TrackBlockAprHighPStopTarg"       , "TrackBlockAprLowPStopTarg"       , "TrackBlockCprDeHighP"       , "TrackBlockCprDeHighPStopTarg"       , "TrackBlockCprDeLowPStopTarg"       , "TrackBlockCprDeLowPStopTarg"       ]
-            trackCollTag           : [ "TTKSFDe"                    , "TTCalSeedFitDe"             , "TTAprKSF"           , "aprHighPTriggerInfoMerger" , "aprHighPStopTargTriggerInfoMerger", "aprLowPStopTargTriggerInfoMerger", "cprDeHighPTriggerInfoMerger", "cprDeHighPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger"]
-	    helixKsCollTag         : [ ""                           , ""                           , ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                , ""                                ]
-            trackHsBlockName       : [ "HelixBlockDeTpr"            , "HelixBlockCprDe"            , "HelixBlockApr"      , "HelixBlockAprHighP"        , "HelixBlockAprHighPStopTarg"       , "HelixBlockAprLowPStopTarg"       , "HelixBlockCprDeHighP"       , "HelixBlockCprDeHighPStopTarg"       , "HelixBlockCprDeLowPStopTarg"       , "HelixBlockCprDeLowPStopTarg"       ]                  
-	    tciCollTag             : [ ""                           ,  ""                          , ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                , ""                                ]
-	    tcmCollTag             : [ ""                           ,  ""                          , ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                , ""                                ]
-	    trackSHBlockName       : []                                                                                                                                                                                                                                                                                                                                      
-	    pidBlockName           : []                                                                                                                                                                                                                                                                                                                                      
-	    pidCollTag             : [ ""                           ,  ""                          , ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                , ""                                ]  
-            trkQualCollTag         : [ ""                           ,  ""                          , ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                , ""                                ]
+            timeClusterBlockName   : [ "TimeClusterBlockDe","TimeClusterBlockDeLeg", "TimeClusterBlockAprHighP"  , "TimeClusterBlockAprHighPStopTarg" , "TimeClusterBlockAprLowPStopTarg" , "TimeClusterBlockCprDeHighP" , "TimeClusterBlockCprDeHighPStopTarg" , "TimeClusterBlockCprDeLowPStopTarg" ]
+            timeClusterCollTag     : [ "TZClusterFinder"   ,"TimeClusterFinder"    , "aprHighPTriggerInfoMerger" , "aprHighPStopTargTriggerInfoMerger", "aprLowPStopTargTriggerInfoMerger", "cprDeHighPTriggerInfoMerger", "cprDeHighPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger"]
+            helixBlockName         : [ "HelixBlockDe"      ,"HelixBlockDeLeg"      , "HelixBlockAprHighP"        , "HelixBlockAprHighPStopTarg"       , "HelixBlockAprLowPStopTarg"       , "HelixBlockCprDeHighP"       , "HelixBlockCprDeHighPStopTarg"       , "HelixBlockCprDeLowPStopTarg"       ]
+            helixCollTag           : [ "MHDeApr"           ,"MHDeM"                , "aprHighPTriggerInfoMerger" , "aprHighPStopTargTriggerInfoMerger", "aprLowPStopTargTriggerInfoMerger", "cprDeHighPTriggerInfoMerger", "cprDeHighPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger"]
+            trackBlockName         : [ "TrackBlockDe"      ,"TrackBlockDeLeg"      , "TrackBlockAprHighP"        , "TrackBlockAprHighPStopTarg"       , "TrackBlockAprLowPStopTarg"       , "TrackBlockCprDeHighP"       , "TrackBlockCprDeHighPStopTarg"       , "TrackBlockCprDeLowPStopTarg"       ]
+            trackCollTag           : [ "KKDeApr"           ,"KKDeM"                , "aprHighPTriggerInfoMerger" , "aprHighPStopTargTriggerInfoMerger", "aprLowPStopTargTriggerInfoMerger", "cprDeHighPTriggerInfoMerger", "cprDeHighPStopTargTriggerInfoMerger", "cprDeLowPStopTargTriggerInfoMerger"]
+            helixKsCollTag         : [ ""                  ,""                     , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                  ]
+            trackHsBlockName       : [ "HelixBlockDe"      ,"HelixBlockDeLeg"      , "HelixBlockAprHighP"        , "HelixBlockAprHighPStopTarg"       , "HelixBlockAprLowPStopTarg"       , "HelixBlockCprDeHighP"       , "HelixBlockCprDeHighPStopTarg"       , "HelixBlockCprDeLowPStopTarg"       ]                  
+            tciCollTag             : [ ""                  ,""                     , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                  ]
+            tcmCollTag             : [ ""                  ,""                     , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                  ]
+            trackSHBlockName       : []                                                                                                                                                                                                                                                                                                
+            pidBlockName           : []                                                                                                                                                                                                                                                                                                
+            pidCollTag             : [ ""                  ,  ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                  ]
+            trkQualCollTag         : [ ""                  ,  ""                   , ""                          , ""                                 , ""                                , ""                           , ""                                   , ""                                  ]
+        }
+
+        StntupleMakerTrigTot : { @table::StntupleMakerTemplate 
+	    makePid                : 0
+	    makeTimeClusters       : 0 #temporary fix
+	    makeHelices            : 1
+	    makeTrackSeeds         : 0
+	    makeTracks             : 1
+            timeClusterBlockName   : [ "TimeClusterBlockDe", "TimeClusterBlockDe", "TimeClusterBlockDe","TimeClusterBlockDmu", "TimeClusterBlockAprHighP"  , "TimeClusterBlockAprLowPMultiTrk"         , "TimeClusterBlockCprDeHighP" ]
+            timeClusterCollTag     : [ "TZClusterFinder"   , "CalTimePeakFinder" , "TZClusterFinder"   ,"TimeClusterFinder"  , "aprHighPTriggerInfoMerger" , "aprLowPStopTargMultiTrkTriggerInfoMerger", "cprDeHighPTriggerInfoMerger"]
+            helixBlockName         : [ "HelixBlockDe"      , "HelixBlockDeCpr"   , "HelixBlockDeApr"   ,"HelixBlockDmu"      , "HelixBlockAprHighP"        , "HelixBlockAprLowPMultiTrk"               , "HelixBlockCprDeHighP"       ]
+            helixCollTag           : [ "MHDeM"             , "CalHelixFinderDe"  ,"AgnosticHelixFinder","MHDmu"              , "aprHighPTriggerInfoMerger" , "aprLowPStopTargMultiTrkTriggerInfoMerger", "cprDeHighPTriggerInfoMerger"]
+            trackBlockName         : [ "TrackBlockDe"      , "TrackBlockDe"      , "TrackBlockDe"      ,"TrackBlockDmu"      , "TrackBlockAprHighP"        , "TrackBlockAprLowPMultiTrk"               , "TrackBlockCprDeHighP"       ]
+            trackCollTag           : [ "KKDeM"             , "KKDeM"             , "KKDeM"             ,"KKDmu"              , "aprHighPTriggerInfoMerger" , "aprLowPStopTargMultiTrkTriggerInfoMerger", "cprDeHighPTriggerInfoMerger"]
+            helixKsCollTag         : [ ""                  , ""                  , ""                  ,""                   , ""                          , ""                                        , ""                           ]
+            trackHsBlockName       : [ "HelixBlockDe"      , "HelixBlockDeCpr"   , "HelixBlockDeApr"   ,"HelixBlockDmu"      , "HelixBlockAprHighP"        , "HelixBlockAprLowPMultiTrk"               , "HelixBlockCprDeHighP"       ]
+            tciCollTag             : [ ""                  , ""                  , ""                  ,""                   , ""                          , ""                                        , ""                           ]
+            tcmCollTag             : [ ""                  , ""                  , ""                  ,""                   , ""                          , ""                                        , ""                           ]
+            trackSHBlockName       : []
+            pidBlockName           : []
+            pidCollTag             : [ ""                  ,  ""                 ,  ""                 ,  ""                 , ""                          , ""                                        , ""                           ]
+            trkQualCollTag         : [ ""                  ,  ""                 ,  ""                 ,  ""                 , ""                          , ""                                        , ""                           ]
         }
 #------------------------------------------------------------------------------
 # make 4 track blocks: train PID
@@ -720,5 +739,15 @@ Stntuple: {
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
 Stntuple.stnmaker_trig    : [ InitStntuple, StntupleMakerTrig,                  FillStntuple ]
+Stntuple.stnmaker_trig_tot: [ InitStntuple, StntupleMakerTrigTot,               FillStntuple ]
+#------------------------------------------------------------------------------
+# new sequences
+#------------------------------------------------------------------------------
+# Stntuple.stnmaker_De      : [ InitStntuple, StntupleMakerDe  ,                  FillStntuple ]
+# Stntuple.stnmaker_Dmu     : [ InitStntuple, StntupleMakerDmu ,                  FillStntuple ]
+# Stntuple.stnmaker_De_Dmu  : [ InitStntuple, StntupleMakerDeDmu,                 FillStntuple ]
+# 
+# Stntuple.stnmaker_De_Dmu_dar : [ InitStntuple, StntupleMakerDeDmuDar,           FillStntuple ]
+# Stntuple.stnmaker_De_Ue_dar  : [ InitStntuple, StntupleMakerDeUeDar,            FillStntuple ]
 
 END_PROLOG

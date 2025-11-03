@@ -86,6 +86,7 @@ void TTriggerAnaModule::BookHelixHistograms(HistBase_t* Hist, const char* Folder
   HBook1F(hist->fTZSlope    ,"tzSlope"    ,Form("%s: TZ slope"      ,Folder), 2000,    -1,  1,Folder);
   HBook1F(hist->fTZSlopeSig ,"tzSlopeSig" ,Form("%s: TZ slope significance",Folder), 200,    0,  20,Folder);
   HBook1F(hist->fHitRatio   ,"hitRatio"   ,Form("%s: Hit ratio"     ,Folder), 100,    0,  2,Folder);
+  HBook1F(hist->fPropDir    ,"propDir"    ,Form("%s: Dir of propagation"   ,Folder), 3,    -1.5,  1.5,Folder);
 }
 
 //-----------------------------------------------------------------------------
@@ -404,6 +405,7 @@ void TTriggerAnaModule::FillEventHistograms(HistBase_t* Hist, double Weight) {
 void TTriggerAnaModule::FillHelixHistograms(HistBase_t* Hist, TStnHelix* Helix) {
   HelixHist_t* hist = (HelixHist_t*) Hist;
 
+  hist->fPropDir->Fill(Helix->fPropDir);
   hist->fNHits->Fill(Helix->fNHits);
   hist->fNComboHits->Fill(Helix->fNComboHits);
   hist->fLambda ->Fill(Helix->fLambda);
@@ -423,10 +425,10 @@ void TTriggerAnaModule::FillHelixHistograms(HistBase_t* Hist, TStnHelix* Helix) 
 
   //MC info
   hist->fSimpPDG1->Fill(Helix->fSimpPDG1);
-  hist->fMCP->Fill(Helix->Mom1().P());
-  float deltaP = Helix->P() - Helix->Mom1().P();
+  hist->fMCP->Fill(Helix->SimpMom1().P());
+  float deltaP = Helix->P() - Helix->SimpMom1().P();
   hist->fDp->Fill(deltaP);
-  float deltaPt = Helix->Pt() - Helix->Mom1().Pt();
+  float deltaPt = Helix->Pt() - Helix->SimpMom1().Pt();
   hist->fDpt->Fill(deltaPt);  
   
 }
@@ -613,9 +615,9 @@ int TTriggerAnaModule::BeginJob() {
 //-----------------------------------------------------------------------------
   RegisterDataBlock("GenpBlock"            , "TGenpBlock"          , &fGenpBlock       );
   RegisterDataBlock("TimeClusterBlockDeCpr", "TStnTimeClusterBlock", &fTimeClusterBlock);
-  RegisterDataBlock("HelixBlockDeCpr"      , "TStnHelixBlock"      , &fHelixBlock      );
-  RegisterDataBlock("HelixBlockApr"        , "TStnHelixBlock"      , &fAprHelixBlock      );
-  RegisterDataBlock("TrackBlockApr"        , "TStnTrackBlock"      , &fTrackBlock      );
+  RegisterDataBlock("HelixBlockDe"         , "TStnHelixBlock"      , &fHelixBlock      );
+  RegisterDataBlock("HelixBlockAprHighP"   , "TStnHelixBlock"      , &fAprHelixBlock      );
+  RegisterDataBlock("TrackBlockAprTrg"     , "TStnTrackBlock"      , &fTrackBlock      );
   //RegisterDataBlock("ClusterBlock"         , "TStnClusterBlock"    , &fClusterBlock    );
   RegisterDataBlock("TriggerBlock"         , "TStnTriggerBlock"    , &fTriggerBlock    );
 //-----------------------------------------------------------------------------
@@ -653,7 +655,7 @@ int TTriggerAnaModule::Event(int ientry) {
   fTimeClusterBlock->GetEntry(ientry);
   fHelixBlock->GetEntry(ientry);
   fAprHelixBlock->GetEntry(ientry);
-  //fTrackBlock->GetEntry(ientry);
+  fTrackBlock->GetEntry(ientry);
   //fClusterBlock->GetEntry(ientry);
   fTriggerBlock->GetEntry(ientry);
 //-----------------------------------------------------------------------------

@@ -10,6 +10,7 @@ namespace stntuple {
 //-----------------------------------------------------------------------------
   double get_proper_time(const mu2e::SimParticle* Simp) {
     double dt(0.);
+    const bool verbose(false);
 
     // The mu2ePrimary code means that G4 track was created by our
     // PrimaryGeneratorAction.  If the particle is "mu2ePrimary" but
@@ -19,10 +20,12 @@ namespace stntuple {
 
     const mu2e::SimParticle* part  (Simp);
     const mu2e::SimParticle* parent(nullptr);
+    const auto process = mu2e::ProcessCode::mu2ePrimary; // code to check for
 
     while(part->parent().isNonnull()) {
-
-      if (part->creationCode() == mu2e::ProcessCode::mu2ePrimary) {
+      if(verbose) std::cout << __func__ << ": part PDG = " << part->pdgId() << " code = " << part->creationCode() << " endProperTime = " << part->endProperTime()
+                            << " dt = " << dt << std::endl;
+      if (part->creationCode() == process) {
 //-----------------------------------------------------------------------------
 // The current particle is a continuation from the previous stage, 
 // not a physically different particle.  We need to find its record in 
@@ -42,6 +45,7 @@ namespace stntuple {
       }
       part = parent;
     }
+    if(verbose) std::cout << __func__ << ": --> final dt = " << dt << std::endl;
 
     return dt;
   }

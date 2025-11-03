@@ -19,6 +19,16 @@
 #include "TGStatusBar.h"
 #include "TGShutter.h"
 
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TLegend.h"
+#include "TGraph.h"
+#include "TColor.h"
+#include "TStyle.h"
+#include "TPaletteAxis.h"
+
+
+
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 
@@ -122,6 +132,9 @@ TEvdFrame::TEvdFrame(const char*  Name,
   fMenuOpen->AddEntry("&Cal View",           M_OPEN_CAL);
   fMenuOpen->AddEntry("&CRV View",           M_OPEN_CRV);
   fMenuOpen->AddEntry("&VST View",           M_OPEN_VST);
+  fMenuOpen->AddEntry("&Legend XY",          M_OPEN_LEGEND_XY);
+  fMenuOpen->AddEntry("&Legend Cal",         M_OPEN_LEGEND_CAL);
+  fMenuOpen->AddEntry("&Legend Crv",         M_OPEN_LEGEND_CRV);
   fMenuOpen->AddEntry("&VRZ View",           M_OPEN_VRZ);
 //-----------------------------------------------------------------------------
 // PRINT menu item on top 
@@ -131,6 +144,7 @@ TEvdFrame::TEvdFrame(const char*  Name,
   fMenuPrint->AddEntry("Print &Combo Hits"  ,  M_PRINT_COMBO_H);
   fMenuPrint->AddEntry("Print &Tracks"      ,  M_PRINT_TRACKS );
   fMenuPrint->AddEntry("Print &TimeClusters",  M_PRINT_TIME_CLUSTERS );
+  fMenuPrint->AddEntry("Print Canvas as &PNG", M_PRINT_TO_PNG);
 //-----------------------------------------------------------------------------
 // define menu handlers
 //-----------------------------------------------------------------------------
@@ -139,6 +153,7 @@ TEvdFrame::TEvdFrame(const char*  Name,
   fMenuOption->Associate(this);
   fMenuHelp  ->Associate(this);
   fMenuOpen  ->Associate(this);
+  fMenuPrint ->Associate(this);
 
   fMenuBar = new TGMenuBar(this, 1, 1, kHorizontalFrame);
 
@@ -580,6 +595,43 @@ Bool_t TEvdFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	}
 	fVisManager->OpenView("vst");
 	break;
+      case M_OPEN_LEGEND_XY:
+        if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_LEGEND_XY: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+        }
+        OpenLegendPopup();
+        break;
+
+      case M_OPEN_LEGEND_CAL:
+        if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_LEGEND_CAL: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+        }
+        OpenLegendCalView();
+        break;
+
+      case M_OPEN_LEGEND_CRV:
+        if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_LEGEND_CRV: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+        }
+        OpenLegendCrvView();
+        break;
+	
+//-----------------------------------------------------------------------------
+//  PRINT menu
+//-----------------------------------------------------------------------------
+      case M_PRINT_TO_PNG:
+        if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_PRINT_TO_PNG: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+        }
+        PrintToPNG(c);
+        break;   
+        
+        
+
       case M_OPEN_VRZ:
 	
 	if (vm->DebugLevel() > 0) {
@@ -685,5 +737,247 @@ void TEvdFrame::HandleButtons(Int_t id) {
 //-----------------------------------------------------------------------------
 void TEvdFrame::DoTab(Int_t id) {
    printf("*** TEvdFrame::DoTab : Tab item %d activated\n", id);
+}
+
+//-----------------------------------------------------------------------------
+// Legend Auxilliaries
+//-----------------------------------------------------------------------------
+void TEvdFrame::OpenLegendPopup() {
+  // Create a top-level window
+
+  TGMainFrame* legendWindow = new TGMainFrame(gClient->GetRoot(), 600, 700);
+  legendWindow->SetWindowName("Legend");
+
+  // Create embedded canvas
+  TRootEmbeddedCanvas* embedCanvas = new TRootEmbeddedCanvas("LegendCanvas", legendWindow, 600, 700);
+  legendWindow->AddFrame(embedCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+  legendWindow->MapSubwindows();
+  legendWindow->Resize();
+  legendWindow->MapWindow();
+
+  // Draw on embedded canvas
+  TCanvas* c = embedCanvas->GetCanvas();
+  c->cd();
+
+  // Dummy objects for legend entries
+  auto* dummyElectronHighP_IT = new TBox(0, 0, 1, 1); dummyElectronHighP_IT->SetFillColor(kRed);
+  // auto* dummyElectronHighP_OOT = new TBox(0, 0, 1, 1); dummyElectronHighP_OOT->SetFillColor(kAzure+1);
+  auto* dummyElectronLowP = new TBox(0, 0, 1, 1); dummyElectronLowP->SetFillColor(kRed+2);
+  auto* dummyPositron = new TBox(0, 0, 1, 1); dummyPositron->SetFillColor(kBlue);
+  auto* dummyMuon = new TBox(0, 0, 1, 1); dummyMuon->SetFillColor(kGreen+2);
+  auto* dummyAntimuon = new TBox(0, 0, 1, 1); dummyAntimuon->SetFillColor(kGreen-2);
+  auto* dummyPiPlus = new TBox(0, 0, 1, 1); dummyPiPlus->SetFillColor(kOrange-3);
+  auto* dummyPiMinus = new TBox(0, 0, 1, 1); dummyPiMinus->SetFillColor(kOrange+7);
+  auto* dummyProton = new TBox(0, 0, 1, 1); dummyProton->SetFillColor(kBlue+2);  // dark blue
+  auto* dummyOther = new TBox(0, 0, 1, 1); dummyOther->SetFillColor(kBlack);
+
+  auto* dummyHit = new TMarker(0, 0, 1);  // cross
+  dummyHit->SetMarkerStyle(5);
+  dummyHit->SetMarkerColor(kRed);
+  dummyHit->SetMarkerSize(4);
+
+  auto* dummyClusterDisk1 = new TMarker(0, 0, 20);  // full circle
+  dummyClusterDisk1->SetMarkerColor(kRed);
+  dummyClusterDisk1->SetMarkerSize(2);
+  dummyClusterDisk1->SetMarkerStyle(20);
+
+  auto* dummyClusterDisk2 = new TMarker(0, 0, 20);  // full circle
+  dummyClusterDisk2->SetMarkerColor(kMagenta);
+  dummyClusterDisk2->SetMarkerSize(2);
+  dummyClusterDisk2->SetMarkerStyle(20);
+
+  auto* dummyTrack = new TGraph();  // outline circle
+  dummyTrack->SetLineColor(kViolet);
+  dummyTrack->SetLineWidth(2);
+  dummyTrack->SetLineStyle(1);
+
+  auto* dummyHelix = new TGraph();  // dashed outline
+  dummyHelix->SetLineColor(kGreen+4);
+  dummyHelix->SetLineWidth(3);
+  dummyHelix->SetLineStyle(4);  // dashed
+
+  // Build legend
+  auto* legend = new TLegend(0.1, 0.1, 0.9, 0.9);
+  legend->SetTextSize(0.025);
+  legend->SetNColumns(1);
+  legend->SetBorderSize(1);
+
+  // Add color squares
+  legend->AddEntry(dummyElectronHighP_IT, "Electron, mc momentum > 20 MeV/c", "f"); // skipped "intime" info. Only features in ttrk, not elsewhere
+  // legend->AddEntry(dummyElectronHighP_OOT, "Electron, mc momentum > 20 MeV/c, out of time", "f");
+  legend->AddEntry(dummyElectronLowP, "Electron, mc momentum < 20 MeV/c", "f");
+  legend->AddEntry(dummyPositron, "Positron", "f");
+  legend->AddEntry(dummyMuon, "Muon", "f");
+  legend->AddEntry(dummyAntimuon, "Antimuon", "f");
+  legend->AddEntry(dummyPiPlus, "Pion +", "f");
+  legend->AddEntry(dummyPiMinus, "Pion -", "f");
+  legend->AddEntry(dummyProton, "Proton", "f");
+  legend->AddEntry(dummyOther, "Other", "f");
+
+  // Spacer
+  legend->AddEntry((TObject*)nullptr, "--------------------------", "");
+
+  // Add shapes
+  legend->AddEntry(dummyHit, "Hit, colored by particle id", "p");
+  legend->AddEntry(dummyClusterDisk1, "Calorimeter cluster, disk 1", "p");
+  legend->AddEntry(dummyClusterDisk2, "Calorimeter cluster, disk 2", "p");
+  legend->AddEntry(dummyTrack, "Track", "l");
+  legend->AddEntry(dummyHelix, "Helix", "l");
+
+   // Spacer
+  legend->AddEntry((TObject*)nullptr, "--------------------------", "");
+
+  //Text
+  legend->AddEntry((TObject*)nullptr, "DISCLAIMER: Legend hard-codes info", "");
+  legend->AddEntry((TObject*)nullptr, "from code like TTrkVisNode, TEvdHelixSeed,", "");
+  legend->AddEntry((TObject*)nullptr, "and therefore may not be up to date", "");
+  legend->AddEntry((TObject*)nullptr, "with latest plotting code.", "");
+  
+
+  
+  legend->Draw();
+  c->Update();
+}
+
+
+void TEvdFrame::OpenLegendCalView() {
+  // Create a top-level window
+
+  TGMainFrame* legendWindow = new TGMainFrame(gClient->GetRoot(), 600, 700);
+  legendWindow->SetWindowName("Legend");
+
+  // Create embedded canvas
+  TRootEmbeddedCanvas* embedCanvas = new TRootEmbeddedCanvas("LegendCanvas", legendWindow, 600, 700);
+  legendWindow->AddFrame(embedCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+  legendWindow->MapSubwindows();
+  legendWindow->Resize();
+  legendWindow->MapWindow();
+
+  // Draw on embedded canvas
+  TCanvas* c = embedCanvas->GetCanvas();
+  c->cd();
+
+  // Dummy objects for legend entries
+  
+  auto* dummyCluster100 = new TBox(0, 0, 1, 1);
+  dummyCluster100->SetFillColor(kRed+2);
+
+  auto* dummyCluster10 = new TBox(0, 0, 1, 1);  
+  dummyCluster10->SetFillColor(kRed);
+ 
+  auto* dummyCluster1 = new TBox(0, 0, 1, 1);  
+  dummyCluster1->SetFillColor(kRed-9);
+
+  auto* dummyCluster0 = new TBox(0, 0, 1, 1); 
+  dummyCluster0->SetFillColor(kRed-10);
+
+  auto* dummyCrystalSolo = new TBox(0, 0, 1, 1); 
+  dummyCrystalSolo->SetFillColor(kYellow-7);
+
+  // Build legend
+  auto* legend = new TLegend(0.1, 0.1, 0.9, 0.9);
+  legend->SetTextSize(0.025);
+  legend->SetNColumns(1);
+  legend->SetBorderSize(1);
+
+  // Add shapes
+  legend->AddEntry(dummyCluster100, "Hit, part of a cluster, > 100 MeV/c", "f");
+  legend->AddEntry(dummyCluster10, "Hit, part of a cluster, > 10 MeV/c", "f");
+  legend->AddEntry(dummyCluster1, "Hit, part of a cluster, > 1 MeV/c", "f");
+  legend->AddEntry(dummyCluster0, "Hit, part of a cluster, < 1 MeV/c", "f");
+  legend->AddEntry(dummyCrystalSolo, "Hit exceeding threshold energy but not part of any cluster", "f");
+
+  // Spacer
+  legend->AddEntry((TObject*)nullptr, "--------------------------", "");
+
+  // Text
+  legend->AddEntry((TObject*)nullptr, "DISCLAIMER: Legend hard-codes info", "");
+  legend->AddEntry((TObject*)nullptr, "from code like TCalVisNode,", "");
+  legend->AddEntry((TObject*)nullptr, "and therefore may not be up to date", "");
+  legend->AddEntry((TObject*)nullptr, "with latest plotting code.", "");
+  
+
+  
+  legend->Draw();
+  c->Update();
+}
+
+
+void TEvdFrame::OpenLegendCrvView() {
+  TGMainFrame* legendWindow = new TGMainFrame(gClient->GetRoot(), 150, 600);
+  legendWindow->SetWindowName("CRV Legend");
+
+  TRootEmbeddedCanvas* embedCanvas = new TRootEmbeddedCanvas("CRVLegendCanvas", legendWindow, 150, 600);
+  legendWindow->AddFrame(embedCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+  legendWindow->MapSubwindows();
+  legendWindow->Resize();
+  legendWindow->MapWindow();
+
+  TCanvas* c = embedCanvas->GetCanvas();
+  c->cd();
+
+  // === Match time range to slider defaults ===
+  const double timeMin = 400;
+  const double timeMax = 1695;
+  const int nBins = 200;
+
+  // Fake 2D histogram for vertical colorbar
+  TH2F* h = new TH2F("crvColorbar", "CRV Hit Time [ns]", 1, 0, 1, nBins, timeMin, timeMax);
+  for (int i = 1; i <= nBins; ++i) {
+    h->SetBinContent(1, i, i);  // Artificial content to span color gradient
+  }
+
+  // === Custom CRV color gradient ===
+  const int nColors = 6;
+  double stops[nColors] = { 0.00, 0.20, 0.40, 0.60, 0.70, 1.00 };
+  double red[nColors]   = { 0.00, 0.00, 0.00, 0.97, 0.97, 0.10 };
+  double green[nColors] = { 0.97, 0.30, 0.40, 0.97, 0.00, 0.00 };
+  double blue[nColors]  = { 0.97, 0.97, 0.00, 0.00, 0.00, 0.00 };
+
+  const int paletteSize = 100;  // Must be < 1000
+  TColor::CreateGradientColorTable(nColors, stops, red, green, blue, paletteSize);
+  gStyle->SetNumberContours(paletteSize);
+
+  h->SetStats(0);
+  h->GetXaxis()->SetLabelSize(0);
+  h->GetXaxis()->SetTickLength(0);
+  h->GetXaxis()->SetNdivisions(0, kFALSE);
+
+  h->GetYaxis()->SetTitle("Hit Time [ns]");
+  h->GetYaxis()->SetTitleSize(0.05);
+  h->GetYaxis()->SetTitleOffset(1.2);
+  h->GetYaxis()->SetLabelSize(0.04);
+  h->GetYaxis()->SetNdivisions(505);
+
+  c->SetLeftMargin(0.2);
+
+  // Draw the histogram to trigger color mapping
+  h->Draw("COL");
+  c->Update();
+
+  // Remove extra axis  the histogram itself just poses as a palette
+  gPad->Modified();
+
+  // === Adjust palette placement visually ===
+  TPaletteAxis* palette = (TPaletteAxis*)h->GetListOfFunctions()->FindObject("palette");
+  if (palette) {
+    palette->SetX1NDC(0.85);
+    palette->SetX2NDC(0.90);
+    palette->SetY1NDC(0.1);
+    palette->SetY2NDC(0.9);
+    c->Modified();
+    c->Update();
+  }
+}
+
+
+
+
+//-------------------------------------------------------------------------------
+
+void TEvdFrame::PrintToPNG(TCanvas* running_canvas) {
+  running_canvas->SaveAs("output.png");
+  printf("\n Print command sent\n");
+  
 }
 
