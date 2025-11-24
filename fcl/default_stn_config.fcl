@@ -1,0 +1,311 @@
+# Setup trigger info and standard paths
+
+BEGIN_PROLOG
+
+# Track surface selection
+TrackSurfaces : ["ST_Back", "ST_Front", "ST_Inner", "ST_Outer", "TT_Front", "TT_Mid", "TT_Back", "TSDA"]
+
+# Define the stntuple data blocks
+TrigNames_timeClusterBlockName: [ "TimeClusterBlockAprHighP"        , "TimeClusterBlockAprMultiHelix"      , "TimeClusterBlockCprDeHighP"     ]
+TrigNames_timeClusterCollTag  : [ "AprTrkDe80m70pTriggerInfoMerger" , "AprHlx50Hlx30TriggerInfoMerger"     , "CprTrkDe80m70pTriggerInfoMerger"]
+TrigNames_helixBlockName      : [ "HelixBlockAprHighP"              , "HelixBlockAprMultiHelix"            , "HelixBlockCprDeHighP"           ]
+TrigNames_helixCollTag        : [ "AprTrkDe80m70pTriggerInfoMerger" , "AprHlx50Hlx30TriggerInfoMerger"     , "CprTrkDe80m70pTriggerInfoMerger"]
+TrigNames_trackBlockName      : [ "TrackBlockAprHighP"              , "TrackBlockAprMultiHelix"            , "TrackBlockCprDeHighP"           ]
+TrigNames_trackCollTag        : [ "AprTrkDe80m70pTriggerInfoMerger" , "AprHlx50Hlx30TriggerInfoMerger"     , "CprTrkDe80m70pTriggerInfoMerger"]
+TrigNames_helixKsCollTag      : [ ""                                , ""                                   , ""                               ]
+TrigNames_trackHsBlockName    : [ "HelixBlockAprHighP"              , "HelixBlockAprMultiHelix"            , "HelixBlockCprDeHighP"           ]
+TrigNames_tciCollTag          : [ ""                                , ""                                   , ""                               ]
+TrigNames_tcmCollTag          : [ ""                                , ""                                   , ""                               ]
+TrigNames_trackSHBlockName    : [ ""                                , ""                                   , ""                               ]
+TrigNames_pidBlockName        : [ ""                                , ""                                   , ""                               ]
+TrigNames_pidCollTag          : [ ""                                , ""                                   , ""                               ]
+TrigNames_trkQualCollTag      : [ ""                                , ""                                   , ""                               ]
+
+OfflineNames_timeClusterBlockName   : [ "TimeClusterBlockDe",  "TimeClusterBlockUe", "TimeClusterBlockDmu",  "TimeClusterBlockUmu" ]
+OfflineNames_timeClusterCollTag     : [ "TZClusterFinder"   ,  "TZClusterFinder"   , "TZClusterFinder"    ,  "TZClusterFinder"     ]
+OfflineNames_helixBlockName         : [ "HelixBlockDe"      ,  "HelixBlockUe"      , "HelixBlockDmu"      ,  "HelixBlockUmu"       ]
+OfflineNames_helixCollTag           : [ "MHDe"              ,  "MHUe"              , "MHDmu"              ,  "MHUmu"               ]
+OfflineNames_trackBlockName         : [ "TrackBlockDe"      ,  "TrackBlockUe"      , "TrackBlockDmu"      ,  "TrackBlockUmu"       ]
+OfflineNames_trackCollTag           : [ "KKDe"              ,  "KKUe"              , "KKDmu"              ,  "KKUmu"               ]
+OfflineNames_helixKsCollTag         : [ ""                  ,  ""                  , ""                   ,  ""                    ]
+OfflineNames_trackHsBlockName       : [ "HelixBlockDe"      ,  "HelixBlockUe"      , "HelixBlockDmu"      ,  "HelixBlockUmu"       ]
+OfflineNames_tciCollTag             : [ ""                  ,  ""                  , ""                   ,  ""                    ]
+OfflineNames_tcmCollTag             : [ ""                  ,  ""                  , ""                   ,  ""                    ]
+OfflineNames_trackSHBlockName       : [ ""                  ,  ""                  , ""                   ,  ""                    ]
+OfflineNames_pidBlockName           : [ ""                  ,  ""                  , ""                   ,  ""                    ]
+OfflineNames_pidCollTag             : [ ""                  ,  ""                  , ""                   ,  ""                    ]
+OfflineNames_trkQualCollTag         : [ "TrkQualDe"         ,  "TrkQualUe"         , "TrkQualDmu"         ,  "TrkQualUmu"          ]
+END_PROLOG
+
+# Stntuple prologs
+#include "Stntuple/fcl/stntuple_prologs.fcl"
+
+# Trigger info, replacing the changes made in includes above
+#include "mu2e-trig-config/core/trigProducers.fcl"
+#include "mu2e-trig-config/core/trigFilters.fcl"
+#include "mu2e-trig-config/core/trigRecoSequences.fcl"
+
+BEGIN_PROLOG
+# override the trigger digitization sequence (must be before trigSequences)
+TrigRecoSequences.artFragmentsGen : []
+END_PROLOG
+
+#include "mu2e-trig-config/core/trigSequences.fcl"
+
+#include "mu2e-trig-config/gen/trig_physMenuPSConfig_OnSpill.fcl"
+#include "mu2e-trig-config/gen/trig_physMenu_OnSpill.fcl"
+
+# Stntuple paths
+#include "Stntuple/fcl/stntuple_services.fcl"
+#include "Stntuple/fcl/stntuple_io.fcl"
+
+# override the max events to print
+services.message.destinations.log.categories.ArtReport.limit : 100
+
+RecoMC : [ @sequence::CaloMC.TruthMatch, CrvCoincidenceClusterMatchMC, SelectReco, compressRecoMCs, CrvCoincidenceClusterMCAssns ]
+
+physics : {
+  @table::TrigSequences
+  producers  : {
+    @table::Digitize.producers
+    @table::Reconstruction.producers
+    @table::TrigProducers.producers
+  }
+  filters    : {
+    @table::TrigFilters.filters
+    @table::Trig_physMenuPSConfig
+    @table::Reconstruction.filters
+
+    # For one track paths
+    Triggerable : {
+      module_type : StrawDigiMCFilter
+      MinNDigis : 15
+      MinParticleMom : 70.0
+      MaxParticleMom : 2000.0
+      StrawDigiMCCollection : compressDigiMCs
+      particleTypes : [ 11, -11, 13, -13, 211, -211]
+      MinNParticles : 1
+    }
+
+    # For two track paths
+    TriggerableTwo : {
+      module_type : StrawDigiMCFilter
+      MinNDigis : 15
+      MinParticleMom : 40.0
+      MaxParticleMom : 2000.0
+      StrawDigiMCCollection : compressDigiMCs
+      particleTypes : [ 11, -11, 13, -13, 211, -211]
+      MinNParticles : 2
+    }
+
+  }
+
+  analyzers  : {
+    @table::Stntuple.analyzers
+    @table::Reconstruction.analyzers
+  }
+
+  # @table::stntuple.paths
+
+  p1 : [ Triggerable     ] # Single track candidate
+  p2 : [ TriggerableTwo  ] # Two track candidate
+
+  # Reco paths for single fit direction / particle species hypotheses
+  RecoDe : [  @sequence::Reconstruction.CaloReco,
+    @sequence::Reconstruction.TrkHitReco,
+    @sequence::Reconstruction.CrvReco,
+    @sequence::Reconstruction.DeReco,
+    MergeKKDe, TrkQualDe,
+    @sequence::RecoMC #FIXME: Only in one path for now
+  ]
+
+  RecoUe : [  @sequence::Reconstruction.CaloReco,
+    @sequence::Reconstruction.TrkHitReco,
+    @sequence::Reconstruction.CrvReco,
+    @sequence::Reconstruction.UeReco,
+    MergeKKUe, TrkQualUe
+  ]
+
+  RecoDmu : [  @sequence::Reconstruction.CaloReco,
+    @sequence::Reconstruction.TrkHitReco,
+    @sequence::Reconstruction.CrvReco,
+    @sequence::Reconstruction.DmuReco,
+    MergeKKDmu, TrkQualDmu
+  ]
+
+  RecoUmu : [  @sequence::Reconstruction.CaloReco,
+    @sequence::Reconstruction.TrkHitReco,
+    @sequence::Reconstruction.CrvReco,
+    @sequence::Reconstruction.UmuReco,
+    MergeKKUmu, TrkQualUmu
+  ]
+
+  lumiStream    : [ ] # Don't run lumi stream reco for now
+  out           : [ ]
+  e1            : [ InitStntuple, StntupleMaker, FillStntuple ]
+  end_paths     : [ e1 ]
+  trigger_paths : [@sequence::Trig_physMenu.trigger_paths]
+}
+
+physics.producers.compressRecoMCs.surfaceStepTags : []
+
+
+#------------------------------------------------------------------------------
+# Clone track/helix/cluster collections specific to each relevant trigger path
+
+# Turn off MC-matching in the trigger which doesn't work with cloning
+physics.producers.TTAprKSFMC : { module_type: NullProducer }
+physics.producers.AprHelixTriggerInfoMerger.doDeepCopy             : 1
+physics.producers.AprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
+physics.producers.AprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
+physics.producers.AprTrkDe50MultiHelixTriggerInfoMerger.doDeepCopy : 1
+physics.producers.AprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
+physics.producers.AprHelixTriggerInfoMerger.doDeepCopy             : 1
+physics.producers.AprHlx50Hlx30TriggerInfoMerger.doDeepCopy        : 1
+physics.producers.AprHlx50Hlx30TriggerInfoMerger.doDeepCopy        : 1
+
+# Turn off MC-matching in the trigger which doesn't work with cloning
+physics.producers.TTCprDeKSFMC : { module_type: NullProducer }
+physics.producers.CprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
+physics.producers.CprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
+physics.producers.CprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
+physics.producers.CprHlxDe50TriggerInfoMerger.doDeepCopy           : 1
+physics.producers.CprHelixUeTriggerInfoMerger.doDeepCopy           : 1
+
+# Turn off MC-matching in the trigger which doesn't work with cloning
+physics.producers.TTTprDeKSFMC : { module_type: NullProducer }
+physics.producers.TprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
+physics.producers.TprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
+physics.producers.TprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
+physics.producers.TprHlxDe70m50pTriggerInfoMerger.doDeepCopy       : 1
+physics.producers.TprHlxUe50m30pTriggerInfoMerger.doDeepCopy       : 1
+physics.producers.TprHlxDe30pIPATriggerInfoMerger.doDeepCopy       : 1
+physics.producers.TprHlxDe30pIPAPhiTriggerInfoMerger.doDeepCopy    : 1
+
+physics.producers.TTMprDeKSFMC : { module_type : NullProducer }
+
+#------------------------------------------------------------------------------
+physics.analyzers.StntupleMaker.makeClusters           : 1
+physics.analyzers.StntupleMaker.makeSimp               : 1
+physics.analyzers.StntupleMaker.makeCrvClusters        : 1
+physics.analyzers.StntupleMaker.crvClustersStorePulses : 0
+physics.analyzers.StntupleMaker.makePid                : 0
+physics.analyzers.StntupleMaker.makeGenp               : 1
+physics.analyzers.StntupleMaker.makeHelices            : 1
+physics.analyzers.StntupleMaker.makeTracks             : 1
+physics.analyzers.StntupleMaker.makeTimeClusters       : 0
+physics.analyzers.StntupleMaker.makeStepPointMC        : 0
+physics.analyzers.StntupleMaker.shCollTag              :   "makeSH"
+physics.analyzers.StntupleMaker.chCollTag              :   "makePH"
+physics.analyzers.StntupleMaker.tcShCollTag            : [ "makeSH" ]
+physics.analyzers.StntupleMaker.tcChCollTag            : [ "makePH" ]
+physics.analyzers.StntupleMaker.caloHitCollTag         :   "CaloHitMaker"
+physics.analyzers.StntupleMaker.triggerResultsTag      : "TriggerResults::S5Stn"
+physics.analyzers.StntupleMaker.nTriggerBits           : 500
+physics.analyzers.StntupleMaker.strawDigiMCCollTag     : "compressDigiMCs"
+physics.analyzers.StntupleMaker.simpCollTag            : "compressDigiMCs"
+physics.analyzers.StntupleMaker.genpCollTag            : "compressDigiMCs"
+physics.analyzers.StntupleMaker.genId                  : ""
+physics.analyzers.StntupleMaker.pdgId                  : 0
+
+
+physics.analyzers.InitStntuple.SelectEvents  : []
+physics.analyzers.StntupleMaker.SelectEvents : []
+physics.analyzers.FillStntuple.SelectEvents  : []
+
+
+# Add the Stntuple data blocks
+physics.analyzers.StntupleMaker.timeClusterBlockName : [@sequence::OfflineNames_timeClusterBlockName, @sequence::TrigNames_timeClusterBlockName]
+physics.analyzers.StntupleMaker.timeClusterCollTag   : [@sequence::OfflineNames_timeClusterCollTag  , @sequence::TrigNames_timeClusterCollTag  ]
+physics.analyzers.StntupleMaker.helixBlockName       : [@sequence::OfflineNames_helixBlockName      , @sequence::TrigNames_helixBlockName      ]
+physics.analyzers.StntupleMaker.helixCollTag         : [@sequence::OfflineNames_helixCollTag        , @sequence::TrigNames_helixCollTag        ]
+physics.analyzers.StntupleMaker.helixCollKsTag       : [@sequence::OfflineNames_helixKsCollTag      , @sequence::TrigNames_helixKsCollTag      ]
+physics.analyzers.StntupleMaker.trackBlockName       : [@sequence::OfflineNames_trackBlockName      , @sequence::TrigNames_trackBlockName      ]
+physics.analyzers.StntupleMaker.trackCollTag         : [@sequence::OfflineNames_trackCollTag        , @sequence::TrigNames_trackCollTag        ]
+physics.analyzers.StntupleMaker.trackHsBlockName     : [@sequence::OfflineNames_trackHsBlockName    , @sequence::TrigNames_trackHsBlockName    ]
+physics.analyzers.StntupleMaker.tciCollTag           : [@sequence::OfflineNames_tciCollTag          , @sequence::TrigNames_tciCollTag          ]
+physics.analyzers.StntupleMaker.tcmCollTag           : [@sequence::OfflineNames_tcmCollTag          , @sequence::TrigNames_tcmCollTag          ]
+physics.analyzers.StntupleMaker.pidCollTag           : [@sequence::OfflineNames_pidCollTag          , @sequence::TrigNames_pidCollTag          ]
+physics.analyzers.StntupleMaker.trkQualCollTag       : [@sequence::OfflineNames_trkQualCollTag      , @sequence::TrigNames_trkQualCollTag      ]
+
+
+#------------------------------------------------------------------------------
+#include "mu2e-trig-config/core/trigDigiInputsEpilog.fcl"
+
+# Add extrapolations to Offline tracks
+physics.producers.KKDe.ExtrapolationSettings.ToOPA            : true
+physics.producers.KKDe.ExtrapolationSettings.Upstream         : true
+physics.producers.KKDe.KKFitSettings.SampleSurfaces  : [@sequence::TrackSurfaces]
+physics.producers.KKUe.ExtrapolationSettings.ToOPA            : true
+physics.producers.KKUe.ExtrapolationSettings.Upstream         : true
+physics.producers.KKUe.KKFitSettings.SampleSurfaces  : [@sequence::TrackSurfaces]
+physics.producers.KKDmu.ExtrapolationSettings.ToOPA           : true
+physics.producers.KKDmu.ExtrapolationSettings.Upstream        : true
+physics.producers.KKDmu.KKFitSettings.SampleSurfaces : [@sequence::TrackSurfaces]
+physics.producers.KKUmu.ExtrapolationSettings.ToOPA           : true
+physics.producers.KKUmu.ExtrapolationSettings.Upstream        : true
+physics.producers.KKUmu.KKFitSettings.SampleSurfaces : [@sequence::TrackSurfaces]
+
+# Add extrapolation to Online tracks
+physics.producers.TrigAprKSF.KKFitSettings.SampleSurfaces  : [@sequence::TrackSurfaces]
+physics.producers.TrigAprKSF.ExtrapolationSettings : {
+  IntersectionTolerance : 0.1
+  BCorrTolerance : 1e-2 # momentum fraction
+  MaxDt : 200.0 # (ns)
+  ToTrackerEnds : true
+  Upstream : false
+  BackToTracker : false
+  ToOPA : false
+}
+physics.producers.TrigCalSeedFitDe.KKFitSettings.SampleSurfaces  : [@sequence::TrackSurfaces]
+physics.producers.TrigCalSeedFitDe.ExtrapolationSettings : {
+  IntersectionTolerance : 0.1
+  BCorrTolerance : 1e-2 # momentum fraction
+  MaxDt : 200.0 # (ns)
+  ToTrackerEnds : true
+  Upstream : false
+  BackToTracker : false
+  ToOPA : false
+}
+
+#------------------------------------------------------------------------------
+# Define track quality modules (use CE- weights for all cases for now)
+
+# Have to merge the KalSeeds for use with TrkQual
+physics.producers.MergeKKDe : {
+  module_type        : MergeKalSeeds
+  KalSeedCollections : [ "KKDe" ]
+}
+physics.producers.TrkQualDe : {
+  module_type          : TrackQuality
+  datFilename          : "Offline/TrkDiag/data/TrkQual_ANN1_v1.dat"
+  KalSeedPtrCollection : "MergeKKDe"
+}
+
+physics.producers.MergeKKUe : @local::physics.producers.MergeKKDe
+physics.producers.MergeKKUe.KalSeedCollections : ["KKUe"]
+physics.producers.TrkQualUe : @local::physics.producers.TrkQualDe
+physics.producers.TrkQualUe.KalSeedPtrCollection : "MergeKKUe"
+
+physics.producers.MergeKKDmu : @local::physics.producers.MergeKKDe
+physics.producers.MergeKKDmu.KalSeedCollections : ["KKDmu"]
+physics.producers.TrkQualDmu : @local::physics.producers.TrkQualDe
+physics.producers.TrkQualDmu.KalSeedPtrCollection : "MergeKKDmu"
+
+physics.producers.MergeKKUmu : @local::physics.producers.MergeKKDe
+physics.producers.MergeKKUmu.KalSeedCollections : ["KKUmu"]
+physics.producers.TrkQualUmu : @local::physics.producers.TrkQualDe
+physics.producers.TrkQualUmu.KalSeedPtrCollection : "MergeKKUmu"
+
+#------------------------------------------------------------------------------
+physics.producers.EWMProducer.SpillType : 1
+services.DbService.purpose: MDC2020_best
+services.DbService.version: v1_3
+services.DbService.verbose : 2
+
+#------------------------------------------------------------------------------
+# Include epilogs to add trigger-MC matching, keep hits, etc.
+#include "Production/JobConfig/digitize/epilog.fcl"
+#include "Production/JobConfig/digitize/OnSpill_epilog.fcl"
+#include "Production/JobConfig/recoMC/epilog.fcl"
+#include "Production/JobConfig/common/epilog.fcl"
