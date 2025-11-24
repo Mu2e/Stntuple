@@ -1,0 +1,53 @@
+#------------------------------------------------------------------------------
+# STN Reco inputs
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/default_stn_config.fcl"
+
+process_name : S5Stn
+
+source       : { module_type : RootInput 
+    fileNames : ["default"]
+    inputCommands : [ "keep  *_*_*_*"]
+}
+
+# Run track quality modules
+physics.Path : [MergeKKDe , TrkQualDe,
+		MergeKKUe , TrkQualUe,
+		MergeKKDmu, TrkQualDmu,
+		MergeKKUmu, TrkQualUmu]
+physics.trigger_paths : [Path]
+
+# Add the collections
+physics.analyzers.InitStntuple.shCollTag                      :   "SelectRecoMC"
+physics.analyzers.InitStntuple.chCollTag                      :   "SelectRecoMC"
+physics.analyzers.InitStntuple.comboHitCollTag                :   "SelectRecoMC"
+physics.analyzers.InitStntuple.strawHitCollTag                :   "SelectRecoMC"
+physics.analyzers.StntupleMaker.shCollTag                     :   "SelectRecoMC"
+physics.analyzers.StntupleMaker.chCollTag                     :   "SelectRecoMC"
+physics.analyzers.StntupleMaker.tcShCollTag                   : [ "SelectRecoMC" ]
+physics.analyzers.StntupleMaker.tcChCollTag                   : [ "SelectRecoMC" ]
+physics.analyzers.StntupleMaker.strawDigiMCCollTag            : "compressRecoMCs"
+physics.analyzers.StntupleMaker.simpCollTag                   : "compressRecoMCs"
+physics.analyzers.StntupleMaker.primaryParticleTag            : "compressRecoMCs"
+physics.analyzers.StntupleMaker.spmcCollTag                   : ["compressRecoMCs:virtualdetector"]
+physics.analyzers.StntupleMaker.vdHitsCollTag                 : "compressRecoMCs:virtualdetector"
+physics.analyzers.StntupleMaker.crvRecoPulseCollTag           :   "SelectRecoMC"
+physics.analyzers.StntupleMaker.crvCoincidenceCollTag         :   "SelectRecoMC"
+physics.analyzers.StntupleMaker.crvCoincidenceClusterCollTag  :   "SelectRecoMC:CrvCoincidenceClusterFinder"
+physics.analyzers.StntupleMaker.crvCoincidenceClusterMCCollTag:   "CrvCoincidenceClusterMCAssns"
+physics.analyzers.StntupleMaker.timeClusterBlockName          : [@sequence::OfflineNames_timeClusterBlockName]
+physics.analyzers.StntupleMaker.timeClusterCollTag            : [@sequence::OfflineNames_timeClusterCollTag  ]
+physics.analyzers.StntupleMaker.helixBlockName                : [@sequence::OfflineNames_helixBlockName      ]
+physics.analyzers.StntupleMaker.helixCollTag                  : [@sequence::OfflineNames_helixCollTag        ]
+physics.analyzers.StntupleMaker.helixCollKsTag                : [@sequence::OfflineNames_helixKsCollTag      ]
+physics.analyzers.StntupleMaker.trackBlockName                : [@sequence::OfflineNames_trackBlockName      ]
+physics.analyzers.StntupleMaker.trackCollTag                  : [@sequence::OfflineNames_trackCollTag        ]
+physics.analyzers.StntupleMaker.trackHsBlockName              : [@sequence::OfflineNames_trackHsBlockName    ]
+physics.analyzers.StntupleMaker.tciCollTag                    : [@sequence::OfflineNames_tciCollTag          ]
+physics.analyzers.StntupleMaker.tcmCollTag                    : [@sequence::OfflineNames_tcmCollTag          ]
+physics.analyzers.StntupleMaker.pidCollTag                    : [@sequence::OfflineNames_pidCollTag          ]
+physics.analyzers.StntupleMaker.trkQualCollTag                : [@sequence::OfflineNames_trkQualCollTag      ]
+
+# Default output file naming
+services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.root"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.stn"
