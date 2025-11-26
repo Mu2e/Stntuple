@@ -161,7 +161,7 @@ production.paths : {
             CalTimePeakFinderDe, CalHelixFinderDe   ,  # CalPatRec
             TimeClusterFinderDe, HelixFinderDe      ,  # TrkPatRec
             MHDe,                                      # helix merging
-            KKDePar                                    # KinKal drift fits
+            KKDe                                       # KinKal drift fits
            ]
 #------------------------------------------------------------------------------
 # p100: concatenation job, trigger path is empty
