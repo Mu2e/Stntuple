@@ -489,6 +489,28 @@ void StntupleInitTrackBlock::SetHitInfo(TStnTrack* track,
   }
 
   track->fNMatSites = nmat | (nmatactive << 16);
+
+//-----------------------------------------------------------------------------
+// number of MC hits produced by the mother particle
+//-----------------------------------------------------------------------------
+  track->fNMcStrawHits = 0;
+  if (list_of_mc_straw_hits) {
+    const int nss_ch = list_of_mc_straw_hits->size();
+    for (int i=0; i<nss_ch; i++) {
+      const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(i);
+      const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
+      if (step) {
+        art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle();
+        art::Ptr<mu2e::SimParticle> mother        = simptr;
+        // while(mother->hasParent())  mother        = mother->parent();
+        const mu2e::SimParticle*    sim           = mother.get();
+        int sim_id = sim->id().asInt();
+        if (sim_id == track->fPartID) {
+          track->fNMcStrawHits += 1;
+        }
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -739,7 +761,16 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   for (int itrk=0; itrk<ntrk; itrk++) {
     if(verbose > 1) printf("%s::%s: KalSeedCollection %s track %2i:\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
     track          = data->NewTrack();
-    const mu2e::KalSeed* kffs = (list_of_kffs) ? &list_of_kffs->at(itrk) : &(*(list_of_kffs_ptrs->at(itrk)));
+    const mu2e::KalSeed* kffs = nullptr;
+    if(list_of_kffs) kffs = &list_of_kffs->at(itrk);
+    else if(list_of_kffs_ptrs) {
+      auto ptr = list_of_kffs_ptrs->at(itrk);
+      if(ptr.isAvailable()) kffs = &(*ptr);
+      else {
+        printf("%s::%s: KalSeedPtrCollection %s track %2i is invalid!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
+        continue;
+      }
+    }
     if(!kffs) {
       printf("%s::%s: KalSeed %s track %2i not defined!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
       continue;
@@ -997,30 +1028,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
                            itrk, track->fPartID, track->fPdgCode, track->NGoodMcHits(),
                            track->fPFront, track->fPStOut, track->fMcDirection);
 
-//-----------------------------------------------------------------------------
-// number of MC hits produced by the mother particle
-//-----------------------------------------------------------------------------
-    track->fNMcStrawHits = 0;
-
-    if (list_of_mc_straw_hits) {
-      const int nss_ch = list_of_mc_straw_hits->size();
-      for (int i=0; i<nss_ch; i++) {
-        const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(i);
-        const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
-
-        if (step) {
-          art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle();
-          art::Ptr<mu2e::SimParticle> mother        = simptr;
-          // while(mother->hasParent())  mother        = mother->parent();
-          const mu2e::SimParticle*    sim           = mother.get();
-          int sim_id = sim->id().asInt();
-
-          if (sim_id == track->fPartID) {
-            track->fNMcStrawHits += 1;
-          }
-        }
-      }
-    }
 //-----------------------------------------------------------------------------
 // consider half-ready case when can't use the extrapolator yet; turn it off softly
 //-----------------------------------------------------------------------------

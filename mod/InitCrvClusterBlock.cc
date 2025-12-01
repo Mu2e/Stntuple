@@ -96,23 +96,13 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
           mc_cluster = imc;
           break;
         }
-        // find the closest matching cluster if exact match not found
-        const float dt = fabs(std::fmod(imc->GetEarliestHitTime(), 1695.) - cluster->GetStartTime());
-        const float dr = std::sqrt((imc->GetAvgHitPos() - cluster->GetAvgHitPos()).perp2());
-        if(verbose > 1) printf(" %2i: MC cluster comparison (dt = %6.1f, dr = %6.1f), association index %i\n", iccc, dt, dr, iassn);
-        if(dt < 100.f) {
-          if(mc_cluster) {
-            const float prev_dt = fabs(std::fmod(mc_cluster->GetEarliestHitTime(), 1695.) - cluster->GetStartTime());
-            const float prev_dr = std::sqrt((mc_cluster->GetAvgHitPos() - cluster->GetAvgHitPos()).perp2());
-            if(dt >= prev_dt) continue;
-            if(verbose > 0) printf(" --> Found a better matching MC cluster (dt = %6.1f, dr = %6.1f) replacing previous (dt = %6.1f, dr = %6.1f), index = %i\n",
-                                   dt, dr, prev_dt, prev_dr, iassn);
-            mc_cluster = imc;
-          } else {
-            if(verbose > 0) printf(" --> Closest matching MC cluster found (dt = %6.1f, dr = %6.1f), association index %i\n", dt, dr, iassn);
-            mc_cluster = imc;
-          }
-        }
+      }
+      if(!mc_cluster && nmc_ccc_assns == nccc) {
+        // try by index if the numbers match
+        const mu2e::CrvCoincidenceClusterMC* imc = &(*(mc_ccc_assns->at(iccc).second));
+        mc_cluster = imc;
+        if(verbose > 0) printf("%s:%s: Cluster %2i: Associated MC cluster found by index %i\n",
+                               typeid(*this).name(), __func__, iccc, iccc);
       }
       if(!mc_cluster) printf("%s::%s: Cluster %2i: Associated MC cluster not found! N(clusters) = %i N(Assns) = %i\n",
                         typeid(*this).name(), __func__, iccc, nccc, nmc_ccc_assns);

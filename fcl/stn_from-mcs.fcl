@@ -16,14 +16,14 @@ physics.producers.AprTrkDe80m70pCollections : {
 	triggerInfoName : "aprHighPKSFilter"
 	# triggerInfoName : "AprTrkDe80m70pKSFilter"
 	# triggerInfoName : "AprTrkDe80m70pTriggerInfoMerger"
-	debugLevel      : 2
+	debugLevel      : 0
 }
 physics.producers.CprTrkDe80m70pCollections : {
 	module_type     : TriggerInfoToCollections
 	triggerInfoName : "cprDeHighPKSFilter"
 	# triggerInfoName : "CprTrkDe80m70pKSFilter"
 	# triggerInfoName : "CprTrkDe80m70pTriggerInfoMerger"
-	debugLevel      : 2
+	debugLevel      : 0
 }
 
 # Run track quality modules and create collections from the main trigger paths
@@ -55,12 +55,12 @@ TrigNames_trkQualCollTag      : [ ""                                , ""        
 
 
 # Add the collections
-physics.analyzers.InitStntuple.shCollTag                      :   "SelectRecoMC"
-physics.analyzers.InitStntuple.chCollTag                      :   "SelectRecoMC"
-physics.analyzers.InitStntuple.comboHitCollTag                :   "SelectRecoMC"
-physics.analyzers.InitStntuple.strawHitCollTag                :   "SelectRecoMC"
-physics.analyzers.StntupleMaker.shCollTag                     :   "SelectRecoMC"
-physics.analyzers.StntupleMaker.chCollTag                     :   "SelectRecoMC"
+# physics.analyzers.InitStntuple.shCollTag                      :   "" #"SelectRecoMC"
+# physics.analyzers.InitStntuple.chCollTag                      :   "" #"SelectRecoMC"
+# physics.analyzers.InitStntuple.comboHitCollTag                :   "" #"SelectRecoMC"
+# physics.analyzers.InitStntuple.strawHitCollTag                :   "" #"SelectRecoMC"
+physics.analyzers.StntupleMaker.shCollTag                     :   "" #"SelectRecoMC"
+physics.analyzers.StntupleMaker.chCollTag                     :   "" #"SelectRecoMC"
 physics.analyzers.StntupleMaker.tcShCollTag                   : [ "SelectRecoMC" ]
 physics.analyzers.StntupleMaker.tcChCollTag                   : [ "SelectRecoMC" ]
 physics.analyzers.StntupleMaker.strawDigiMCCollTag            : "compressRecoMCs"
@@ -86,7 +86,7 @@ physics.analyzers.StntupleMaker.tcmCollTag                    : [@sequence::Offl
 physics.analyzers.StntupleMaker.pidCollTag                    : [@sequence::OfflineNames_pidCollTag          , @sequence::TrigNames_pidCollTag          ]
 physics.analyzers.StntupleMaker.trkQualCollTag                : [@sequence::OfflineNames_trkQualCollTag      , @sequence::TrigNames_trkQualCollTag      ]
 
-physics.analyzers.StntupleMaker.trackVerbose : 2
+physics.analyzers.StntupleMaker.trackVerbose : 0
 
 # Default output file naming
 services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.root"

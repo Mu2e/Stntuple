@@ -22,6 +22,7 @@
 #include "Offline/DataProducts/inc/VirtualDetectorId.hh"
 
 #include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/KalSeedMC.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
@@ -47,8 +48,6 @@
 //-----------------------------------------------------------------------------
 int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   const char* oname = {"Stntuple::InitSimpBlock"};
-
-  std::vector<art::Handle<mu2e::SimParticleCollection>> list_of_sp;
 
   const mu2e::SimParticleCollection*       simp_coll(nullptr);
   const mu2e::SimParticle*                 sim      (nullptr);
@@ -208,6 +207,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     }
   }
 
+  // Retrieve all tracks in the event to check against the sim particles
+  auto track_mc_colls = AnEvent->getMany<mu2e::KalSeedMCCollection>();
+
+  // check if this is an RPC event
   const bool is_rpc = primary && (fGenProcessID == mu2e::ProcessCode::mu2eExternalRPC || fGenProcessID == mu2e::ProcessCode::mu2eInternalRPC);
 
   if (simp_handle.isValid()) {
@@ -257,19 +260,36 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
         found |= process_id == mu2e::ProcessCode::mu2eInternalRPC    ;
         found |= process_id == mu2e::ProcessCode::mu2eExternalRPC    ;
         found |= process_id == mu2e::ProcessCode::mu2eFlatPhoton     ;
-        found |= is_pion && is_rpc                                   ; // save pions for reweighting RPC FIXME: Saving too many pions outside of RPC
+        found |= is_pion && is_rpc                                   ; // save pions for reweighting RPC
         found |= is_pbar                                             ; // save pbar for reweighting
 
         // Check if this is a relevant particle for tracking studies
         constexpr float min_relevant_mom = 30.; // the point at which we may reconstruct the track
-        const bool relevant_track = (nhits > 12 &&
-                                     sim->startMomentum().vect().mag() > min_relevant_mom
-                                     && (std::abs(pdg_code) == 11 || std::abs(pdg_code) == 13 || std::abs(pdg_code) == 211));
-        if(verbose && !found && relevant_track)
+        constexpr int   min_nhits        = 12;  // minimum number of hits to be relevant to reconstruction
+        const bool relevant_particle = sim->startMomentum().vect().mag() > min_relevant_mom
+                                       && (std::abs(pdg_code) == 11 || std::abs(pdg_code) == 13 || std::abs(pdg_code) == 211);
+        const bool relevant_track = (nhits > min_nhits && relevant_particle);
+        if(verbose > 0 && !found && relevant_track)
           printf("InitSimpBlock::%s: Relevant Trk SIM: ID = %4i, PDG = %5i, Code = %s\n",
                  __func__, id, pdg_code, sim->creationCode().name().c_str());
         found |= relevant_track;
 
+        // If not yet found but reasonable momentum, check if there is a reconstructed track associated with this SimParticle
+        if (!found && relevant_particle) {
+          for (const auto& coll : track_mc_colls) {
+            for (const auto& track : *coll) {
+              int nhits = 0;
+              for(auto& hit : track.trkStrawHitMCs()) {
+                auto stub = track.simParticle(hit);
+                if(stub._spkey == sim->id()) nhits++;
+                found |= nhits > min_nhits;
+                if(found) break;
+              }
+              if(found) break;
+            }
+            if(found) break;
+          }
+        }
 
         if(verbose > 1) printf("InitSimpBlock::%s: Checking SIM: ID = %4i, PDG = %5i, Code = %s --> found = %o\n",
                                __func__, id, pdg_code, sim->creationCode().name().c_str(), found);
