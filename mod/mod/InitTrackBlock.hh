@@ -18,10 +18,13 @@
 #include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalSeedAssns.hh"
 #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
 #include "Offline/RecoDataProducts/inc/MVAResult.hh"
 #include "Offline/RecoDataProducts/inc/PIDProduct.hh"
 #include "Offline/RecoDataProducts/inc/TrkStraw.hh"
+#include "Offline/MCDataProducts/inc/KalSeedMC.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
@@ -67,6 +70,8 @@ public:
 
   mu2e::AlgorithmIDCollection*             list_of_algs               ;
   const mu2e::KalSeedCollection*           list_of_kffs               ;
+  const mu2e::KalSeedPtrCollection*        list_of_kffs_ptrs          ;
+  const mu2e::KalHelixAssns*               list_of_kff_assns          ;
   const mu2e::MVAResultCollection*         list_of_trk_qual           ;
   const mu2e::StrawDigiMCCollection*       list_of_mc_straw_hits      ;
   const mu2e::ComboHitCollection*          fSschColl                  ;
@@ -102,7 +107,16 @@ public:
   void   InitTrackerZMap(const mu2e::Tracker* Tracker, ZMap_t* Map);
   void   get_station    (const mu2e::Tracker* Tracker, ZMap_t* Map, double Z, int* Plane, int* Offset);
   double s_at_given_z   (const mu2e::KalSeed* KSeed, double Z);
-  
+  bool   SetTrackMCInfo (TStnTrack* track, const mu2e::KalSeed* seed, const mu2e::KalSeedMCAssns& ksmc_assns);
+  void   SetTrackMCInfo (TStnTrack* track, const mu2e::KalSeed* ks, AbsEvent* AnEvent);
+  void   SetHitInfo     (TStnTrack* track,
+                         const mu2e::KalSeed* ks,
+                         const std::vector<mu2e::TrkStrawHitSeed>* hots,
+                         const mu2e::Tracker* tracker);
+  void   SetExpectedHits(TStnTrack* track,
+                         const mu2e::KalSeed* ks,
+                         const mu2e::Tracker* tracker);
+  void    RetrieveData  (AbsEvent* AnEvent);
   
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

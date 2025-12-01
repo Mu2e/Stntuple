@@ -84,13 +84,34 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     if(mc_ccc_assns) {
       for(int iassn = 0; iassn < nmc_ccc_assns; ++iassn) {
         const auto assn = mc_ccc_assns->at(iassn);
-        if(!assn.first || !assn.second) continue;
-        const mu2e::CrvCoincidenceCluster*   ireco = &(*(assn.first));
+        if(!assn.second) {
+          printf("InitCrvClusterBlock::%s: Cluster %2i: MC association %i is not valid! Reco = %o, MC = %o\n", __func__, iccc, iassn,
+                 assn.first.isAvailable(), assn.second.isAvailable());
+          continue;
+        }
+        const mu2e::CrvCoincidenceCluster*   ireco = (!assn.first) ? nullptr : &(*(assn.first));
         const mu2e::CrvCoincidenceClusterMC* imc   = &(*(assn.second));
-        if(&(*(ireco)) == &(*cluster)) {
+        if(ireco && &(*(ireco)) == &(*cluster)) {
           if(verbose > 1) printf(" --> Associated MC cluster found, association index %i\n", iassn);
           mc_cluster = imc;
           break;
+        }
+        // find the closest matching cluster if exact match not found
+        const float dt = fabs(std::fmod(imc->GetEarliestHitTime(), 1695.) - cluster->GetStartTime());
+        const float dr = std::sqrt((imc->GetAvgHitPos() - cluster->GetAvgHitPos()).perp2());
+        if(verbose > 1) printf(" %2i: MC cluster comparison (dt = %6.1f, dr = %6.1f), association index %i\n", iccc, dt, dr, iassn);
+        if(dt < 100.f) {
+          if(mc_cluster) {
+            const float prev_dt = fabs(std::fmod(mc_cluster->GetEarliestHitTime(), 1695.) - cluster->GetStartTime());
+            const float prev_dr = std::sqrt((mc_cluster->GetAvgHitPos() - cluster->GetAvgHitPos()).perp2());
+            if(dt >= prev_dt) continue;
+            if(verbose > 0) printf(" --> Found a better matching MC cluster (dt = %6.1f, dr = %6.1f) replacing previous (dt = %6.1f, dr = %6.1f), index = %i\n",
+                                   dt, dr, prev_dt, prev_dr, iassn);
+            mc_cluster = imc;
+          } else {
+            if(verbose > 0) printf(" --> Closest matching MC cluster found (dt = %6.1f, dr = %6.1f), association index %i\n", dt, dr, iassn);
+            mc_cluster = imc;
+          }
         }
       }
       if(!mc_cluster) printf("%s::%s: Cluster %2i: Associated MC cluster not found! N(clusters) = %i N(Assns) = %i\n",

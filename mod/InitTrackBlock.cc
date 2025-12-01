@@ -35,6 +35,7 @@
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeedAssns.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/TrkFitFlag.hh"
 
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
@@ -185,6 +186,498 @@ double StntupleInitTrackBlock::s_at_given_z(const mu2e::KalSeed* KSeed, double Z
   // return sz1;
 }
 
+//-----------------------------------------------------------------------------
+// retrieve event data
+void StntupleInitTrackBlock::RetrieveData(AbsEvent* AnEvent) {
+  const int verbose(fVerbose);
+  mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+  tracker = ttHandle.get();
+
+  list_of_algs = 0;
+  art::Handle<mu2e::AlgorithmIDCollection> algsHandle;
+  AnEvent->getByLabel(fAlgorithmIDCollTag, algsHandle);
+  if (algsHandle.isValid()) list_of_algs = (mu2e::AlgorithmIDCollection*) algsHandle.product();
+
+  list_of_kffs = 0;
+  list_of_kffs_ptrs = 0;
+  int ntrk = 0;
+  art::Handle<mu2e::KalSeedCollection> kffcH;
+  AnEvent->getByLabel(fKFFCollTag,kffcH);
+  if (kffcH.isValid())    {
+    list_of_kffs = kffcH.product();
+    ntrk = list_of_kffs->size();
+    if(verbose > 0) printf("%s::%s: KalSeedCollection %15s has %2i tracks\n",
+                           typeid(*this).name(), __func__,
+                           fKFFCollTag.encode().c_str(), ntrk);
+  } else {
+    // attempt to get a kalseed pointer collection by the same name
+    art::Handle<mu2e::KalSeedPtrCollection> trkPtrCollH;
+    AnEvent->getByLabel(fKFFCollTag,trkPtrCollH);
+    if(trkPtrCollH.isValid()) {
+      list_of_kffs_ptrs = trkPtrCollH.product();
+      ntrk = list_of_kffs_ptrs->size();
+      if(verbose > 0) printf("%s::%s: KalSeedPtrCollection %15s has %2i tracks\n",
+                             typeid(*this).name(), __func__,
+                             fKFFCollTag.encode().c_str(), ntrk);
+    } else {
+      if(verbose > 0) {
+        printf("%s::%s: KalSeedCollection %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
+        if(verbose > 1) {
+          std::vector<art::Handle<mu2e::KalSeedCollection>> track_collections = AnEvent->getMany<mu2e::KalSeedCollection>();
+          printf("  Available KalSeedCollections:\n");
+          for(auto coll : track_collections) {
+            printf("    %s\n", coll.provenance()->moduleLabel().c_str());
+          }
+          std::vector<art::Handle<mu2e::KalSeedPtrCollection>> track_ptr_collections = AnEvent->getMany<mu2e::KalSeedPtrCollection>();
+          printf("  Available KalSeedPtrCollections:\n");
+          for(auto coll : track_ptr_collections) {
+            printf("    %s\n", coll.provenance()->moduleLabel().c_str());
+          }
+        }
+      }
+    }
+  }
+
+  list_of_kff_assns = 0;
+  art::Handle<mu2e::KalHelixAssns> kffAssnsH;
+  AnEvent->getByLabel(fKFFCollTag,kffAssnsH);
+  if (kffAssnsH.isValid()) {
+    list_of_kff_assns = kffAssnsH.product();
+    const int nassns = list_of_kff_assns->size();
+    if(verbose > 0) printf("%s::%s: KalHelixAssns %15s has %2i associations\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns);
+    if(nassns != ntrk) printf("%s::%s: KalHelixAssns %15s has a different number of tracks! %i assns %i trks\n",
+                              typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns, ntrk);
+  } else {
+    if(verbose > 0) printf("%s::%s: KalHelixAssns %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
+  }
+
+  list_of_trk_qual = 0;
+  art::Handle<mu2e::MVAResultCollection> trkQualHandle;
+  AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
+  if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
+  else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
+
+  fSschColl = 0;
+  art::Handle<mu2e::ComboHitCollection> sschcH;
+  AnEvent->getByLabel(fSsChCollTag,sschcH);
+  if (sschcH.isValid()) fSschColl = sschcH.product();
+  else if(verbose > 0) printf(" WARNING InitTrackBlock::%s: ComboHitCollection %s not found\n", __func__, fSsChCollTag.encode().c_str());
+
+  list_of_mc_straw_hits = 0;
+  art::Handle<mu2e::StrawDigiMCCollection> sdmcHandle;
+  AnEvent->getByLabel(fStrawDigiMCCollTag,sdmcHandle);
+  if (sdmcHandle.isValid()) list_of_mc_straw_hits = sdmcHandle.product();
+  else if(fStrawDigiMCCollTag != "") printf(" InitTrackBlock::%s: StrawDigiMC collection %s not found\n", __func__, fStrawDigiMCCollTag.encode().c_str());
+
+  list_of_extrapolated_tracks = 0;
+  art::Handle<mu2e::TrkCaloIntersectCollection>  texHandle;
+  AnEvent->getByLabel(fTciCollTag,texHandle);
+  if (texHandle.isValid()) list_of_extrapolated_tracks = texHandle.product();
+
+  list_of_pidp = 0;
+  art::Handle<mu2e::PIDProductCollection>  pidpHandle;
+  AnEvent->getByLabel(fPIDProductCollTag,pidpHandle);
+  if (pidpHandle.isValid()) list_of_pidp = pidpHandle.product();
+}
+
+//-----------------------------------------------------------------------------
+// set expected hits information
+// FIXME: not currently correct due to missing track position vs. z
+void StntupleInitTrackBlock::SetExpectedHits(TStnTrack* track,
+                                            const mu2e::KalSeed* ks,
+                                            const mu2e::Tracker* tracker) {
+//-----------------------------------------------------------------------------
+// given track parameters, build the expected hit mask
+//-----------------------------------------------------------------------------
+  double z, zw, dz, dz_min;
+  int    iplane, offset;
+  int    nz(88);
+  const auto& hots = ks->hits();
+
+  for (int iz=0; iz<nz; iz++) {
+    z = zmap.fZ[iz];
+    // find the track hit closest to that Z
+    dz_min = 1.e10;
+    for (const auto& hit : hots) {
+      const auto sid = hit.strawId();
+      const auto& straw = tracker->straw(sid);
+      zw = straw.getMidPoint().z();
+      dz = z-zw;
+      if (std::fabs(dz) < dz_min) {
+        dz_min = fabs(dz);
+        // closest_hit = hit;
+        // closest_z   = zw;
+      }
+    }
+//-----------------------------------------------------------------------------
+// found closest hit and the extrapolation length, then extrapolate track
+//-----------------------------------------------------------------------------
+    // s0  = closest_hit->trkLen();
+    //      s   = (z-track->fZ0)/(closest_z-track->fZ0)*s0;
+
+    HepPoint pz(0.,0.,0.); // FIXME      = ks->position(s);
+
+    get_station(tracker,&zmap,z,&iplane,&offset);
+
+    const mu2e::Panel*  panel0 = NULL;
+    const mu2e::Panel*  panel;
+    const mu2e::Plane*  plane;
+    double              min_dphi(1.e10);
+    double              dphi, nx, ny, wx, wy, wrho, rho, phi0;
+    CLHEP::Hep3Vector   w0mid;
+    int                 ipanel;
+
+    plane = &tracker->getPlane(iplane);
+
+    for (int i=0; i<3; i++) {
+      ipanel = 2*i+offset;		// panel number
+      // check if point pz(x0,y0) overlaps with the segment iseg
+      // expected mask is set to zero
+      panel = &plane->getPanel(ipanel);
+      w0mid = panel->straw0MidPoint();
+      // also calculate pho wrt the sector
+      wx    = w0mid.x();
+      wy    = w0mid.y();
+
+      phi0  = w0mid.phi();            // make sure I understand the range
+
+      wrho  = sqrt(wx*wx+wy*wy);
+
+      nx    = wx/wrho;
+      ny    = wy/wrho;
+
+      rho = nx*pz.x()+ny*pz.y();
+
+      dphi = TVector2::Phi_mpi_pi(phi0-pz.phi());
+      if ((abs(dphi) < min_dphi) && (rho > wrho)) {
+        min_dphi = fabs(dphi);
+        panel0   = panel;
+      }
+    }
+//-----------------------------------------------------------------------------
+// OK, closest segment found, set the expected bit..
+//-----------------------------------------------------------------------------
+    if (panel0 != NULL) {
+      track->fExpectedHitMask.SetBit(iz,1);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+// set hit information
+void StntupleInitTrackBlock::SetHitInfo(TStnTrack* track,
+                    const mu2e::KalSeed* ks,
+                    const std::vector<mu2e::TrkStrawHitSeed>* hots,
+                    const mu2e::Tracker* tracker) {
+
+  const int verbose(fVerbose); //control output level for debugging
+  for (int j=0; j<50; j++) { // hits by station
+    track->fNHPerStation[j] = 0;
+  }
+
+  SetExpectedHits(track, ks, tracker);
+
+  // loop through all hits on the track
+  int ntrkhits(0), nhitsambig0(0), nwrong(0);
+  const int n_kffs_hits = hots->size();
+  for (int it=0; it<n_kffs_hits; it++) {
+    if(verbose > 5) printf(" Checking hit %i\n", it);
+    const auto hit = &hots->at(it);
+    if (!hit) continue;
+    mu2e::StrawId sid = hit->strawId();
+    const mu2e::Straw* straw = &tracker->straw(sid);
+    ++ntrkhits;
+    const bool is_active = hit->flag().hasAllProperties(mu2e::StrawHitFlag::active);
+    if(verbose > 2)
+      printf("%3i: active = %o; ID = %5i, plane = %3i, panel = %5i, layer = %5i\n", it, is_active,
+        (int) sid.asUint16(), (int) sid.getPlane(),
+        (int) sid.getPanelId().asUint16(),
+        (int) sid.getLayerId().asUint16());
+  //-----------------------------------------------------------------------------
+  // the rest makes sense only for active hits
+  //-----------------------------------------------------------------------------
+    if (is_active) {
+      const int loc = hit->index();
+      if (hit->ambig() == 0) nhitsambig0 += 1;
+      if (loc >= 0 && (list_of_mc_straw_hits) && int(list_of_mc_straw_hits->size()) > loc) {
+        if(verbose > 5) printf(" --> MC digi found\n");
+        const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
+
+        const auto stgs = mcdigi->earlyStrawGasStep().get();
+      //-----------------------------------------------------------------------------
+      // count number of active hits with R > 200 um and misassigned drift signs
+      //-----------------------------------------------------------------------------
+        if (stgs) {
+          if(verbose > 5) printf(" --> MC gas step found\n");
+          if (hit->driftRadius() > 0.2) {
+            const CLHEP::Hep3Vector* v1 = &straw->getMidPoint();
+            HepPoint p1(v1->x(),v1->y(),v1->z());
+
+            CLHEP::Hep3Vector v2 = stgs->position();
+            HepPoint    p2(v2.x(),v2.y(),v2.z());
+
+            TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
+
+            TrkLineTraj trstep (p2,stgs->momvec().unit(),0.,0.);
+
+            TrkPoca poca(trstep, 0., trstraw, 0.);
+
+            const float mcdoca = poca.doca();
+        //-----------------------------------------------------------------------------
+        // if mcdoca and hit->_iamb have different signs, the hit drift direction has wrong sign
+        //-----------------------------------------------------------------------------
+            if (hit->ambig()*mcdoca < 0) nwrong += 1;
+          }
+        }
+      }
+
+      const mu2e::StrawId& straw_id = straw->id();
+
+      int ist = straw_id.getStation();
+
+      track->fNHPerStation[ist] += 1;
+
+      int pan = straw_id.getPanel();
+      int lay = straw_id.getLayer();
+      int bit = zmap.fMap[ist][pan][lay];
+
+      track->fHitMask.SetBit(bit,1);
+    } // end of active hit check
+  } // end of loop over hits on the track
+  track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
+  track->fNActive   = ks->nHits() | (nwrong << 16);
+
+  // check the doublet info
+  int nd_os(0), nd_ss(0); // number of doublets with opposite sign ambig and same sign ambig (note: not just active doublets)
+  int nad(0); // number of active doublets
+  for (int it = 0; it < n_kffs_hits - 1; it++) {
+    
+    const mu2e::TrkStrawHitSeed* ihit = &hots->at(it);
+    const mu2e::TrkStrawHitSeed* jhit = &hots->at(it + 1);
+    
+    if (ihit->strawId().uniquePanel() == jhit->strawId().uniquePanel()) {
+      
+      if (ihit->flag().hasAllProperties(mu2e::StrawHitFlag::active)
+          && jhit->flag().hasAllProperties(mu2e::StrawHitFlag::active)) {
+        ++nad;
+      }
+      
+      if (ihit->ambig() == jhit->ambig()) {
+        ++nd_ss;
+      } else {
+        ++nd_os;
+      }
+    }
+  }
+  track->fNDoublets = nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nad << 24);
+
+  // check the material crossing info
+  int nmat(0), nmatactive (0); double radlen(0.);
+  if(verbose > 2) printf("Printing material crossing collection:\n");
+  for (const auto& straw : ks->straws()) {
+    ++nmat;
+    if (straw.active()) {
+      ++nmatactive;
+      radlen += straw._radlen;
+    }
+    if(verbose > 2) {
+      printf("%3i: active = %o; ID = %5i, plane = %2i, panel = %5i, layer = %5i\n", nmat-1, straw.active(),
+             (int) straw._straw.asUint16(), (int) straw._straw.getPlane(),
+             (int) straw._straw.getPanelId().asUint16(),
+             (int) straw._straw.getLayerId().asUint16());
+    }
+  }
+
+  track->fNMatSites = nmat | (nmatactive << 16);
+}
+
+//-----------------------------------------------------------------------------
+// set MC info for the track, using hits directly
+void StntupleInitTrackBlock::SetTrackMCInfo(TStnTrack* track,
+                                            const mu2e::KalSeed* ks,
+                                            AbsEvent* AnEvent) {
+  if (!track || !ks) return;
+  track->fPdgCode  = 0;
+  track->fPartID   = -1;
+  track->fNGoodMcHits = ks->nDOF() << 16;
+  track->fPFront = -1.f;
+  track->fPStOut = -1.f;
+  track->fMcDirection = 0;
+  if(!fSschColl || !list_of_mc_straw_hits) return; // no hit collections
+
+  // initialize hit information by sim particle 
+  const static int max_npart(100);
+  int     npart(0), part_nh[max_npart], part_id[max_npart], part_netDir[max_npart];
+  int     part_pdg_code[max_npart];
+  double  part_first_z[max_npart], part_first_z_p[max_npart];
+  double  part_last_z [max_npart];
+  
+  // particle with the most (active) hits
+  int     imax_nh(-1), max_nh(0);
+
+  // loop over track hits
+  const auto trk_hits = ks->hits();
+  const int n_kffs_hits = trk_hits.size();
+  for (int it = 0; it < n_kffs_hits; it++) {
+    const auto& hit = trk_hits.at(it);
+    const bool is_active = hit.flag().hasAllProperties(mu2e::StrawHitFlag::active);
+    if (!is_active) continue;
+    const int loc = hit.index();
+    if (loc < 0 || int(list_of_mc_straw_hits->size()) <= loc) continue;
+    const mu2e::StrawDigiMC& mcdigi = list_of_mc_straw_hits->at(loc);
+    const auto stgs = mcdigi.earlyStrawGasStep().get();
+    if(!stgs) continue;
+    const auto sim = stgs->simParticle().get();
+    if(!sim) continue;
+    const int id = sim->id().asInt();
+
+    // check if we have seen this sim particle already
+    bool found = false;
+    int index = 0;
+    for (int ip=0; ip<npart; ip++) {
+      if (id == part_id[ip]) { //increment N(hits) by this SIM if already seen
+        found        = true;
+        part_nh[ip] += 1;
+        int d = (stgs->momentum().z() >= 0) ? 1 : -1;
+        part_netDir[ip] += d;
+        const double dz = stgs->position().z();
+        if(dz < part_first_z[ip]) {
+          part_first_z   [ip] = dz;
+          part_first_z_p [ip] = std::sqrt(stgs->momentum().mag2());
+        }
+        if(dz > part_last_z[ip]) {
+          part_last_z    [ip] = dz;
+        }
+        index = ip;
+        break; // exit loop once found
+      }
+    }
+
+    // if this is the first occurrence, add it to the list
+    if (!found) {
+      index = npart;
+      const double dz = stgs->position().z();
+      part_id        [npart] = id;
+      part_pdg_code  [npart] = sim->pdgId();
+      part_nh        [npart] = 1;
+      part_first_z   [npart] = dz;
+      part_first_z_p [npart] = std::sqrt(stgs->momentum().mag2());
+      part_netDir    [npart] = (stgs->momentum().z() >= 0) ? 1 : -1;
+      part_last_z    [npart] = dz;
+      npart                 += 1;
+    }
+
+    // check if this particle has the most hits so far
+    if (part_nh[index] > max_nh) {
+      max_nh   = part_nh[index];
+      imax_nh  = index;
+    }
+  }
+  if(imax_nh < 0) return; // no sim particle found
+
+  // set the MC information
+  track->fPdgCode     = part_pdg_code[imax_nh];
+  track->fPartID      = part_id      [imax_nh];
+  track->fNGoodMcHits = (ks->nDOF() << 16) + max_nh;
+  track->fPFront      = part_first_z_p[imax_nh];
+  track->fMcDirection = (part_netDir[imax_nh] >= 0.) ? 1 : -1;
+
+  // check the virtual detector information
+  mu2e::GeomHandle<mu2e::VirtualDetector> vdg;
+  if(vdg->nDet() == 0) return; // no virtual detectors defined
+  art::Handle<mu2e::StepPointMCCollection> vdhits;
+  AnEvent->getByLabel(fVdhCollTag,vdhits);
+  if(!vdhits.isValid()) return; // no virtual detector hits
+
+  double tfront(1.e10), tstout(1.e10);
+  const int nvdhits = vdhits->size();
+  for (int i=0; i<nvdhits; i++) {
+    const mu2e::StepPointMC& hit = vdhits->at(i);
+    mu2e::VirtualDetectorId vdid(hit.volumeId());
+    art::Ptr<mu2e::SimParticle> const& simptr = hit.simParticle();
+    const mu2e::SimParticle* sim  = simptr.get();
+    if(!sim) continue;
+    if(int(sim->id().asInt()) != track->fPartID) continue; // not the correct sim particle
+
+    // check if this is front of tracker or stopping target
+    if(vdid.isTrackerFront() && hit.time() < tfront) {
+      track->fPFront = hit.momentum().mag();
+      tfront = hit.time();
+    } else if(vdid.isStoppingTarget() && hit.time() < tstout) {
+      track->fPStOut = hit.momentum().mag();
+      tstout = hit.time();
+    }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+// set MC info for the track
+bool StntupleInitTrackBlock::SetTrackMCInfo(TStnTrack* track, const mu2e::KalSeed* ks,
+                                            const mu2e::KalSeedMCAssns& ksmc_assns) {
+  if (!track || !ks) return false;
+  track->fPdgCode  = 0;
+  track->fPartID   = -1;
+  track->fNGoodMcHits = ks->nDOF() << 16;
+  track->fPFront = -1.f;
+  track->fPStOut = -1.f;
+  track->fMcDirection = 0;
+
+  // find the KalSeedMC associated with this KalSeed
+  const mu2e::KalSeedMC* ksmc(nullptr);
+  for (const auto& assn : ksmc_assns) {
+    const auto seed = assn.first;
+    const auto mc   = assn.second;
+    if(!seed || !mc) continue;
+    if (&(*ks) == &(*seed)) {
+      // found it
+      ksmc = &(*mc);
+      break;
+    }
+  }
+  if(!ksmc) return false; // no MC info found
+
+  // find the main sim particle for this track
+  const mu2e::SimPartStub* main_sim_stub = nullptr;
+  for(auto& stub : ksmc->simParticles()) {
+    if(!main_sim_stub || stub._nhits > main_sim_stub->_nhits) {
+      main_sim_stub = &stub;
+    }
+  }
+  if(!main_sim_stub) return false; // no sim particle found
+
+  track->fPdgCode  = main_sim_stub->_pdg;
+  track->fPartID   = main_sim_stub->_spkey.asInt();
+  track->fNGoodMcHits = (ks->nDOF() << 16) + main_sim_stub->_nhits;
+
+  // set the track information at the virtual detector steps
+  float tfront(1.e10f), tstout(1.e10f);
+  for(auto const& vdstep : ksmc->vdSteps()) {
+    if(vdstep._vdid.isTrackerFront() && vdstep._time < tfront) {
+      track->fPFront = vdstep._mom.R();
+      tfront = vdstep._time;
+    } else if(vdstep._vdid.isStoppingTarget() && vdstep._time < tstout) {
+      track->fPStOut = vdstep._mom.R();
+      tstout = vdstep._time;
+    }
+  }
+
+  // set the track direction using the majority of the hit directions
+  int netdir = 0;
+  for(auto const& tshmc : ksmc->trkStrawHitMCs()) {
+    const auto& hit_sim_stub = ksmc->simParticle(tshmc);
+    if(hit_sim_stub._spkey == main_sim_stub->_spkey) {
+      const float pz = tshmc.particleMomentum().Z();
+      if(pz > 0.f) {
+        netdir += 1;
+      } else if(pz < 0.f) {
+        netdir -= 1;
+      }
+    }
+  }
+  track->fMcDirection = (netdir < 0) ? -1 : (netdir > 0) ? 1 : 0;
+  return true;
+}
 
 //-----------------------------------------------------------------------------
 int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, Int_t Mode) {
@@ -204,16 +697,17 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   sr_number = AnEvent->subRun();
   rn_number = AnEvent->run();
 
-  if (Block->Initialized(ev_number,rn_number)) {
+  if (Block->Initialized(ev_number,rn_number)) { // FIXME: add subrun?
     if(verbose > 0) printf("%s::%s: Block initialized already, exiting\n", typeid(*this).name(), __func__);
     return 0;
   }
 
-  mu2e::GeomHandle<mu2e::Tracker> ttHandle;
-  tracker = ttHandle.get();
 
   data = (TStnTrackBlock*) Block;
   data->Clear();
+
+  // get the event data
+  RetrieveData(AnEvent);
 
   if (initialized == 0) {
     initialized = 1;
@@ -221,65 +715,12 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     InitTrackerZMap(tracker,&zmap);
   }
 
-  list_of_algs = 0;
-  art::Handle<mu2e::AlgorithmIDCollection> algsHandle;
-  AnEvent->getByLabel(fAlgorithmIDCollTag, algsHandle);
-  if (algsHandle.isValid()) list_of_algs = (mu2e::AlgorithmIDCollection*) algsHandle.product();
 
-  list_of_kffs = 0;
-  art::Handle<mu2e::KalSeedCollection> kffcH;
-  AnEvent->getByLabel(fKFFCollTag,kffcH);
-  if (kffcH.isValid())    {
-    list_of_kffs = kffcH.product();
-    ntrk         = list_of_kffs->size();
-    if(verbose > 0) printf("%s::%s: KalSeedCollection %15s has %2i tracks\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), ntrk);
-  } else {
-    if(verbose > 0) printf("%s::%s: KalSeedCollection %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
-  }
+  ntrk = (list_of_kffs) ? list_of_kffs->size() : (list_of_kffs_ptrs) ? list_of_kffs_ptrs->size() : 0; 
+  nassns = (list_of_kff_assns) ? list_of_kff_assns->size() : 0;
 
-  const mu2e::KalHelixAssns* list_of_kff_assns = nullptr;
-  art::Handle<mu2e::KalHelixAssns> kffAssnsH;
-  AnEvent->getByLabel(fKFFCollTag,kffAssnsH);
-  if (kffAssnsH.isValid()) {
-    list_of_kff_assns = kffAssnsH.product();
-    nassns = list_of_kff_assns->size();
-    if(verbose > 0) printf("%s::%s: KalHelixAssns %15s has %2i associations\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns);
-    if(nassns != ntrk) printf("%s::%s: KalHelixAssns %15s has a different number of tracks! %i assns %i trks\n",
-                              typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns, ntrk);
-  } else {
-    if(verbose > 0) printf("%s::%s: KalHelixAssns %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
-  }
-
-  list_of_trk_qual = 0;
-  art::Handle<mu2e::MVAResultCollection> trkQualHandle;
-  AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
-  if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
-  else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
-
-  fSschColl = 0;
-  art::Handle<mu2e::ComboHitCollection> sschcH;
-  AnEvent->getByLabel(fSsChCollTag,sschcH);
-  if (sschcH.isValid()) fSschColl = sschcH.product();
-  else printf(" WARNING InitTrackBlock::%s: ComboHitCollection %s not found\n", __func__, fSsChCollTag.encode().c_str());
-
-  list_of_mc_straw_hits = 0;
-  art::Handle<mu2e::StrawDigiMCCollection> sdmcHandle;
-  AnEvent->getByLabel(fStrawDigiMCCollTag,sdmcHandle);
-  if (sdmcHandle.isValid()) list_of_mc_straw_hits = sdmcHandle.product();
-  else if(fStrawDigiMCCollTag != "") printf(" InitTrackBlock::%s: StrawDigiMC collection %s not found\n", __func__, fStrawDigiMCCollTag.encode().c_str());
-
-  list_of_extrapolated_tracks = 0;
-  art::Handle<mu2e::TrkCaloIntersectCollection>  texHandle;
-  AnEvent->getByLabel(fTciCollTag,texHandle);
-  if (texHandle.isValid()) list_of_extrapolated_tracks = texHandle.product();
-
-  art::Handle<mu2e::TrackClusterMatchCollection>  tcmH;
-  AnEvent->getByLabel(fTcmCollTag,tcmH);
-
-  list_of_pidp = 0;
-  art::Handle<mu2e::PIDProductCollection>  pidpHandle;
-  AnEvent->getByLabel(fPIDProductCollTag,pidpHandle);
-  if (pidpHandle.isValid()) list_of_pidp = pidpHandle.product();
+  // art::Handle<mu2e::TrackClusterMatchCollection>  tcmH;
+  // AnEvent->getByLabel(fTcmCollTag,tcmH);
 
   art::ServiceHandle<mu2e::GeometryService>   geom;
   mu2e::GeomHandle<mu2e::DetectorSystem>      ds;
@@ -298,7 +739,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   for (int itrk=0; itrk<ntrk; itrk++) {
     if(verbose > 1) printf("%s::%s: KalSeedCollection %s track %2i:\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
     track          = data->NewTrack();
-    const mu2e::KalSeed* kffs = &list_of_kffs->at(itrk);
+    const mu2e::KalSeed* kffs = (list_of_kffs) ? &list_of_kffs->at(itrk) : &(*(list_of_kffs_ptrs->at(itrk)));
     if(!kffs) {
       printf("%s::%s: KalSeed %s track %2i not defined!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), itrk);
       continue;
@@ -529,424 +970,55 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // double     szb        = s_at_given_z(kffs,zback);
 
 //-----------------------------------------------------------------------------
-// the total number of planes is 36, use 50 for simplicity
+// initialize hit-related quantities
 //-----------------------------------------------------------------------------
-    const mu2e::TrkStrawHitSeed  *hit; // , *closest_hit(NULL);
-
-    //const TrkHitVector*       kffs_hits = &kffs->hitVector();
-
-    for (int j=0; j<50; j++) {
-      track->fNHPerStation[j] = 0;
-    }
-
-    int     loc, nss_ch, found, ntrkhits(0), nhitsambig0(0); // , pdg_code;
-    int     ipart;
-    const static int max_npart(100);
-    int     id(-1),  npart(0), part_nh[max_npart], part_id[max_npart], part_netDir[max_npart];
-    int     part_pdg_code[max_npart];
-    double  part_first_z[max_npart], part_first_z_p[max_npart];
-    double  part_last_z [max_npart], part_last_z_p [max_npart];
-    int     nwrong = 0;
-    double  mcdoca;
-
-    const mu2e::SimParticle   *sim   (nullptr);
-    const mu2e::StrawGasStep  *stgs  (nullptr);
-
-    nss_ch = (fSschColl) ? fSschColl->size() : -1;
-
-    if (nss_ch <= 0) {
-      printf(">>> ERROR in InitTrackBlock::%s ComboHitCollection by module %s is empty, NHITS = %i\n", __func__, fSsChCollTag.encode().c_str(), nss_ch);
-    }
-    else {
-      if(verbose > 2) printf("Printing hit collection:\n");
-      for (int it=0; it<n_kffs_hits; it++) {
-        if(verbose > 5) printf(" Checking hit %i\n", it);
-        hit = &hots->at(it);
-//-----------------------------------------------------------------------------
-// skip calorimeter hit
-//-----------------------------------------------------------------------------
-        if (! hit) continue;
-        mu2e::StrawId sid = hit->strawId();
-        const mu2e::Straw* straw = &tracker->straw(sid);
-        ++ntrkhits;
-        const bool is_active = hit->flag().hasAllProperties(mu2e::StrawHitFlag::active);
-        if(verbose > 2)
-          printf("%3i: active = %o; ID = %5i, plane = %3i, panel = %5i, layer = %5i\n", it, is_active,
-                 (int) sid.asUint16(), (int) sid.getPlane(),
-                 (int) sid.getPanelId().asUint16(),
-                 (int) sid.getLayerId().asUint16());
-//-----------------------------------------------------------------------------
-// the rest makes sense only for active hits
-//-----------------------------------------------------------------------------
-        if (is_active) {
-          loc   = hit->index();
-          if (hit->ambig() == 0) nhitsambig0 += 1;
-          if ((loc >= 0) && (loc < nss_ch)) {
-            if ((list_of_mc_straw_hits) && (list_of_mc_straw_hits->size() > 0)) {
-              if(verbose > 5) printf(" --> MC digi found\n");
-              const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
-
-              stgs = mcdigi->earlyStrawGasStep().get();
-//-----------------------------------------------------------------------------
-// count number of active hits with R > 200 um and misassigned drift signs
-//-----------------------------------------------------------------------------
-              if (stgs) {
-                if(verbose > 5) printf(" --> MC gas step found\n");
-                if (hit->driftRadius() > 0.2) {
-                  const CLHEP::Hep3Vector* v1 = &straw->getMidPoint();
-                  HepPoint p1(v1->x(),v1->y(),v1->z());
-
-                  CLHEP::Hep3Vector v2 = stgs->position();
-                  HepPoint    p2(v2.x(),v2.y(),v2.z());
-
-                  TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
-
-                  TrkLineTraj trstep (p2,stgs->momvec().unit(),0.,0.);
-
-                  TrkPoca poca(trstep, 0., trstraw, 0.);
-
-                  mcdoca = poca.doca();
-//-----------------------------------------------------------------------------
-// if mcdoca and hit->_iamb have different signs, the hit drift direction has wrong sign
-//-----------------------------------------------------------------------------
-                  if (hit->ambig()*mcdoca < 0) nwrong      += 1;
-                }
-
-                sim = &(*stgs->simParticle());
-              }
-
-              // check if there's an associated SIM particle, store the ID
-              if (sim != NULL) id = sim->id().asInt();
-              else {
-                printf(">>> ERROR in %s : sim is NULL, set PDG_CODE to -1\n",oname);
-                id = -1;
-              }
-
-              // check if this SIM particle has already been seen
-              found = 0;
-              for (int ip=0; ip<npart; ip++) {
-                if (id == part_id[ip]) { //increment N(hits) by this SIM if already seen
-                  found        = 1;
-                  part_nh[ip] += 1;
-                  int d = (stgs->momentum().z() >= 0) ? 1 : -1;
-                  part_netDir[ip] += d;
-                  const double dz = stgs->position().z();
-                  if(dz < part_first_z[ip]) {
-                    part_first_z   [ip] = dz;
-                    part_first_z_p [ip] = std::sqrt(stgs->momentum().mag2());
-                  }
-                  if(dz > part_last_z[ip]) {
-                    part_last_z    [ip] = dz;
-                    part_last_z_p  [ip] = std::sqrt(stgs->momentum().mag2());
-                  }
-                  break;
-                }
-              }
-
-              // if this is the first occurrence, add it to the list
-              if (found == 0) {
-                const double dz = stgs->position().z();
-                part_id        [npart] = id;
-                part_pdg_code  [npart] = sim->pdgId();
-                part_nh        [npart] = 1;
-                part_first_z   [npart] = dz;
-                part_first_z_p [npart] = std::sqrt(stgs->momentum().mag2());
-                part_netDir    [npart] = (stgs->momentum().z() >= 0) ? 1 : -1;
-                part_last_z    [npart] = dz;
-                part_last_z_p  [npart] = std::sqrt(stgs->momentum().mag2());
-                npart                 += 1;
-              }
-            }
-          }
-          else {
-            printf(">>> ERROR in StntupleInitMu2eTrackBlock: wrong hit collection used");
-            printf(", loc = %10i, n_straw_hits = %10i\n", loc,nss_ch);
-          }
-
-          const mu2e::StrawId& straw_id = straw->id();
-
-          int ist = straw_id.getStation();
-
-          track->fNHPerStation[ist] += 1;
-
-          int pan = straw_id.getPanel();
-          int lay = straw_id.getLayer();
-          int bit = zmap.fMap[ist][pan][lay];
-
-          track->fHitMask.SetBit(bit,1);
-        }
-      }
-    }
-//-----------------------------------------------------------------------------
-// Dave's variables calculated by KalDiag
-//-----------------------------------------------------------------------------
-    // printf("InitTrackBlock: ERROR: kalDiag is gone, FIXIT\n");
-    // _kalDiag->kalDiag(kffs,false);
-//-----------------------------------------------------------------------------
-// total number of hits associated with the trackand the number of bend sites
-//-----------------------------------------------------------------------------
-    track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
-
-    track->fNMatSites = 0; // _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
-    int nmat(0), nmatactive (0); double radlen(0.);
-    if(verbose > 2) printf("Printing material crossing collection:\n");
-    for (const auto& straw : kffs->straws()) {
-      ++nmat;
-      if (straw.active()) {
-        ++nmatactive;
-        radlen += straw._radlen;
-      }
-      if(verbose > 2) {
-        printf("%3i: active = %o; ID = %5i, plane = %2i, panel = %5i, layer = %5i\n", nmat-1, straw.active(),
-               (int) straw._straw.asUint16(), (int) straw._straw.getPlane(),
-               (int) straw._straw.getPanelId().asUint16(),
-               (int) straw._straw.getLayerId().asUint16());
-      }
-    }
-    
-    track->fNMatSites = nmat | (nmatactive << 16);
+    SetHitInfo(track, kffs, hots, tracker);
     if (list_of_trk_qual) track->fTrkQual = list_of_trk_qual->at(itrk)._value;
     else                  track->fTrkQual = -1.e6;
 //-----------------------------------------------------------------------------
-// defined bit-packed fNActive word
+// print hit info if requested
 //-----------------------------------------------------------------------------
-    track->fNActive   = kffs->nHits() | (nwrong << 16);
     if(verbose > 1) printf("  N(hits) = %2i, N(active) = %2i, N(wrong) = %2i, N(mat) = %3i, N(active mat) = %3i, trkqual = %5.2f\n",
                            track->fNHits, track->NActive(), track->NWrong(),
-                           nmat, nmatactive,
+                           track->NMat(), track->NMatActive(),
                            track->fTrkQual);
 
-    int nd_os(0), nd_ss(0); // number of doublets with opposite sign ambig and same sign ambig (note: not just active doublets)
-    int nad(0); // number of active doublets
-
-    for (int it = 0; it < n_kffs_hits - 1; it++) {
-      
-      const mu2e::TrkStrawHitSeed* ihit = &hots->at(it);
-      const mu2e::TrkStrawHitSeed* jhit = &hots->at(it + 1);
-      
-      if (ihit->strawId().uniquePanel() == jhit->strawId().uniquePanel()) {
-        
-        if (ihit->flag().hasAllProperties(mu2e::StrawHitFlag::active)
-            && jhit->flag().hasAllProperties(mu2e::StrawHitFlag::active)) {
-          ++nad;
-        }
-        
-        if (ihit->ambig() == jhit->ambig()) {
-          ++nd_ss;
-        } else {
-          ++nd_os;
-        }
-      }
+//-----------------------------------------------------------------------------
+// Either use the KalSeedMCAssns or the available hit information for truth matching
+//-----------------------------------------------------------------------------
+    art::Handle<mu2e::KalSeedMCAssns> ksmcH;
+    AnEvent->getByLabel("SelectReco",ksmcH); // FIXME: hardcoded module label
+    // attempt to get the MC information from reco-MC associations
+    // if that fails, use hit-based information
+    if(!ksmcH.isValid() || !SetTrackMCInfo(track, kffs, *ksmcH)) {
+      SetTrackMCInfo(track, kffs, AnEvent); // uses hit-based info
     }
-
-    track->fNDoublets = nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nad << 24);
-//-----------------------------------------------------------------------------
-// given track parameters, build the expected hit mask
-//-----------------------------------------------------------------------------
-    double z, zw, dz, dz_min; //  s0, closest_z(-1.e6), s;
-    int    iplane, offset;
-    int    nz(88);
-
-    for (int iz=0; iz<nz; iz++) {
-      z = zmap.fZ[iz];
-					// find the track hit closest to that Z
-      dz_min = 1.e10;
-      for (auto it : *hots) {
-
-	hit = &it;
-	if (! hit) continue;
-
-	// s_hit = &hit->comboHit();
-	loc   = hit->index(); // s_hit-s_hit0;
-	mu2e::StrawId sid = hit->strawId();
-	const mu2e::Straw* straw = &tracker->straw(sid);
-	zw    = straw->getMidPoint().z();
-	dz    = z-zw;
-
-	if (fabs(dz) < dz_min) {
-	  dz_min      = fabs(dz);
-	  // closest_hit = hit;
-	  // closest_z   = zw;
-	}
-      }
-//-----------------------------------------------------------------------------
-// found closest hit and the extrapolation length, then extrapolate track
-//-----------------------------------------------------------------------------
-      // s0  = closest_hit->trkLen();
-      //      s   = (z-track->fZ0)/(closest_z-track->fZ0)*s0;
-
-      HepPoint    pz(0.,0.,0.); // FIXME      = kffs->position(s);
-
-      get_station(tracker,&zmap,z,&iplane,&offset);
-
-      const mu2e::Panel*  panel0 = NULL;
-      const mu2e::Panel*  panel;
-      const mu2e::Plane*  plane;
-      double              min_dphi(1.e10);
-      double              dphi, nx, ny, wx, wy, wrho, rho, phi0;
-      CLHEP::Hep3Vector   w0mid;
-      int                 ipanel;
-
-      plane = &tracker->getPlane(iplane);
-
-      for (int i=0; i<3; i++) {
-	ipanel = 2*i+offset;		// panel number
-					// check if point pz(x0,y0) overlaps with the segment iseg
-					// expected mask is set to zero
-	panel = &plane->getPanel(ipanel);
-	w0mid = panel->straw0MidPoint();
-					// also calculate pho wrt the sector
-	wx    = w0mid.x();
-	wy    = w0mid.y();
-
-	phi0  = w0mid.phi();            // make sure I understand the range
-
-	wrho  = sqrt(wx*wx+wy*wy);
-
-	nx    = wx/wrho;
-	ny    = wy/wrho;
-
-	rho = nx*pz.x()+ny*pz.y();
-
-	dphi = TVector2::Phi_mpi_pi(phi0-pz.phi());
-	if ((abs(dphi) < min_dphi) && (rho > wrho)) {
-	  min_dphi = fabs(dphi);
-	  panel0   = panel;
-	}
-      }
-//-----------------------------------------------------------------------------
-// OK, closest segment found, set the expected bit..
-//-----------------------------------------------------------------------------
-      if (panel0 != NULL) {
-	track->fExpectedHitMask.SetBit(iz,1);
-      }
-    }
-//-----------------------------------------------------------------------------
-// identify track with the particle which produced most hits
-//-----------------------------------------------------------------------------
-    ipart = 0;
-    int nh0 = part_nh[0];
-
-    for (int ip=1; ip<npart; ip++) {
-      if (part_nh[ip] > nh0) {
-	nh0 = part_nh[ip];
-	ipart = ip;
-      }
-    }
-
-    track->fPdgCode     = part_pdg_code[ipart];
-    track->fPartID      = part_id      [ipart];
-    track->fNGoodMcHits = (kffs->nDOF() << 16) + nh0;
-
-    if(verbose > 1) printf(" Track %i MC info: ID = %3i, PDG = %5i, N(hits) = %2i, z(first) = %6.1f, p(first) = %5.1f, z(last) = %6.1f, p(last) = %5.1f\n",
-                           itrk, track->fPartID, track->fPdgCode, nh0,
-                           part_first_z[ipart], part_first_z_p[ipart],
-                           part_last_z [ipart], part_last_z_p [ipart]);
-//-----------------------------------------------------------------------------
-// particle parameters at virtual detectors
-//-----------------------------------------------------------------------------
-    mu2e::GeomHandle<mu2e::VirtualDetector> vdg;
-
-    double t_front(1.e6), t_stout(1.e6);
-
-    // initialize MC track front to an early sim hit in case no virtual detector hit is found
-    track->fPFront = part_first_z_p[ipart];
-    track->fPStOut = -1.;
-    track->fMcDirection = (part_netDir[ipart] >= 0.) ? 1 : -1;
-
-    if(verbose > 1) printf(" N(virtual detectors) = %i\n", vdg->nDet());
-    if (vdg->nDet() > 0) {
-//-----------------------------------------------------------------------------
-// no more step point MC's in the tracker - straw gas steps there
-//-----------------------------------------------------------------------------
-      art::Handle<mu2e::StepPointMCCollection> vdhits;
-      AnEvent->getByLabel(fVdhCollTag,vdhits);
-      if (!vdhits.isValid()) {
-	char warning[500];
-	snprintf(warning,500,"WARNING in InitTrackBlock::%s: StepPointMCCollection %s not found\n",
-                 __func__,fVdhCollTag.encode().data());
-	mf::LogWarning(oname) << warning;
-      }
-      else {
-	int nvdhits = vdhits->size();
-        if(verbose > 2) printf(" N(virtual detector hits) = %i with tag %s\n", nvdhits, fVdhCollTag.encode().c_str());
-	for (int i=0; i<nvdhits; i++) {
-	  const mu2e::StepPointMC* hit = &(*vdhits)[i];
-
-	  //int vdid = hit.volumeId();
-	  mu2e::VirtualDetectorId vdid(hit->volumeId());
-          if(verbose > 3) printf("  Virtual detector hit %2i: %15s\n", i, vdid.name().c_str());
-
-	  if (vdid.id() == mu2e::VirtualDetectorId::ST_Out) {
-
-	    //	    TAnaDump::Instance()->printStepPointMC(hit,"");
-
-	    art::Ptr<mu2e::SimParticle> const& simptr = hit->simParticle();
-	    const mu2e::SimParticle* sim  = simptr.operator ->();
-
-	    if (sim == NULL) {
-	      char warning[100];
-	      printf(">>> ERROR: %s sim == NULL\n",oname);
-	      sprintf(warning,"WARNING: SimParticle for step %i = NULL\n",i);
-	      mf::LogWarning(oname) << warning;
-	    } else {
-              int sim_id = sim->id().asInt();
-              if(verbose > 4) printf("   simID = %5i\n", sim_id);
-              if ((sim_id == track->fPartID)  && (hit->time() <  t_stout)) {
-                track->fPStOut = hit->momentum().mag();
-                t_stout        = hit->time();
-                if(verbose > 3) printf(" Sim ST_Out hit found: p = %5.1f, t = %6.1f\n", track->fPStOut, t_stout);
-              }
-            }
-	  }
-	  else if (vdid.isTrackerFront()) {
-
-	    //	    TAnaDump::Instance()->printStepPointMC(hit,"");
-
-	    art::Ptr<mu2e::SimParticle> const& simptr = hit->simParticle();
-	    const mu2e::SimParticle* sim  = simptr.operator ->();
-
-	    if (sim == NULL) {
-	      printf(">>> ERROR: %s sim == NULL\n",oname);
-	    } else {
-              int sim_id = sim->id().asInt();
-              if(verbose > 4) printf("   simID = %5i\n", sim_id);
-              if ((sim_id == track->fPartID) && (hit->time() < t_front)) {
-                track->fPFront = hit->momentum().mag();
-                t_front        = hit->time();
-                //track->fMcDirection = (hit->momentum().z() >= 0.) ? 1 : -1;
-                if(verbose > 3) printf(" Sim TT_Front hit found: p = %5.1f, t = %6.1f MC trajectory = %2i\n", track->fPFront, t_front, track->fMcDirection);
-              }
-            }
-	  }
-	}
-      }
-    }
-    if(verbose > 1) printf(" Track MC P(front) = %5.1f, MC P(ST Out) = %5.1f, MC trajectory = %2i\n", track->fPFront, track->fPStOut, track->fMcDirection);
+    if(verbose > 1) printf(" Track %i MC info: ID = %3i, PDG = %5i, N(hits) = %2i, P(front) = %5.1f, MC P(ST Out) = %5.1f, MC trajectory = %2i\n",
+                           itrk, track->fPartID, track->fPdgCode, track->NGoodMcHits(),
+                           track->fPFront, track->fPStOut, track->fMcDirection);
 
 //-----------------------------------------------------------------------------
 // number of MC hits produced by the mother particle
 //-----------------------------------------------------------------------------
     track->fNMcStrawHits = 0;
 
-    if (list_of_mc_straw_hits->size() > 0) {
+    if (list_of_mc_straw_hits) {
+      const int nss_ch = list_of_mc_straw_hits->size();
       for (int i=0; i<nss_ch; i++) {
-	const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(i);
-
+        const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(i);
         const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
 
-	if (step) {
-	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle();
-	  art::Ptr<mu2e::SimParticle> mother        = simptr;
-	  // while(mother->hasParent())  mother        = mother->parent();
-	  const mu2e::SimParticle*    sim           = mother.get();
+        if (step) {
+          art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle();
+          art::Ptr<mu2e::SimParticle> mother        = simptr;
+          // while(mother->hasParent())  mother        = mother->parent();
+          const mu2e::SimParticle*    sim           = mother.get();
+          int sim_id = sim->id().asInt();
 
-	  int sim_id = sim->id().asInt();
-
-	  if (sim_id == track->fPartID) {
-	    track->fNMcStrawHits += 1;
-	  }
-	}
+          if (sim_id == track->fPartID) {
+            track->fNMcStrawHits += 1;
+          }
+        }
       }
     }
 //-----------------------------------------------------------------------------

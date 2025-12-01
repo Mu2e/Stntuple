@@ -70,7 +70,7 @@ int StntupleInitTriggerBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Even
             break;
           }
         }
-	if (nt == 0) {
+	if (nt == 0 && !std::isupper(name[0])) { // ignore paths that start with uppercase letters, these are usually Offline paths
 	  printf("%s ERROR: path %s is not in the trigger table for this run. The bit is NOT SET\n",oname,name.data());
 	}
       }
