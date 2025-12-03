@@ -84,14 +84,25 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     if(mc_ccc_assns) {
       for(int iassn = 0; iassn < nmc_ccc_assns; ++iassn) {
         const auto assn = mc_ccc_assns->at(iassn);
-        if(!assn.first || !assn.second) continue;
-        const mu2e::CrvCoincidenceCluster*   ireco = &(*(assn.first));
+        if(!assn.second) {
+          printf("InitCrvClusterBlock::%s: Cluster %2i: MC association %i is not valid! Reco = %o, MC = %o\n", __func__, iccc, iassn,
+                 assn.first.isAvailable(), assn.second.isAvailable());
+          continue;
+        }
+        const mu2e::CrvCoincidenceCluster*   ireco = (!assn.first) ? nullptr : &(*(assn.first));
         const mu2e::CrvCoincidenceClusterMC* imc   = &(*(assn.second));
-        if(&(*(ireco)) == &(*cluster)) {
+        if(ireco && &(*(ireco)) == &(*cluster)) {
           if(verbose > 1) printf(" --> Associated MC cluster found, association index %i\n", iassn);
           mc_cluster = imc;
           break;
         }
+      }
+      if(!mc_cluster && nmc_ccc_assns == nccc) {
+        // try by index if the numbers match
+        const mu2e::CrvCoincidenceClusterMC* imc = &(*(mc_ccc_assns->at(iccc).second));
+        mc_cluster = imc;
+        if(verbose > 0) printf("%s:%s: Cluster %2i: Associated MC cluster found by index %i\n",
+                               typeid(*this).name(), __func__, iccc, iccc);
       }
       if(!mc_cluster) printf("%s::%s: Cluster %2i: Associated MC cluster not found! N(clusters) = %i N(Assns) = %i\n",
                         typeid(*this).name(), __func__, iccc, nccc, nmc_ccc_assns);

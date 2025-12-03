@@ -1,0 +1,37 @@
+#------------------------------------------------------------------------------
+# Reco+STN Digi inputs
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/default_stn_config.fcl"
+
+process_name : S5Stn
+
+source       : { module_type : RootInput
+    fileNames : ["undefined" ]
+    inputCommands : [ "keep  *_*_*_*",
+                      "drop mu2e::HelixSeeds_*_*_*",
+                      "drop mu2e::KalSeeds_*_*_*",
+                      "drop mu2e::TriggerInfo_*_*_*",
+                      "drop mu2e::CaloClusters_*_*_*",
+                      "drop mu2e::TimeClusters_*_*_*",
+                      "drop mu2e::CosmicTrackSeeds_*_*_*",
+                      "drop *CaloClusterCollection_*_*_*",
+                      "drop *ComboHitCollection_*_*_*"
+                     ]
+}
+
+# Add the paths of interest, Triggerable + single hypothesis reco paths
+physics.trigger_paths[200] : "1:p1"
+physics.trigger_paths[201] : "2:RecoDe"
+physics.trigger_paths[202] : "3:RecoUe"
+physics.trigger_paths[203] : "4:RecoDmu"
+physics.trigger_paths[204] : "5:RecoUmu"
+
+# Default output file naming
+services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.root"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.stn"
+
+# default compression
+physics.analyzers.InitStntuple.THistModule.compressionLevel : 501 # 7
+
+# Resolve a segmentation fault in StrawDrift T2D calculation
+services.ProditionsService.strawElectronics.overrideDbTimeOffsets : false

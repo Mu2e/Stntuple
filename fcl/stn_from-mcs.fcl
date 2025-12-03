@@ -1,0 +1,105 @@
+#------------------------------------------------------------------------------
+# STN Reco inputs
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/default_stn_config.fcl"
+
+process_name : S5Stn
+
+source       : { module_type : RootInput 
+    fileNames : ["default"]
+    inputCommands : [ "keep  *_*_*_*"]
+}
+
+# Create ptr collections from the trigger results
+physics.producers.AprTrkDe80m70pCollections : {
+	module_type     : TriggerInfoToCollections
+	triggerInfoName : "aprHighPKSFilter"
+	# triggerInfoName : "AprTrkDe80m70pKSFilter"
+	# triggerInfoName : "AprTrkDe80m70pTriggerInfoMerger"
+	debugLevel      : 0
+}
+physics.producers.CprTrkDe80m70pCollections : {
+	module_type     : TriggerInfoToCollections
+	triggerInfoName : "cprDeHighPKSFilter"
+	# triggerInfoName : "CprTrkDe80m70pKSFilter"
+	# triggerInfoName : "CprTrkDe80m70pTriggerInfoMerger"
+	debugLevel      : 0
+}
+
+# Run track quality modules and create collections from the main trigger paths
+physics.TrkQualPath : [MergeKKDe , TrkQualDe,
+				MergeKKUe , TrkQualUe,
+				MergeKKDmu, TrkQualDmu,
+				MergeKKUmu, TrkQualUmu]
+
+physics.TriggerInfoPaths : [ 
+	AprTrkDe80m70pCollections,
+	CprTrkDe80m70pCollections
+]
+
+physics.trigger_paths : [TrkQualPath, TriggerInfoPaths]
+
+TrigNames_timeClusterBlockName: [ "TimeClusterBlockAprHighP"        , "TimeClusterBlockCprDeHighP"     ]
+TrigNames_timeClusterCollTag  : [ "AprTrkDe80m70pCollections"       , "CprTrkDe80m70pCollections"      ]
+TrigNames_helixBlockName      : [ "HelixBlockAprHighP"              , "HelixBlockCprDeHighP"           ]
+TrigNames_helixCollTag        : [ "AprTrkDe80m70pCollections"       , "CprTrkDe80m70pCollections"      ]
+TrigNames_trackBlockName      : [ "TrackBlockAprHighP"              , "TrackBlockCprDeHighP"           ]
+TrigNames_trackCollTag        : [ "AprTrkDe80m70pCollections"       , "CprTrkDe80m70pCollections"      ]
+TrigNames_helixKsCollTag      : [ ""                                , ""                               ]
+TrigNames_trackHsBlockName    : [ "HelixBlockAprHighP"              , "HelixBlockCprDeHighP"           ]
+TrigNames_tciCollTag          : [ ""                                , ""                               ]
+TrigNames_tcmCollTag          : [ ""                                , ""                               ]
+TrigNames_trackSHBlockName    : [ ""                                , ""                               ]
+TrigNames_pidBlockName        : [ ""                                , ""                               ]
+TrigNames_pidCollTag          : [ ""                                , ""                               ]
+TrigNames_trkQualCollTag      : [ ""                                , ""                               ]
+
+
+# Add the collections
+# physics.analyzers.InitStntuple.shCollTag                      :   "" #"SelectRecoMC"
+# physics.analyzers.InitStntuple.chCollTag                      :   "" #"SelectRecoMC"
+# physics.analyzers.InitStntuple.comboHitCollTag                :   "" #"SelectRecoMC"
+# physics.analyzers.InitStntuple.strawHitCollTag                :   "" #"SelectRecoMC"
+physics.analyzers.StntupleMaker.shCollTag                     :   "" #"SelectRecoMC"
+physics.analyzers.StntupleMaker.chCollTag                     :   "" #"SelectRecoMC"
+physics.analyzers.StntupleMaker.tcShCollTag                   : [ "SelectRecoMC" ]
+physics.analyzers.StntupleMaker.tcChCollTag                   : [ "SelectRecoMC" ]
+physics.analyzers.StntupleMaker.strawDigiMCCollTag            : "compressRecoMCs"
+physics.analyzers.StntupleMaker.simpCollTag                   : "compressRecoMCs"
+physics.analyzers.StntupleMaker.primaryParticleTag            : "compressRecoMCs"
+physics.analyzers.StntupleMaker.spmcCollTag                   : ["compressRecoMCs:virtualdetector"]
+physics.analyzers.StntupleMaker.vdHitsCollTag                 : "compressRecoMCs:virtualdetector"
+physics.analyzers.StntupleMaker.crvRecoPulseCollTag           :   "SelectReco"
+physics.analyzers.StntupleMaker.crvCoincidenceCollTag         :   "SelectReco"
+physics.analyzers.StntupleMaker.crvCoincidenceClusterCollTag  :   "SelectReco:CrvCoincidenceClusterFinder"
+physics.analyzers.StntupleMaker.crvCoincidenceClusterMCCollTag:   "CrvCoincidenceClusterMCAssns"
+physics.analyzers.StntupleMaker.triggerResultsTag             : "TriggerResults::Digitize"
+physics.analyzers.StntupleMaker.timeClusterBlockName          : [@sequence::OfflineNames_timeClusterBlockName, @sequence::TrigNames_timeClusterBlockName]
+physics.analyzers.StntupleMaker.timeClusterCollTag            : [@sequence::OfflineNames_timeClusterCollTag  , @sequence::TrigNames_timeClusterCollTag  ]
+physics.analyzers.StntupleMaker.helixBlockName                : [@sequence::OfflineNames_helixBlockName      , @sequence::TrigNames_helixBlockName      ]
+physics.analyzers.StntupleMaker.helixCollTag                  : [@sequence::OfflineNames_helixCollTag        , @sequence::TrigNames_helixCollTag        ]
+physics.analyzers.StntupleMaker.helixCollKsTag                : [@sequence::OfflineNames_helixKsCollTag      , @sequence::TrigNames_helixKsCollTag      ]
+physics.analyzers.StntupleMaker.trackBlockName                : [@sequence::OfflineNames_trackBlockName      , @sequence::TrigNames_trackBlockName      ]
+physics.analyzers.StntupleMaker.trackCollTag                  : [@sequence::OfflineNames_trackCollTag        , @sequence::TrigNames_trackCollTag        ]
+physics.analyzers.StntupleMaker.trackHsBlockName              : [@sequence::OfflineNames_trackHsBlockName    , @sequence::TrigNames_trackHsBlockName    ]
+physics.analyzers.StntupleMaker.tciCollTag                    : [@sequence::OfflineNames_tciCollTag          , @sequence::TrigNames_tciCollTag          ]
+physics.analyzers.StntupleMaker.tcmCollTag                    : [@sequence::OfflineNames_tcmCollTag          , @sequence::TrigNames_tcmCollTag          ]
+physics.analyzers.StntupleMaker.pidCollTag                    : [@sequence::OfflineNames_pidCollTag          , @sequence::TrigNames_pidCollTag          ]
+physics.analyzers.StntupleMaker.trkQualCollTag                : [@sequence::OfflineNames_trkQualCollTag      , @sequence::TrigNames_trkQualCollTag      ]
+
+physics.analyzers.StntupleMaker.trackVerbose : 0
+
+# default compression
+physics.analyzers.InitStntuple.THistModule.compressionLevel : 501 # 7
+
+# Default output file naming
+services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.root"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.stn"
+
+# Optionally add hit reco to the job, but only runs on the subset of hits on tracks:
+# physics.analyzers.StntupleMaker.shCollTag                     :   "makeSH"
+# physics.analyzers.StntupleMaker.chCollTag                     :   "makePH"
+# physics.HitReco : [@sequence::TrackerMC.DigiSim,
+#                    @sequence::Reconstruction.TrkHitReco]
+# physics.producers.makeSD.StrawGasStepModules : ["compressRecoMCs"]
+# physics.trigger : [@sequence::physics.trigger, HitReco]

@@ -157,7 +157,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger(12,12,"caloPhoton_trigger"         ,1));
     trigger_table->AddTrigger(new TStnTrigger(31,31,"p1"                         ,1)); // a kludge to get rid of su2020 warnings
   }
-  else if (RunNumber <= 1210) {
+  else if (RunNumber <= 1210 && false) { // FIXME: Turned off for now to test updated trigger paths
 //-----------------------------------------------------------------------------
 // runs 1200-1210: this may or may not be correct, consider the following
 // just an example
