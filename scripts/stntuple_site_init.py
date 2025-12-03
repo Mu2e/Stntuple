@@ -41,8 +41,11 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
 
     includes = includes + ' -I'+os.environ['MUSE_WORK_DIR'];
 
-    if (os.getenv('MUSE_BACKING') and (os.getenv('MUSE_BACKING') != '')) : 
-        includes = includes + ' -I'+os.environ['MUSE_BACKING' ];
+    if (os.getenv('MUSE_BACKING') and (os.getenv('MUSE_BACKING') != '')) :
+        backing_list = os.getenv('MUSE_BACKING').split(' ')
+        for b in backing_list:
+            if b == '': continue
+            includes = includes + ' -I'+ b;
 
     muse_flavor = os.environ.get("MUSE_FLAVOR")
 
