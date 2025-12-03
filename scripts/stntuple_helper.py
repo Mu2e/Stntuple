@@ -96,7 +96,7 @@ class stntuple_helper:
 
     def compile_fortran(self,list_of_f_files, skip_list = []):
         if (self._debug):
-            print  (self._dirname+"[build_libs]: list_of_f_files:"+self._subdir,list_of_f_files);
+            print  (self.dirname+"[build_libs]: list_of_f_files:"+self.subdir,list_of_f_files);
 
         for f in list_of_f_files:
             if (not f in skip_list):
