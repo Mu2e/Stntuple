@@ -36,6 +36,7 @@ physics.TriggerInfoPaths : [
 	AprTrkDe80m70pCollections,
 	CprTrkDe80m70pCollections
 ]
+
 physics.trigger_paths : [TrkQualPath, TriggerInfoPaths]
 
 TrigNames_timeClusterBlockName: [ "TimeClusterBlockAprHighP"        , "TimeClusterBlockCprDeHighP"     ]
@@ -94,3 +95,11 @@ physics.analyzers.InitStntuple.THistModule.compressionLevel : 501 # 7
 # Default output file naming
 services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.root"
 physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.stn"
+
+# Optionally add hit reco to the job, but only runs on the subset of hits on tracks:
+# physics.analyzers.StntupleMaker.shCollTag                     :   "makeSH"
+# physics.analyzers.StntupleMaker.chCollTag                     :   "makePH"
+# physics.HitReco : [@sequence::TrackerMC.DigiSim,
+#                    @sequence::Reconstruction.TrkHitReco]
+# physics.producers.makeSD.StrawGasStepModules : ["compressRecoMCs"]
+# physics.trigger : [@sequence::physics.trigger, HitReco]
