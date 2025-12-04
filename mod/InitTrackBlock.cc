@@ -252,10 +252,12 @@ void StntupleInitTrackBlock::RetrieveData(AbsEvent* AnEvent) {
   }
 
   list_of_trk_qual = 0;
-  art::Handle<mu2e::MVAResultCollection> trkQualHandle;
-  AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
-  if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
-  else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
+  if(fTrkQualCollTag != "") {
+    art::Handle<mu2e::MVAResultCollection> trkQualHandle;
+    AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
+    if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
+    else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
+  }
 
   fSschColl = 0;
   art::Handle<mu2e::ComboHitCollection> sschcH;
@@ -741,56 +743,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   ntrk = (list_of_kffs) ? list_of_kffs->size() : (list_of_kffs_ptrs) ? list_of_kffs_ptrs->size() : 0; 
   nassns = (list_of_kff_assns) ? list_of_kff_assns->size() : 0;
 
-<<<<<<< Updated upstream
   // art::Handle<mu2e::TrackClusterMatchCollection>  tcmH;
   // AnEvent->getByLabel(fTcmCollTag,tcmH);
-=======
-  const mu2e::KalHelixAssns* list_of_kff_assns = nullptr;
-  art::Handle<mu2e::KalHelixAssns> kffAssnsH;
-  AnEvent->getByLabel(fKFFCollTag,kffAssnsH);
-  if (kffAssnsH.isValid()) {
-    list_of_kff_assns = kffAssnsH.product();
-    nassns = list_of_kff_assns->size();
-    if(verbose > 0) printf("%s::%s: KalHelixAssns %15s has %2i associations\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns);
-    if(nassns != ntrk) printf("%s::%s: KalHelixAssns %15s has a different number of tracks! %i assns %i trks\n",
-                              typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), nassns, ntrk);
-  } else {
-    if(verbose > 0) printf("%s::%s: KalHelixAssns %s not found!\n", typeid(*this).name(), __func__, fKFFCollTag.encode().c_str());
-  }
-
-  list_of_trk_qual = 0;
-  if(fTrkQualCollTag != "" ) {
-    art::Handle<mu2e::MVAResultCollection> trkQualHandle;
-    AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
-    if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
-    else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
-  }
-
-  fSschColl = 0;
-  art::Handle<mu2e::ComboHitCollection> sschcH;
-  AnEvent->getByLabel(fSsChCollTag,sschcH);
-  if (sschcH.isValid()) fSschColl = sschcH.product();
-  else printf(" WARNING InitTrackBlock::%s: ComboHitCollection %s not found\n", __func__, fSsChCollTag.encode().c_str());
-
-  list_of_mc_straw_hits = 0;
-  art::Handle<mu2e::StrawDigiMCCollection> sdmcHandle;
-  AnEvent->getByLabel(fStrawDigiMCCollTag,sdmcHandle);
-  if (sdmcHandle.isValid()) list_of_mc_straw_hits = sdmcHandle.product();
-  else if(fStrawDigiMCCollTag != "") printf(" InitTrackBlock::%s: StrawDigiMC collection %s not found\n", __func__, fStrawDigiMCCollTag.encode().c_str());
-
-  list_of_extrapolated_tracks = 0;
-  art::Handle<mu2e::TrkCaloIntersectCollection>  texHandle;
-  AnEvent->getByLabel(fTciCollTag,texHandle);
-  if (texHandle.isValid()) list_of_extrapolated_tracks = texHandle.product();
-
-  art::Handle<mu2e::TrackClusterMatchCollection>  tcmH;
-  AnEvent->getByLabel(fTcmCollTag,tcmH);
-
-  list_of_pidp = 0;
-  art::Handle<mu2e::PIDProductCollection>  pidpHandle;
-  AnEvent->getByLabel(fPIDProductCollTag,pidpHandle);
-  if (pidpHandle.isValid()) list_of_pidp = pidpHandle.product();
->>>>>>> Stashed changes
 
   art::ServiceHandle<mu2e::GeometryService>   geom;
   mu2e::GeomHandle<mu2e::DetectorSystem>      ds;
