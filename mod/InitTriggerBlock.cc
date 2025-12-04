@@ -55,24 +55,31 @@ int StntupleInitTriggerBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Even
       const std::string& name = trn.getTrigPathName(i);
 
       if (trn.accepted(name)) {
-	//-----------------------------------------------------------------------------
-	// the event has passed the logic of the trigger path named 'name'
-	//-----------------------------------------------------------------------------
-	char oname[] = "StntupleInitTriggerBlock::InitDataBlock";
+        //-----------------------------------------------------------------------------
+        // the event has passed the logic of the trigger path named 'name'
+        //-----------------------------------------------------------------------------
+        char oname[] = "StntupleInitTriggerBlock::InitDataBlock";
 
-	ttbl->GetListOfTriggers(name.data(),&list);
-	int nt = list.GetEntriesFast();
+        int trig_bit = -1;
+        try {
+          trig_bit = trn.getTrigBit(name);
+        } catch (...) {}
+        // ttbl->GetListOfTriggers(name.data(),&list);
+        ttbl->GetListOfTriggers("",&list); // check against all triggers
+        int nt = list.GetEntriesFast();
+        bool found = false;
         for (int k=0; k<nt; k++){
           TStnTrigger* tr = (TStnTrigger*) list.At(k);
-          if (tr->Name().Data() == name){
-            int bit = tr->Bit();
-            block->fPaths.SetBit(bit);
+          const int bit = tr->Bit();
+          if (tr->Name().Data() == name || (trig_bit >= 0 && bit == trig_bit)) {
+            block->fPaths.SetBit((trig_bit >= 0) ? trig_bit : bit); // use the bit from the TriggerResults
+            found = true;
             break;
           }
         }
-	if (nt == 0 && !std::isupper(name[0])) { // ignore paths that start with uppercase letters, these are usually Offline paths
-	  printf("%s ERROR: path %s is not in the trigger table for this run. The bit is NOT SET\n",oname,name.data());
-	}
+        if (!found && !std::isupper(name[0])) { // ignore paths that start with uppercase letters, these are usually Offline paths
+          printf("%s ERROR: path %s is not in the trigger table for this run. The bit is NOT SET\n",oname,name.data());
+        }
       }
     }
   }
