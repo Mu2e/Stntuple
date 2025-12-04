@@ -89,6 +89,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 
     caloCrystalHitsMaker         : "CaloHitMaker"
     caloClusterMaker             : "CaloClusterMaker"
+    caloHitCollTag               : "CaloHitMaker"
 #------------------------------------------------------------------------------
 # default tags for CRV reco collections
 #------------------------------------------------------------------------------
@@ -206,7 +207,7 @@ MuHitDisplay: { module_type: MuHitDisplay                 ## class name;
     
     genpCollTag                  : "generate"
     comboHitCollTag              : "FlagBkgHits"                     ## "FlagBkgHits" ## (was "makePH") flagged comboHits
-    helixSeedCollTag             : "MHFinderDe"                      # helices
+    helixSeedCollTag             : "MHDe"                      # helices
     strawHitCollTag              : "makeSH"
     sdCollTag                    : "compressDigiMCs"                 # standard MC choice
     swCollTag                    : "compressDigiMCs"                 # standard MC choice
@@ -219,7 +220,7 @@ MuHitDisplay: { module_type: MuHitDisplay                 ## class name;
 
     phiClusterCollTag            : "TZClusterFinder"                 ## "PhiClusterFinder"
     timeClusterCollTag           : "CalTimePeakFinder"
-    kffCollTag                   : "KKDeMHPar"                       ## "KSFDeMHDar"
+    kffCollTag                   : "KKDe"                       ## "KSFDeMHDar"
     ksfCollTag                   : "KFFDeMHDar"
     ctsCollTag                   : "LineFinder"
 
