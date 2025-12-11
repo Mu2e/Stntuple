@@ -154,7 +154,7 @@ physics.producers.compressRecoMCs.surfaceStepTags : []
 # Clone track/helix/cluster collections specific to each relevant trigger path
 
 # Turn off MC-matching in the trigger which doesn't work with cloning
-physics.producers.TTAprKSFMC : { module_type: NullProducer }
+physics.producers.TrigAprKSFMC : { module_type: NullProducer }
 physics.producers.AprHelixTriggerInfoMerger.doDeepCopy             : 1
 physics.producers.AprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
 physics.producers.AprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
@@ -165,7 +165,7 @@ physics.producers.AprHlx50Hlx30TriggerInfoMerger.doDeepCopy        : 1
 physics.producers.AprHlx50Hlx30TriggerInfoMerger.doDeepCopy        : 1
 
 # Turn off MC-matching in the trigger which doesn't work with cloning
-physics.producers.TTCprDeKSFMC : { module_type: NullProducer }
+physics.producers.TrigCprDeKSFMC : { module_type: NullProducer }
 physics.producers.CprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
 physics.producers.CprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
 physics.producers.CprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
@@ -173,7 +173,7 @@ physics.producers.CprHlxDe50TriggerInfoMerger.doDeepCopy           : 1
 physics.producers.CprHelixUeTriggerInfoMerger.doDeepCopy           : 1
 
 # Turn off MC-matching in the trigger which doesn't work with cloning
-physics.producers.TTTprDeKSFMC : { module_type: NullProducer }
+physics.producers.TriTprDeKSFMC : { module_type: NullProducer }
 physics.producers.TprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
 physics.producers.TprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
 physics.producers.TprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
@@ -182,7 +182,8 @@ physics.producers.TprHlxUe50m30pTriggerInfoMerger.doDeepCopy       : 1
 physics.producers.TprHlxDe30pIPATriggerInfoMerger.doDeepCopy       : 1
 physics.producers.TprHlxDe30pIPAPhiTriggerInfoMerger.doDeepCopy    : 1
 
-physics.producers.TTMprDeKSFMC : { module_type : NullProducer }
+physics.producers.TrigMprDeKSFMC : { module_type : NullProducer }
+physics.producers.TrigTprDeKSFMC : { module_type : NullProducer }
 
 #------------------------------------------------------------------------------
 physics.analyzers.StntupleMaker.makeClusters           : 1
