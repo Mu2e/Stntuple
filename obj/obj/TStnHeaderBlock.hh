@@ -70,6 +70,7 @@ public:
   int    NTracks      () const { return fNTracks;       }
   int    NStrawHits   () const { return fNStrawHits;    }
   int    NComboHits   () const { return fNComboHits;    }
+  int    NCaloHits    () const { return fNCaloHits;     }
 
   float InstLum       () const { return fInstLum;       }
   float MeanLum       () const { return fMeanLum;       }

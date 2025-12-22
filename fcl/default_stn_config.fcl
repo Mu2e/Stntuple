@@ -173,7 +173,7 @@ physics.producers.CprHlxDe50TriggerInfoMerger.doDeepCopy           : 1
 physics.producers.CprHelixUeTriggerInfoMerger.doDeepCopy           : 1
 
 # Turn off MC-matching in the trigger which doesn't work with cloning
-physics.producers.TriTprDeKSFMC : { module_type: NullProducer }
+physics.producers.TrigTprDeKSFMC : { module_type: NullProducer }
 physics.producers.TprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
 physics.producers.TprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
 physics.producers.TprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
@@ -184,6 +184,12 @@ physics.producers.TprHlxDe30pIPAPhiTriggerInfoMerger.doDeepCopy    : 1
 
 physics.producers.TrigMprDeKSFMC : { module_type : NullProducer }
 physics.producers.TrigTprDeKSFMC : { module_type : NullProducer }
+
+# Previous name
+physics.producers.TTAprKSFMC   : { module_type: NullProducer }
+physics.producers.TTCprDeKSFMC : { module_type: NullProducer }
+physics.producers.TTTprDeKSFMC : { module_type: NullProducer }
+physics.producers.TTMprDeKSFMC : { module_type: NullProducer }
 
 #------------------------------------------------------------------------------
 physics.analyzers.StntupleMaker.makeClusters           : 1

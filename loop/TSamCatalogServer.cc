@@ -70,7 +70,7 @@ int TSamCatalogServer::FindDataset(const char* Book, const char* Dataset) {
 //-----------------------------------------------------------------------------
 // query SAM 
 //-----------------------------------------------------------------------------
-  cmd = Form("samweb list-definitions --group=mu2e | grep %s | grep .stn$ | grep %s ",Book,Dataset);
+  cmd = Form("source /cvmfs/mu2e.opensciencegrid.org/setupmu2e-art.sh; setup dhtools; samweb list-definitions --group=mu2e | grep %s | grep .stn$ | grep %s ",Book,Dataset);
   cmd += " | wc -l";
 
   if (fPrintLevel > 0) printf("TSamCatalogServer::%s cmd= %s\n", __func__, cmd.Data());
@@ -267,8 +267,9 @@ int TSamCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
 //-----------------------------------------------------------------------------
   // TString sam_defname = Form("nts.mu2e.%s.%s.stn",Dataset->GetName(),Dataset->GetBook());
   TString sam_defname = Form("nts.${USER}.%s.%s.stn",Dataset->GetName(),Dataset->GetBook());
-  cmd = Form("DATASET=`samweb list-definitions --group=mu2e | grep %s | grep .stn$ | grep %s | tail -n 1`; ",Dataset->GetBook(),Dataset->GetName());
-  cmd += Form("samweb list-file-locations --dimensions \"dh.dataset ${DATASET}\""); //,sam_defname.Data());
+  cmd = Form("setup dhtools; DATASET=`samweb list-definitions --group=mu2e | grep %s | grep .stn$ | grep %s | tail -n 1`; ",Dataset->GetBook(),Dataset->GetName());
+  // cmd += Form("samweb list-file-locations --dimensions \"dh.dataset ${DATASET}\""); //,sam_defname.Data());
+  cmd += Form("setup mu2efiletools; mu2eDatasetFileList ${DATASET}"); //,sam_defname.Data());
 
   if (fPrintLevel > 0) {
     printf(" DEBUG FILESETS: Retrieving data with: %s\n",cmd.Data());
@@ -308,7 +309,9 @@ int TSamCatalogServer::InitListOfFilesets(TStnDataset* Dataset,
     ListOfFiles->Add(new TObjString(buf)); 
   }
   gSystem->ClosePipe(pipe);
-    
+  if (fPrintLevel > 0) {
+    printf(" DEBUG FILESETS: fileset: %s found %zu files\n",s_fileset.Data(), found_files.size());
+  }
   return 0;
 }
 
@@ -582,15 +585,21 @@ int TSamCatalogServer::InitDataset(TStnDataset*     Dataset,
       // Test replacing the query with a simple samweb call
       for(auto o : files) {
         TString line = TString(((TObjString*) o)->String());
-        TString name = line(line.Index(":")+1,line.Sizeof()).Data();
-        name.ReplaceAll(":", "");
-        name.Replace(name.Index("\t"), 1, "/");
-        size = TString(name(name.Index("\t")+1, name.Sizeof())).Atoi();
-        name = name(0, name.Index("\t"));
+        TString name = line;
+        if(name.Contains(":")) { // samweb return style
+          name = line(line.Index(":")+1,line.Sizeof()).Data();
+          name.ReplaceAll(":", "");
+          name.Replace(name.Index("\t"), 1, "/");
+          size = TString(name(name.Index("\t")+1, name.Sizeof())).Atoi();
+          name = name(0, name.Index("\t"));
+        }
+        name.ReplaceAll(" ", "");
+        name.ReplaceAll("\t", "");
+        name.ReplaceAll("\n", "");
         status = 0;
         if(fPrintLevel > 0) printf("Line = %s, Name = %s, size = %f\n", line.Data(),
                                    name.Data(), size);
-        TFile* f    = TFile::Open(name, "READ"); // FIXME: This info should be from the catalog
+        TFile* f = TFile::Open(name.Data(), "READ"); // FIXME: This info should be from the catalog
         if(!f) printf("TSamCatalogServer::%s: Failed to open file %s!\n", __func__, name.Data());
         else {
           TTree* tree = (TTree*) f->Get("STNTUPLE");
