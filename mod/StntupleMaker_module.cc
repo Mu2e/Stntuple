@@ -375,6 +375,41 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   fFolder->Add(fDarHandle);
 
+  // Validate inputs
+
+  // Tracks
+  const size_t n_track_blocks = fTrackBlockName.size();
+  if(fTrackCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTrackCollTag list size doesn't match track block list size");
+  if(fTrackHsBlockName.size() != n_track_blocks)
+    throw std::runtime_error("fTrackHsBlockName list size doesn't match track block list size");
+  if(fTciCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTciCollTag list size doesn't match track block list size");
+  if(fTcmCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTcmCollTag list size doesn't match track block list size");
+  if(fTrkQualCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTrkQualCollTag list size doesn't match track block list size");
+  if(fPidCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fPidCollTag list size doesn't match track block list size");
+  if(fMakePid && fPidBlockName.size() != n_track_blocks)
+    throw std::runtime_error("fPidBlockName list size doesn't match track block list size");
+  if(!fTrackTsBlockName.empty() && fTrackTsBlockName.size() != n_track_blocks)
+    throw std::runtime_error("fTrackTsBlockName list size doesn't match track block list size");
+  if(fTrackTsBlockName.size() != fTrackTsCollTag.size())
+    throw std::runtime_error("fTrackTsBlockName list size doesn't match coll tag list size");
+
+  // Helices
+  const size_t n_helix_blocks = fHelixBlockName.size();
+  if(fHelixSeedCollTag.size() != n_helix_blocks)
+    throw std::runtime_error("fHelixSeedCollTag list size doesn't match helix block list size");
+  if(fTClBlockName.size() != n_helix_blocks)
+    throw std::runtime_error("fTClBlockName list size doesn't match helix block list size");
+  if(!fKsfBlockName.empty() && fKsfBlockName.size() != n_helix_blocks)
+    throw std::runtime_error("fKsfBlockName list size doesn't match helix block list size");
+  if(fKsfBlockName.size() != fHelixKsCollTag.size())
+    throw std::runtime_error("fKsfBlockName list size doesn't match helix KS coll tag list size");
+
+
 }
 
 

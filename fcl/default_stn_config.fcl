@@ -20,6 +20,8 @@ TrigNames_trackSHBlockName    : [ ""                                , ""        
 TrigNames_pidBlockName        : [ ""                                , ""                                   , ""                               ]
 TrigNames_pidCollTag          : [ ""                                , ""                                   , ""                               ]
 TrigNames_trkQualCollTag      : [ ""                                , ""                                   , ""                               ]
+TrigNames_trackTsBlockName    : []
+TrigNames_trackTsCollTag      : []
 
 OfflineNames_timeClusterBlockName   : [ "TimeClusterBlockDe",  "TimeClusterBlockUe", "TimeClusterBlockDmu",  "TimeClusterBlockUmu" ]
 OfflineNames_timeClusterCollTag     : [ "TZClusterFinder"   ,  "TZClusterFinder"   , "TZClusterFinder"    ,  "TZClusterFinder"     ]
@@ -35,6 +37,8 @@ OfflineNames_trackSHBlockName       : [ ""                  ,  ""               
 OfflineNames_pidBlockName           : [ ""                  ,  ""                  , ""                   ,  ""                    ]
 OfflineNames_pidCollTag             : [ ""                  ,  ""                  , ""                   ,  ""                    ]
 OfflineNames_trkQualCollTag         : [ "TrkQualDe"         ,  "TrkQualUe"         , "TrkQualDmu"         ,  "TrkQualUmu"          ]
+OfflineNames_trackTsBlockName       : []
+OfflineNames_trackTsCollTag         : []
 END_PROLOG
 
 # Stntuple prologs
@@ -236,7 +240,11 @@ physics.analyzers.StntupleMaker.trackSHBlockName     : [@sequence::OfflineNames_
 physics.analyzers.StntupleMaker.pidBlockName         : [@sequence::OfflineNames_pidBlockName        , @sequence::TrigNames_pidBlockName        ]
 physics.analyzers.StntupleMaker.pidCollTag           : [@sequence::OfflineNames_pidCollTag          , @sequence::TrigNames_pidCollTag          ]
 physics.analyzers.StntupleMaker.trkQualCollTag       : [@sequence::OfflineNames_trkQualCollTag      , @sequence::TrigNames_trkQualCollTag      ]
-
+physics.analyzers.StntupleMaker.trackTsBlockName     : [@sequence::OfflineNames_trackTsBlockName    , @sequence::TrigNames_trackTsBlockName    ]
+physics.analyzers.StntupleMaker.trackTsCollTag       : [@sequence::OfflineNames_trackTsCollTag      , @sequence::TrigNames_trackTsCollTag      ]
+physics.analyzers.StntupleMaker.trackSeedBlockName   : []
+physics.analyzers.StntupleMaker.trackSeedCollTag     : []
+physics.analyzers.StntupleMaker.helixKsCollTag       : []
 
 #------------------------------------------------------------------------------
 #include "mu2e-trig-config/core/trigDigiInputsEpilog.fcl"
