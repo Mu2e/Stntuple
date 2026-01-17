@@ -169,6 +169,7 @@ protected:
 
   string                   fCaloCrystalHitMaker;
   string                   fCaloClusterMaker;
+  string                   fCaloClusterMCMaker;
 //-----------------------------------------------------------------------------
 // initialization of various data blocks
 //-----------------------------------------------------------------------------
@@ -321,6 +322,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fCaloCrystalHitMaker     (PSet.get<string>        ("caloCrystalHitsMaker"))
   , fCaloClusterMaker        (PSet.get<string>        ("caloClusterMaker"    ))
+  , fCaloClusterMCMaker      (PSet.get<string>        ("caloClusterMCMaker", ""))
 
   , fGenId((PSet.get<std::string>("genId","unknown") == "unknown") ? GenId::findByName (PSet.get<std::string>("genId")) : GenId::unknown)
   , fPdgId                   (PSet.get<int>           ("pdgId"               ))
@@ -540,6 +542,7 @@ void StntupleMaker::beginJob() {
 				     compression_level);
     if (db) {
       db->AddCollName("mu2e::CaloClusterCollection",fCaloClusterMaker.data());
+      db->AddCollName("mu2e::CaloClusterMCCollection",fCaloClusterMCMaker.data());
       SetResolveLinksMethod("ClusterBlock",StntupleInitMu2eClusterBlockLinks);
     }
   }

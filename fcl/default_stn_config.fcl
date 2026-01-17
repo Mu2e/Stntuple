@@ -211,6 +211,8 @@ physics.analyzers.StntupleMaker.chCollTag              :   "makePH"
 physics.analyzers.StntupleMaker.tcShCollTag            : [ "makeSH" ]
 physics.analyzers.StntupleMaker.tcChCollTag            : [ "makePH" ]
 physics.analyzers.StntupleMaker.caloHitCollTag         :   "CaloHitMaker"
+physics.analyzers.StntupleMaker.caloClusterMaker       : "CaloClusterMaker"
+physics.analyzers.StntupleMaker.caloClusterMCMaker     : "CaloClusterTruthMatch"
 physics.analyzers.StntupleMaker.triggerResultsTag      : "TriggerResults::S5Stn"
 physics.analyzers.StntupleMaker.nTriggerBits           : 1000
 physics.analyzers.StntupleMaker.strawDigiMCCollTag     : "compressDigiMCs"

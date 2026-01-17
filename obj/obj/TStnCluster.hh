@@ -34,9 +34,11 @@ class TStnCluster : public TObject {
   enum {
     kNFreeIntsV1   = 10,		// V1
     kNFreeFloatsV1 = 10,		// V1
+    kNFreeIntsV2   = 10, // V2
+    kNFreeFloatsV2 =  3, // V2
 
-    kNFreeInts     = 10,		// V2
-    kNFreeFloats   =  3			// V2
+    kNFreeInts     =  8,		// V3
+    kNFreeFloats   =  2			// V3
   };
 
 public:
@@ -50,6 +52,8 @@ public:
   int                       fTrackNumber;     // closest track in TStnTrackBlock
   int                       fIx1;	      // [row, column] or [x1,x2] for a disk
   int                       fIx2;
+  int                       fMCSimID;         // Sim particle ID with the highest energy deposit, added in V3
+  int                       fMCSimPDG;        // Sim particle PDG with the highest energy deposit, added in V3
   int                       fInt[kNFreeInts];
 //-----------------------------------------------------------------------------
 // floats
@@ -76,6 +80,7 @@ public:
   float                     fSigYY;
   float                     fNx   ;    // cluster direction
   float                     fNy   ;
+  float                     fMCSimEDep; // MC main sim energy deposit, added in V3
   float                     fFloat[kNFreeFloats];
 //-----------------------------------------------------------------------------
 // transients
@@ -127,7 +132,7 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
 
-  ClassDef(TStnCluster,2)
+  ClassDef(TStnCluster,3)
 };
 
 #endif
