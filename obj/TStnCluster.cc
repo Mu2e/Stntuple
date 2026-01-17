@@ -91,14 +91,17 @@ void TStnCluster::ReadV1(TBuffer &R__b) {
   fMCSimID       =  -1;     // added in V3
   fMCSimPDG      =  0 ;     // added in V3
   fMCSimEDep     = -1.;     // added in V3
+  fMCEDep        = -1.;     // added in V3
+  fMCTime        =  0.;     // added in V3
 }
 
 //-----------------------------------------------------------------------------
 void TStnCluster::Streamer(TBuffer& R__b) {
-  int nwi, nwf;
+  int nwi, nwf, nwf2;
 
   nwi = (int*  ) &fInt   - &fNumber + kNFreeInts;
   nwf = (float*) &fFloat - &fX      + kNFreeFloats ;
+  nwf2= (float*) &fFloat2- &fMCTime + kNFreeFloats2;
 
   if (R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion(); 
@@ -112,14 +115,19 @@ void TStnCluster::Streamer(TBuffer& R__b) {
         fMCSimID       = -1 ;
         fMCSimPDG      =  0 ;
         fMCSimEDep     = -1.;
+        fMCEDep        = -1.;
+        fMCTime        =  0.;
+      } else {
+        R__b.ReadFastArray(&fMCTime,nwf2); // Extra float region added in V3
       }
     }
   }
   else {
     R__b.WriteVersion(TStnCluster::IsA());
 
-    R__b.WriteFastArray(&fNumber,nwi);
-    R__b.WriteFastArray(&fX     ,nwf);
+    R__b.WriteFastArray(&fNumber,nwi );
+    R__b.WriteFastArray(&fX     ,nwf );
+    R__b.WriteFastArray(&fMCTime,nwf2);
   }
 }
 
@@ -133,6 +141,8 @@ TStnCluster::TStnCluster(Int_t Number) {
   fMCSimID      = -1;
   fMCSimPDG     =  0;
   fMCSimEDep    = -1.f;
+  fMCEDep       = -1.f;
+  fMCTime       =  0.f;
 }
 
 
@@ -147,6 +157,8 @@ void TStnCluster::Clear(Option_t* opt) {
   fMCSimID      = -1;
   fMCSimPDG     =  0;
   fMCSimEDep    = -1.f;
+  fMCEDep       = -1.f;
+  fMCTime       =  0.f;
 }
 
 //-----------------------------------------------------------------------------

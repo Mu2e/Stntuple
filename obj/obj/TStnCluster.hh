@@ -38,7 +38,9 @@ class TStnCluster : public TObject {
     kNFreeFloatsV2 =  3, // V2
 
     kNFreeInts     =  8,		// V3
-    kNFreeFloats   =  2			// V3
+    kNFreeFloats   =  1,		// V3
+
+    kNFreeFloats2  = 10 // more space for expansion added in V3
   };
 
 public:
@@ -81,7 +83,11 @@ public:
   float                     fNx   ;    // cluster direction
   float                     fNy   ;
   float                     fMCSimEDep; // MC main sim energy deposit, added in V3
+  float                     fMCEDep; // MC energy deposited, added in V3
   float                     fFloat[kNFreeFloats];
+
+  float                     fMCTime; // MC time, weighted by sim energy dep, added in V3
+  float                     fFloat2[kNFreeFloats2]; // Extra expansion room added in V3
 //-----------------------------------------------------------------------------
 // transients
 //-----------------------------------------------------------------------------

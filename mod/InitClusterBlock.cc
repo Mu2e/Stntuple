@@ -42,7 +42,7 @@
 //-----------------------------------------------------------------------------
 int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 
-  constexpr int verbose(0);
+  constexpr int verbose(10);
 
   //  const char*               oname = {"MuratInitClusterBlock"};
   
@@ -286,10 +286,13 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
     if(mc_cl) {
       // Map sim --> energy deposited
       std::map<art::Ptr<mu2e::SimParticle>, float> sim_edep;
+      float total_time(0.f), total_edep(mc_cl->totalEnergyDep());
       for(const auto& hit : mc_cl->caloHitMCs()) {
         for(const auto& edep : hit->energyDeposits()) {
           const auto sim = edep.sim();
-          sim_edep[sim] += edep.energyDep();
+          const float energy = edep.energyDep();
+          sim_edep[sim] += energy;
+          total_time += edep.time() * energy / total_edep;
         }
       }
       // Find the main sim info
@@ -305,8 +308,10 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
       cluster->fMCSimID   = main_sim;
       cluster->fMCSimPDG  = pdg;
       cluster->fMCSimEDep = edep;
-      if(verbose > 1) printf("  --> Associated MC cluster found: E = %6.2f, E(G4) = %6.2f, N(MC hits) = %2zu, ID = %4i, PDG = %5i, E(sim) = %6.2f\n",
-                                  mc_cl->totalEnergyDep(), mc_cl->totalEnergyDepG4(),
+      cluster->fMCEDep    = total_edep;
+      cluster->fMCTime    = total_time;
+      if(verbose > 1) printf("  --> Associated MC cluster found: E = %6.2f, E(G4) = %6.2f, T = %6.1f, N(MC hits) = %2zu, ID = %4i, PDG = %5i, E(sim) = %6.2f\n",
+                             total_edep, mc_cl->totalEnergyDepG4(), total_time,
                              mc_cl->caloHitMCs().size(), main_sim, pdg, edep);
     }
 
