@@ -42,7 +42,7 @@
 //-----------------------------------------------------------------------------
 int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 
-  constexpr int verbose(2);
+  constexpr int verbose(0);
 
   //  const char*               oname = {"MuratInitClusterBlock"};
 
