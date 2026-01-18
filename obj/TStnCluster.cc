@@ -88,9 +88,15 @@ void TStnCluster::ReadV1(TBuffer &R__b) {
   fSigYY         = -1.;
   fNx            =  1.;     // cluster direction
   fNy            =  0.;
+  fTimeRMS       =  0.;     // added in V3
+  fMaxR          =  0.;     // added in V3
+  fE9            =  0.;     // added in V3
+  fE25           =  0.;     // added in V3
+  fOutRingE      =  0.;     // added in V3
   fMCSimID       =  -1;     // added in V3
   fMCSimPDG      =  0 ;     // added in V3
   fMCSimEDep     = -1.;     // added in V3
+  fMCSimMomIn    = -1.;     // added in V3
   fMCEDep        = -1.;     // added in V3
   fMCTime        =  0.;     // added in V3
 }
@@ -112,9 +118,15 @@ void TStnCluster::Streamer(TBuffer& R__b) {
       R__b.ReadFastArray(&fNumber,nwi);
       R__b.ReadFastArray(&fX     ,nwf);
       if(R__v < 3) { // added in version 3
+        fTimeRMS       =  0.;
+        fMaxR          =  0.;
+        fE9            =  0.;
+        fE25           =  0.;
+        fOutRingE      =  0.;
         fMCSimID       = -1 ;
         fMCSimPDG      =  0 ;
         fMCSimEDep     = -1.;
+        fMCSimMomIn    = -1.;
         fMCEDep        = -1.;
         fMCTime        =  0.;
       } else {
@@ -138,9 +150,15 @@ TStnCluster::TStnCluster(Int_t Number) {
   fNumber       = Number;
   fCaloCluster  = 0;
   fClosestTrack = 0;
+  fTimeRMS      =  0.f;
+  fMaxR         =  0.f;
+  fE9           =  0.f;
+  fE25          =  0.f;
+  fOutRingE     =  0.f;
   fMCSimID      = -1;
   fMCSimPDG     =  0;
   fMCSimEDep    = -1.f;
+  fMCSimMomIn   = -1.f;
   fMCEDep       = -1.f;
   fMCTime       =  0.f;
 }
@@ -154,6 +172,11 @@ TStnCluster::~TStnCluster() {
 //-----------------------------------------------------------------------------
 void TStnCluster::Clear(Option_t* opt) {
   Error("Print", "Not implemented yet");
+  fTimeRMS      =  0.f;
+  fMaxR         =  0.f;
+  fE9           =  0.f;
+  fE25          =  0.f;
+  fOutRingE     =  0.f;
   fMCSimID      = -1;
   fMCSimPDG     =  0;
   fMCSimEDep    = -1.f;

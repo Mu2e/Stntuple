@@ -11,7 +11,7 @@
 #define murat_inc_TStnCluster_hh
 
 // storable objects (data products)
-// 
+//
 
 // C++ includes.
 #include <iostream>
@@ -48,11 +48,11 @@ public:
 // integers
 //-----------------------------------------------------------------------------
   int                       fNumber;          // index in the list of reconstructed clusters
-  int                       fDiskID;	      // 
+  int                       fDiskID;	      //
   int                       fNCrystals;       //
   int                       fNCr1     ;       // N crystals above 1 MeV
   int                       fTrackNumber;     // closest track in TStnTrackBlock
-  int                       fIx1;	      // [row, column] or [x1,x2] for a disk
+  int                       fIx1;	      // [row, column] or [x1,x2] for a disk -- Not used
   int                       fIx2;
   int                       fMCSimID;         // Sim particle ID with the highest energy deposit, added in V3
   int                       fMCSimPDG;        // Sim particle PDG with the highest energy deposit, added in V3
@@ -64,12 +64,12 @@ public:
   float                     fY;
   float                     fZ;
   float                     fYMean;
-  float                     fZMean;
-  float                     fSigY;      // cluster width in Y 
-  float                     fSigZ;	// cluster width in Z/X (fSigZ is reused)
+  float                     fZMean;     // Currently actually X mean
+  float                     fSigY;      // cluster width in Y
+  float                     fSigZ;	// cluster width in Z/X (fSigZ is reused as sig X)
   float                     fSigR;      // don't know what it is
   float                     fEnergy   ;
-  float                     fTime     ; 
+  float                     fTime     ;
   float                     fFrE1     ; // e1/etotal
   float                     fFrE2     ; // (e1+e2)/etotal
   float                     fSigE1    ;
@@ -77,16 +77,25 @@ public:
 //-----------------------------------------------------------------------------
 // 7 words added in version 2
 //-----------------------------------------------------------------------------
-  float                     fSigXX;    // sums over crystals
+  float                     fSigXX;      // sums over crystals
   float                     fSigXY;
   float                     fSigYY;
-  float                     fNx   ;    // cluster direction
-  float                     fNy   ;
-  float                     fMCSimEDep; // MC main sim energy deposit, added in V3
-  float                     fMCEDep; // MC energy deposited, added in V3
+  float                     fNx   ;      // cluster direction, cos(phi)
+  float                     fNy   ;      // sin(phi)
+//-----------------------------------------------------------------------------
+// 9 words + expansion space added in version 3
+//-----------------------------------------------------------------------------
+  float                     fTimeRMS;    // RMS of hit times within the cluster
+  float                     fMaxR ;      // max crystal distance from most energetic crystal
   float                     fFloat[kNFreeFloats];
 
-  float                     fMCTime; // MC time, weighted by sim energy dep, added in V3
+  float                     fE9;         // Energy of main crystal + neighbors
+  float                     fE25;        // Energy of main crystal + neighbors and their neighbors
+  float                     fOutRingE;   // Energy of cluster crystals with R > 600 mm
+  float                     fMCSimEDep;  // MC main sim energy deposit, added in V3
+  float                     fMCSimMomIn; // MC main sim momentum in, added in V3
+  float                     fMCEDep;     // MC energy deposited, added in V3
+  float                     fMCTime;     // MC time, weighted by sim energy dep, added in V3
   float                     fFloat2[kNFreeFloats2]; // Extra expansion room added in V3
 //-----------------------------------------------------------------------------
 // transients
@@ -101,32 +110,43 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  int     DiskID     () { return fDiskID  ; }
-  int     Ix1        () { return fIx1; }
-  int     Ix2        () { return fIx2; }
-  int     NCrystals  () { return fNCrystals; }
-  int     Number     () { return fNumber; }
-  int     TrackNumber() { return fTrackNumber; }
+  int     DiskID      () const { return fDiskID  ; }
+  int     Ix1         () const { return fIx1; }
+  int     Ix2         () const { return fIx2; }
+  int     NCrystals   () const { return fNCrystals; }
+  int     Number      () const { return fNumber; }
+  int     TrackNumber () const { return fTrackNumber; }
 
-  float   Energy     () { return fEnergy; }
-  float   Time       () { return fTime  ; }
+  float   Energy      () const { return fEnergy; }
+  float   Time        () const { return fTime  ; }
 
-  float   Nx         () { return fNx;    }
-  float   Ny         () { return fNy;    }
+  float   Nx          () const { return fNx;    }
+  float   Ny          () const { return fNy;    }
 
-  float   SeedFr     () { return fFrE1;  }
+  float   SeedFr      () const { return fFrE1;  }
+  float   SeedFr2     () const { return fFrE2;  }
 
-  float   SigX       () { return fSigZ;  }
-  float   SigY       () { return fSigY;  }
-  float   SigZ       () { return fSigZ;  }
+  float   SigX        () const { return fSigZ;  }
+  float   SigY        () const { return fSigY;  }
+  float   SigZ        () const { return fSigZ;  }
 
-  float   SigXX      () { return fSigXX; }
-  float   SigXY      () { return fSigXY; }
-  float   SigYY      () { return fSigYY; }
+  float   SigXX       () const { return fSigXX; }
+  float   SigXY       () const { return fSigXY; }
+  float   SigYY       () const { return fSigYY; }
 
+  float   E9          () const { return fE9;    }
+  float   E25         () const { return fE25;   }
+  float   OutRingE    () const { return fOutRingE;}
+
+  // evaluated values
+  float   E1          () const { return SeedFr() * Energy(); } // energy of main hit
+  float   E2          () const { return SeedFr2() * Energy(); } // energy of main two hits
+  float   RingE       () const { return E9() - E1(); } // energy around the main hit
+
+  // linked track
   TStnTrack* ClosestTrack() { return fClosestTrack; }
 
-  void    SetNumber(int I) { fNumber = I; } // 
+  void    SetNumber(int I) { fNumber = I; } //
 
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
