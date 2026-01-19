@@ -30,8 +30,8 @@ physics.trigger_paths[203] : "4:RecoDmu"
 physics.trigger_paths[204] : "5:RecoUmu"
 
 # Default output file naming
-services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.root"
-physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.stn"
+services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.Stntuple.001210_00000000.root"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.Stntuple.001210_00000000.stn"
 
 # default compression
 physics.analyzers.InitStntuple.THistModule.compressionLevel : 501 # 7

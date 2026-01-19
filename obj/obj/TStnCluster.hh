@@ -134,14 +134,18 @@ public:
   float   SigXY       () const { return fSigXY; }
   float   SigYY       () const { return fSigYY; }
 
+  float   TimeRMS     () const { return fTimeRMS;}
+  float   MaxDeltaR   () const { return fMaxR;  }
   float   E9          () const { return fE9;    }
   float   E25         () const { return fE25;   }
   float   OutRingE    () const { return fOutRingE;}
 
   // evaluated values
   float   E1          () const { return SeedFr() * Energy(); } // energy of main hit
-  float   E2          () const { return SeedFr2() * Energy(); } // energy of main two hits
+  float   E2          () const { return SeedFr2() * Energy() - E1(); } // energy of the second biggest hit
+  float   E12         () const { return SeedFr2() * Energy(); } // energy of main two hits
   float   RingE       () const { return E9() - E1(); } // energy around the main hit
+  float   R           () const { return std::sqrt(fX*fX + fY*fY); }
 
   // linked track
   TStnTrack* ClosestTrack() { return fClosestTrack; }

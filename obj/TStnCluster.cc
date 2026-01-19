@@ -130,7 +130,7 @@ void TStnCluster::Streamer(TBuffer& R__b) {
         fMCEDep        = -1.;
         fMCTime        =  0.;
       } else {
-        R__b.ReadFastArray(&fMCTime,nwf2); // Extra float region added in V3
+        R__b.ReadFastArray(&fE9,nwf2); // Extra float region added in V3
       }
     }
   }
@@ -139,7 +139,7 @@ void TStnCluster::Streamer(TBuffer& R__b) {
 
     R__b.WriteFastArray(&fNumber,nwi );
     R__b.WriteFastArray(&fX     ,nwf );
-    R__b.WriteFastArray(&fMCTime,nwf2);
+    R__b.WriteFastArray(&fE9    ,nwf2);
   }
 }
 
