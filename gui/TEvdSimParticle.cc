@@ -32,13 +32,14 @@
 // #include "art/Framework/Principal/Handle.h"
 
 // #include "BTrk/KalmanTrack/KalRep.hh"
-
+                                        // probably will go away 
+#include "BTrk/BbrGeom/HepPoint.h"
 // #include "BTrk/TrkBase/HelixParams.hh"
 // #include "BTrk/TrkBase/HelixTraj.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+// #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
@@ -263,15 +264,15 @@ void TEvdSimParticle::PaintRZ(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // first display track hits - active and not 
 //-----------------------------------------------------------------------------
-  const mu2e::TrkStrawHit  *hit;
+//  const mu2e::TrkStrawHit  *hit;
   //   const TrkHitVector*       hits = &fKrep->hitVector();
 
   int nhits = 0; // NHits();
   for (int i=0; i<nhits; i++) {
-    hit = nullptr; // Hit(i)->TrkStrawHit();
-    rdrift = hit->driftRadius();
+    //    hit = nullptr; // Hit(i)->TrkStrawHit();
+    // rdrift = hit->driftRadius();
 
-    hstraw = &hit->straw();
+    hstraw = nullptr ; // &hit->straw();
     zw     = hstraw->getMidPoint().z();
     rw     = hstraw->getMidPoint().perp();
 
@@ -281,8 +282,8 @@ void TEvdSimParticle::PaintRZ(Option_t* Option) {
     fEllipse->SetR2(rdrift);
     fEllipse->SetFillStyle(3003);
 
-    if (hit->isActive()) fEllipse->SetFillColor(kRed);
-    else                 fEllipse->SetFillColor(kBlue+3);
+    // if (hit->isActive()) fEllipse->SetFillColor(kRed);
+    // else                 fEllipse->SetFillColor(kBlue+3);
 
     fEllipse->PaintEllipse(zw,rw,rdrift,0,0,2*M_PI*180,0);
   }

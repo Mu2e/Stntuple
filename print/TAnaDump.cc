@@ -2151,7 +2151,7 @@ void TAnaDump::refitTrack(void* Trk, double NSig) {
 //-----------------------------------------------------------------------------
 // emulate calculation of the unbiased residual
 //-----------------------------------------------------------------------------
-void TAnaDump::Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit) {
+void TAnaDump::Test_000(const KalRep* Krep) { // , mu2e::TrkStrawHit* Hit) {
 
 //  apparently, Hit has (had ?) once to be on the track ?
 
@@ -2165,6 +2165,7 @@ void TAnaDump::Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit) {
 
   fTmp[0] = -1;
   fTmp[1] = -1;
+
 
 //   KalRep* krep = Krep->clone();
 

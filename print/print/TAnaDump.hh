@@ -65,7 +65,7 @@ namespace mu2e {
   class HelixSeed;
   class TrackClusterMatch;
   class TrkCaloHit;
-  class TrkStrawHit;
+  //  class TrkStrawHit;
   class TrkPrintUtils;
 }
 
@@ -346,7 +346,7 @@ public:
 					// refit track dropping hits away > NSig sigma (0.1)
   void  refitTrack(void* Trk, double NSig);
 
-  void  Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit);
+  void  Test_000(const KalRep* Krep); //, mu2e::TrkStrawHit* Hit);
 
   ClassDef(TAnaDump,0)
 };
