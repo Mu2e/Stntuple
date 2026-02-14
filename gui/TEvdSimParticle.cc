@@ -32,7 +32,8 @@
 // #include "art/Framework/Principal/Handle.h"
 
 // #include "BTrk/KalmanTrack/KalRep.hh"
-
+                                        // probably will go away 
+#include "BTrk/BbrGeom/HepPoint.h"
 // #include "BTrk/TrkBase/HelixParams.hh"
 // #include "BTrk/TrkBase/HelixTraj.hh"
 

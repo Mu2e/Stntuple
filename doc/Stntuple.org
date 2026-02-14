@@ -112,3 +112,6 @@ EventFilter.eventList : [
 * [[file:data_blocks.org][Stntuple data blocks]]
 * [[file:track_id.org][TStnTrackID]]
 * ------------------------------------------------------------------------------
+* maintenance - nightly builds etc                                           
+- nightly build logs : file:/exp/mu2e/app/users/mu2epro/nightly2/secondary/repo
+* ------------------------------------------------------------------------------

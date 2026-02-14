@@ -52,7 +52,6 @@ def local_build():
                          'Stntuple_obj',
                          'Stntuple_geom',
                          'Stntuple_base',
-                         'mu2e_BTrkData',
                          'mu2e_RecoDataProducts' ,
                          'mu2e_MCDataProducts' ,
                          'mu2e_DataProducts' ,

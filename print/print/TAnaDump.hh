@@ -63,8 +63,10 @@ namespace mu2e {
   class ComboHit;
   class CosmicTrackSeed;
   class HelixSeed;
-  class TrackClusterMatch;
+  // class TrackClusterMatch;
   // class TrkPrintUtils;
+  // class TrkCaloHit;
+  // class TrkStrawHit;
 }
 
 class KalRep;

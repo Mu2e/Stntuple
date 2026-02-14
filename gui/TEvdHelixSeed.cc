@@ -27,8 +27,8 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "BTrk/TrkBase/HelixParams.hh"
-#include "BTrk/TrkBase/HelixTraj.hh"
+// #include "BTrk/TrkBase/HelixParams.hh"
+// #include "BTrk/TrkBase/HelixTraj.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
@@ -144,8 +144,8 @@ void TEvdHelixSeed::PaintXY(Option_t* Option) {
 void TEvdHelixSeed::PaintRZ(Option_t* Option) {
 
   double            zwire[2], rdrift, zt[4], rt[4], zw, rw;
-  CLHEP::Hep3Vector tdir;
-  HepPoint          tpos;
+  //  CLHEP::Hep3Vector tdir;
+  //  HepPoint          tpos;
   TPolyLine         pline;
   int               nplanes, /*npanels,*/ nl;
 

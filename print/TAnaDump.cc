@@ -2143,6 +2143,65 @@ void TAnaDump::printStepPointMCCollection(const char* ModuleLabel,
 
 //     if (fabs(res) > 0.1*NSig) {
 //       trk->deactivateHit(hit);
+//     if (fabs(res) > 0.1*NSig) {
+//       trk->deactivateHit(hit);
+//     }
+//   }
+
+//   trk->fit();
+
+//   printKalRep(trk, "hits");
+// }
+
+
+//-----------------------------------------------------------------------------
+// emulate calculation of the unbiased residual
+//-----------------------------------------------------------------------------
+// void TAnaDump::Test_000(const KalRep* Krep) { // , mu2e::TrkStrawHit* Hit) {
+
+//  apparently, Hit has (had ?) once to be on the track ?
+
+  // double             s, slen, rdrift, sflt, tflt, doca/*, sig , xdr*/;
+  // const mu2e::Straw *straw;
+  // int                sign /*, shId, layer*/;
+  // HepPoint           spi , tpi , hpos;
+ 
+  // CLHEP::Hep3Vector  spos, sdir;
+  // TrkSimpTraj  *ptraj(NULL);
+
+  // fTmp[0] = -1;
+  // fTmp[1] = -1;
+
+
+//   KalRep* krep = Krep->clone();
+
+//   straw  = &Hit->straw();
+//   //  layer  = straw->id().getLayer();
+//   rdrift = Hit->driftRadius();
+//   //  shId   = straw->index().asInt();
+  
+//   //  const KalHit* khit = krep->findHotSite(Hit);
+
+//   s      = Hit->fltLen();
+
+//   //  int active = Hit->isActive();
+
+// //   if (active) krep->deactivateHot(Hit);
+
+// //   krep->resetFit();
+// //   krep->fit();
+// // 					// local track trajectory
+// //   ptraj = krep->localTrajectory(s,slen);
+
+//   vector<KalSite*>::const_iterator itt;
+//   int found = 0;
+//   for (auto /* vector<KalSite*>::const_iterator */ it=krep->siteList().begin();
+//        it!= krep->siteList().end(); it++) {
+//     const KalHit* kalhit = (*it)->kalHit();
+//     if (kalhit && (kalhit->hitOnTrack() == Hit)) {
+//       itt   = it;
+//       found = 1;
+//       break;
 //     }
 //   }
 
