@@ -280,8 +280,15 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 401, 401,"calo_MVANNCE"                ,1));
     trigger_table->AddTrigger(new TStnTrigger( 402, 402,"calo_cosmic"                 ,1));
     trigger_table->AddTrigger(new TStnTrigger( 420, 420,"calo_RMC"                    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 425, 425,"calo_cluster_50"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 426, 426,"calo_cluster_60"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 427, 427,"calo_cluster_70"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 428, 428,"calo_cluster_75"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 429, 429,"calo_cluster_80"             ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 500, 500,"cst_TimeCluster"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 510, 510,"apr_TC"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 511, 511,"apr_TC_calo"                 ,1));
     trigger_table->AddTrigger(new TStnTrigger( 520, 520,"cst_CosmicTrackSeed"         ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 600, 600,"minBias_SDCount"             ,1));
