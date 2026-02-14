@@ -38,7 +38,6 @@
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
@@ -55,6 +54,9 @@
 #include "Stntuple/print/TAnaDump.hh"
 
 #include "CLHEP/Vector/ThreeVector.h"
+#include "CLHEP/Geometry/Point3D.h"
+#include "BTrk/BbrGeom/HepPoint.h"
+// typedef HepGeom::Point3D<double> HepPoint;
 
 ClassImp(stntuple::TEvdSimParticle)
 
@@ -257,23 +259,23 @@ void TEvdSimParticle::PaintRZ(Option_t* Option) {
   const mu2e::Tracker* tracker = handle.get();
 
   //  const mu2e::Straw  *hstraw, *s, *straw[2];		// first straw
-  const mu2e::Straw  *hstraw, *straw[2];		// first straw
+  const mu2e::Straw  /**hstraw,*/ *straw[2];		// first straw
   
   nplanes = tracker->nPlanes();
 //-----------------------------------------------------------------------------
 // first display track hits - active and not 
 //-----------------------------------------------------------------------------
-  const mu2e::TrkStrawHit  *hit;
+  // const mu2e::TrkStrawHit  *hit;
   //   const TrkHitVector*       hits = &fKrep->hitVector();
 
   int nhits = 0; // NHits();
   for (int i=0; i<nhits; i++) {
-    hit = nullptr; // Hit(i)->TrkStrawHit();
-    rdrift = hit->driftRadius();
+    // hit = nullptr; // Hit(i)->TrkStrawHit();
+    // rdrift = hit->driftRadius();
 
-    hstraw = &hit->straw();
-    zw     = hstraw->getMidPoint().z();
-    rw     = hstraw->getMidPoint().perp();
+    // hstraw = &hit->straw();
+    // zw     = hstraw->getMidPoint().z();
+    // rw     = hstraw->getMidPoint().perp();
 
     fEllipse->SetX1(zw);
     fEllipse->SetY1(rw);
@@ -281,8 +283,8 @@ void TEvdSimParticle::PaintRZ(Option_t* Option) {
     fEllipse->SetR2(rdrift);
     fEllipse->SetFillStyle(3003);
 
-    if (hit->isActive()) fEllipse->SetFillColor(kRed);
-    else                 fEllipse->SetFillColor(kBlue+3);
+    // if (hit->isActive()) fEllipse->SetFillColor(kRed);
+    // else                 fEllipse->SetFillColor(kBlue+3);
 
     fEllipse->PaintEllipse(zw,rw,rdrift,0,0,2*M_PI*180,0);
   }

@@ -40,7 +40,7 @@
 #include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+
 
 class TApplication;
 

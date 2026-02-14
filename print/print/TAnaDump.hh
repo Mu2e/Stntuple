@@ -53,7 +53,7 @@ namespace mu2e {
   class CrvRecoPulse;
   class CrvCoincidence;
   class CrvCoincidenceCluster;
-  class TrkToCaloExtrapol;
+  // class TrkToCaloExtrapol;
   class StepPointMC;
   class StrawGasStep;
   class GenParticle;
@@ -64,9 +64,7 @@ namespace mu2e {
   class CosmicTrackSeed;
   class HelixSeed;
   class TrackClusterMatch;
-  class TrkCaloHit;
-  class TrkStrawHit;
-  class TrkPrintUtils;
+  // class TrkPrintUtils;
 }
 
 class KalRep;
@@ -91,7 +89,7 @@ public:
   const mu2e::StrawDigiMCCollection* _mcdigis;
   double                             fTmp[100];  // for testing
 
-  mu2e::TrkPrintUtils*               _printUtils;
+  // mu2e::TrkPrintUtils*               _printUtils;
 
 private:
 
@@ -265,11 +263,11 @@ public:
 				const char* StrawHitCollTag    = "makeSH"         ,
 				const char* StrawDigiMCCollTag = "compressDigiMCs");
 
-  void printKalRep(const KalRep* Krep, const char* Opt = "", const char* Prefix = "");
+  // void printKalRep(const KalRep* Krep, const char* Opt = "", const char* Prefix = "");
 
-  void printKalRepCollection(const char* KalRepCollTag               , 
-			     int         hitOpt             = 0      , 
-			     const char* StrawDigiMCCollTag = nullptr); 
+  // void printKalRepCollection(const char* KalRepCollTag               , 
+  //       		     int         hitOpt             = 0      , 
+  //       		     const char* StrawDigiMCCollTag = nullptr); 
 //-----------------------------------------------------------------------------
 // MC truth: gen and sim particles
 //-----------------------------------------------------------------------------
@@ -325,28 +323,28 @@ public:
 //-----------------------------------------------------------------------------
 // calorimeter cluster added to the track fit
 //-----------------------------------------------------------------------------
-  void printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit);
+  // void printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit);
 //-----------------------------------------------------------------------------
 // extrapolation and track-to-calorimeter matching
 //-----------------------------------------------------------------------------
-  void printTrkToCaloExtrapol           (const mu2e::TrkToCaloExtrapol*extrk,
-					 const char* Opt = "");
+  // void printTrkToCaloExtrapol           (const mu2e::TrkToCaloExtrapol*extrk,
+  //       				 const char* Opt = "");
 
-  void printTrkToCaloExtrapolCollection (const char* ModuleLabel, 
-					 const char* ProductName = "", 
-					 const char* ProcessName = "");
+  // void printTrkToCaloExtrapolCollection (const char* ModuleLabel, 
+  //       				 const char* ProductName = "", 
+  //       				 const char* ProcessName = "");
 
-  void printTrackClusterMatch           (const mu2e::TrackClusterMatch* TcMatch, const char* Option);
+  // void printTrackClusterMatch           (const mu2e::TrackClusterMatch* TcMatch, const char* Option);
 
 
-  void printTrackClusterMatchCollection(const char* ModuleLabel     , 
-					const char* ProductName = "", 
-					const char* ProcessName = "");
+  // void printTrackClusterMatchCollection(const char* ModuleLabel     , 
+  //       				const char* ProductName = "", 
+  //       				const char* ProcessName = "");
   
-					// refit track dropping hits away > NSig sigma (0.1)
-  void  refitTrack(void* Trk, double NSig);
+  //       				// refit track dropping hits away > NSig sigma (0.1)
+  // void  refitTrack(void* Trk, double NSig);
 
-  void  Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit);
+  // void  Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit);
 
   ClassDef(TAnaDump,0)
 };

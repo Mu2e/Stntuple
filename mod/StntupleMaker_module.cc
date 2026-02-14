@@ -68,7 +68,7 @@
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/alg/TStntuple.hh"
 
-#include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
+// #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 #include "Offline/MCDataProducts/inc/GenId.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 // #include "TrkDiag/inc/KalDiag.hh"
@@ -209,9 +209,9 @@ protected:
 
   TNamed*                  fVersion;
 
-  TNamedHandle*            fDarHandle;
+  // TNamedHandle*            fDarHandle;
 
-  DoubletAmbigResolver*    fDar;
+  // DoubletAmbigResolver*    fDar;
 
 //------------------------------------------------------------------------------
 // function members
@@ -370,12 +370,12 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   fInitTimeClusterBlock = new TObjArray();
   fInitTimeClusterBlock->SetOwner(kTRUE);
-  fDar                  = new DoubletAmbigResolver (PSet.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
-  fDarHandle            = new TNamedHandle("DarHandle",fDar);
+  // fDar                  = new DoubletAmbigResolver (PSet.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
+  // fDarHandle            = new TNamedHandle("DarHandle",fDar);
   // fKalDiag              = new KalDiag     (PSet.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
   // fKalDiagHandle        = new TNamedHandle("KalDiagHandle"      ,fKalDiag);
 
-  fFolder->Add(fDarHandle);
+  // fFolder->Add(fDarHandle);
 
   // Validate inputs
 
@@ -417,8 +417,8 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
 //------------------------------------------------------------------------------
 StntupleMaker::~StntupleMaker() {
-  delete fDar;
-  delete fDarHandle;
+  // delete fDar;
+  // delete fDarHandle;
   delete fVersion;
 
   if (fInitCrvPulseBlock  ) delete fInitCrvPulseBlock;
@@ -793,7 +793,7 @@ void StntupleMaker::beginJob() {
       init_block->SetTcmCollTag         (fTcmCollTag[i]);
       init_block->SetTrkQualCollTag     (fTrkQualCollTag[i]);
 
-      init_block->SetDoubletAmbigResolver(fDar);
+      // init_block->SetDoubletAmbigResolver(fDar);
 
       init_block->fVerbose = fTrackVerbose;
 

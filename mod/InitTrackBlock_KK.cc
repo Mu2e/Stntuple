@@ -32,12 +32,12 @@
 #include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
-#include "Offline/BTrkData/inc/TrkCaloHit.hh"
-#include "Offline/BTrkData/inc/Doublet.hh"
 
-#include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
-#include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
+
+// #include "Offline/BTrkData/inc/Doublet.hh"
+
+// #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
+// #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 

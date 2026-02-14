@@ -6,6 +6,7 @@
 
 #include "TROOT.h"
 #include "TVector2.h"
+#include "CLHEP/Vector/ThreeVector.h"
 
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Run.h"
@@ -46,13 +47,13 @@
 #include "Offline/MCDataProducts/inc/PhysicalVolumeInfo.hh"
 #include "Offline/MCDataProducts/inc/PhysicalVolumeInfoMultiCollection.hh"
 
-#include "Offline/BTrkData/inc/TrkCaloHit.hh"
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
-#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 
-#include "Offline/RecoDataProducts/inc/TrkToCaloExtrapol.hh"
-#include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
-#include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
+
+// #include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
+
+// #include "Offline/RecoDataProducts/inc/TrkToCaloExtrapol.hh"
+// #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
+// #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
 #include "Offline/Mu2eUtilities/inc/LsqSums4.hh"
@@ -62,6 +63,7 @@
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
 // BTRK (BaBar) includes
+#include "BTrk/BbrGeom/HepPoint.h"
 #include "BTrk/BbrGeom/TrkLineTraj.hh"
 #include "BTrk/TrkBase/TrkPoca.hh"
 #include "BTrk/KalmanTrack/KalHit.hh"
@@ -69,10 +71,12 @@
 #include "BTrk/TrkBase/HelixParams.hh"
 #include "BTrk/ProbTools/ChisqConsistency.hh"
 
-#include "Offline/TrkReco/inc/TrkPrintUtils.hh"
+// #include "Offline/TrkReco/inc/TrkPrintUtils.hh"
 
+#include "CLHEP/Geometry/Point3D.h"
 
 using namespace std;
+// typedef HepGeom::Point3D<double> HepPoint;
 
 ClassImp(TAnaDump)
 
@@ -139,7 +143,7 @@ TAnaDump::TAnaDump(const fhicl::ParameterSet* PSet) {
   fFlagBgrHitsModuleLabel = "FlagBkgHits";
   fSdmcCollTag            = "compressDigiMCs";
 
-  _printUtils = new mu2e::TrkPrintUtils(PSet->get<fhicl::ParameterSet>("printUtils",fhicl::ParameterSet()));
+  // _printUtils = new mu2e::TrkPrintUtils(PSet->get<fhicl::ParameterSet>("printUtils",fhicl::ParameterSet()));
 }
 
 // //-----------------------------------------------------------------------------
@@ -165,7 +169,7 @@ TAnaDump* TAnaDump::Instance(const fhicl::ParameterSet* PSet) {
 TAnaDump::~TAnaDump() {
   fListOfObjects->Delete();
   delete fListOfObjects;
-  delete _printUtils;
+  // delete _printUtils;
 }
 
 //------------------------------------------------------------------------------
@@ -209,7 +213,7 @@ void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl,
 
   art::ServiceHandle<mu2e::GeometryService> geom;
   mu2e::GeomHandle  <mu2e::Calorimeter>     cal;
-  Hep3Vector        gpos, tpos;
+  CLHEP::Hep3Vector        gpos, tpos;
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("-----------------------------------------------------------------------------------------------");
@@ -1054,136 +1058,136 @@ void TAnaDump::printEventHeader() {
 	 fEvent->event());
 }
 
-//-----------------------------------------------------------------------------
-void TAnaDump::printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit){
-  double    len  = CaloHit->fltLen();
-  HepPoint  plen = Krep->position(len);
+// //-----------------------------------------------------------------------------
+// void TAnaDump::printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit){
+//   double    len  = CaloHit->fltLen();
+//   HepPoint  plen = Krep->position(len);
   
-  printf("%3i %5i 0x%08x %1i %9.3f %8.3f %8.3f %9.3f %8.3f %7.3f",
-	 -1,//++i,
-	 0, //straw->index().asInt(), 
-	 CaloHit->hitFlag(),
-	 //	     hit->isUsable(),
-	 CaloHit->isActive(),
-	 len,
-	 //	     hit->hitRms(),
-	 plen.x(),plen.y(),plen.z(),
-	 CaloHit->time(), -1.//sh->dt()
-	 );
+//   printf("%3i %5i 0x%08x %1i %9.3f %8.3f %8.3f %9.3f %8.3f %7.3f",
+// 	 -1,//++i,
+// 	 0, //straw->index().asInt(), 
+// 	 CaloHit->hitFlag(),
+// 	 //	     hit->isUsable(),
+// 	 CaloHit->isActive(),
+// 	 len,
+// 	 //	     hit->hitRms(),
+// 	 plen.x(),plen.y(),plen.z(),
+// 	 CaloHit->time(), -1.//sh->dt()
+// 	 );
 
-  printf(" %2i %2i %2i %2i",
-	 -1,//straw->id().getPlane(),
-	 -1,//straw->id().getPanel(),
-	 -1,//straw->id().getLayer(),
-	 -1//straw->id().getStraw()
-	 );
+//   printf(" %2i %2i %2i %2i",
+// 	 -1,//straw->id().getPlane(),
+// 	 -1,//straw->id().getPanel(),
+// 	 -1,//straw->id().getLayer(),
+// 	 -1//straw->id().getStraw()
+// 	 );
 
-  printf(" %8.3f",CaloHit->hitT0().t0());
+//   printf(" %8.3f",CaloHit->hitT0().t0());
   
-  double res, sigres;
-  CaloHit->resid(res, sigres, true);
+//   double res, sigres;
+//   CaloHit->resid(res, sigres, true);
 
-  CLHEP::Hep3Vector  pos;
-  CaloHit->hitPosition(pos);
+//   CLHEP::Hep3Vector  pos;
+//   CaloHit->hitPosition(pos);
 
-  printf("%8.3f %8.3f %9.3f %7.3f %7.3f",
-	 pos.x(),
-	 pos.y(),
-	 pos.z(),
-	 res,
-	 sigres
-	 );
+//   printf("%8.3f %8.3f %9.3f %7.3f %7.3f",
+// 	 pos.x(),
+// 	 pos.y(),
+// 	 pos.z(),
+// 	 res,
+// 	 sigres
+// 	 );
       
-  printf("   %6.3f", -1.);//CaloHit->driftRadius());
+//   printf("   %6.3f", -1.);//CaloHit->driftRadius());
   
 	  
 
-  printf("  %7.3f",-1.);
+//   printf("  %7.3f",-1.);
 
-  double exterr = CaloHit->temperature();//*CaloHit->driftVelocity();
+//   double exterr = CaloHit->temperature();//*CaloHit->driftVelocity();
 
-  printf(" %6.3f %6.3f %6.3f %6.3f %6.3f",		 
-	 -1.,//CaloHit->totalErr(),
-	 CaloHit->hitErr(),
-	 CaloHit->hitT0().t0Err(),
-	 -1.,//,CaloHit->penaltyErr(),
-	 exterr
-	 );
-  //-----------------------------------------------------------------------------
-  // test: calculated residual in fTmp[0]
-  //-----------------------------------------------------------------------------
-  //       Test_000(Krep,hit);
-  //       printf(" %7.3f",fTmp[0]);
+//   printf(" %6.3f %6.3f %6.3f %6.3f %6.3f",		 
+// 	 -1.,//CaloHit->totalErr(),
+// 	 CaloHit->hitErr(),
+// 	 CaloHit->hitT0().t0Err(),
+// 	 -1.,//,CaloHit->penaltyErr(),
+// 	 exterr
+// 	 );
+//   //-----------------------------------------------------------------------------
+//   // test: calculated residual in fTmp[0]
+//   //-----------------------------------------------------------------------------
+//   //       Test_000(Krep,hit);
+//   //       printf(" %7.3f",fTmp[0]);
 
-  printf("\n");
+//   printf("\n");
 
-}
+// }
 
-//-----------------------------------------------------------------------------
-// ""       : banner+track parameters (default)
-// "banner" : banner only
-// "data"   : track parameters only
-// "hits"   : hits
-//-----------------------------------------------------------------------------
-void TAnaDump::printKalRep(const KalRep* Krep, const char* Opt, const char* Prefix) {
+// //-----------------------------------------------------------------------------
+// // ""       : banner+track parameters (default)
+// // "banner" : banner only
+// // "data"   : track parameters only
+// // "hits"   : hits
+// //-----------------------------------------------------------------------------
+// void TAnaDump::printKalRep(const KalRep* Krep, const char* Opt, const char* Prefix) {
 
-  //  TString opt = Opt;
+//   //  TString opt = Opt;
 
-  _printUtils->printTrack(fEvent,Krep,Opt,Prefix);
-}
+//   _printUtils->printTrack(fEvent,Krep,Opt,Prefix);
+// }
 
-//-----------------------------------------------------------------------------
-void TAnaDump::printKalRepCollection(const char* KalRepCollTag     , 
-				     int         hitOpt            ,
-				     const char* StrawDigiMCCollTag) {
+// //-----------------------------------------------------------------------------
+// void TAnaDump::printKalRepCollection(const char* KalRepCollTag     , 
+// 				     int         hitOpt            ,
+// 				     const char* StrawDigiMCCollTag) {
 
-  art::InputTag                          krepCollTag(KalRepCollTag);
-  art::Handle<mu2e::KalRepPtrCollection> krepsHandle; 
-//-----------------------------------------------------------------------------
-// make sure collection exists
-//-----------------------------------------------------------------------------
-  fEvent->getByLabel(krepCollTag,krepsHandle);
-  if (! krepsHandle.isValid()) {
-    printf("TAnaDump::printKalRepCollection: no KalRepPtrCollection tag=%s, BAIL OUT\n", KalRepCollTag);
-    printf(" available ones are:\n");
-    print_kalrep_colls();
-    return;
-  }
+//   art::InputTag                          krepCollTag(KalRepCollTag);
+//   art::Handle<mu2e::KalRepPtrCollection> krepsHandle; 
+// //-----------------------------------------------------------------------------
+// // make sure collection exists
+// //-----------------------------------------------------------------------------
+//   fEvent->getByLabel(krepCollTag,krepsHandle);
+//   if (! krepsHandle.isValid()) {
+//     printf("TAnaDump::printKalRepCollection: no KalRepPtrCollection tag=%s, BAIL OUT\n", KalRepCollTag);
+//     printf(" available ones are:\n");
+//     print_kalrep_colls();
+//     return;
+//   }
 
-  art::InputTag sdmc_tag = StrawDigiMCCollTag;
-  if (sdmc_tag == "") sdmc_tag = fSdmcCollTag;
+//   art::InputTag sdmc_tag = StrawDigiMCCollTag;
+//   if (sdmc_tag == "") sdmc_tag = fSdmcCollTag;
 
-  art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
-  fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag,sdmccH);
+//   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
+//   fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag,sdmccH);
 
-  if (sdmccH.isValid()) _mcdigis = sdmccH.product();
-  else                  _mcdigis = nullptr;
+//   if (sdmccH.isValid()) _mcdigis = sdmccH.product();
+//   else                  _mcdigis = nullptr;
 
-  if (_mcdigis == nullptr) {
-    printf(">>> ERROR in TAnaDump::printKalRepCollection: failed to locate StepPointMCCollection:: by %s\n",
-           sdmc_tag.encode().data());
-  }
+//   if (_mcdigis == nullptr) {
+//     printf(">>> ERROR in TAnaDump::printKalRepCollection: failed to locate StepPointMCCollection:: by %s\n",
+//            sdmc_tag.encode().data());
+//   }
 
-  int ntrk = krepsHandle->size();
+//   int ntrk = krepsHandle->size();
 
-  const KalRep *trk;
+//   const KalRep *trk;
 
-  int banner_printed = 0;
-  for (int i=0; i<ntrk; i++) {
-    art::Ptr<KalRep> kptr = krepsHandle->at(i);
-    //    fEvent->get(kptr.id(), krepsHandle);
-    fhicl::ParameterSet const& pset = krepsHandle.provenance()->parameterSet();
-    string module_type = pset.get<string>("module_type");
+//   int banner_printed = 0;
+//   for (int i=0; i<ntrk; i++) {
+//     art::Ptr<KalRep> kptr = krepsHandle->at(i);
+//     //    fEvent->get(kptr.id(), krepsHandle);
+//     fhicl::ParameterSet const& pset = krepsHandle.provenance()->parameterSet();
+//     string module_type = pset.get<string>("module_type");
  
-    trk = kptr.get();
-    if (banner_printed == 0) {
-      printKalRep(trk,"banner",module_type.data());
-      banner_printed = 1;
-    }
-    printKalRep(trk,"data",module_type.data());
-    if (hitOpt > 0) printKalRep(trk,"hits");
-  }
-}
+//     trk = kptr.get();
+//     if (banner_printed == 0) {
+//       printKalRep(trk,"banner",module_type.data());
+//       banner_printed = 1;
+//     }
+//     printKalRep(trk,"data",module_type.data());
+//     if (hitOpt > 0) printKalRep(trk,"hits");
+//   }
+// }
 
 
 //-----------------------------------------------------------------------------
@@ -1478,77 +1482,77 @@ void TAnaDump::printCaloRecoDigiCollection(const char* ModuleLabel,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TAnaDump::printTrkToCaloExtrapol(const mu2e::TrkToCaloExtrapol* trkToCalo,
-				      const char* Opt) {
- TString opt = Opt;
+// void TAnaDump::printTrkToCaloExtrapol(const mu2e::TrkToCaloExtrapol* trkToCalo,
+// 				      const char* Opt) {
+//  TString opt = Opt;
 
-  if ((opt == "") || (opt == "banner")) {
-    printf("-------------------------------------------------------------------------------------------------------\n");
-    printf("sectionId      Time     ExtPath     Ds       FitCon      t0          X           Y        Z          Mom  \n");
-    printf("-------------------------------------------------------------------------------------------------------\n");
-  }
+//   if ((opt == "") || (opt == "banner")) {
+//     printf("-------------------------------------------------------------------------------------------------------\n");
+//     printf("sectionId      Time     ExtPath     Ds       FitCon      t0          X           Y        Z          Mom  \n");
+//     printf("-------------------------------------------------------------------------------------------------------\n");
+//   }
   
-  if ((opt == "") || (opt.Index("data") >= 0)) {
+//   if ((opt == "") || (opt.Index("data") >= 0)) {
 
-    double ds = trkToCalo->pathLengthExit()-trkToCalo->pathLengthEntrance();
+//     double ds = trkToCalo->pathLengthExit()-trkToCalo->pathLengthEntrance();
   
-    printf("%6i %10.3f %10.3f %8.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f \n",
-	   trkToCalo->diskId(),
-	   trkToCalo->time(),
-	   trkToCalo->pathLengthEntrance(),
-	   ds,
-	   trkToCalo->fitConsistency(),
-	   trkToCalo->t0(),
-	   trkToCalo->entrancePosition().x(),
-	   trkToCalo->entrancePosition().y(),
-	   trkToCalo->entrancePosition().z(),
-	   trkToCalo->momentum().mag() );
-  }
+//     printf("%6i %10.3f %10.3f %8.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f \n",
+// 	   trkToCalo->diskId(),
+// 	   trkToCalo->time(),
+// 	   trkToCalo->pathLengthEntrance(),
+// 	   ds,
+// 	   trkToCalo->fitConsistency(),
+// 	   trkToCalo->t0(),
+// 	   trkToCalo->entrancePosition().x(),
+// 	   trkToCalo->entrancePosition().y(),
+// 	   trkToCalo->entrancePosition().z(),
+// 	   trkToCalo->momentum().mag() );
+//   }
   
-}
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void TAnaDump::printTrkToCaloExtrapolCollection(const char* ModuleLabel, 
-						const char* ProductName,
-						const char* ProcessName) {
+// void TAnaDump::printTrkToCaloExtrapolCollection(const char* ModuleLabel, 
+// 						const char* ProductName,
+// 						const char* ProcessName) {
 
-  printf(">>>> ModuleLabel = %s\n",ModuleLabel);
+//   printf(">>>> ModuleLabel = %s\n",ModuleLabel);
 
-  //data about hits in the calorimeter crystals
+//   //data about hits in the calorimeter crystals
 
-  art::Handle<mu2e::TrkToCaloExtrapolCollection> trkToCaloHandle;
-  const mu2e::TrkToCaloExtrapolCollection* trkToCalo;
+//   art::Handle<mu2e::TrkToCaloExtrapolCollection> trkToCaloHandle;
+//   const mu2e::TrkToCaloExtrapolCollection* trkToCalo;
 
-  if (ProductName[0] != 0) {
-    art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
-			    art::ProcessNameSelector(ProcessName)         && 
-			    art::ModuleLabelSelector(ModuleLabel)            );
-    fEvent->get(selector, trkToCaloHandle);
-  }
-  else {
-    art::Selector  selector(art::ProcessNameSelector(ProcessName)         && 
-			    art::ModuleLabelSelector(ModuleLabel)            );
-    fEvent->get(selector, trkToCaloHandle);
-  }
+//   if (ProductName[0] != 0) {
+//     art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
+// 			    art::ProcessNameSelector(ProcessName)         && 
+// 			    art::ModuleLabelSelector(ModuleLabel)            );
+//     fEvent->get(selector, trkToCaloHandle);
+//   }
+//   else {
+//     art::Selector  selector(art::ProcessNameSelector(ProcessName)         && 
+// 			    art::ModuleLabelSelector(ModuleLabel)            );
+//     fEvent->get(selector, trkToCaloHandle);
+//   }
 
-  trkToCalo = trkToCaloHandle.operator ->();
+//   trkToCalo = trkToCaloHandle.operator ->();
 
-  int nhits = trkToCalo->size();
+//   int nhits = trkToCalo->size();
 
-  const mu2e::TrkToCaloExtrapol* hit;
+//   const mu2e::TrkToCaloExtrapol* hit;
   
-  int banner_printed = 0;
-  for (int i=0; i<nhits; i++) {
-    hit = &trkToCalo->at(i);
-    if (banner_printed == 0) {
-      printTrkToCaloExtrapol(hit, "banner");
-      banner_printed = 1;
-    }
-    printTrkToCaloExtrapol(hit,"data");
-  }
+//   int banner_printed = 0;
+//   for (int i=0; i<nhits; i++) {
+//     hit = &trkToCalo->at(i);
+//     if (banner_printed == 0) {
+//       printTrkToCaloExtrapol(hit, "banner");
+//       banner_printed = 1;
+//     }
+//     printTrkToCaloExtrapol(hit,"data");
+//   }
   
-}
+// }
 
 
 
@@ -1873,10 +1877,10 @@ void TAnaDump::printStepPointMC(const mu2e::StepPointMC* Step, const char* Detec
     if ((strcmp(Detector,"tracker") == 0) && tracker) {
       const mu2e::Straw* straw = &tracker->getStraw(mu2e::StrawId(Step->volumeId()));
 
-      const Hep3Vector* v1 = &straw->getMidPoint();
+      const CLHEP::Hep3Vector* v1 = &straw->getMidPoint();
       HepPoint p1(v1->x(),v1->y(),v1->z());
 
-      const Hep3Vector* v2 = &Step->position();
+      const CLHEP::Hep3Vector* v2 = &Step->position();
       HepPoint    p2(v2->x(),v2->y(),v2->z());
 
       TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
@@ -1900,7 +1904,7 @@ void TAnaDump::printStepPointMC(const mu2e::StepPointMC* Step, const char* Detec
     double energy = sqrt(pabs*pabs+mass*mass);
     double ekin  = energy-mass;
         
-    Hep3Vector mom = Step->momentum();
+    CLHEP::Hep3Vector mom = Step->momentum();
     double pt = sqrt(pabs*pabs - mom.z()*mom.z());
 
     art::Handle<mu2e::PhysicalVolumeInfoMultiCollection> volumes;
@@ -2046,196 +2050,196 @@ void TAnaDump::printStepPointMCCollection(const char* ModuleLabel,
  
 // }
 
-//-----------------------------------------------------------------------------
-void TAnaDump::printTrackClusterMatch(const mu2e::TrackClusterMatch* Tcm, const char* Opt) {
+// //-----------------------------------------------------------------------------
+// void TAnaDump::printTrackClusterMatch(const mu2e::TrackClusterMatch* Tcm, const char* Opt) {
 
-  TString opt = Opt;
+//   TString opt = Opt;
   
-  if ((opt == "") || (opt == "banner")) {
-    printf("--------------------------------------------------------------------------------------\n");
-    printf("  Disk         Cluster          Track         chi2     du        dv       dt       E/P\n");
-    printf("--------------------------------------------------------------------------------------\n");
-  }
+//   if ((opt == "") || (opt == "banner")) {
+//     printf("--------------------------------------------------------------------------------------\n");
+//     printf("  Disk         Cluster          Track         chi2     du        dv       dt       E/P\n");
+//     printf("--------------------------------------------------------------------------------------\n");
+//   }
 
-  if ((opt == "") || (opt == "data")) {
+//   if ((opt == "") || (opt == "data")) {
 
-    const mu2e::CaloCluster*      cl  = Tcm->caloCluster();
-    const mu2e::TrkCaloIntersect* tex = Tcm->textrapol  ();
+//     const mu2e::CaloCluster*      cl  = Tcm->caloCluster();
+//     const mu2e::TrkCaloIntersect* tex = Tcm->textrapol  ();
 
-    int disk     = cl->diskID();
-    double chi2  = Tcm->chi2();
+//     int disk     = cl->diskID();
+//     double chi2  = Tcm->chi2();
 
-    printf("%5i %16p  %16p  %8.3f %8.3f %8.3f %8.3f %8.3f\n",
-	   disk,  static_cast<const void*>(cl),  static_cast<const void*>(tex),  chi2,Tcm->du(),Tcm->dv(),Tcm->dt(),Tcm->ep());
-  }
-}
+//     printf("%5i %16p  %16p  %8.3f %8.3f %8.3f %8.3f %8.3f\n",
+// 	   disk,  static_cast<const void*>(cl),  static_cast<const void*>(tex),  chi2,Tcm->du(),Tcm->dv(),Tcm->dt(),Tcm->ep());
+//   }
+// }
 
 
 
-//-----------------------------------------------------------------------------
-void TAnaDump::printTrackClusterMatchCollection(const char* ModuleLabel, 
-						const char* ProductName,
-						const char* ProcessName) {
+// //-----------------------------------------------------------------------------
+// void TAnaDump::printTrackClusterMatchCollection(const char* ModuleLabel, 
+// 						const char* ProductName,
+// 						const char* ProcessName) {
 
-  printf(">>>> ModuleLabel = %s\n",ModuleLabel);
+//   printf(">>>> ModuleLabel = %s\n",ModuleLabel);
 
-  art::Handle<mu2e::TrackClusterMatchCollection> handle;
-  const mu2e::TrackClusterMatchCollection*       coll;
+//   art::Handle<mu2e::TrackClusterMatchCollection> handle;
+//   const mu2e::TrackClusterMatchCollection*       coll;
 
-  art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
-			  art::ProcessNameSelector(ProcessName)         && 
-			  art::ModuleLabelSelector(ModuleLabel)            );
+//   art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
+// 			  art::ProcessNameSelector(ProcessName)         && 
+// 			  art::ModuleLabelSelector(ModuleLabel)            );
 
-  fEvent->get(selector,handle);
+//   fEvent->get(selector,handle);
 
-  if (handle.isValid()) coll = handle.product();
-  else {
-    printf(">>> ERROR in TAnaDump::printTrackClusterMatchCollection: failed to locate requested collection. Available:");
+//   if (handle.isValid()) coll = handle.product();
+//   else {
+//     printf(">>> ERROR in TAnaDump::printTrackClusterMatchCollection: failed to locate requested collection. Available:");
 
-    // vector<art::Handle<mu2e::TrackClusterMatchCollection>> list_of_handles;
-    auto list_of_handles = fEvent->getMany<mu2e::TrackClusterMatchCollection>();
+//     // vector<art::Handle<mu2e::TrackClusterMatchCollection>> list_of_handles;
+//     auto list_of_handles = fEvent->getMany<mu2e::TrackClusterMatchCollection>();
 
-    for (auto ih=list_of_handles.begin(); ih<list_of_handles.end(); ih++) {
-      printf("%s\n", ih->provenance()->moduleLabel().data());
-    }
+//     for (auto ih=list_of_handles.begin(); ih<list_of_handles.end(); ih++) {
+//       printf("%s\n", ih->provenance()->moduleLabel().data());
+//     }
 
-    printf(". BAIL OUT. \n");
-    return;
-  }
+//     printf(". BAIL OUT. \n");
+//     return;
+//   }
 
-  int nm = coll->size();
+//   int nm = coll->size();
 
-  const mu2e::TrackClusterMatch* obj;
+//   const mu2e::TrackClusterMatch* obj;
 
-  int banner_printed = 0;
+//   int banner_printed = 0;
 
-  for (int i=0; i<nm; i++) {
-    obj = &coll->at(i);
-    if (banner_printed == 0) {
-      printTrackClusterMatch(obj, "banner");
-      banner_printed = 1;
-    }
-    printTrackClusterMatch(obj,"data");
-  }
+//   for (int i=0; i<nm; i++) {
+//     obj = &coll->at(i);
+//     if (banner_printed == 0) {
+//       printTrackClusterMatch(obj, "banner");
+//       banner_printed = 1;
+//     }
+//     printTrackClusterMatch(obj,"data");
+//   }
  
-}
+// }
 
 
 //-----------------------------------------------------------------------------
-void TAnaDump::refitTrack(void* Trk, double NSig) {
-  KalRep* trk = (KalRep*) Trk;
+// void TAnaDump::refitTrack(void* Trk, double NSig) {
+//   KalRep* trk = (KalRep*) Trk;
 
-  const TrkHitVector* hits = &trk->hitVector();
+//   const TrkHitVector* hits = &trk->hitVector();
 
-  for (auto it=hits->begin(); it!=hits->end(); it++) {
+//   for (auto it=hits->begin(); it!=hits->end(); it++) {
 
-    // TrkStrawHit inherits from TrkHitOnTrk
+//     // TrkStrawHit inherits from TrkHitOnTrk
 
-    TrkHit* hit = (TrkHit*) &(*it);
+//     TrkHit* hit = (TrkHit*) &(*it);
 
-    const mu2e::TrkStrawHit* straw_hit = (const mu2e::TrkStrawHit*) (*it);
+//     const mu2e::TrkStrawHit* straw_hit = (const mu2e::TrkStrawHit*) (*it);
 
-    double res = straw_hit->resid();
+//     double res = straw_hit->resid();
 
-    if (fabs(res) > 0.1*NSig) {
-      trk->deactivateHit(hit);
-    }
-  }
-
-  trk->fit();
-
-  printKalRep(trk, "hits");
-}
-
-
-//-----------------------------------------------------------------------------
-// emulate calculation of the unbiased residual
-//-----------------------------------------------------------------------------
-void TAnaDump::Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit) {
-
-//  apparently, Hit has (had ?) once to be on the track ?
-
-  // double             s, slen, rdrift, sflt, tflt, doca/*, sig , xdr*/;
-  // const mu2e::Straw *straw;
-  // int                sign /*, shId, layer*/;
-  // HepPoint           spi , tpi , hpos;
- 
-  // CLHEP::Hep3Vector  spos, sdir;
-  // TrkSimpTraj  *ptraj(NULL);
-
-  fTmp[0] = -1;
-  fTmp[1] = -1;
-
-//   KalRep* krep = Krep->clone();
-
-//   straw  = &Hit->straw();
-//   //  layer  = straw->id().getLayer();
-//   rdrift = Hit->driftRadius();
-//   //  shId   = straw->index().asInt();
-  
-//   //  const KalHit* khit = krep->findHotSite(Hit);
-
-//   s      = Hit->fltLen();
-
-//   //  int active = Hit->isActive();
-
-// //   if (active) krep->deactivateHot(Hit);
-
-// //   krep->resetFit();
-// //   krep->fit();
-// // 					// local track trajectory
-// //   ptraj = krep->localTrajectory(s,slen);
-
-//   vector<KalSite*>::const_iterator itt;
-//   int found = 0;
-//   for (auto /* vector<KalSite*>::const_iterator */ it=krep->siteList().begin();
-//        it!= krep->siteList().end(); it++) {
-//     const KalHit* kalhit = (*it)->kalHit();
-//     if (kalhit && (kalhit->hitOnTrack() == Hit)) {
-//       itt   = it;
-//       found = 1;
-//       break;
+//     if (fabs(res) > 0.1*NSig) {
+//       trk->deactivateHit(hit);
 //     }
 //   }
+
+//   trk->fit();
+
+//   printKalRep(trk, "hits");
+// }
+
+
+// //-----------------------------------------------------------------------------
+// // emulate calculation of the unbiased residual
+// //-----------------------------------------------------------------------------
+// void TAnaDump::Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit) {
+
+// //  apparently, Hit has (had ?) once to be on the track ?
+
+//   // double             s, slen, rdrift, sflt, tflt, doca/*, sig , xdr*/;
+//   // const mu2e::Straw *straw;
+//   // int                sign /*, shId, layer*/;
+//   // HepPoint           spi , tpi , hpos;
+ 
+//   // CLHEP::Hep3Vector  spos, sdir;
+//   // TrkSimpTraj  *ptraj(NULL);
+
+//   fTmp[0] = -1;
+//   fTmp[1] = -1;
+
+// //   KalRep* krep = Krep->clone();
+
+// //   straw  = &Hit->straw();
+// //   //  layer  = straw->id().getLayer();
+// //   rdrift = Hit->driftRadius();
+// //   //  shId   = straw->index().asInt();
+  
+// //   //  const KalHit* khit = krep->findHotSite(Hit);
+
+// //   s      = Hit->fltLen();
+
+// //   //  int active = Hit->isActive();
+
+// // //   if (active) krep->deactivateHot(Hit);
+
+// // //   krep->resetFit();
+// // //   krep->fit();
+// // // 					// local track trajectory
+// // //   ptraj = krep->localTrajectory(s,slen);
+
+// //   vector<KalSite*>::const_iterator itt;
+// //   int found = 0;
+// //   for (auto /* vector<KalSite*>::const_iterator */ it=krep->siteList().begin();
+// //        it!= krep->siteList().end(); it++) {
+// //     const KalHit* kalhit = (*it)->kalHit();
+// //     if (kalhit && (kalhit->hitOnTrack() == Hit)) {
+// //       itt   = it;
+// //       found = 1;
+// //       break;
+// //     }
+// //   }
       
-//   if (found == 0) {
-//     ptraj = (TrkSimpTraj  *) krep->localTrajectory(s,slen);
-//   }
-//   else {
-//     krep->smoothedTraj(itt,itt,ptraj);
-//   }
+// //   if (found == 0) {
+// //     ptraj = (TrkSimpTraj  *) krep->localTrajectory(s,slen);
+// //   }
+// //   else {
+// //     krep->smoothedTraj(itt,itt,ptraj);
+// //   }
 
-//   spos = straw->getMidPoint();
-//   sdir = straw->getDirection();
-// 					// convert Hep3Vector into HepPoint
+// //   spos = straw->getMidPoint();
+// //   sdir = straw->getDirection();
+// // 					// convert Hep3Vector into HepPoint
 
-//   HepPoint    p1(spos.x(),spos.y(),spos.z());
+// //   HepPoint    p1(spos.x(),spos.y(),spos.z());
 
-// 					// wire as a trajectory
-//   TrkLineTraj st(p1,sdir,0.,0.);
+// // 					// wire as a trajectory
+// //   TrkLineTraj st(p1,sdir,0.,0.);
 
-//   TrkPoca poca = TrkPoca(st,0.,*ptraj,0);
+// //   TrkPoca poca = TrkPoca(st,0.,*ptraj,0);
 
-//   Hep3Vector        sdi , tdi, u;
+// //   Hep3Vector        sdi , tdi, u;
 
-//   sflt = poca.flt1();
-//   tflt = poca.flt2();
+// //   sflt = poca.flt1();
+// //   tflt = poca.flt2();
 
-//   st.getInfo(sflt,spi,sdi);
-//   ptraj->getInfo(tflt,tpi,tdi);
+// //   st.getInfo(sflt,spi,sdi);
+// //   ptraj->getInfo(tflt,tpi,tdi);
       
-//   u    = sdi.cross(tdi).unit();  // direction towards the center
+// //   u    = sdi.cross(tdi).unit();  // direction towards the center
 
-//   sign     = Hit->ambig();
-//   hpos     = spi+u*rdrift*sign;
-// 					// hit residal is positive when its residual vector 
-// 					// points inside
-//   doca     = (tpi-hpos).dot(u);
-//   //  sig      = sqrt(rdrift*rdrift +0.1*0.1); // 2.5; // 1.; // hit[ih]->hitRms();
-//   //  xdr      = doca/sig;
+// //   sign     = Hit->ambig();
+// //   hpos     = spi+u*rdrift*sign;
+// // 					// hit residal is positive when its residual vector 
+// // 					// points inside
+// //   doca     = (tpi-hpos).dot(u);
+// //   //  sig      = sqrt(rdrift*rdrift +0.1*0.1); // 2.5; // 1.; // hit[ih]->hitRms();
+// //   //  xdr      = doca/sig;
 
-//   fTmp[0]  = doca;
+// //   fTmp[0]  = doca;
 
-  //  if (active) krep->activateHot(Hit);
+//   //  if (active) krep->activateHot(Hit);
 
-}
+// }

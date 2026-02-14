@@ -12,6 +12,8 @@
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 
+#include "BTrk/BbrGeom/HepPoint.h"
+
 #include <vector>
 
 using std::vector ;
