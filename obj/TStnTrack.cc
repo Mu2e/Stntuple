@@ -40,7 +40,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
     float        fNyTrk;
     float        fNzTrk;
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
 
   struct TStnTrackDataV4_t {
@@ -223,7 +223,7 @@ void TStnTrack::ReadV4(TBuffer &R__b) {
       fDisk[i].fDr       = -1.e6       ; // undefined before V10
       fDisk[i].fSInt     = -1.e6       ; // undefined before V10
       fDisk[i].fCluster  = NULL;
-      fDisk[i].fExtrk    = NULL;
+      // fDisk[i].fExtrk    = NULL;
     }
   }
 
@@ -261,7 +261,7 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
     float        fChi2Match;		// track-cluster match chi&^2
     float        fPath;
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
 
   struct TStnTrackDataV5_t {
@@ -453,7 +453,7 @@ void TStnTrack::ReadV5(TBuffer &R__b) {
       fDisk[i].fDr       = -1.e6       ; // undefined before V10
       fDisk[i].fSInt     = -1.e6       ; // undefined before V10
       fDisk[i].fCluster  = NULL        ;
-      fDisk[i].fExtrk    = NULL        ;
+      // fDisk[i].fExtrk    = NULL        ;
     }
   }
 
@@ -495,7 +495,7 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
     float        fPath;			// track path in the disk
     float        fIntDepth;             // assumed interaction depth, added in V6;
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
 
   struct TStnTrackDataV6_t {
@@ -688,7 +688,7 @@ void TStnTrack::ReadV6(TBuffer &R__b) {
       fDisk[i].fDr       = -1.e6       ; // undefined before V10
       fDisk[i].fSInt     = -1.e6       ; // undefined before V10
       fDisk[i].fCluster  = NULL        ;
-      fDisk[i].fExtrk    = NULL        ;
+      // fDisk[i].fExtrk    = NULL        ;
     }
   }
 
@@ -731,7 +731,7 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
     float        fPath;			// track path in the disk
     float        fIntDepth;             // assumed interaction depth, added in V6;
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
 
   struct TStnTrackDataV7_t {
@@ -926,7 +926,7 @@ void TStnTrack::ReadV7(TBuffer &R__b) {
       fDisk[i].fDr       = -1.e6       ; // undefined before V10
       fDisk[i].fSInt     = -1.e6       ; // undefined before V10
       fDisk[i].fCluster  = NULL        ;
-      fDisk[i].fExtrk    = NULL        ;
+      // fDisk[i].fExtrk    = NULL        ;
     }
   }
 
@@ -970,7 +970,7 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
     float        fPath;			// track path in the disk
     float        fIntDepth;             // assumed interaction depth, added in V6;
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
 
   struct TStnTrackDataV8_t {
@@ -1168,7 +1168,7 @@ void TStnTrack::ReadV8(TBuffer &R__b) {
       fDisk[i].fSInt     = -1;           // undefined before V10
 
       fDisk[i].fCluster  = NULL        ;
-      fDisk[i].fExtrk    = NULL        ;
+      // fDisk[i].fExtrk    = NULL        ;
     }
   }
 
@@ -1209,7 +1209,7 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
     float        fPath;			// track path in the disk
     float        fIntDepth;             // assumed interaction depth, added in V6;
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
 
   struct TStnTrackDataV9_t {
@@ -1411,7 +1411,7 @@ void TStnTrack::ReadV9(TBuffer &R__b) {
       fDisk[i].fSInt     = -1;           // added in V10
 
       fDisk[i].fCluster  = NULL        ;
-      fDisk[i].fExtrk    = NULL        ;
+      // fDisk[i].fExtrk    = NULL        ;
     }
   }
 
@@ -1454,7 +1454,7 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
     float        fDr;                   // ** added in V10: DR(cluster-track), signed
     float        fSInt;                 // ** added in V10: interaction length, calculated
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
 
   struct TStnTrackDataV10_t {
@@ -1655,7 +1655,7 @@ void TStnTrack::ReadV10(TBuffer &R__b) {
       fDisk[i].fSInt     = disk.fSInt  ; // ** added in V10
 
       fDisk[i].fCluster  = NULL        ;
-      fDisk[i].fExtrk    = NULL        ;
+      // fDisk[i].fExtrk    = NULL        ;
     }
   }
 
@@ -1888,7 +1888,7 @@ void TStnTrack::Clear(Option_t* Opt) {
   fKalRep[2] = 0;
   fKalRep[3] = 0;
 
-  fExtrk              = NULL;
+  // fExtrk              = NULL;
   fClosestCaloCluster = NULL;
   fCluster            = NULL;
 
@@ -1935,7 +1935,7 @@ void TStnTrack::Clear(Option_t* Opt) {
     fDisk[i].fDr           = 1.e6;
     fDisk[i].fSInt         = 1.e6;
     fDisk[i].fCluster      = NULL;
-    fDisk[i].fExtrk        = NULL;
+    // fDisk[i].fExtrk        = NULL;
   }
 
   fVMinS        = NULL;
@@ -1991,7 +1991,7 @@ void TStnTrack::Clear(Option_t* Opt) {
   fTrkCaloHit.fDr           = 1.e6;
   fTrkCaloHit.fSInt         = 1.e6;
   fTrkCaloHit.fCluster      = NULL;
-  fTrkCaloHit.fExtrk        = NULL;
+  // fTrkCaloHit.fExtrk        = NULL;
 
 					// by definition, LogLH < 0
   fEleLogLHCal  =  1.;

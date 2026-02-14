@@ -30,7 +30,7 @@ class TStnCluster;
 namespace mu2e {
   class KalSeed ;
   class CaloCluster;
-  class TrkToCaloExtrapol;
+  // class TrkToCaloExtrapol;
 }
 
 // namespace murat {
@@ -122,7 +122,7 @@ public:
     float        fDr;                   // ** added in V10: DR(cluster-track), signed
     float        fSInt;                 // ** added in V10: interaction length, calculated
     const mu2e::CaloCluster*       fCluster;
-    const mu2e::TrkToCaloExtrapol* fExtrk;
+    // const mu2e::TrkToCaloExtrapol* fExtrk;
   };
     
   TLorentzVector            fMomentum;        // this assumes DEM fit hypothesis
@@ -212,7 +212,7 @@ public:
 //-----------------------------------------------------------------------------
 //  transient data members, all persistent ones should go above
 //-----------------------------------------------------------------------------
-  const mu2e::TrkToCaloExtrapol* fExtrk;              //!
+  // const mu2e::TrkToCaloExtrapol* fExtrk;              //!
   const mu2e::CaloCluster*       fClosestCaloCluster; //!
 
   InterData_t*                   fVMinS;	      //! intersection with min S

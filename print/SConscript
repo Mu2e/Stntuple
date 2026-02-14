@@ -44,7 +44,6 @@ def local_build():
                         'mu2e_RecoDataProducts',
                         'mu2e_DataProducts',
                         'mu2e_CaloMC',
-                        'mu2e_BTrkData',
                                                 
                         babarlibs,
                         
