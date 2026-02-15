@@ -13,7 +13,7 @@
 
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+
 
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
@@ -21,6 +21,8 @@
 
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/TrackerGeom/inc/Tracker.hh"
+
+#include "BTrk/BbrGeom/HepPoint.h"
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
@@ -124,7 +126,8 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
       nhtot += nhits;
 
       for (int ih=0; ih<nhits; ih++) {
-	const mu2e::TrkStrawHitSeed* tsh = static_cast<const mu2e::TrkStrawHitSeed*> (&ks_hits->at(ih));
+	// const mu2e::TrkStrawHitSeed* tsh = static_cast<const mu2e::TrkStrawHitSeed*> (&ks_hits->at(ih));
+	const auto* tsh = &ks_hits->at(ih);
 	int ind = tsh->index(); // in the list of straw hits
 	sh      = &sh_coll->at(ind);
 
@@ -162,12 +165,12 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
 	  const CLHEP::Hep3Vector& v2 = step->position();
 	  HepPoint    p2(v2.x(),v2.y(),v2.z());
 	      
-	  TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
-	  TrkLineTraj trstep (p2,step->momvec().unit(),0.,0.);
+	  // TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
+	  // TrkLineTraj trstep (p2,step->momvec().unit(),0.,0.);
 	      
-	  TrkPoca poca(trstep, 0., trstraw, 0.);
+	  // TrkPoca poca(trstep, 0., trstraw, 0.);
 	
-	  mcdoca = poca.doca();
+	  // mcdoca = poca.doca();
 	}
 	else {
 	  pdg_id        = -1;

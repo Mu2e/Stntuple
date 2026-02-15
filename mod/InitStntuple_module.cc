@@ -222,9 +222,9 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     }
     trigger_table->AddTrigger(new TStnTrigger( 410, 410,"minBias_CDCount"             ,1));
 
-  } else if (RunNumber <= 1220) {
+  } else if (RunNumber <= 1450) {
 //-----------------------------------------------------------------------------
-// runs 1211-1220: Trigger bits/names were updated (Oct. 2025)
+// runs 1211-1450: Trigger bits/names were updated (Oct. 2025)
 //-----------------------------------------------------------------------------
     // < 100 is for Offline/processing paths
     trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                     ,1));
@@ -269,6 +269,7 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 230, 230,"apr_TrkUe_80m70p"            ,1));
     trigger_table->AddTrigger(new TStnTrigger( 240, 240,"apr_TwoTrkDe_80m70p_D0200"   ,1));
     trigger_table->AddTrigger(new TStnTrigger( 250, 250,"apr_TwoTrkDe_50"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 255, 255,"apr_Hlx_50_Hlx_30"           ,1));
     trigger_table->AddTrigger(new TStnTrigger( 260, 260,"apr_TrkDe_50_D0200"          ,1));
     trigger_table->AddTrigger(new TStnTrigger( 265, 265,"apr_Hlx_50"                  ,1));
     trigger_table->AddTrigger(new TStnTrigger( 266, 266,"apr_Hlx_30"                  ,1));
@@ -279,8 +280,15 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 401, 401,"calo_MVANNCE"                ,1));
     trigger_table->AddTrigger(new TStnTrigger( 402, 402,"calo_cosmic"                 ,1));
     trigger_table->AddTrigger(new TStnTrigger( 420, 420,"calo_RMC"                    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 425, 425,"calo_cluster_50"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 426, 426,"calo_cluster_60"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 427, 427,"calo_cluster_70"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 428, 428,"calo_cluster_75"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 429, 429,"calo_cluster_80"             ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 500, 500,"cst_TimeCluster"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 510, 510,"apr_TC"                      ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 511, 511,"apr_TC_calo"                 ,1));
     trigger_table->AddTrigger(new TStnTrigger( 520, 520,"cst_CosmicTrackSeed"         ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 600, 600,"minBias_SDCount"             ,1));

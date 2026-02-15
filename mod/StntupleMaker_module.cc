@@ -68,7 +68,7 @@
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/alg/TStntuple.hh"
 
-#include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
+// #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 #include "Offline/MCDataProducts/inc/GenId.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 // #include "TrkDiag/inc/KalDiag.hh"
@@ -169,6 +169,7 @@ protected:
 
   string                   fCaloCrystalHitMaker;
   string                   fCaloClusterMaker;
+  string                   fCaloClusterMCMaker;
 //-----------------------------------------------------------------------------
 // initialization of various data blocks
 //-----------------------------------------------------------------------------
@@ -208,9 +209,9 @@ protected:
 
   TNamed*                  fVersion;
 
-  TNamedHandle*            fDarHandle;
+  // TNamedHandle*            fDarHandle;
 
-  DoubletAmbigResolver*    fDar;
+  // DoubletAmbigResolver*    fDar;
 
 //------------------------------------------------------------------------------
 // function members
@@ -321,6 +322,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fCaloCrystalHitMaker     (PSet.get<string>        ("caloCrystalHitsMaker"))
   , fCaloClusterMaker        (PSet.get<string>        ("caloClusterMaker"    ))
+  , fCaloClusterMCMaker      (PSet.get<string>        ("caloClusterMCMaker", ""))
 
   , fGenId((PSet.get<std::string>("genId","unknown") == "unknown") ? GenId::findByName (PSet.get<std::string>("genId")) : GenId::unknown)
   , fPdgId                   (PSet.get<int>           ("pdgId"               ))
@@ -368,20 +370,55 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   fInitTimeClusterBlock = new TObjArray();
   fInitTimeClusterBlock->SetOwner(kTRUE);
-  fDar                  = new DoubletAmbigResolver (PSet.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
-  fDarHandle            = new TNamedHandle("DarHandle",fDar);
+  // fDar                  = new DoubletAmbigResolver (PSet.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
+  // fDarHandle            = new TNamedHandle("DarHandle",fDar);
   // fKalDiag              = new KalDiag     (PSet.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
   // fKalDiagHandle        = new TNamedHandle("KalDiagHandle"      ,fKalDiag);
 
-  fFolder->Add(fDarHandle);
+  // fFolder->Add(fDarHandle);
+
+  // Validate inputs
+
+  // Tracks
+  const size_t n_track_blocks = fTrackBlockName.size();
+  if(fTrackCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTrackCollTag list size doesn't match track block list size");
+  if(fTrackHsBlockName.size() != n_track_blocks)
+    throw std::runtime_error("fTrackHsBlockName list size doesn't match track block list size");
+  if(fTciCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTciCollTag list size doesn't match track block list size");
+  if(fTcmCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTcmCollTag list size doesn't match track block list size");
+  if(fTrkQualCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fTrkQualCollTag list size doesn't match track block list size");
+  if(fPidCollTag.size() != n_track_blocks)
+    throw std::runtime_error("fPidCollTag list size doesn't match track block list size");
+  if(fMakePid && fPidBlockName.size() != n_track_blocks)
+    throw std::runtime_error("fPidBlockName list size doesn't match track block list size");
+  if(!fTrackTsBlockName.empty() && fTrackTsBlockName.size() != n_track_blocks)
+    throw std::runtime_error("fTrackTsBlockName list size doesn't match track block list size");
+  if(fTrackTsBlockName.size() != fTrackTsCollTag.size())
+    throw std::runtime_error("fTrackTsBlockName list size doesn't match coll tag list size");
+
+  // Helices
+  const size_t n_helix_blocks = fHelixBlockName.size();
+  if(fHelixSeedCollTag.size() != n_helix_blocks)
+    throw std::runtime_error("fHelixSeedCollTag list size doesn't match helix block list size");
+  if(fTClBlockName.size() != n_helix_blocks)
+    throw std::runtime_error("fTClBlockName list size doesn't match helix block list size");
+  if(!fKsfBlockName.empty() && fKsfBlockName.size() != n_helix_blocks)
+    throw std::runtime_error("fKsfBlockName list size doesn't match helix block list size");
+  if(fKsfBlockName.size() != fHelixKsCollTag.size())
+    throw std::runtime_error("fKsfBlockName list size doesn't match helix KS coll tag list size");
+
 
 }
 
 
 //------------------------------------------------------------------------------
 StntupleMaker::~StntupleMaker() {
-  delete fDar;
-  delete fDarHandle;
+  // delete fDar;
+  // delete fDarHandle;
   delete fVersion;
 
   if (fInitCrvPulseBlock  ) delete fInitCrvPulseBlock;
@@ -505,6 +542,7 @@ void StntupleMaker::beginJob() {
 				     compression_level);
     if (db) {
       db->AddCollName("mu2e::CaloClusterCollection",fCaloClusterMaker.data());
+      db->AddCollName("mu2e::CaloClusterMCCollection",fCaloClusterMCMaker.data());
       SetResolveLinksMethod("ClusterBlock",StntupleInitMu2eClusterBlockLinks);
     }
   }
@@ -755,7 +793,7 @@ void StntupleMaker::beginJob() {
       init_block->SetTcmCollTag         (fTcmCollTag[i]);
       init_block->SetTrkQualCollTag     (fTrkQualCollTag[i]);
 
-      init_block->SetDoubletAmbigResolver(fDar);
+      // init_block->SetDoubletAmbigResolver(fDar);
 
       init_block->fVerbose = fTrackVerbose;
 

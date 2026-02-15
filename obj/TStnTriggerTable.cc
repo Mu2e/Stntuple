@@ -61,7 +61,7 @@ void TStnTriggerTable::GetListOfTriggers(const char* Pattern,
     if (t) {
       trigger_name = t->Name();
       trigger_name.ToUpper();
-      if (strstr(trigger_name,pat) != 0) {
+      if (pat == "" || strstr(trigger_name,pat) != 0) {
 	List->Add((TObject*)t);
       }
     }

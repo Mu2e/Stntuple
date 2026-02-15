@@ -7,6 +7,10 @@
 #include "TObject.h"
 #include "TBuffer.h"
 
+#include <format>
+#include <iostream>
+#include <string>
+
 class TBitset: public TObject {
 protected:
   Int_t     fNBits;
@@ -46,6 +50,9 @@ public:
 inline Int_t TBitset::GetBit(Int_t I) const {
   Int_t iw = I / 32;
   Int_t ib = I % 32;
+  if(iw >= fNWords) {
+    throw std::runtime_error(std::format("Attempting to read word {} and bit {}, with max {} and set bits {} (input {})", iw, ib, fNWords, fNBits, I));
+  }
   return (fBits[iw] >> ib) & 0x1 ;
 }
 
@@ -56,6 +63,9 @@ inline void TBitset::SetBit(Int_t I) {
 
   Int_t iw = I / 32;
   Int_t ib = I % 32;
+  if(iw >= fNWords) {
+    throw std::runtime_error(std::format("Attempting to set word {} and bit {}, with max {} and set bits {} (input {})", iw, ib, fNWords, fNBits, I));
+  }
   fBits[iw] |= (0x1 << ib);
 }
 
@@ -67,6 +77,9 @@ inline void TBitset::SetBit(Int_t I, int Val) {
   Val = (Val != 0);   // safety
   int iw = I / 32;
   int ib = I % 32;
+  if(iw >= fNWords) {
+    throw std::runtime_error(std::format("Attempting to set word {} and bit {}, with max {} and set bits {} (input {})", iw, ib, fNWords, fNBits, I));
+  }
 
   int mask = Val << ib;
   fBits[iw] = (fBits[iw]^(0x1 << ib)) | mask;

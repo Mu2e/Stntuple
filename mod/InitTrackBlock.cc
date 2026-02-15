@@ -38,13 +38,13 @@
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/TrkFitFlag.hh"
 
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
-#include "Offline/BTrkData/inc/TrkCaloHit.hh"
-#include "Offline/BTrkData/inc/Doublet.hh"
+
+
+// #include "Offline/BTrkData/inc/Doublet.hh"
 
 #include "Offline/RecoDataProducts/inc/TrkStraw.hh"
-#include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
-#include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
+// #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
+// #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 
 #include "Offline/MCDataProducts/inc/GenParticle.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
@@ -62,6 +62,7 @@
 					          // BaBar
 #include "BTrk/ProbTools/ChisqConsistency.hh"
 #include "BTrk/BbrGeom/BbrVectorErr.hh"
+#include "BTrk/BbrGeom/HepPoint.h"
 #include "BTrk/BbrGeom/TrkLineTraj.hh"
 #include "BTrk/TrkBase/TrkPoca.hh"
 #include "BTrk/KalmanTrack/KalHit.hh"
@@ -252,10 +253,12 @@ void StntupleInitTrackBlock::RetrieveData(AbsEvent* AnEvent) {
   }
 
   list_of_trk_qual = 0;
-  art::Handle<mu2e::MVAResultCollection> trkQualHandle;
-  AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
-  if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
-  else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
+  if(fTrkQualCollTag != "") {
+    art::Handle<mu2e::MVAResultCollection> trkQualHandle;
+    AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
+    if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
+    else if(fTrkQualCollTag != "") printf(" InitTrackBlock::%s: Track quality collection %s not found\n", __func__, fTrkQualCollTag.encode().c_str());
+  }
 
   fSschColl = 0;
   art::Handle<mu2e::ComboHitCollection> sschcH;
@@ -269,10 +272,10 @@ void StntupleInitTrackBlock::RetrieveData(AbsEvent* AnEvent) {
   if (sdmcHandle.isValid()) list_of_mc_straw_hits = sdmcHandle.product();
   else if(fStrawDigiMCCollTag != "") printf(" InitTrackBlock::%s: StrawDigiMC collection %s not found\n", __func__, fStrawDigiMCCollTag.encode().c_str());
 
-  list_of_extrapolated_tracks = 0;
-  art::Handle<mu2e::TrkCaloIntersectCollection>  texHandle;
-  AnEvent->getByLabel(fTciCollTag,texHandle);
-  if (texHandle.isValid()) list_of_extrapolated_tracks = texHandle.product();
+  // list_of_extrapolated_tracks = 0;
+  // art::Handle<mu2e::TrkCaloIntersectCollection>  texHandle;
+  // AnEvent->getByLabel(fTciCollTag,texHandle);
+  // if (texHandle.isValid()) list_of_extrapolated_tracks = texHandle.product();
 
   list_of_pidp = 0;
   art::Handle<mu2e::PIDProductCollection>  pidpHandle;

@@ -8,8 +8,11 @@ process_name : S5Stn
 source       : { module_type : RootInput
     fileNames : ["undefined" ]
     inputCommands : [ "keep  *_*_*_*",
-                      "drop mu2e::HelixSeeds_*_*_*",
-                      "drop mu2e::KalSeeds_*_*_*",
+                      "drop mu2e::HelixSeed*_*_*_*",
+                      "drop mu2e::KalSeed*_*_*_*",
+                      "drop mu2e::KalSeedMCs_*_*_*",
+                      "drop mu2e::IntensityInfo*_*_*_*",
+                      "drop mu2e::RecoCount_*_*_*",
                       "drop mu2e::TriggerInfo_*_*_*",
                       "drop mu2e::CaloClusters_*_*_*",
                       "drop mu2e::TimeClusters_*_*_*",
@@ -27,8 +30,8 @@ physics.trigger_paths[203] : "4:RecoDmu"
 physics.trigger_paths[204] : "5:RecoUmu"
 
 # Default output file naming
-services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.root"
-physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.ConvAna.001210_00000000.stn"
+services.TFileService.fileName                          : "nts.user.dddddb1s5r0000.Stntuple.001210_00000000.root"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.user.dddddb1s5r0000.Stntuple.001210_00000000.stn"
 
 # default compression
 physics.analyzers.InitStntuple.THistModule.compressionLevel : 501 # 7

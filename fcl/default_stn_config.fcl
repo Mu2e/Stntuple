@@ -20,6 +20,8 @@ TrigNames_trackSHBlockName    : [ ""                                , ""        
 TrigNames_pidBlockName        : [ ""                                , ""                                   , ""                               ]
 TrigNames_pidCollTag          : [ ""                                , ""                                   , ""                               ]
 TrigNames_trkQualCollTag      : [ ""                                , ""                                   , ""                               ]
+TrigNames_trackTsBlockName    : []
+TrigNames_trackTsCollTag      : []
 
 OfflineNames_timeClusterBlockName   : [ "TimeClusterBlockDe",  "TimeClusterBlockUe", "TimeClusterBlockDmu",  "TimeClusterBlockUmu" ]
 OfflineNames_timeClusterCollTag     : [ "TZClusterFinder"   ,  "TZClusterFinder"   , "TZClusterFinder"    ,  "TZClusterFinder"     ]
@@ -35,6 +37,8 @@ OfflineNames_trackSHBlockName       : [ ""                  ,  ""               
 OfflineNames_pidBlockName           : [ ""                  ,  ""                  , ""                   ,  ""                    ]
 OfflineNames_pidCollTag             : [ ""                  ,  ""                  , ""                   ,  ""                    ]
 OfflineNames_trkQualCollTag         : [ "TrkQualDe"         ,  "TrkQualUe"         , "TrkQualDmu"         ,  "TrkQualUmu"          ]
+OfflineNames_trackTsBlockName       : []
+OfflineNames_trackTsCollTag         : []
 END_PROLOG
 
 # Stntuple prologs
@@ -154,7 +158,7 @@ physics.producers.compressRecoMCs.surfaceStepTags : []
 # Clone track/helix/cluster collections specific to each relevant trigger path
 
 # Turn off MC-matching in the trigger which doesn't work with cloning
-physics.producers.TTAprKSFMC : { module_type: NullProducer }
+physics.producers.TrigAprKSFMC : { module_type: NullProducer }
 physics.producers.AprHelixTriggerInfoMerger.doDeepCopy             : 1
 physics.producers.AprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
 physics.producers.AprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
@@ -165,7 +169,7 @@ physics.producers.AprHlx50Hlx30TriggerInfoMerger.doDeepCopy        : 1
 physics.producers.AprHlx50Hlx30TriggerInfoMerger.doDeepCopy        : 1
 
 # Turn off MC-matching in the trigger which doesn't work with cloning
-physics.producers.TTCprDeKSFMC : { module_type: NullProducer }
+physics.producers.TrigCprDeKSFMC : { module_type: NullProducer }
 physics.producers.CprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
 physics.producers.CprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
 physics.producers.CprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
@@ -173,7 +177,7 @@ physics.producers.CprHlxDe50TriggerInfoMerger.doDeepCopy           : 1
 physics.producers.CprHelixUeTriggerInfoMerger.doDeepCopy           : 1
 
 # Turn off MC-matching in the trigger which doesn't work with cloning
-physics.producers.TTTprDeKSFMC : { module_type: NullProducer }
+physics.producers.TrigTprDeKSFMC : { module_type: NullProducer }
 physics.producers.TprTrkDe80m70pD0200TriggerInfoMerger.doDeepCopy  : 1
 physics.producers.TprTrkDe80m70pTriggerInfoMerger.doDeepCopy       : 1
 physics.producers.TprTrkDe50D0200TriggerInfoMerger.doDeepCopy      : 1
@@ -182,7 +186,14 @@ physics.producers.TprHlxUe50m30pTriggerInfoMerger.doDeepCopy       : 1
 physics.producers.TprHlxDe30pIPATriggerInfoMerger.doDeepCopy       : 1
 physics.producers.TprHlxDe30pIPAPhiTriggerInfoMerger.doDeepCopy    : 1
 
-physics.producers.TTMprDeKSFMC : { module_type : NullProducer }
+physics.producers.TrigMprDeKSFMC : { module_type : NullProducer }
+physics.producers.TrigTprDeKSFMC : { module_type : NullProducer }
+
+# Previous name
+physics.producers.TTAprKSFMC   : { module_type: NullProducer }
+physics.producers.TTCprDeKSFMC : { module_type: NullProducer }
+physics.producers.TTTprDeKSFMC : { module_type: NullProducer }
+physics.producers.TTMprDeKSFMC : { module_type: NullProducer }
 
 #------------------------------------------------------------------------------
 physics.analyzers.StntupleMaker.makeClusters           : 1
@@ -200,8 +211,10 @@ physics.analyzers.StntupleMaker.chCollTag              :   "makePH"
 physics.analyzers.StntupleMaker.tcShCollTag            : [ "makeSH" ]
 physics.analyzers.StntupleMaker.tcChCollTag            : [ "makePH" ]
 physics.analyzers.StntupleMaker.caloHitCollTag         :   "CaloHitMaker"
+physics.analyzers.StntupleMaker.caloClusterMaker       : "CaloClusterMaker"
+physics.analyzers.StntupleMaker.caloClusterMCMaker     : "CaloClusterTruthMatch"
 physics.analyzers.StntupleMaker.triggerResultsTag      : "TriggerResults::S5Stn"
-physics.analyzers.StntupleMaker.nTriggerBits           : 500
+physics.analyzers.StntupleMaker.nTriggerBits           : 1000
 physics.analyzers.StntupleMaker.strawDigiMCCollTag     : "compressDigiMCs"
 physics.analyzers.StntupleMaker.simpCollTag            : "compressDigiMCs"
 physics.analyzers.StntupleMaker.genpCollTag            : "compressDigiMCs"
@@ -225,9 +238,15 @@ physics.analyzers.StntupleMaker.trackCollTag         : [@sequence::OfflineNames_
 physics.analyzers.StntupleMaker.trackHsBlockName     : [@sequence::OfflineNames_trackHsBlockName    , @sequence::TrigNames_trackHsBlockName    ]
 physics.analyzers.StntupleMaker.tciCollTag           : [@sequence::OfflineNames_tciCollTag          , @sequence::TrigNames_tciCollTag          ]
 physics.analyzers.StntupleMaker.tcmCollTag           : [@sequence::OfflineNames_tcmCollTag          , @sequence::TrigNames_tcmCollTag          ]
+physics.analyzers.StntupleMaker.trackSHBlockName     : [@sequence::OfflineNames_trackSHBlockName    , @sequence::TrigNames_trackSHBlockName    ]
+physics.analyzers.StntupleMaker.pidBlockName         : [@sequence::OfflineNames_pidBlockName        , @sequence::TrigNames_pidBlockName        ]
 physics.analyzers.StntupleMaker.pidCollTag           : [@sequence::OfflineNames_pidCollTag          , @sequence::TrigNames_pidCollTag          ]
 physics.analyzers.StntupleMaker.trkQualCollTag       : [@sequence::OfflineNames_trkQualCollTag      , @sequence::TrigNames_trkQualCollTag      ]
-
+physics.analyzers.StntupleMaker.trackTsBlockName     : [@sequence::OfflineNames_trackTsBlockName    , @sequence::TrigNames_trackTsBlockName    ]
+physics.analyzers.StntupleMaker.trackTsCollTag       : [@sequence::OfflineNames_trackTsCollTag      , @sequence::TrigNames_trackTsCollTag      ]
+physics.analyzers.StntupleMaker.trackSeedBlockName   : []
+physics.analyzers.StntupleMaker.trackSeedCollTag     : []
+physics.analyzers.StntupleMaker.helixKsCollTag       : []
 
 #------------------------------------------------------------------------------
 #include "mu2e-trig-config/core/trigDigiInputsEpilog.fcl"
@@ -306,6 +325,6 @@ services.DbService.verbose : 2
 #------------------------------------------------------------------------------
 # Include epilogs to add trigger-MC matching, keep hits, etc.
 #include "Production/JobConfig/digitize/epilog.fcl"
-#include "Production/JobConfig/digitize/OnSpill_epilog.fcl"
+# #include "Production/JobConfig/digitize/OnSpill_epilog.fcl"
 #include "Production/JobConfig/recoMC/epilog.fcl"
 #include "Production/JobConfig/common/epilog.fcl"

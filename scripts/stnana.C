@@ -177,6 +177,7 @@ void stnana (TString     Book   ,
         /* DEBUG */  //   printf("[stnana.C]: g.MinRun=%i  g.MaxRun=%i\n",g.MinRun,g.MaxRun);
       }
 
+      // g.catalog->SetPrintLevel(10);
       g.catalog->InitDataset(g.dataset,Book,Dataset,Fileset,File,g.MinRun,g.MaxRun);
 
       if (g.dataset->GetNFiles() <= 0) {
