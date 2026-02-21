@@ -27,7 +27,6 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
-// #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/DataProducts/inc/StrawId.hh"
@@ -126,9 +125,6 @@ int TTrkVisNode::InitEvent() {
 
   TStnVisManager* vm      = TStnVisManager::Instance();
   const art::Event* event = vm->Event();
-
-  // Tracker calibration object.
-  // mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
 
   const mu2e::ComboHit              *hit;
   stntuple::TEvdStrawHit            *evd_straw_hit;

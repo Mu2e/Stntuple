@@ -19,7 +19,6 @@
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Stntuple/print/TAnaDump.hh"
@@ -91,9 +90,6 @@ int TEvdHelixVisNode::InitEvent() {
     fHsColl = nullptr;
   }
 
-
-  // Tracker calibration object.
-  //  mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
 
   //  const mu2e::ComboHit              *hit;
   // stntuple::TEvdStrawHit            *evd_straw_hit; 

@@ -48,7 +48,6 @@ target_link_libraries(${lib}
   Offline::GeometryService
   Offline::SeedService_SeedService_service
   Offline::GlobalConstantsService
-  Offline::ConditionsService
   Offline::GlobalConstantsService_GlobalConstantsService_service
   Offline::Mu2eUtilities
   Offline::GeneralUtilities
