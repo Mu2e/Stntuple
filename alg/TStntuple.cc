@@ -47,9 +47,9 @@ TStntuple::TStntuple() {
   int    nb   = 1100;
   double bin  = 0.1;
 
-  TString table = "Offline/ConditionsService/data/czarnecki_Al.tbl";
+  TString table = "Offline/EventGenerator/data/czarnecki_Al.tbl";
   if(true) { //FIXME: Make this configurable
-    table = "Offline/ConditionsService/data/heeck_finer_binning_2016_szafron.tbl";
+    table = "Offline/EventGenerator/data/heeck_finer_binning_2016_szafron.tbl";
     nb  = 11000; //finer binning in this table
     bin = 0.01;
   }
@@ -129,7 +129,7 @@ Int_t TStntuple::Init(Int_t RunNumber) {
 // parameterization of the DIO spectrum on Al
 // from Czarnecki et al, Phys.Rev.D84:013006,2011 (http://www.arxiv.org/abs/1106.4756)
 // function is normalized to the unit integral,
-// full histogram from ConditionsService, so the histogram used has to 
+// full histogram from tbl file, so the histogram used has to 
 // be divided by the number of events and, then, scaled to the expected number 
 // of protons on target
 //-----------------------------------------------------------------------------
