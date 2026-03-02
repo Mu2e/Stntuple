@@ -1320,14 +1320,18 @@ void TTrkVisNode::Print(Option_t* Opt) const {
 void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
   TString class_name(ClassName);
 
-  TAnaDump* ad = TAnaDump::Instance();
+  TAnaDump*       ad = TAnaDump::Instance();
+  TStnVisManager* vm = TStnVisManager::Instance();
 
   if (class_name == "ComboHit") {
 //-----------------------------------------------------------------------------
 // print a ComboHit or a collection of those
 //-----------------------------------------------------------------------------
-    if (Object) ad->printComboHit          ((const mu2e::ComboHit*) Object,nullptr);
-    else        ad->printComboHitCollection(fChCollTag.encode().data(),fSdmcCollTag.encode().data());
+    if (Object) ad->printComboHit((const mu2e::ComboHit*) Object,nullptr);
+    else        {
+      ad->printComboHitCollection(fChCollTag.encode().data(),fSdmcCollTag.encode().data(),
+                                  vm->TMin(),vm->TMax(),vm->MinEDep(),vm->MaxEDep());
+    }
   }
   else if (class_name == "CosmicTrackSeed") {
 //-----------------------------------------------------------------------------
