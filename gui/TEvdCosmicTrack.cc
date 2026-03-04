@@ -171,7 +171,7 @@ void TEvdCosmicTrack::PaintVST(Option_t* Option) {
 //-----------------------------------------------------------------------------
 void TEvdCosmicTrack::PaintVRZ(Option_t* Option) {
 
-  TStnVisManager* vm = TStnVisManager::Instance();
+  //TStnVisManager* vm = TStnVisManager::Instance();
   //  TGeoCombiTrans* gt = vm->GetCurrentView()->GetCombiTrans();
     
   // double posm[3], posl[3], dirm[3], dirl[3];
