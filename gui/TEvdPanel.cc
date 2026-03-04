@@ -78,8 +78,8 @@ TEvdPanel::TEvdPanel(): TObject() {
 // build the transformation matrix
 //-----------------------------------------------------------------------------
   const mu2e::HepTransform& ds_to_p = Panel->dsToPanel();
-  const HepRotation&  hr            = ds_to_p.rotation();
-  const Hep3Vector&   ht            = ds_to_p.displacement();
+  //const HepRotation&  hr            = ds_to_p.rotation();
+  //const Hep3Vector&   ht            = ds_to_p.displacement();
 
   // double phix = hr.phiX  ()*180./M_PI;
   // double phiy = hr.phiY  ()*180./M_PI;
