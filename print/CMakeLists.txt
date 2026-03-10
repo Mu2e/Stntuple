@@ -41,7 +41,7 @@ target_link_libraries(${lib}
   Stntuple_base
   Offline::CalPatRec
   Offline::CaloCluster
-  Offline::TrkDiag
+  #  Offline::TrkDiag
   Offline::TrkReco
   
   Offline::CalorimeterGeom
@@ -55,6 +55,9 @@ target_link_libraries(${lib}
   Offline::RecoDataProducts
   Offline::DataProducts
   Offline::CaloMC
+
+  BTrk_BbrGeom
+  BTrk_TrkBase
   
   art::Persistency_Provenance
   

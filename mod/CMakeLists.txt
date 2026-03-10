@@ -178,6 +178,9 @@ target_link_libraries(${lib}
   Offline::MCDataProducts
   Offline::DataProducts
   Offline::CalorimeterGeom
+
+  BTrk_BbrGeom
+  BTrk_TrkBase
   
   art::Framework_Core
   art::Framework_Services_Registry

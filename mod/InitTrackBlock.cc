@@ -9,6 +9,8 @@
 #include "TLorentzVector.h"
 #include "TVector2.h"
 					// Mu2e
+#include "BTrk/BbrGeom/TrkLineTraj.hh"
+
 #include "Stntuple/obj/TStnTrack.hh"
 #include "Stntuple/obj/TStnTrackBlock.hh"
 #include "Stntuple/obj/TStnEvent.hh"
