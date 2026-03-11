@@ -181,6 +181,12 @@ target_link_libraries(${lib}
 
   BTrk_BbrGeom
   BTrk_TrkBase
+  BTrk_difAlgebra
+  BTrk_BField
+  BTrk_DetectorModel
+  BTrkLegacy
+  BTrk_MatEnv
+  BTrk_BaBar
   
   art::Framework_Core
   art::Framework_Services_Registry

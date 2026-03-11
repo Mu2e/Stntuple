@@ -58,7 +58,13 @@ target_link_libraries(${lib}
 
   BTrk_BbrGeom
   BTrk_TrkBase
-  
+  BTrk_difAlgebra
+  BTrk_BField
+  BTrk_DetectorModel
+  BTrkLegacy
+  BTrk_MatEnv
+  BTrk_BaBar
+
   art::Persistency_Provenance
   
   ROOT::Physics ROOT::GenVector ROOT::Graf ROOT::Graf3d ROOT::Geom ROOT::Matrix ROOT::Core
