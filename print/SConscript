@@ -27,7 +27,7 @@ def local_build():
                         'Stntuple_geom',
                         'mu2e_CalPatRec',
                         'mu2e_CaloCluster',
-                        'mu2e_TrkDiag',
+                        # 'mu2e_TrkDiag',
                         'mu2e_TrkReco',
                         
                         'mu2e_CalorimeterGeom',
