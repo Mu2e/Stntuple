@@ -9,7 +9,7 @@
 #include "TLorentzVector.h"
 #include "TVector2.h"
 					// Mu2e
-#include "BTrk/BbrGeom/TrkLineTraj.hh"
+// #include "BTrk/BbrGeom/TrkLineTraj.hh"
 
 #include "Stntuple/obj/TStnTrack.hh"
 #include "Stntuple/obj/TStnTrackBlock.hh"
@@ -40,8 +40,6 @@
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/TrkFitFlag.hh"
 
-
-
 // #include "Offline/BTrkData/inc/Doublet.hh"
 
 #include "Offline/RecoDataProducts/inc/TrkStraw.hh"
@@ -62,12 +60,12 @@
 #include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
 
 					          // BaBar
-#include "BTrk/ProbTools/ChisqConsistency.hh"
-#include "BTrk/BbrGeom/BbrVectorErr.hh"
-#include "BTrk/BbrGeom/HepPoint.h"
-#include "BTrk/BbrGeom/TrkLineTraj.hh"
-#include "BTrk/TrkBase/TrkPoca.hh"
-#include "BTrk/KalmanTrack/KalHit.hh"
+// #include "BTrk/ProbTools/ChisqConsistency.hh"
+// #include "BTrk/BbrGeom/BbrVectorErr.hh"
+// #include "BTrk/BbrGeom/HepPoint.h"
+// #include "BTrk/BbrGeom/TrkLineTraj.hh"
+// #include "BTrk/TrkBase/TrkPoca.hh"
+// #include "BTrk/KalmanTrack/KalHit.hh"
 
 #include "Stntuple/mod/InitTrackBlock.hh"
 // #include "Stntuple/mod/THistModule.hh"
@@ -319,8 +317,10 @@ void StntupleInitTrackBlock::SetExpectedHits(TStnTrack* track,
 //-----------------------------------------------------------------------------
     // s0  = closest_hit->trkLen();
     //      s   = (z-track->fZ0)/(closest_z-track->fZ0)*s0;
+    
+    // HepPoint pz(0.,0.,0.); // FIXME      = ks->position(s);
 
-    HepPoint pz(0.,0.,0.); // FIXME      = ks->position(s);
+    CLHEP::Hep3Vector pz(0.,0.,0.); // FIXME      = ks->position(s);
 
     get_station(tracker,&zmap,z,&iplane,&offset);
 
@@ -398,9 +398,9 @@ void StntupleInitTrackBlock::SetHitInfo(TStnTrack* track,
         (int) sid.asUint16(), (int) sid.getPlane(),
         (int) sid.getPanelId().asUint16(),
         (int) sid.getLayerId().asUint16());
-  //-----------------------------------------------------------------------------
-  // the rest makes sense only for active hits
-  //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// the rest makes sense only for active hits
+//-----------------------------------------------------------------------------
     if (is_active) {
       const int loc = hit->index();
       if (hit->ambig() == 0) nhitsambig0 += 1;
@@ -409,28 +409,31 @@ void StntupleInitTrackBlock::SetHitInfo(TStnTrack* track,
         const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
 
         const auto stgs = mcdigi->earlyStrawGasStep().get();
-      //-----------------------------------------------------------------------------
-      // count number of active hits with R > 200 um and misassigned drift signs
-      //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// count number of active hits with R > 200 um and misassigned drift signs
+//-----------------------------------------------------------------------------
         if (stgs) {
           if(verbose > 5) printf(" --> MC gas step found\n");
           if (hit->driftRadius() > 0.2) {
-            const CLHEP::Hep3Vector* v1 = &straw->getMidPoint();
-            HepPoint p1(v1->x(),v1->y(),v1->z());
 
-            CLHEP::Hep3Vector v2 = stgs->position();
-            HepPoint    p2(v2.x(),v2.y(),v2.z());
+            // 2026-04-25: this needs work TODO FIXME
+            
+            // const CLHEP::Hep3Vector* v1 = &straw->getMidPoint();
+            // HepPoint p1(v1->x(),v1->y(),v1->z());
 
-            TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
+            // CLHEP::Hep3Vector v2 = stgs->position();
+            // HepPoint    p2(v2.x(),v2.y(),v2.z());
 
-            TrkLineTraj trstep (p2,stgs->momvec().unit(),0.,0.);
+            // TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
 
-            TrkPoca poca(trstep, 0., trstraw, 0.);
+            // TrkLineTraj trstep (p2,stgs->momvec().unit(),0.,0.);
 
-            const float mcdoca = poca.doca();
-        //-----------------------------------------------------------------------------
-        // if mcdoca and hit->_iamb have different signs, the hit drift direction has wrong sign
-        //-----------------------------------------------------------------------------
+            // TrkPoca poca(trstep, 0., trstraw, 0.);
+
+            const float mcdoca = -1; // PM make it random .... poca.doca();
+//-----------------------------------------------------------------------------
+// if mcdoca and hit->_iamb have different signs, the hit drift direction has wrong sign
+//-----------------------------------------------------------------------------
             if (hit->ambig()*mcdoca < 0) nwrong += 1;
           }
         }
@@ -447,8 +450,8 @@ void StntupleInitTrackBlock::SetHitInfo(TStnTrack* track,
       int bit = zmap.fMap[ist][pan][lay];
 
       track->fHitMask.SetBit(bit,1);
-    } // end of active hit check
-  } // end of loop over hits on the track
+    }
+  }
   track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
   track->fNActive   = ks->nHits() | (nwrong << 16);
 
@@ -1038,7 +1041,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 //    const mu2e::TrkCaloIntersect*  extrk;
     CLHEP::Hep3Vector                     x1, x2;
-    HepPoint                       extr_point;
+    //    HepPoint                       extr_point;
     CLHEP::Hep3Vector                     extr_mom;
     // int                            iv, next;
     // TStnTrack::InterData_t*        vint;

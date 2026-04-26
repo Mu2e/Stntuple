@@ -22,7 +22,7 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
-#include "BTrk/BbrGeom/HepPoint.h"
+// #include "BTrk/BbrGeom/HepPoint.h"
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
@@ -159,11 +159,11 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
 	  sim_id        = simptr->id().asInt();
 	  mc_mom        = step->momvec().mag();
 
-	  const CLHEP::Hep3Vector& v1 = straw->getMidPoint();
-	  HepPoint p1(v1.x(),v1.y(),v1.z());
+	  // const CLHEP::Hep3Vector& v1 = straw->getMidPoint();
+	  // HepPoint p1(v1.x(),v1.y(),v1.z());
 	      
-	  const CLHEP::Hep3Vector& v2 = step->position();
-	  HepPoint    p2(v2.x(),v2.y(),v2.z());
+	  // const CLHEP::Hep3Vector& v2 = step->position();
+	  // HepPoint    p2(v2.x(),v2.y(),v2.z());
 	      
 	  // TrkLineTraj trstraw(p1,straw->getDirection()  ,0.,0.);
 	  // TrkLineTraj trstep (p2,step->momvec().unit(),0.,0.);

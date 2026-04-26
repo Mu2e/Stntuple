@@ -56,14 +56,14 @@ target_link_libraries(${lib}
   Offline::DataProducts
   Offline::CaloMC
 
-  BTrk_BbrGeom
-  BTrk_TrkBase
-  BTrk_difAlgebra
-  BTrk_BField
-  BTrk_DetectorModel
-  BTrkLegacy
-  BTrk_MatEnv
-  BTrk_BaBar
+#  BTrk_BbrGeom
+#  BTrk_TrkBase
+#  BTrk_difAlgebra
+#  BTrk_BField
+#  BTrk_DetectorModel
+#  BTrkLegacy
+#  BTrk_MatEnv
+#  BTrk_BaBar
 
   art::Persistency_Provenance
   

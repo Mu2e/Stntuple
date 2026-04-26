@@ -71,7 +71,6 @@
 // #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 #include "Offline/MCDataProducts/inc/GenId.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
-// #include "TrkDiag/inc/KalDiag.hh"
 
 using namespace std; 
 
@@ -208,8 +207,6 @@ protected:
   int                      fHelixVerbose;
 
   TNamed*                  fVersion;
-
-  // TNamedHandle*            fDarHandle;
 
   // DoubletAmbigResolver*    fDar;
 
@@ -371,11 +368,6 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fInitTimeClusterBlock = new TObjArray();
   fInitTimeClusterBlock->SetOwner(kTRUE);
   // fDar                  = new DoubletAmbigResolver (PSet.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
-  // fDarHandle            = new TNamedHandle("DarHandle",fDar);
-  // fKalDiag              = new KalDiag     (PSet.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
-  // fKalDiagHandle        = new TNamedHandle("KalDiagHandle"      ,fKalDiag);
-
-  // fFolder->Add(fDarHandle);
 
   // Validate inputs
 
@@ -778,7 +770,10 @@ void StntupleMaker::beginJob() {
     for (int i=0; i<nblocks; i++) {
       const char* block_name = fTrackBlockName[i].data();
 
-      if      (fTrackFitType == 1) init_block = new StntupleInitTrackBlock   ();
+      if      (fTrackFitType == 1) {
+        throw std::runtime_error("no more BTRK, use KK");
+        // init_block = new StntupleInitTrackBlock   ();
+      }
       else if (fTrackFitType == 2) init_block = new StntupleInitTrackBlock_KK();
 
       fInitTrackBlock->Add(init_block);
@@ -882,33 +877,6 @@ void StntupleMaker::GetDefTrackCollName(char* Name) {
 }
 
 
-// //_____________________________________________________________________________
-// int StntupleMaker::InitCalDataBlock(TStnDataBlock* Block) {
-//   int mode = 0;
-//   AbsEvent* event = AbsEnv::instance()->theEvent();
-//   return StntupleInitMu2eCalDataBlock(Block,event,mode);
-// }
-
-// //_____________________________________________________________________________
-// int StntupleMaker::InitHeaderBlock(TStnDataBlock* Block) {
-//   int mode = 0;
-//   AbsEvent* event = AbsEnv::instance()->theEvent();
-//   return StntupleInitMu2eHeaderBlock(Block,event,mode);
-// }
-
-// //_____________________________________________________________________________
-// int StntupleMaker::InitTrackBlock(TStnDataBlock* Block) {
-//   int mode = 0;
-//   AbsEvent* event = AbsEnv::instance()->theEvent();
-//   return StntupleInitMu2eTrackBlock(Block,event,mode);
-// }
-
-//_____________________________________________________________________________
-// int StntupleMaker::InitTriggerBlock(TStnDataBlock* Block) {
-//   int mode = 0;
-//   AbsEvent* event = AbsEnv::instance()->theEvent();
-//   return StntupleInitMu2eTriggerBlock(Block,event,mode);
-// }
 
 } // end namespace mu2e
 
