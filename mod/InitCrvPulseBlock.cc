@@ -40,8 +40,8 @@ int StntupleInitCrvPulseBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Eve
     }
   }
   
-  const mu2e::CrvRecoPulse* p0(nullptr);
-  if (ncrp > 0) p0 = &crpc->at(0);
+  // const mu2e::CrvRecoPulse* p0(nullptr);
+  // if (ncrp > 0) p0 = &crpc->at(0);
 
   for (int i=0; i<ncrp; i++) {
     const mu2e::CrvRecoPulse* ralph = &crpc->at(i);

@@ -98,8 +98,7 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
 //-----------------------------------------------------------------------------
   const mu2e::StrawGasStep* step (nullptr);
   const mu2e::SimParticle*  sim  (nullptr);
-  const mu2e::Straw*        straw(nullptr);
-    
+
   TTrackStrawHit*      hit; 
 
   int   pdg_id, mother_pdg_id, sim_id, gen_id;
@@ -134,9 +133,8 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
 	int sd_flag = 0;
 	if (sd_coll) sd_flag = *((int*) &sd_coll->at(ind).digiFlag());
 
-	mu2e::StrawId const& sid = tsh->strawId();
-
-	straw = &tracker->getStraw(sid);
+	// mu2e::StrawId const& sid = tsh->strawId();
+	// const mu2e::Straw* straw = &tracker->getStraw(sid);  // related to commented out part below
 	hit   = data->NewHit();
 
 	const mu2e::StrawDigiMC* sdmc = &sdmc_coll->at(ind);  // loc

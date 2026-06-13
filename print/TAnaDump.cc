@@ -1854,8 +1854,8 @@ void TAnaDump::printStepPointMC(const mu2e::StepPointMC* Step, const char* Detec
       printf("--------------------------------------------------------------------------------------------------------------------\n");
     }
 
-    mu2e::GeomHandle<mu2e::Tracker> ttHandle;
-    const mu2e::Tracker* tracker = ttHandle.get();
+    // mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+    // const mu2e::Tracker* tracker = ttHandle.get();
   
     art::Ptr<mu2e::SimParticle> const& simptr = Step->simParticle();
     const mu2e::SimParticle* sim  = simptr.operator ->();
