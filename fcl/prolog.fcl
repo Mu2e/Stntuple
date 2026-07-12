@@ -283,7 +283,7 @@ Stntuple: {
 	    THistModule: { @table::StntupleTHistModule                    # defaults of the base class
                 # module_name       : InitStntuple
                 histFileName      : "default.stn"
-                splitLevel        : 99
+                splitLevel        : 1    # 99
                 module_label      : "InitStntuple"
             }
 	}
@@ -296,10 +296,10 @@ Stntuple: {
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
-	    THistModule: {
-                @table::StntupleTHistModule
-            }                   # defaults of the base class
-	    module_name       : StntupleEventDump
+            TModule: { @table::StntupleTHistModule.TModule
+                interactiveMode  : 1                          ## 1:stop  after each event 2: stop at end-of-job;
+                module_label: "StntupleEventDump"
+            }
 	}
 #------------------------------------------------------------------------------
 # downstream electrons - explicitly - the same as default
