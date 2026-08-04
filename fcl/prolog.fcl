@@ -272,6 +272,7 @@ Stntuple: {
     filters: {
 	EventFilter : { module_type:EventFilter
 	    printFreq    : 1000000
+            diagLevel    : 0
 	    eventList    : []          # [ run1, subrun1, event1, ...]
 	}
     } 

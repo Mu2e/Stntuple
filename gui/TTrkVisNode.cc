@@ -909,11 +909,13 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
   mu2e::GeomHandle<mu2e::Tracker> ttHandle;
   const mu2e::Tracker* tracker = ttHandle.get();
 
-  double tmin   = vm->TMin();
-  double tmax   = vm->TMax();
+  double tmin    = vm->TMin();
+  double tmax    = vm->TMax();
+  float min_edep = vm->MinEDep();
+  float max_edep = vm->MaxEDep();
 
-  double phimin = -M_PI; // vm->TMin();
-  double phimax =  M_PI; // vm->TMax();
+  double phimin  = -M_PI; // vm->TMin();
+  double phimax  =  M_PI; // vm->TMax();
 
   stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
 
@@ -946,9 +948,10 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
       const mu2e::Straw* straw = &tracker->getStraw(sh->strawId()); // first straw hit
       int station = straw->id().getStation();
       double time = ch->correctedTime();
+      float  edep = ch->energyDep();
 
       if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) {
-        if ((time >= tmin) && (time <= tmax)) {
+        if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep < max_edep)) {
           float phi = ech->Pos()->Phi();
 
           if ((phi >= phimin) && (phi <= phimax)) {

@@ -1239,7 +1239,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       const mu2e::CaloCluster* cl = tch->caloCluster().get();
 
       if (cl) {
-	CLHEP::Hep3Vector cpos = bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector()));
+	CLHEP::Hep3Vector cpos = bc->mu2eToTracker(bc->diskFFToMu2e( cl->diskID(), cl->cog3Vector()));
 
 	CLHEP::Hep3Vector pos;
 	// tch->hitPosition(pos);

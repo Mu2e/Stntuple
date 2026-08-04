@@ -216,7 +216,7 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
     max_r      = 0.; // Largest distance between main crystal and other crystals
 
     // main crystal neighbors and next neighbors
-    std::vector<int> neighbors, nneighbors;
+    std::vector<unsigned> neighbors, nneighbors;
 
     for (int ih=0; ih<nh; ih++) {
       hit = &(*list_of_crystals.at(ih));
