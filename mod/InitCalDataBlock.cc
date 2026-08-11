@@ -25,7 +25,7 @@ Int_t StntupleInitMu2eCalDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
   static char   calo_module_label[100], calo_description[100];
   int           ev_number, rn_number, nhits;
 
-  mu2e::CaloHitCollection* list_of_hits(0);
+  mu2e::CaloHitCollection* list_of_hits(nullptr);
 
   ev_number = AnEvent->event();
   rn_number = AnEvent->run();
@@ -52,7 +52,7 @@ Int_t StntupleInitMu2eCalDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
 			  calo_hits_handle);
     }
 
-    list_of_hits  = (mu2e::CaloHitCollection*) calo_hits_handle.product();
+    if (calo_hits_handle.isValid()) list_of_hits  = (mu2e::CaloHitCollection*) calo_hits_handle.product();
   }
 
   if (list_of_hits == NULL) {
@@ -101,7 +101,7 @@ Int_t StntupleInitMu2eCalDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
 				        // also a dummy line
   data->fMinFraction      = 1.0;
   data->fWrapperThickness = cal->G4Info().get<double>("wrapperThickness");      // wrapperThickness();
-  data->fShellThickness   = cal->G4Info().get<double>("crystalFrameThickness"); // caseThickness  ();
+  data->fShellThickness   = -1.; // 2026-08-08: currently undefined // cal->G4Info().get<double>("crystalFrameThickness"); // caseThickness  ();
 
 					// on return set event and run numbers
 					// to mark block as initialized
