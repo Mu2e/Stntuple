@@ -53,12 +53,13 @@ void TStrawDigiBlock::Streamer(TBuffer &R__b) {
 
   if (R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion(); 
-    // if      (R__v == 1) ReadV1(R__b);
+    if      (R__v == 1) {  // ReadV1(R__b);
     // else if (R__v == 2) ReadV2(R__b);
-    R__b >> fNDigis;
-    R__b.ReadFastArray(fEwTag1024,36);
-    if (fNDigis > 0) {
-      fListOfDigis->Streamer(R__b);
+      R__b >> fNDigis;
+      R__b.ReadFastArray(fEwTag1024,36);
+      if (fNDigis > 0) {
+        fListOfDigis->Streamer(R__b);
+      }
     }
 //     else {
 // //-----------------------------------------------------------------------------

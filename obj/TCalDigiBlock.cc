@@ -54,18 +54,19 @@ void TCalDigiBlock::Streamer(TBuffer &R__b) {
 
   if (R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion(); 
-    // if      (R__v == 1) ReadV1(R__b);
-    // else if (R__v == 2) ReadV2(R__b);
-    R__b >> fNDigis;
-    if (fNDigis > 0) {
-      fListOfCalDigis->Streamer(R__b);
+    if      (R__v == 1) {         // ReadV1(R__b);
+                                        // else if (R__v == 2) ReadV2(R__b);
+      R__b >> fNDigis;
+      if (fNDigis > 0) {
+        fListOfCalDigis->Streamer(R__b);
+      }
     }
-//     else {
-// //-----------------------------------------------------------------------------
-// // read version > 1 ???
-// //-----------------------------------------------------------------------------
-//       std::cout << std::format(">>> WARNING: TCalDigiBlock::Streamer read version:{} fNDigis:{}\n",R__v,fNDigis);
-//    } 
+    else {
+//-----------------------------------------------------------------------------
+// read version > 1 ???
+//-----------------------------------------------------------------------------
+      std::cout << std::format(">>> ERROR: TCalDigiBlock::Streamer read version:{}\n",R__v);
+    } 
   }
   else {
     R__b.WriteVersion(TCalDigiBlock::IsA());

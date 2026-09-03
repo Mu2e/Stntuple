@@ -22,7 +22,7 @@ public:
   int     Ns() { return fNs; } // return adc.size(); }
   int     Init(int Ns);
 
-  void    Set(int SipmID, float T0, float PeakPos, std::vector<int>* Wf);
+  void    Set(int SipmID, float T0, float PeakPos, const std::vector<int>* Wf);
 
   std::vector<uint16_t>& Wf() { return fWf; }
 
