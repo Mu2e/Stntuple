@@ -46,6 +46,7 @@
 TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager(Name, Title) {
   if (gROOT->IsBatch()) return;
 
+  // gROOT->SetWebDisplay("server:8088");
   //  InitGui(Title);
 //-----------------------------------------------------------------------------
 // views

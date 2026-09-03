@@ -132,16 +132,19 @@ int TCalVisNode::InitEvent() {
       hit = &(*fListOfCrystalHits)->at(i);
 					// in short, the crystal number
       id  = hit->crystalID();
-      if ((id >= 0) && (id < fNCrystals)) {
+      if ((id >= fFirst) && (id < fFirst+fNCrystals)) {
 //-----------------------------------------------------------------------------
 // hit on a given disk
 //-----------------------------------------------------------------------------
-	if (hit->energyDep() > fMinCrystalEnergy) {
-	  evd_cr = EvdCrystal(id);
-	  
+        float hit_energy = hit->energyDep();
+	if (hit_energy > fMinCrystalEnergy) {
+	  evd_cr = EvdCrystal(id-fFirst);
 	  evd_cr->AddHit(hit);
-	  evd_cr->SetFillColor(kYellow-7); 
-	  evd_cr->SetFillStyle(1024);
+          if (hit_energy > evd_cr->MaxHitEnergy()) {
+            evd_cr->SetMaxHitEnergy(hit_energy);
+            evd_cr->SetFillColor(kYellow-7); 
+            evd_cr->SetFillStyle(1024);
+          }
 	}
       }
     }
@@ -178,15 +181,18 @@ int TCalVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // displayed color of the crystal is define by the max hit energy
 //-----------------------------------------------------------------------------
-	  double energy = hit->energyDep();
+	  double hit_energy = hit->energyDep();
 
- 	  if (energy > fMinCrystalEnergy) {
- 	    if      (energy > 100.) evd_cr->SetFillColor(kRed+ 2);
- 	    else if (energy >  10.) evd_cr->SetFillColor(kRed   ); 
- 	    else if (energy >   1.) evd_cr->SetFillColor(kRed- 9); 
- 	    else                    evd_cr->SetFillColor(kRed-10); 
-	    
- 	    evd_cr->SetFillStyle(1024);
+ 	  if (hit_energy > fMinCrystalEnergy) {
+            if (hit_energy > evd_cr->MaxHitEnergy()) {
+              evd_cr->SetMaxHitEnergy(hit_energy);
+              if      (hit_energy > 100.) evd_cr->SetFillColor(kRed+ 2);
+              else if (hit_energy >  10.) evd_cr->SetFillColor(kRed   ); 
+              else if (hit_energy >   1.) evd_cr->SetFillColor(kRed- 9); 
+              else                        evd_cr->SetFillColor(kRed-10); 
+              
+              evd_cr->SetFillStyle(1024);
+            }
  	  }
 	}
       }

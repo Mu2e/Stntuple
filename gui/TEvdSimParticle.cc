@@ -240,7 +240,7 @@ void TEvdSimParticle::PaintPhiZ(Option_t* Option) {
 void TEvdSimParticle::PaintRZ(Option_t* Option) {
 
   //  double            flen, zwire[2], ds, rdrift, zt[4], rt[4], zw, rw;
-  double            zwire[2], rdrift(0.), zt[4], rt[4], zw, rw;
+  double            zwire[2], rdrift(0.), zt[4], rt[4], zw{0}, rw{0};
   CLHEP::Hep3Vector tdir;
   // HepPoint          tpos;
   TPolyLine         pline;

@@ -13,8 +13,9 @@ include_directories(
 
 set (include_files
   TCalDigiBlock.hh TCalDigi.hh
-  TCalDataBlock.hh TCalHitData.hh TCrvClusterBlock.hh TCrvCoincidenceCluster.hh TCrvCoincidence.hh 
-  TCrvPulseBlock.hh TCrvRecoPulse.hh TGenParticle.hh TGenpBlock.hh TSimParticle.hh TSimpBlock.hh 
+  TCalDataBlock.hh TCalHitData.hh TCrvClusterBlock.hh TCrvCoincidenceCluster.hh
+  # TCrvCoincidence.hh 
+  TCrvDigi.hh TCrvDigiBlock.hh TCrvPulseBlock.hh TCrvRecoPulse.hh TGenParticle.hh TGenpBlock.hh TSimParticle.hh TSimpBlock.hh 
   TStepPointMCBlock.hh TStepPointMC.hh TStnClusterBlock.hh TStnCluster.hh TStnDataBlock.hh
   TStnDBManager.hh TStnElectron.hh TStnErrorLogger.hh TStnEvent.hh TStnGoodRunList.hh 
   TStnHeaderBlock.hh TStnHelixBlock.hh TStnHelix.hh TStnLinkBlock.hh TStnNode.hh TStnPidBlock.hh 
@@ -32,8 +33,10 @@ set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 set (source_files
   TCalDigiBlock.cc TCalDigi.cc
-  TCalDataBlock.cc TCalHitData.cc TCrvClusterBlock.cc TCrvCoincidence.cc TCrvCoincidenceCluster.cc
-  TCrvPulseBlock.cc TCrvRecoPulse.cc TGenParticle.cc TGenpBlock.cc TSimParticle.cc TSimpBlock.cc
+  TCalDataBlock.cc TCalHitData.cc TCrvClusterBlock.cc
+  # TCrvCoincidence.cc
+  TCrvCoincidenceCluster.cc
+  TCrvDigi.cc TCrvDigiBlock.cc TCrvPulseBlock.cc TCrvRecoPulse.cc TGenParticle.cc TGenpBlock.cc TSimParticle.cc TSimpBlock.cc
   TStepPointMCBlock.cc TStepPointMC.cc TStnClusterBlock.cc TStnCluster.cc TStnDataBlock.cc
   TStnDBManager.cc TStnElectron.cc TStnErrorLogger.cc TStnEvent.cc TStnGoodRunList.cc TStnHeaderBlock.cc
   TStnHelixBlock.cc TStnHelix.cc TStnInitDataBlock.cc TStnLinkBlock.cc TStnNode.cc TStnPidBlock.cc

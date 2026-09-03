@@ -47,24 +47,16 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
      being  kAzure+1. Since this is the only file with this functionality, the line is commented out as of this update.
 *** Cal view:
    - In the calorimeter view:
-|-----------+-----------------------------|
-| color     | meaning                     |
-|-----------+-----------------------------|
-| kRed+2    | Hit in a cluster            |
-|           | >100 MeV/c                  |
-| kRed      | Hit in a cluster            |
-|           | >10 MeV/c                   |
-| kRed-9    | Hit in a cluster            |
-|           | >1 MeV/c                    |
-| kRed-10   | Hit in a cluster            |
-|           | <1 MeV/c                    |
-| kYellow-7 | Hit exceeding minimum       |
-|           | threshold energy, but       |
-|           | not part of any cluster     |
-| No color  | No hit of sufficient energy |
-|           | recorded in crystal         |
-|           |                             |
-|-----------+-----------------------------|
+|-----------+---------------------------------------------------------------------|
+| color     | meaning                                                             |
+|-----------+---------------------------------------------------------------------|
+| kRed+2    | clustered hit with E > 100 MeV                                      |
+| kRed      | clustered hit with E > 10 MeV                                       |
+| kRed-9    | clustered hit with E > 1 MeV                                        |
+| kRed-10   | clustered hit with E < 1 MeV/c                                      |
+| kYellow-7 | crystal has one or more unclustered hits with E > fMinCrystalEnergy |
+| No color  | No hits with E > fMinCrystalEnergy in the crystal                   |
+|-----------+---------------------------------------------------------------------|
    - This information can be viewed in Open -> Legend Cal
    - Cluster energy colors are defined in file:../gui/TCalVisNode.cc::137 (around line 137)
 *** Cal view:

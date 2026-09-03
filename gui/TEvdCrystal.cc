@@ -134,6 +134,7 @@ void TEvdCrystal::Clear(Option_t* Opt) {
   SetLineColor(1);
   fNHits     = 0;
   fEnergy    = 0.;
+  fMaxHitEnergy = 0.;
 
   fListOfHits->Clear();
 }

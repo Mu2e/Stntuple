@@ -51,6 +51,7 @@
 #include "Stntuple/mod/StntupleGlobals.hh"
 
 #include "Stntuple/mod/InitCalDigiBlock.hh"
+#include "Stntuple/mod/InitCrvDigiBlock.hh"
 #include "Stntuple/mod/InitCrvPulseBlock.hh"
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
 #include "Stntuple/mod/InitGenpBlock.hh"
@@ -111,6 +112,7 @@ protected:
   int                      fMakeHelices;
   int                      fMakeTrackSeeds;
   int                      fMakeTrigger;
+  int                      fMakeCrvDigis;
   int                      fMakeCrvPulses;
   int                      fMakeCrvClusters;
 //-----------------------------------------------------------------------------
@@ -127,6 +129,7 @@ protected:
   art::InputTag            fCalDigiCollTag;
   art::InputTag            fCalHitCollTag;
 
+  art::InputTag            fCrvDigiCollTag;                 //
   string                   fCrvRecoPulseCollTag;            //
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
@@ -180,6 +183,7 @@ protected:
 // initialization of various data blocks
 //-----------------------------------------------------------------------------
   StntupleInitCalDigiBlock*     fInitCalDigiBlock;
+  StntupleInitCrvDigiBlock*     fInitCrvDigiBlock;
   StntupleInitCrvPulseBlock*    fInitCrvPulseBlock;
   StntupleInitCrvClusterBlock*  fInitCrvClusterBlock;
   StntupleInitGenpBlock*        fInitGenpBlock;
@@ -272,6 +276,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMakeHelices             (PSet.get<int>           ("makeHelices"         ))
   , fMakeTrackSeeds          (PSet.get<int>           ("makeTrackSeeds"      ))
   , fMakeTrigger             (PSet.get<int>           ("makeTrigger"         ))
+  , fMakeCrvDigis            (PSet.get<int>           ("makeCrvDigis"        ))
   , fMakeCrvPulses           (PSet.get<int>           ("makeCrvPulses"       ))
   , fMakeCrvClusters         (PSet.get<int>           ("makeCrvClusters"     ))
   
@@ -286,11 +291,11 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCalDigiCollTag          (PSet.get<art::InputTag> ("calDigiCollTag"      ))
   , fCalHitCollTag           (PSet.get<art::InputTag> ("calHitCollTag"       ))
 
-  , fCrvRecoPulseCollTag         (PSet.get<string>    ("crvRecoPulseCollTag"         ))
-  , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
-  , fCrvCoincidenceClusterCollTag(PSet.get<string>    ("crvCoincidenceClusterCollTag"))
-  , fCrvCoincidenceClusterMCCollTag(PSet.get<string>  ("crvCoincidenceClusterMCCollTag", ""))
-  , fCrvClustersStorePulses        (PSet.get<int>     ("crvClustersStorePulses", 1))
+  , fCrvDigiCollTag                (PSet.get<art::InputTag>("crvDigiCollTag"           ))
+  , fCrvRecoPulseCollTag           (PSet.get<string>       ("crvRecoPulseCollTag"         ))
+  , fCrvCoincidenceClusterCollTag  (PSet.get<string>       ("crvCoincidenceClusterCollTag"))
+  , fCrvCoincidenceClusterMCCollTag(PSet.get<string>       ("crvCoincidenceClusterMCCollTag", ""))
+  , fCrvClustersStorePulses        (PSet.get<int>          ("crvClustersStorePulses", 1))
 
   , fVdhCollTag              (PSet.get<art::InputTag> ("vdHitsCollTag"       ))
   , fTClBlockName            (PSet.get<vector<string>>("timeClusterBlockName"))
@@ -354,8 +359,11 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   TModule::fFolder->Add(fVersion);
 
   fInitCalDigiBlock     = nullptr;
+  
+  fInitCrvDigiBlock     = nullptr;
   fInitCrvPulseBlock    = nullptr;
   fInitCrvClusterBlock  = nullptr;
+
   fInitGenpBlock        = nullptr;
   fInitHeaderBlock      = nullptr;
   fInitSimpBlock        = nullptr;
@@ -364,7 +372,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   fInitStepPointMCBlock = new TObjArray();
   fInitStepPointMCBlock->SetOwner(kTRUE);
-
+//-----------------------------------------------------------------------------
+// multiple sets of helices etc
+//-----------------------------------------------------------------------------
   fInitHelixBlock       = new TObjArray();
   fInitHelixBlock->SetOwner(kTRUE);
 
@@ -426,9 +436,12 @@ StntupleMaker::~StntupleMaker() {
   delete fVersion;
 
   if (fInitCalDigiBlock   ) delete fInitCalDigiBlock;
+  if (fInitCrvDigiBlock   ) delete fInitCrvDigiBlock;
   if (fInitCrvPulseBlock  ) delete fInitCrvPulseBlock;
   if (fInitCrvClusterBlock) delete fInitCrvClusterBlock;
   if (fInitSimpBlock      ) delete fInitSimpBlock;
+
+  if (fInitStrawDigiBlock ) delete fInitStrawDigiBlock;
 
   delete fInitStepPointMCBlock;
   delete fInitHelixBlock;
@@ -567,6 +580,17 @@ void StntupleMaker::beginJob() {
 //-----------------------------------------------------------------------------
 // CRV
 //-----------------------------------------------------------------------------
+  if (fMakeCrvDigis) {
+    fInitCrvDigiBlock = new StntupleInitCrvDigiBlock();
+    fInitCrvDigiBlock->SetCrvDigiCollTag(fCrvDigiCollTag);
+
+    AddDataBlock("CrvDigiBlock","TCrvDigiBlock",
+		 fInitCrvDigiBlock,
+		 buffer_size,
+		 split_mode,
+		 compression_level);
+  }
+  
   if (fMakeCrvPulses) {
 
     fInitCrvPulseBlock = new StntupleInitCrvPulseBlock();

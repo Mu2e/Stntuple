@@ -47,6 +47,7 @@ protected:
   int                   fFillColor;
   int                   fLineColor;
   int                   fNHits;		// number of (resolved) crystal hits
+  float                 fMaxHitEnergy;  // max energy of hits in this crystal
 
   float                 fEnergy;  	// total deposited energy
   const mu2e::Disk*     fDisk;
@@ -65,6 +66,7 @@ public:
   TClonesArray*     ListOfHits   () { return fListOfHits; }
   int               NHits        () const { return fNHits;      }
   float             Energy       () const { return fEnergy;     }
+  float             MaxHitEnergy () const { return fMaxHitEnergy;  }
   double            Radius       () const { return fShape->Radius(); }
   const mu2e::Disk* Disk         () const { return fDisk; }
   double            X0           () const { return fShape->X0(); }
@@ -79,6 +81,7 @@ public:
   void  SetFillColor(int Color) { fShape->fFillColor = Color; }
   void  SetLineColor(int Color) { fShape->fLineColor = Color; }
   void  SetLineWidth(int Width) { fShape->fLineWidth = Width; }
+  void  SetMaxHitEnergy(float E) { fMaxHitEnergy = E; }
 
   void   AddHit(const mu2e::CaloHit* CrystalHit);
 

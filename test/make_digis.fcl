@@ -49,7 +49,9 @@ physics : {
 	    makeClusters     : 0
 
             makeStrawDigis   : 1
-            
+
+            makeCrvDigis     : 1
+            makeCrvPulses    : 0
 	    makeCrvClusters  : 0  # default: 1
 	    makePid          : 0
 	    makeSimp         : 0

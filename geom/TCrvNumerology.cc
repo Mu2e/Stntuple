@@ -13,16 +13,16 @@ int sector_type[22] = {
 //-----------------------------------------------------------------------------
 TCrvNumerology::TCrvNumerology() {
 
-  const char* gdata{"Stntuple/geom/data"};
+  const char* crv_sectors_fn {"Stntuple/geom/data/crv_sectors.txt" };
+  const char* crv_counters_fn{"Stntuple/geom/data/crv_counters.txt"};
 
-  const char* dir  = gEnv->GetValue("Stntuple.GeometryData",gdata);
+  const char* sectors_fn = gEnv->GetValue("Stntuple.GeometryData.CrvSectors",crv_sectors_fn);
 //-----------------------------------------------------------------------------
 // read file and construct sectors
 //-----------------------------------------------------------------------------
-  TString fn = Form("%s/crv_sectors.txt",dir);
-  FILE* f  = fopen(fn.Data(),"r");
+  FILE* f  = fopen(sectors_fn,"r");
   if (f == 0) {
-    Error("Init",Form("missing file %s\n",fn.Data()));
+    Error("Init",Form("missing file: %s\n",sectors_fn));
     // return -2;
   }
 
@@ -69,10 +69,11 @@ TCrvNumerology::TCrvNumerology() {
 //-----------------------------------------------------------------------------
 // now the same way read in the counter geom data
 //-----------------------------------------------------------------------------
-  TString fn1 = Form("%s/crv_counter_geom.txt",dir);
-  FILE* f1  = fopen(fn1.Data(),"r");
+  
+  const char* counters_fn = gEnv->GetValue("Stntuple.GeometryData.CrvSectors",crv_counters_fn);
+  FILE* f1  = fopen(counters_fn,"r");
   if (f1 == 0) {
-    Error("Init",Form("missing file %s\n",fn1.Data()));
+    Error("Init",Form("missing file %s\n",counters_fn));
     // return -2;
   }
 

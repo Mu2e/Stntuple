@@ -10,11 +10,14 @@
 #pragma link C++  class  TCalDigi-;
 #pragma link C++  class  TCalDataBlock-;
 #pragma link C++  class  TCalHitData-;
+
+#pragma link C++  class  TCrvDigi-;
+#pragma link C++  class  TCrvDigiBlock-;
 #pragma link C++  class  TCrvClusterBlock-;
 #pragma link C++  class  TCrvCoincidenceCluster-;
-#pragma link C++  class  TCrvCoincidence-;
 #pragma link C++  class  TCrvPulseBlock-;
 #pragma link C++  class  TCrvRecoPulse-;
+
 #pragma link C++  class  TGenParticle;
 #pragma link C++  class  TGenpBlock-;
 #pragma link C++  class  TSimParticle-;
