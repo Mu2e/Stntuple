@@ -322,7 +322,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(TTrackAnaModule,0)
+  ClassDefOverride(TTrackAnaModule,0)
 };
 }
 #endif

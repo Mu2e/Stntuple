@@ -75,7 +75,7 @@ public:
   void ReadV1(TBuffer& R__b);
   void ReadV2(TBuffer& R__b);
 
-  ClassDef (TStrawHit,3)
+  ClassDefOverride (TStrawHit,3)
 };
 
 #endif

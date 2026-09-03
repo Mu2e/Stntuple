@@ -37,6 +37,6 @@ public:
   int       Event          (int ientry);
   int       EndJob         ();
 
-  ClassDef(TDuplicateFilterModule,0)
+  ClassDefOverride(TDuplicateFilterModule,0)
 };
 #endif

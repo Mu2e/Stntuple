@@ -48,7 +48,7 @@ public:
 
   virtual int  test_coverage(double MuB, double SMin, double SMax, int NPoints);
 
-  ClassDef(TBeltLH,0)
+  ClassDefOverride(TBeltLH,0)
 };
 
 }

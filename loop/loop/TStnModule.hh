@@ -153,11 +153,11 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void  Clear (const char* Opt);
-  virtual void  Delete(const char* Opt);
-  virtual void  Print (const char* Opt) const ;
+  virtual void  Clear (const char* Opt) override;
+  virtual void  Delete(const char* Opt) override;
+  virtual void  Print (const char* Opt) const override ;
 
-  ClassDef(TStnModule,0)   // Base Class for the STNTUPLE analysis module
+  ClassDefOverride(TStnModule,0)   // Base Class for the STNTUPLE analysis module
 };
 
 #endif

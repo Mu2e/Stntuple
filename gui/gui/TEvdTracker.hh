@@ -67,7 +67,7 @@ public:
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(stntuple::TEvdTracker,0)
+  ClassDefOverride(stntuple::TEvdTracker,0)
 };
 }
 

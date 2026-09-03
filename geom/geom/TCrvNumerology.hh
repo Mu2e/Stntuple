@@ -83,7 +83,7 @@ public:
   void    Clear(Option_t* Opt = "") ;
   void    Print(Option_t* Opt = "") const ;
 
-  ClassDef(TCrvNumerology,0)
+  ClassDefOverride(TCrvNumerology,0)
 
 };
 

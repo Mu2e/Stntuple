@@ -72,6 +72,6 @@ public:
   Float_t   B0IntegratedLiveLumi() { return fB0IntegratedLiveLumi; }
   Int_t     FrontendTime        () { return fFrontendTime;     }
 
-  ClassDef(TBeamConditions,1)
+  ClassDefOverride(TBeamConditions,1)
 };
 #endif

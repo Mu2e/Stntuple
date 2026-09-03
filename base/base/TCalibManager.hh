@@ -38,7 +38,7 @@ public:
 
   int  SetPass(const char* Pass, Int_t Force = 0);
 
-  ClassDef (TCalibManager,1)
+  ClassDefOverride (TCalibManager,1)
 };
 
 #endif

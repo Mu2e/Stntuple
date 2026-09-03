@@ -432,7 +432,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(TValidationModule,0)
+  ClassDefOverride(TValidationModule,0)
 };
 }
 #endif

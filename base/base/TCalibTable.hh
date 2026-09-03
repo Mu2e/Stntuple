@@ -31,7 +31,7 @@ public:
 
   const char* GetFilename(int RunNumber);
 
-  ClassDef (TCalibTable,1)
+  ClassDefOverride (TCalibTable,1)
 };
 
 #endif

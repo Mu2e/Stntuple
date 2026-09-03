@@ -76,7 +76,7 @@ public:
   void ReadV1(TBuffer& R__b);
   void ReadV2(TBuffer& R__b);
 
-  ClassDef(TGenpBlock,3)		// GENP block: output of MC event generators
+  ClassDefOverride(TGenpBlock,3)		// GENP block: output of MC event generators
 };
 
 #endif

@@ -139,7 +139,7 @@ public:
   virtual void   PrintMe()                     const ;  // *MENU*
   virtual void   Print  (const char* Opt = "") const ;  // *MENU*
 
-  ClassDef(stntuple::TEvdComboHit,0)
+  ClassDefOverride(stntuple::TEvdComboHit,0)
 };
 
 }

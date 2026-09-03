@@ -40,9 +40,9 @@ public:
 
 				// ****** overloaded functions of TObject
 
-  void  Clear(Option_t* Opt = "");
+  virtual void  Clear(Option_t* Opt = "") override;
 
-  ClassDef(TBitset,1)
+  ClassDefOverride(TBitset,1)
 };
 
 

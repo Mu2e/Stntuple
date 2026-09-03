@@ -70,7 +70,7 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer &R__b);
 
-  ClassDef (TVDetHitData,2)
+  ClassDefOverride (TVDetHitData,2)
 };
 
 #endif

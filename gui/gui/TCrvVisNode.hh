@@ -104,7 +104,7 @@ public:
 
   int getCRVSection(int shieldNumber);
 
-  ClassDef(TCrvVisNode, 0)
+  ClassDefOverride(TCrvVisNode, 0)
 };
 
 

@@ -50,7 +50,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TTrackStrawHitBlock,1)	// track straw hit data block
+  ClassDefOverride(TTrackStrawHitBlock,1)	// track straw hit data block
 };
 
 

@@ -87,7 +87,7 @@ public:
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(stntuple::TEvdTrkStrawHit,0)
+  ClassDefOverride(stntuple::TEvdTrkStrawHit,0)
 };
 }
 

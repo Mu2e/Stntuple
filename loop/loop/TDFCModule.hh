@@ -85,6 +85,6 @@ public:
   int       Event          (int ientry);
   int       EndJob         ();
 
-  ClassDef(TDFCModule,0)
+  ClassDefOverride(TDFCModule,0)
 };
 #endif

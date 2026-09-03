@@ -79,7 +79,7 @@ public:
 //-----------------------------------------------------------------------------
   void     ReadV1(TBuffer &R__b);
 
-  ClassDef(TStepPointMC,2)
+  ClassDefOverride(TStepPointMC,2)
 };
 
 #endif

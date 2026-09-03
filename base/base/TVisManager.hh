@@ -199,7 +199,7 @@ public:
   virtual void SetTickx(Int_t value = 1) {}
   virtual void SetTicky(Int_t value = 1) {}
 
-  ClassDef(TVisManager,1)		// Abs visualization manager for TGeant
+  ClassDefOverride(TVisManager,1)		// Abs visualization manager for TGeant
 };
 
 #endif

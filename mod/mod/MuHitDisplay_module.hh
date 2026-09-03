@@ -263,7 +263,7 @@ public:
   virtual void     endRun  (const art::Run& aRun);
   virtual void     analyze (const art::Event& Evt);
 
-  //  ClassDef(mu2e::MuHitDisplay,0)
+  //  ClassDefOverride(mu2e::MuHitDisplay,0)
 };
 }
 #endif

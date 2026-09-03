@@ -52,9 +52,9 @@ public:
   ~TCdf2Files();
 				// ****** overloaded methods of TObject
 
-  void Clear(Option_t* Opt="");
-  void Print(Option_t* Opt="") const;
+  void Clear(Option_t* Opt="") override;
+  void Print(Option_t* Opt="") const override;
 
-  ClassDef(TCdf2Files,1)
+  ClassDefOverride(TCdf2Files,1)
 };
 #endif

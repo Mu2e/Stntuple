@@ -52,7 +52,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TCrvRecoPulse,1)	         // CRV reco pulse
+  ClassDefOverride(TCrvRecoPulse,1)	         // CRV reco pulse
 };
 
 

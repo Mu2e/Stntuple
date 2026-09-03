@@ -98,7 +98,7 @@ public:
   virtual void   Clear(const char* Opt = "") ;
   virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TStnCrystal,0)
+  ClassDefOverride(TStnCrystal,0)
 };
 
 

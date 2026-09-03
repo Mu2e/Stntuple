@@ -134,7 +134,7 @@ public:
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TStrawHitVisNode,0)
+  ClassDefOverride(TStrawHitVisNode,0)
 };
 
 

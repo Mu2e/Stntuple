@@ -45,6 +45,6 @@ public:
   TCdf2RunSections();
   ~TCdf2RunSections();
 
-  ClassDef(TCdf2RunSections,1)
+  ClassDefOverride(TCdf2RunSections,1)
 };
 #endif

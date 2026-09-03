@@ -243,6 +243,6 @@ protected:
   Int_t  AddFolders(TFolder*   Fol1, TFolder*   Fol2);
   Int_t  AddArrays (TObjArray* A1  , TObjArray* A2  );
 
-  ClassDef(TStnAna,0)  // STNTUPLE event loop utility
+  ClassDefOverride(TStnAna,0)  // STNTUPLE event loop utility
 };
 #endif

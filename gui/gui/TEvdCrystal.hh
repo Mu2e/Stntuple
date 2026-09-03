@@ -102,7 +102,7 @@ public:
   virtual void   Clear(const char* Opt = "") ;
   virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdCrystal,0)
+  ClassDefOverride(TEvdCrystal,0)
 };
 
 

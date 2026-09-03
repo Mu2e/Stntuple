@@ -91,7 +91,7 @@ public:
 //-----------------------------------------------------------------------------
   void   ReadV1(TBuffer& R__b);
 
-  ClassDef(TStepPointMCBlock,2)	 // TStepPointMC block: Mu2e G4 output
+  ClassDefOverride(TStepPointMCBlock,2)	 // TStepPointMC block: Mu2e G4 output
 };
 
 #endif

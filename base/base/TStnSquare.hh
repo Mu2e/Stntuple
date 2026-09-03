@@ -19,7 +19,7 @@ public:
 
   static int Test(double Size = 30., double RIn=360., double ROut=670.);
 
-  ClassDef(TStnSquare,0)
+  ClassDefOverride(TStnSquare,0)
 
 };
 

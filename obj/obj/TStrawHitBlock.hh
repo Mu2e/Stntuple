@@ -52,7 +52,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TStrawHitBlock,2)	// straw hit data block
+  ClassDefOverride(TStrawHitBlock,2)	// straw hit data block
 };
 
 

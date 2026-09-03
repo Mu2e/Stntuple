@@ -48,7 +48,7 @@ public:
   
   virtual void Print (Option_t* Opt = "") const ;
 
-  ClassDef(TStnElectron,0)
+  ClassDefOverride(TStnElectron,0)
     
 };
 

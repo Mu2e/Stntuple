@@ -68,7 +68,7 @@ public:
   virtual void  Clear(const char* Opt = "");
   virtual void  Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdCluster,0)
+  ClassDefOverride(TEvdCluster,0)
 };
 
 

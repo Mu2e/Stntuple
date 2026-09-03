@@ -141,10 +141,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnModule
 //-----------------------------------------------------------------------------
-  int     BeginJob();
-  int     BeginRun();
-  int     Event   (int ientry);
-  int     EndJob  ();
+  virtual int     BeginJob() override;
+  virtual int     BeginRun() override;
+  virtual int     Event   (int ientry) override;
+  virtual int     EndJob  () override;
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
@@ -165,7 +165,7 @@ public:
 
   void    Debug();
 
-  ClassDef(stntuple::TCrvAnaModule,0)
+  ClassDefOverride(stntuple::TCrvAnaModule,0)
 };
 }
 #endif

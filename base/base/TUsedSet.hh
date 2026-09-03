@@ -33,6 +33,6 @@ public:
   TUsedSet();
   ~TUsedSet();
 
-  ClassDef(TUsedSet,1)
+  ClassDefOverride(TUsedSet,1)
 };
 #endif

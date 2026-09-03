@@ -31,7 +31,7 @@ public:
   virtual Float_t    GetMaxFieldMag() const { return 5. ; }
   virtual TEveVector GetField(float X, float Y, float Z) const ;
 
-  ClassDef(TMu2eBField, 0);
+  ClassDefOverride(TMu2eBField, 0);
 };
 }
 #endif

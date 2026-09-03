@@ -39,7 +39,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TCrvPulseBlock,1)	// CRV reco block
+  ClassDefOverride(TCrvPulseBlock,1)	// CRV reco block
 };
 
 

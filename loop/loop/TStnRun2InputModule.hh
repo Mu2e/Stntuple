@@ -28,25 +28,25 @@ public:
 // overloaded methods of TStnInputModule
 //-----------------------------------------------------------------------------
   virtual ~TStnRun2InputModule();
-  virtual TStnNode* GetNode(const char* BranchName, const char* ClassName);
+  virtual TStnNode* GetNode(const char* BranchName, const char* ClassName) override;
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  Int_t       SetBranches();
+  virtual int       SetBranches() override;
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnInputModule
 //-----------------------------------------------------------------------------
-  virtual Int_t     RegisterInputBranches(TStnEvent* Event);
+  virtual int      RegisterInputBranches(TStnEvent* Event) override;
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnModule
 //-----------------------------------------------------------------------------
-  virtual int BeginJob    ();
-  virtual int BeginRun    ();
-  virtual int Event       (Int_t i);
-  virtual int EndRun      ();
-  virtual int EndJob      ();
+  virtual int BeginJob    () override;
+  virtual int BeginRun    () override;
+  virtual int Event       (Int_t i) override;
+  virtual int EndRun      () override;
+  virtual int EndJob      () override;
 
-  ClassDef(TStnRun2InputModule,0)	// RUN II input module
+  ClassDefOverride(TStnRun2InputModule,0)	// RUN II input module
 };
 
 #endif

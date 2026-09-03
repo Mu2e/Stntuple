@@ -90,7 +90,7 @@ public:
 //-----------------------------------------------------------------------------
 //  void ReadV1(TBuffer& R__b);
 
-  ClassDef(TStnPid,1)
+  ClassDefOverride(TStnPid,1)
 };
 
 #endif

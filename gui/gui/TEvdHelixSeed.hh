@@ -73,7 +73,7 @@ public:
   virtual void  Clear(Option_t* Opt = "");
   virtual void  Print(Option_t* Opt = "") const ; // **MENU**
 
-  ClassDef(stntuple::TEvdHelixSeed,0)
+  ClassDefOverride(stntuple::TEvdHelixSeed,0)
 };
 
 }

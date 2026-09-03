@@ -65,7 +65,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* option = "") const;
 
-  ClassDef(TStnPidBlock,1)
+  ClassDefOverride(TStnPidBlock,1)
 };
 
 #endif

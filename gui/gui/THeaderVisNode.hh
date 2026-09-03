@@ -42,7 +42,7 @@ public:
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 
-  ClassDef(THeaderVisNode,0)
+  ClassDefOverride(THeaderVisNode,0)
 };
 
 

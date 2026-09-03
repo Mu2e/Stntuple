@@ -80,7 +80,7 @@ public:
   virtual void  PrintMe() const ;                           // **MENU**
   virtual void  Print  (Option_t* Opt = "") const override; // **MENU**
 
-  ClassDef(stntuple::TEvdCosmicTrack,0)
+  ClassDefOverride(stntuple::TEvdCosmicTrack,0)
 };
 
 }

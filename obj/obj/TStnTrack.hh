@@ -357,8 +357,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void Clear (Option_t* Opt = "") ;
-  virtual void Print (Option_t* Opt = "") const ;
+  virtual void Clear (Option_t* Opt = "") override ;
+  virtual void Print (Option_t* Opt = "") const override;
 
 //-----------------------------------------------------------------------------
 // schema evolution
@@ -371,7 +371,7 @@ public:
   void ReadV9 (TBuffer& R__b);
   void ReadV10(TBuffer& R__b);
 
-  ClassDef(TStnTrack,17)
+  ClassDefOverride(TStnTrack,17)
 
 };
 

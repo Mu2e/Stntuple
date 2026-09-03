@@ -133,7 +133,7 @@ public:
   void     ReadV2(TBuffer &R__b);
   void     ReadV3(TBuffer &R__b);
 
-  ClassDef(TSimParticle,4)
+  ClassDefOverride(TSimParticle,4)
 };
 
 #endif

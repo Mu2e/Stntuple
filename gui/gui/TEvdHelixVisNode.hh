@@ -101,7 +101,7 @@ public:
   virtual void Clear(const char* Opt = "")       ; // **MENU**
   virtual void Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdHelixVisNode,0)
+  ClassDefOverride(TEvdHelixVisNode,0)
 };
 
 

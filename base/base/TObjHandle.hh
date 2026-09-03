@@ -24,7 +24,7 @@ class TObjHandle : public TObject {
 //-----------------------------------------------------------------------------
   void* Object() { return fObject; }
 
-  ClassDef(TObjHandle,0)
+  ClassDefOverride(TObjHandle,0)
 
 };
 

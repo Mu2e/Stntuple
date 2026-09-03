@@ -35,11 +35,11 @@ public:
 
   virtual ~TStnInputModule();
 
-  virtual int       BeginJob    ();
-  virtual int       BeginRun    ();
-  virtual int       Event       (Int_t i);
-  virtual int       EndRun      ();
-  virtual int       EndJob      ();
+  virtual int       BeginJob    () override;
+  virtual int       BeginRun    () override;
+  virtual int       Event       (Int_t i) override;
+  virtual int       EndRun      () override;
+  virtual int       EndJob      () override;
 
   int               InitChain(const char* FileName, const char* TreeName);
   virtual int       AddDataset(TStnDataset* Dataset, int Print = 0);
@@ -76,6 +76,6 @@ public:
   virtual Int_t     NextEvent(Int_t IEntry);
   virtual Int_t     LoadEntry(Int_t IEntry);
 
-  ClassDef(TStnInputModule,0)   // Base class for STNTUPLE input module
+  ClassDefOverride(TStnInputModule,0)   // Base class for STNTUPLE input module
 };
 #endif

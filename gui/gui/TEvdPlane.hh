@@ -69,7 +69,7 @@ public:
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(stntuple::TEvdPlane,0)
+  ClassDefOverride(stntuple::TEvdPlane,0)
 };
 }
 

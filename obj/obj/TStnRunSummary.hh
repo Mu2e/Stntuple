@@ -224,7 +224,7 @@ public:
   void      ReadV6(TBuffer& R__b, UInt_t R__s, UInt_t R__c);
   void      ReadV7(TBuffer& R__b, UInt_t R__s, UInt_t R__c);
 
-  ClassDef(TStnRunSummary,8)
+  ClassDefOverride(TStnRunSummary,8)
 };
 
 #endif

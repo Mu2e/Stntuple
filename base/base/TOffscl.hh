@@ -24,6 +24,6 @@ public:
 
   void  Print(const char* Opt = "") const ;
 
-  ClassDef(TOffscl,1)
+  ClassDefOverride(TOffscl,1)
 };
 #endif

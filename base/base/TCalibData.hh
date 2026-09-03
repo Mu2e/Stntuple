@@ -19,7 +19,7 @@ public:
 
   virtual int Init(TObject* Data) = 0;
 
-  ClassDef (TCalibData,1)
+  ClassDefOverride (TCalibData,1)
 };
 
 #endif

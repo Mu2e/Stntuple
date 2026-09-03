@@ -31,6 +31,6 @@ public:
 
   void  Print(const char* Opt = "") const ;
 
-  ClassDef(TSetRunMaps,1)
+  ClassDefOverride(TSetRunMaps,1)
 };
 #endif

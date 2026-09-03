@@ -39,7 +39,7 @@ public:
   virtual void Clear(Option_t* opt="")       override;
   virtual void Print(Option_t* opt="") const override;
 
-  ClassDef(TCrvDigiBlock,1)     // CRV reco block
+  ClassDefOverride(TCrvDigiBlock,1)     // CRV reco block
 };
 
 #endif

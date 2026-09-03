@@ -121,7 +121,7 @@ public:
   virtual void   Clear(Option_t* Opt = "") ;
   virtual void   Print(Option_t* Opt = "") const ;
 
-  ClassDef(TDisk,0)
+  ClassDefOverride(TDisk,0)
     
 };
 

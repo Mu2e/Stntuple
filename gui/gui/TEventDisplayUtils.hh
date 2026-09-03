@@ -27,7 +27,7 @@ public:
   void     NextEvent         ();
   void     GotoEvent         ();
 
-  ClassDef(TEventDisplayUtils,0)
+  ClassDefOverride(TEventDisplayUtils,0)
 };
 }
 #endif 

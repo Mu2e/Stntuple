@@ -124,7 +124,7 @@ public:
 //-----------------------------------------------------------------------------
   void  SetPrintLevel(Int_t Level) { fPrintLevel = Level; }
 
-  ClassDef(TStnCatalogServer,0)
+  ClassDefOverride(TStnCatalogServer,0)
 };
 
 #endif

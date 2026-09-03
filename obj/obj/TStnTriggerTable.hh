@@ -53,7 +53,7 @@ public:
   void        Delete(Option_t* option = "");
   void        Print (Option_t* option = "") const; // *MENU*
 
-  ClassDef(TStnTriggerTable,1)
+  ClassDefOverride(TStnTriggerTable,1)
 };
 
 #endif

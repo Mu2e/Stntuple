@@ -46,7 +46,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TStnTrackSeedBlock,1)
+  ClassDefOverride(TStnTrackSeedBlock,1)
 };
 
 #endif

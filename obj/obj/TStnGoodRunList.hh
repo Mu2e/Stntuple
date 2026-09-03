@@ -108,7 +108,7 @@ public:
   virtual void   Clear(Option_t* Opt = "");
   virtual void   Print(Option_t* Opt = "") const;
 
-  ClassDef(TStnGoodRunList,1)
+  ClassDefOverride(TStnGoodRunList,1)
 
 };
 

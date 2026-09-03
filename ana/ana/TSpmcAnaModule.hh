@@ -217,7 +217,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(TSpmcAnaModule,0)
+  ClassDefOverride(TSpmcAnaModule,0)
 };
 
 }

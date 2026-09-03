@@ -151,10 +151,9 @@ public:
   }
 
   virtual Int_t GetEntry(Int_t ientry);
-					// ****** overloaded functions of 
-					// TObject
-  void Print(Option_t* opt="") const;
+					// ****** overloaded functions of TObject
+  virtual void Print(Option_t* opt="") const override;
 
-  ClassDef(TStnDataBlock,1)
+  ClassDefOverride(TStnDataBlock,1)
 };
 #endif

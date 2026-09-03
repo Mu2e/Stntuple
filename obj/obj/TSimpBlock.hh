@@ -72,7 +72,7 @@ public:
 //-----------------------------------------------------------------------------
 //  I/O and schema evolution
 //-----------------------------------------------------------------------------
-  ClassDef(TSimpBlock,1)		// TSimBlock: simulated particles
+  ClassDefOverride(TSimpBlock,1)		// TSimBlock: simulated particles
 };
 
 #endif

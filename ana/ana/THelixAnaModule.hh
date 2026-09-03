@@ -219,7 +219,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(THelixAnaModule,0)
+  ClassDefOverride(THelixAnaModule,0)
 };
 }
 #endif

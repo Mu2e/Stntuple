@@ -104,7 +104,7 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer &R__b);
 
-  ClassDef (TTrackStrawHit,1)
+  ClassDefOverride (TTrackStrawHit,1)
 };
 
 #endif

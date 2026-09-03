@@ -63,7 +63,7 @@ public:
   void      LogError(const char* Message);
   void      LogError(char* Message);
 
-  //  ClassDef(StntupleModule,0)
+  //  ClassDefOverride(StntupleModule,0)
 };
 
 #endif

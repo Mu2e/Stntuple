@@ -83,14 +83,14 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt="");
-  void Print(Option_t* opt="") const;
+  void Clear(Option_t* opt="") override;
+  void Print(Option_t* opt="") const override;
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
   //  void  ReadV1(TBuffer &R__b);
 
-  ClassDef(TStnTriggerBlock,1)
+  ClassDefOverride(TStnTriggerBlock,1)
 
 };
 

@@ -29,7 +29,7 @@ public:
 
   void   Clear(Option_t* Option = "");
 
-  ClassDef(TStnRunRecord,0)
+  ClassDefOverride(TStnRunRecord,0)
 };
 
 #endif

@@ -162,7 +162,7 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
 
-  ClassDef(TStnCluster,3)
+  ClassDefOverride(TStnCluster,3)
 };
 
 #endif

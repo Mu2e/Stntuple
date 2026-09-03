@@ -59,6 +59,6 @@ public:
   Int_t Write(const char* Name=0, Int_t option=0, Int_t bufsize=0) const ;
   //  void  MakeAvgBeamline();
 
-  ClassDef(TStnDBManager,2)
+  ClassDefOverride(TStnDBManager,2)
 };
 #endif

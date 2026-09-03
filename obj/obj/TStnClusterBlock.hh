@@ -48,7 +48,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TStnClusterBlock,1)
+  ClassDefOverride(TStnClusterBlock,1)
 };
 
 #endif

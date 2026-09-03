@@ -111,7 +111,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(TGenAnaModule,0)
+  ClassDefOverride(TGenAnaModule,0)
 };
 }
 #endif

@@ -74,7 +74,7 @@ public:
   // virtual void Clear(const char* Opt = "")       ; // **MENU**
   virtual void Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdPanelVisNode,0)
+  ClassDefOverride(TEvdPanelVisNode,0)
 };
 }
 

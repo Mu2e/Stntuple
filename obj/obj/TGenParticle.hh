@@ -83,7 +83,7 @@ public:
 //-----------------------------------------------------------------------------
   void     Print(Option_t* opt = "") const;
 
-  ClassDef(TGenParticle,1)
+  ClassDefOverride(TGenParticle,1)
 };
 
 #endif

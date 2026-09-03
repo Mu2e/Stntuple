@@ -95,7 +95,7 @@ public:
 //-----------------------------------------------------------------------------
   void         Print(Option_t* opt) const ;
 
-  ClassDef(TPhotosAnaModule,0)
+  ClassDefOverride(TPhotosAnaModule,0)
 };
 }
 #endif

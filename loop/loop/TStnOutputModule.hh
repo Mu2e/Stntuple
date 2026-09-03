@@ -72,6 +72,6 @@ public:
 
   Int_t       OpenNewFile   (const char* Filename );
 
-  ClassDef(TStnOutputModule,0)
+  ClassDefOverride(TStnOutputModule,0)
 };
 #endif

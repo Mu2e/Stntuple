@@ -61,7 +61,7 @@ public:
 					// versions 1 and 2, just a member 
 					// function has been added and a data 
 					// member has been renamed
-  ClassDef(TStnLinkBlock,2)
+  ClassDefOverride(TStnLinkBlock,2)
 };
 
 #endif

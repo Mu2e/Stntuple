@@ -14,7 +14,7 @@ public:
   TMatrix33();
   virtual ~TMatrix33();
 
-  ClassDef(TMatrix33,3)
+  ClassDefOverride(TMatrix33,3)
 };
 
 #endif

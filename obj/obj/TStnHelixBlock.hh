@@ -51,7 +51,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TStnHelixBlock,1)
+  ClassDefOverride(TStnHelixBlock,1)
 };
 
 #endif

@@ -156,7 +156,7 @@ public:
   int    UpperLimit(double   MuB  , double SMin, double SMax, double* S, double* Prob);
   int    UpperLimit(model_t* Model, double SMin, double SMax, double* S, double* Prob);
 
-  ClassDef(TFeldmanCousins,0)
+  ClassDefOverride(TFeldmanCousins,0)
 };
 }
 #endif

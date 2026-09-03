@@ -49,7 +49,7 @@ public:
 
   void  Print  (Option_t* Option = "") const;
   
-  ClassDef(TStnTrigger,1)
+  ClassDefOverride(TStnTrigger,1)
 
 };
 

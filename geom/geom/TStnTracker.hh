@@ -50,7 +50,7 @@ public:
   void    Clear(Option_t* Opt = "") override ;
   void    Print(Option_t* Opt = "") const override;
 
-  ClassDef(TStnTracker,0)
+  ClassDefOverride(TStnTracker,0)
 
 };
 

@@ -149,7 +149,7 @@ public:
   void ReadV2(TBuffer& R__b);
   void ReadV3(TBuffer& R__b);
 
-  ClassDef(TStnTrackSeed,4);
+  ClassDefOverride(TStnTrackSeed,4);
 };
 
 #endif

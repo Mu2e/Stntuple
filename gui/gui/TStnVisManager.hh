@@ -309,6 +309,6 @@ public:
 }
 
  
-  // ClassDef(TStnVisManager, 0)
+  // ClassDefOverride(TStnVisManager, 0)
   };
 #endif

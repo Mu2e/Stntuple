@@ -52,7 +52,7 @@ public:
   void          Clear(Option_t* opt = "") { fNDataWords = 0; }
   void          Print(Option_t* opt = "") const ;
 
-  ClassDef(TStnArrayF,2)		// an intelligent array of integers
+  ClassDefOverride(TStnArrayF,2)		// an intelligent array of integers
 };
 
 

@@ -126,7 +126,7 @@ public:
 //-----------------------------------------------------------------------------
   const mu2e::TrkPanelMap::Row*  PanelMap(int PlaneID, int PanelID);
   
-  ClassDef(TStnGeoManager,0)
+  ClassDefOverride(TStnGeoManager,0)
 };
 
 #endif

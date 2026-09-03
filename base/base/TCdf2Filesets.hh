@@ -33,6 +33,6 @@ public:
   void Clear(Option_t* Opt="");
   void Print(Option_t* Opt="") const;
 
-  ClassDef(TCdf2Filesets,1)
+  ClassDefOverride(TCdf2Filesets,1)
 };
 #endif

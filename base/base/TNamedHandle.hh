@@ -24,7 +24,7 @@ class TNamedHandle : public TNamed {
 //-----------------------------------------------------------------------------
   void* Object() { return fObject; }
 
-  ClassDef(TNamedHandle,0)
+  ClassDefOverride(TNamedHandle,0)
 
 };
 

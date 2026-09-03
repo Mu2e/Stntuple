@@ -78,7 +78,7 @@ public:
   void        Clear(Option_t* opt="");
   void        Print(Option_t* opt="") const;
 
-  ClassDef(TCalDataBlock,2)
+  ClassDefOverride(TCalDataBlock,2)
 };
 
 #endif

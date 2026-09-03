@@ -118,7 +118,7 @@ protected:
 	//std::vector<int>		sipmPEs[4];		// Height of pulse in PEs		( ? ? Unnecessary ? ? )
 
 
-	ClassDef(TEvdCrvBar, 0)
+	ClassDefOverride(TEvdCrvBar, 0)
 };
 
 

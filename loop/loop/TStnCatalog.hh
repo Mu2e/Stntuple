@@ -89,7 +89,7 @@ public:
   void  Clear(Option_t* Opt = "");
   void  Print(Option_t* Opt = "") const ;
 
-  ClassDef(TStnCatalog,0)
+  ClassDefOverride(TStnCatalog,0)
 };
 
 #endif

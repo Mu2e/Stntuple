@@ -65,7 +65,7 @@ public:
   virtual void  Clear(Option_t* Opt = "");
   virtual void  Print(Option_t* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdTrackSeed,0)
+  ClassDefOverride(TEvdTrackSeed,0)
 };
 
 

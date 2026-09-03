@@ -64,7 +64,7 @@ public:
 
   virtual Int_t RegisterInputBranches(TStnEvent* Event);
 
-  ClassDef(TStnGeneratorModule,0) // MC event generator module
+  ClassDefOverride(TStnGeneratorModule,0) // MC event generator module
 };
 
 #endif

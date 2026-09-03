@@ -115,7 +115,7 @@ public:
   virtual void  Print  (const char* Opt = "") const ;               // *MENU*
   virtual void  PrintMe()                     const ;               // *MENU*
 
-  ClassDef(stntuple::TEvdStrawHit,0)
+  ClassDefOverride(stntuple::TEvdStrawHit,0)
 };
 
 }

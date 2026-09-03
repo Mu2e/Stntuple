@@ -160,7 +160,7 @@ public:
 
   virtual void Print(const char* Option_t) const;
 
-  ClassDef(TKinLH,0)
+  ClassDefOverride(TKinLH,0)
 };
 }
 #endif

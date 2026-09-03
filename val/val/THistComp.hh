@@ -29,7 +29,7 @@ public:
   TH1*       GetHist1 () { return fHist1;  }
   TH1*       GetHist2 () { return fHist2;  }
   Double_t   GetKsProb() { return fKsProb; }
-  Double_t   GetNorm()   { return fNorm; }
+  Double_t   GetNorm()   { return fNorm  ; }
 //-----------------------------------------------------------------------------
 //  overloaded functions of TObject
 //-----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ public:
   void DrawEP() { Draw("ep"); }         // *MENU*;
   virtual void        Dump() const;    // *MENU*
 
-  ClassDef(THistComp,2)
+  ClassDefOverride(THistComp,2)
 };
 
 
@@ -66,7 +66,7 @@ public:
   virtual ~TGoodHistComp(){}
 
 
-  ClassDef(TGoodHistComp,1)
+  ClassDefOverride(TGoodHistComp,1)
 };
 
 
@@ -79,7 +79,7 @@ public:
   virtual ~TBadHistComp(){}
 
 
-  ClassDef(TBadHistComp,1)
+  ClassDefOverride(TBadHistComp,1)
 };
 
 #endif

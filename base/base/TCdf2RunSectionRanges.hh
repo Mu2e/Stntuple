@@ -29,6 +29,6 @@ public:
   TCdf2RunSectionRanges();
   ~TCdf2RunSectionRanges();
 
-  ClassDef(TCdf2RunSectionRanges,1)
+  ClassDefOverride(TCdf2RunSectionRanges,1)
 };
 #endif

@@ -76,7 +76,7 @@ public:
   void    Clear(Option_t* Opt = "") ;
   void    Print(Option_t* Opt = "") const ;
 
-  ClassDef(TDiskCalorimeter,0)
+  ClassDefOverride(TDiskCalorimeter,0)
 
 };
 

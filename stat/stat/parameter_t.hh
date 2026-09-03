@@ -45,7 +45,7 @@ namespace stntuple {
     
     virtual void    Print(const Option_t* Opt) const ;
 
-    ClassDef(stntuple::parameter_t,0)
+    ClassDefOverride(stntuple::parameter_t,0)
     
   };
 }

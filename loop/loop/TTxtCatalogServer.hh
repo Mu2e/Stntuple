@@ -74,7 +74,7 @@ public:
 			      Int_t       Run1   ,
 			      Int_t       Run2   );
   
-  ClassDef(TTxtCatalogServer,0)
+  ClassDefOverride(TTxtCatalogServer,0)
 };
 
 #endif

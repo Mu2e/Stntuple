@@ -41,7 +41,7 @@ public:
 
   virtual void  Paint(Option_t* Opt="") = 0;
 
-  ClassDef(TStnShape,0)
+  ClassDefOverride(TStnShape,0)
 
 };
 

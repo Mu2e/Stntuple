@@ -96,7 +96,7 @@ public:
   // contents of AAA_FILES.html
   TObjArray fAAAFilesHtml;
   
-  ClassDef(TSamCatalogServer,0)
+  ClassDefOverride(TSamCatalogServer,0)
 };
 
 #endif

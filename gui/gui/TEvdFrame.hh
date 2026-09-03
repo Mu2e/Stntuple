@@ -93,7 +93,7 @@ public:
 
   void PrintToPNG(TCanvas* running_canvas);
 
-  ClassDef(TEvdFrame,1)
+  ClassDefOverride(TEvdFrame,1)
 };
 
 

@@ -63,9 +63,9 @@ public:
 					// ****** overloaded functions of 
 					// TObject
 
-  void Print(Option_t* option = "") const;
+  void Print(Option_t* option = "") const override;
 
-  ClassDef(TStnNode,0)
+  ClassDefOverride(TStnNode,0)
 };
 
 #endif

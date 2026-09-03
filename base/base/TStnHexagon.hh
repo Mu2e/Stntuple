@@ -19,7 +19,7 @@ public:
 
   static int Test(double HexSize = 30., double RIn=360., double ROut=670.);
 
-  ClassDef(TStnHexagon,0)
+  ClassDefOverride(TStnHexagon,0)
 
 };
 

@@ -35,6 +35,6 @@ public:
 
   void  Print(const char* Opt = "") const ;
 
-  ClassDef(TCalibRunLists,1)
+  ClassDefOverride(TCalibRunLists,1)
 };
 #endif

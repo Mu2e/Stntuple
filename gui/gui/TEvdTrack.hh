@@ -76,7 +76,7 @@ public:
   virtual void  Clear(Option_t* Opt = "");
   virtual void  Print(Option_t* Opt = "") const ; // **MENU**
 
-  ClassDef(stntuple::TEvdTrack,0)
+  ClassDefOverride(stntuple::TEvdTrack,0)
 };
 
 }

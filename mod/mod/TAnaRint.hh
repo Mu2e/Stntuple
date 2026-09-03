@@ -35,7 +35,7 @@ public:
 
   void   SetInteractiveMode(int Mode) { fInteractiveMode = Mode; }
 
-  ClassDef(TAnaRint,0)
+  ClassDefOverride(TAnaRint,0)
 
 };
 

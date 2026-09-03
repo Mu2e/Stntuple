@@ -90,7 +90,7 @@ public:
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  //  ClassDef(TMcTruthVisNode,0)
+  //  ClassDefOverride(TMcTruthVisNode,0)
 };
 }
 #endif

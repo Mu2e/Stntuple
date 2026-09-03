@@ -102,7 +102,7 @@ public:
   int ReadHistogram1D(const char* Fn, TH1F** Hist);
   int ReadHistogram2D(const char* Fn, TH2F** Hist);
 
-  ClassDef (TEmuLogLH,0)
+  ClassDefOverride (TEmuLogLH,0)
 };
 
 #endif

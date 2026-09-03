@@ -25,7 +25,7 @@ public:
 
   void  Print(Option_t* opt="") const ;
 
-  ClassDef(TStnErrorLogger,0)
+  ClassDefOverride(TStnErrorLogger,0)
 
 };
 

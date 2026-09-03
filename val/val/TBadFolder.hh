@@ -9,6 +9,6 @@ public:
   virtual ~TBadFolder(){}
 
 
-  ClassDef(TBadFolder,1)
+  ClassDefOverride(TBadFolder,1)
 };
 #endif

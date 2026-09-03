@@ -194,7 +194,7 @@ public:
   void ReadV5(TBuffer& R__b);   // 2024-03-07 G.P.
   void ReadV6(TBuffer& R__b);   // 2024-10-17 G.P.
 
-  ClassDef(TStnHelix,7);
+  ClassDefOverride(TStnHelix,7);
 };
 
 #endif

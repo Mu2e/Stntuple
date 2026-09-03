@@ -98,7 +98,7 @@ public:
   virtual void  ExecuteEvent       (int Event, int Px, int Py);	
 
 
-  ClassDef(stntuple::TEvdTimeCluster,0)
+  ClassDefOverride(stntuple::TEvdTimeCluster,0)
 };
 
 }

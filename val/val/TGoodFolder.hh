@@ -9,6 +9,6 @@ public:
   virtual ~TGoodFolder(){}
 
 
-  ClassDef(TGoodFolder,1)
+  ClassDefOverride(TGoodFolder,1)
 };
 #endif

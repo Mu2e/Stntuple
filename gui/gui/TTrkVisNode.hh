@@ -195,7 +195,7 @@ public:
   virtual void Clear(const char* Opt = "")       ; // **MENU**
   virtual void Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TTrkVisNode,0)
+  ClassDefOverride(TTrkVisNode,0)
 };
 
 

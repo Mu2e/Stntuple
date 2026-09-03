@@ -56,7 +56,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TCrvClusterBlock,1)	// CRV coincidence cluster block
+  ClassDefOverride(TCrvClusterBlock,1)	// CRV coincidence cluster block
 };
 
 

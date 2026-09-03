@@ -90,7 +90,7 @@ public:
 
   virtual void  Print               (Option_t* option = "") const ;  // *MENU* 
 
-  ClassDef(TStnView,0)
+  ClassDefOverride(TStnView,0)
 };
 
 #endif

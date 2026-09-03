@@ -39,7 +39,7 @@ public:
     fDist          = Dist;
   }
 
-  //  ClassDef(TVisNode,0)
+  //  ClassDefOverride(TVisNode,0)
 };
 
 #endif

@@ -115,7 +115,7 @@ public:
 
   int test_coverage(double MuB, double SMin, double SMax, int NPoints);
 
-  ClassDef(upper_limit,0)
+  ClassDefOverride(upper_limit,0)
 };
 
 }

@@ -120,7 +120,7 @@ public:
   virtual int beforeEndJob  ();
   virtual int afterEndJob   ();
 
-  //  ClassDef(THistModule,0)
+  //  ClassDefOverride(THistModule,0)
 };
 
 #endif

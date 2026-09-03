@@ -93,7 +93,7 @@ public:
   void   ReadV1(TBuffer& R__b);
 
 
-  ClassDef(TStnHeaderBlock,4)	       // Mu2e STNTUPLE event header
+  ClassDefOverride(TStnHeaderBlock,4)	       // Mu2e STNTUPLE event header
 };
 
 #endif

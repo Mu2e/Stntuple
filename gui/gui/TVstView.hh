@@ -35,7 +35,7 @@ public:
   // virtual void  ExecuteEvent       (Int_t event, Int_t px, Int_t py);
   //  virtual Int_t DistancetoPrimitive(Int_t px, Int_t py);
 
-  ClassDef(TVstView,0)
+  ClassDefOverride(TVstView,0)
 };
 
 #endif

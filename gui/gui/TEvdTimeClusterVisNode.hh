@@ -117,7 +117,7 @@ public:
 
   virtual void Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdTimeClusterVisNode,0)
+  ClassDefOverride(TEvdTimeClusterVisNode,0)
 };
 
 

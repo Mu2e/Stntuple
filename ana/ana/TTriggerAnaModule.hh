@@ -202,7 +202,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(stntuple::TTriggerAnaModule,0)
+  ClassDefOverride(stntuple::TTriggerAnaModule,0)
 };
 }
 #endif

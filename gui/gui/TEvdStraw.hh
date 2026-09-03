@@ -89,7 +89,7 @@ public:
   virtual void Clear(const char* Opt = "")       ;
   virtual void Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(stntuple::TEvdStraw,0)
+  ClassDefOverride(stntuple::TEvdStraw,0)
 };
 
 }

@@ -348,7 +348,7 @@ public:
 
   // void  Test_000(const KalRep* Krep, mu2e::TrkStrawHit* Hit);
 
-  ClassDef(TAnaDump,0)
+  ClassDefOverride(TAnaDump,0)
 };
 
 

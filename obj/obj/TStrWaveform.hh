@@ -44,7 +44,7 @@ public:
 //-----------------------------------------------------------------------------
 //  void ReadV1(TBuffer &R__b);
 
-  ClassDef (TStrWaveform,2)
+  ClassDefOverride (TStrWaveform,2)
 };
 
 #endif

@@ -116,7 +116,7 @@ protected:
   void SetDisplayBeamMuMinus(int OnOff) { fDisplayBeamMuMinus = OnOff; }
   void SetDisplayBeamMuPlus (int OnOff) { fDisplayBeamMuPlus  = OnOff; }
 
-  ClassDef(TEventDisplayModule,0)
+  ClassDefOverride(TEventDisplayModule,0)
 };
 }
 #endif

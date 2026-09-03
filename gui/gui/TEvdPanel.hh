@@ -68,15 +68,15 @@ public:
   
   //  virtual void  Draw    (Option_t* option = "");
 
-  virtual void  Paint   (Option_t* option = "");
-          void  PaintXY (Option_t* option = "");
-          void  PaintRZ (Option_t* option = "");
-          void  PaintVST(Option_t* option = "");
-          void  PaintVRZ(Option_t* option = "");
+  virtual void  Paint   (Option_t* option = "") override;
+  virtual void  PaintXY (Option_t* option = "");
+  virtual void  PaintRZ (Option_t* option = "");
+  virtual void  PaintVST(Option_t* option = "");
+  virtual void  PaintVRZ(Option_t* option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive   (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive   (Int_t px, Int_t py) override;
   virtual Int_t DistancetoPrimitiveXY (Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ (Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveVST(Int_t px, Int_t py);
@@ -84,7 +84,7 @@ public:
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(stntuple::TEvdPanel,0)
+  ClassDefOverride(stntuple::TEvdPanel,0)
 };
 
 }

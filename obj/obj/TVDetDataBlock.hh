@@ -40,7 +40,7 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TVDetDataBlock,1)	// virtual data block
+  ClassDefOverride(TVDetDataBlock,1)	// virtual data block
 };
 
 

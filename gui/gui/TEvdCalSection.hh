@@ -68,7 +68,7 @@ public:
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TEvdCalSection,0)
+  ClassDefOverride(TEvdCalSection,0)
 };
 
 

@@ -20,7 +20,7 @@ public:
 
   TStnVisManager* vm;
 
-  ClassDef(TEvdMainFrame, 0)
+  ClassDefOverride(TEvdMainFrame, 0)
 };
 
 #endif

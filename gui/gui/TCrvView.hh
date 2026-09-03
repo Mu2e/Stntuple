@@ -37,7 +37,7 @@ public:
   virtual void ExecuteEvent       (Int_t event, Int_t px, Int_t py);
   virtual int  DistancetoPrimitive(Int_t px, Int_t py);
   
-  ClassDef(TCrvView, 0)
+  ClassDefOverride(TCrvView, 0)
 };
 
 #endif

@@ -111,6 +111,6 @@ public:
 
   void  Print(Option_t* opt="") const ;
 
-  ClassDef(TStnEvent,50)
+  ClassDefOverride(TStnEvent,50)
 };
 #endif

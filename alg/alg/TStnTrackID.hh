@@ -152,7 +152,7 @@ public:
 //-----------------------------------------------------------------------------
 //  overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void  Print  (Option_t*  Option = "") const ;
+  void  Print  (Option_t*  Option = "") const override;
 //-----------------------------------------------------------------------------
 //  schema evolution
 //  2009-12-24: current version - V5
@@ -162,7 +162,7 @@ public:
 //   void  ReadV3(TBuffer& R__b);
 //   void  ReadV4(TBuffer& R__b);
 
-  ClassDef(TStnTrackID,0)
+  ClassDefOverride(TStnTrackID,0)
 
 };
 

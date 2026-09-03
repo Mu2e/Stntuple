@@ -114,7 +114,7 @@ public:
 
   int test_coverage(double MuB, double SMin, double SMax, int NPoints);
 
-  ClassDef(crow_gardner,0)
+  ClassDefOverride(crow_gardner,0)
 };
 
 }

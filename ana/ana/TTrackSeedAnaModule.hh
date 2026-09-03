@@ -148,7 +148,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(TTrackSeedAnaModule,0)
+  ClassDefOverride(TTrackSeedAnaModule,0)
 };
 }
 #endif

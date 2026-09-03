@@ -24,7 +24,7 @@ public:
   int         GetMaxRun  () { return fMaxRun; }
   const char* GetFilename() { return fFilename.Data(); }
 
-  ClassDef(TCalibRunRange,1)
+  ClassDefOverride(TCalibRunRange,1)
 };
 
 #endif

@@ -57,7 +57,7 @@ public:
   void  Clear(Option_t* Opt = "");
   void  Print(Option_t* Opt = "") const ;
 
-  ClassDef(TStnFileset,0)
+  ClassDefOverride(TStnFileset,0)
 };
 
 #endif

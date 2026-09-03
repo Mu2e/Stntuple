@@ -38,6 +38,6 @@ public:
   Int_t    Live        () { return fLive; }
   Int_t    FrontendTime() { return fFrontendTime; }
 
-  ClassDef(TTriggerConditions,1)
+  ClassDefOverride(TTriggerConditions,1)
 };
 #endif
