@@ -41,10 +41,6 @@ TCrvAnaModule::TCrvAnaModule(const char* name, const char* title):
 //-----------------------------------------------------------------------------
   fPdgCode     = 11;
   fProcessCode = 2;			// conversionGun, 28:StoppedParticleReactionGun
-
-  // fHelixBlockName[0] = "HelixBlockTprDe";
-  // fHelixBlockName[1] = "HelixBlockCprDe";
-  // fHelixBlockName[2] = "HelixBlockDe";
 }
 
 //-----------------------------------------------------------------------------
@@ -299,7 +295,7 @@ void TCrvAnaModule::FillCrvClusterHistograms(CrvClusterHist_t* Hist, TCrvCoincid
 
   Hist->fSectorType->Fill(CrvCluster->SectorType());
   Hist->fNPulses->Fill(CrvCluster->NPulses());
-  Hist->fNPe->Fill(CrvCluster->NPe());
+  Hist->fNPe->Fill(CrvCluster->Pes());
   Hist->fStartTime->Fill(CrvCluster->StartTime());
   Hist->fEndTime->Fill(CrvCluster->EndTime());
 
@@ -317,14 +313,14 @@ void TCrvAnaModule::FillCrvClusterHistograms(CrvClusterHist_t* Hist, TCrvCoincid
 //-----------------------------------------------------------------------------
 void TCrvAnaModule::FillCrvPulseHistograms(CrvPulseHist_t* Hist, TCrvRecoPulse* Pulse) {
 
-  Hist->fNPe->Fill(Pulse->NPe());
-  Hist->fNPeHeight->Fill(Pulse->NPeHeight());
-  Hist->fNDigis->Fill(Pulse->NDigis());
-  Hist->fBar->Fill(Pulse->Bar());
+  Hist->fNPe->Fill(Pulse->Pes());
+  Hist->fNPeHeight->Fill(Pulse->PesPh());
+  Hist->fNDigis->Fill(0);
+  Hist->fBar->Fill(Pulse->Sbid());
   Hist->fSipm->Fill(Pulse->Sipm());
   Hist->fTime->Fill(Pulse->Time());
-  Hist->fHeight->Fill(Pulse->Height());
-  Hist->fWidth->Fill(Pulse->Width());
+  Hist->fHeight->Fill(Pulse->Ph());
+  Hist->fWidth->Fill(Pulse->Beta());
   Hist->fChi2->Fill(Pulse->Chi2());
   Hist->fLeTime->Fill(Pulse->LeTime());
 

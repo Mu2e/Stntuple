@@ -138,10 +138,10 @@ public:
   double bgr_mom();
   double sig_mom();
 
-  virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
+  virtual int  construct_interval(double MuB, double MuS, int NObs = -1) override;
   
-  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr);
-  virtual int  test_coverage     (double MuB, double SMin, double SMax, int NPoints);
+  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr) override;
+  virtual int  test_coverage     (double MuB, double SMin, double SMax, int NPoints) override;
 
   static int   partition(sdata arr[], int low , int high, double pivot);
   static void  quickSort(sdata arr[], int low , int high);
@@ -156,9 +156,9 @@ public:
   int    read_hist(const char* Filename);
   
   void   plot_interval();
-  void   make_belt_hist();
+  virtual void   make_belt_hist() override;
 
-  virtual void Print(const char* Option_t) const;
+  virtual void Print(const char* Option_t) const override;
 
   ClassDefOverride(TKinLH,0)
 };

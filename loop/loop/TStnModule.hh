@@ -9,6 +9,8 @@
 #include "TH2.h"
 #include "TProfile.h"
 
+#include "Stntuple/base/TStnBookHist.hh"
+
 class TStnAna;
 class TCanvas;
 class TStnHeaderBlock;
@@ -16,6 +18,7 @@ class TStnDataBlock;
 class TStnNode;
 class TStnEvent;
 class TStnGoodRunList;
+
 
 class TStnModule: public TNamed {
 public:
@@ -27,6 +30,15 @@ public:
   };
 
   enum { kNDebugBits = 100 };
+
+//-----------------------------------------------------------------------------
+// fit results - data structures
+//-----------------------------------------------------------------------------
+  struct fit_result_t {
+    double p[3];                        // gaussian fit
+    double e[3];
+    double chi2dof;
+  };
 
 protected:
   int              fEnabled;
@@ -41,6 +53,8 @@ protected:
   TObjArray*       fListOfL3TrigNames;     // ! list of L3 trigger names
   TObjArray*       fListOfL3Triggers;      // ! list of passed L3 triggers
   int              fDebugBit[kNDebugBits]; // ! hopefully, it will be enough
+  TStnBookHist*    fBookHist;              // ! histogram booking tool
+  
 public:
   TStnModule();
   TStnModule(const char* name, const char* title);
@@ -150,6 +164,8 @@ public:
 
 
   TCanvas* NewSlide(const char* name, const char* title, int nx, int ny);
+
+  int      FitHistogram(TH1* Hist, fit_result_t* Fp, float XMin = 1, float XMax = -1, int NMin = 100);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

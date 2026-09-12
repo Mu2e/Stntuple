@@ -17,8 +17,6 @@ public:
    TStnRunRecord(int RunNumber = -1);
   ~TStnRunRecord();
 
-  void   Print(Option_t* Option = "") const ;
-
   int    RunNumber() { return fRunNumber; }
   int    NEvents  () { return fEvent.size(); }
 
@@ -27,7 +25,8 @@ public:
 
   int    AddEvent (int EventNumber);
 
-  void   Clear(Option_t* Option = "");
+  virtual void Clear(Option_t* Option = "") override;
+  virtual void Print(Option_t* Option = "") const override;
 
   ClassDefOverride(TStnRunRecord,0)
 };

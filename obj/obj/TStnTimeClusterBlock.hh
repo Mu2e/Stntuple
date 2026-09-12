@@ -8,17 +8,23 @@
 #include "TClonesArray.h"
 
 #include "Stntuple/obj/TStnDataBlock.hh"
+#include "Stntuple/obj/TStnLinkBlock.hh"
 #include "Stntuple/obj/TStnTimeCluster.hh"
 #include "TBuffer.h"
 
+namespace stntuple {
+  class InitTimeClusterBlock;
+}
+
 class TStnTimeClusterBlock: public TStnDataBlock {
-  friend class StntupleInitTimeClusterBlock;
+  friend class stntuple::InitTimeClusterBlock;
 public:
 //----------------------------------------------------------------------------
 //  data members
 //-----------------------------------------------------------------------------
   Int_t          fNTimeClusters;
   TClonesArray*  fListOfTimeClusters;
+  TStnLinkBlock* fListOfChLinks;        // added in V2
 //----------------------------------------------------------------------------
 //  functions
 //----------------------------------------------------------------------------
@@ -42,13 +48,18 @@ public:
     return (TStnTimeCluster*) fListOfTimeClusters->UncheckedAt(I); 
   }
 
+  TStnLinkBlock*     ListOfChLinks() { return fListOfChLinks; }
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
   virtual void Clear(Option_t* opt="") override;
   virtual void Print(Option_t* opt="") const override;
-
-  ClassDefOverride(TStnTimeClusterBlock,1)
+//-----------------------------------------------------------------------------
+// schema evolution
+//-----------------------------------------------------------------------------
+  void ReadV1(TBuffer &R__b);
+  
+  ClassDefOverride(TStnTimeClusterBlock,2)
 };
 
 #endif

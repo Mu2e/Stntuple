@@ -21,28 +21,36 @@ void TCalHitData::ReadV1(TBuffer &R__b) {
   int nwi = ((int*  ) &data.fTime ) - &data.fID;
   int nwf = ((float*) &data.fDummy) - &data.fTime  ;
   
-  R__b.ReadFastArray(&fID  ,nwi);
-  R__b.ReadFastArray(&fTime,nwf);
+  R__b.ReadFastArray(&data.fID  ,nwi);
+  R__b.ReadFastArray(&data.fTime,nwf);
+
+  fCid    = data.fID;
+  fNSipms = data.fNChannels;
+  fTime   = data.fTime;
+  fEDep   = data.fEnergy;
+  fSigT   = -1;
+  fSigE   = -1;
 }
 
 //_____________________________________________________________________________
 void TCalHitData::Streamer(TBuffer &R__b) {
-  int nwi = 2;
-  int nwf = 2;
+  int nwi = ((int*) &fTime)            - &fCid;
+  int nwf = ((float*) &fOfflineCalHit) - &fTime;
   
   if(R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion();
     if (R__v == 1) ReadV1(R__b);
     else {
 //-----------------------------------------------------------------------------
-// read version > 1 ???
+// current version 2
 //-----------------------------------------------------------------------------
-      printf(">>> ERROR: TCalHitData::Streamer read wrong version %i\n",R__v);
+      R__b.ReadFastArray(&fCid ,nwi);
+      R__b.ReadFastArray(&fTime,nwf);
     }
   }
   else {
     R__b.WriteVersion(TCalHitData::IsA());
-    R__b.WriteFastArray(&fID  ,nwi);
+    R__b.WriteFastArray(&fCid ,nwi);
     R__b.WriteFastArray(&fTime,nwf);
   } 
 }
@@ -58,10 +66,12 @@ TCalHitData::~TCalHitData() {
 
 //_____________________________________________________________________________
 void TCalHitData::Clear(Option_t* opt) {
-  fID        = -1;
-  fNChannels = -1;
+  fCid       = -1;
+  fNSipms    = -1;
   fTime      = -1.;
-  fEnergy    = -1.;
+  fEDep      = -1.;
+  fSigT      = -1.;
+  fSigE      = -1.;
 }
 
 //_____________________________________________________________________________

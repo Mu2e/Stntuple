@@ -234,8 +234,8 @@ public:
 //-----------------------------------------------------------------------------
 //  overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void  Clear (const char* Opt = "");
-  void  Print (const char* Opt = "") const ;
+  virtual void  Clear (const char* Opt = "") override;
+  virtual void  Print (const char* Opt = "") const override;
   
 protected:
 

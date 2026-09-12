@@ -32,12 +32,8 @@
 #include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
-
-
 // #include "Offline/BTrkData/inc/Doublet.hh"
 
-// #include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
-// #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
@@ -53,13 +49,6 @@
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
-
-					          // BaBar 
-// #include "BTrk/ProbTools/ChisqConsistency.hh"
-// #include "BTrk/BbrGeom/BbrVectorErr.hh"
-// #include "BTrk/BbrGeom/TrkLineTraj.hh"
-// #include "BTrk/TrkBase/TrkPoca.hh"
-// #include "BTrk/KalmanTrack/KalHit.hh"
 
 #include "Stntuple/mod/InitTrackBlock_KK.hh"
 //-----------------------------------------------------------------------------

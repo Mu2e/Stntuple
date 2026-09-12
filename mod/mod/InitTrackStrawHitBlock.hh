@@ -31,7 +31,7 @@ public:
 public:
 
   void   SetKalRepPtrCollTag   (std::string&   Tag) { fKalRepPtrCollTag   = art::InputTag(Tag); }
-  void   SetKalSeedCollTag     (std::string&   Tag) { fKalSeedCollTag     = art::InputTag(Tag); }
+  void   SetKalSeedCollTag     (art::InputTag& Tag) { fKalSeedCollTag     = Tag; }
   void   SetShCollTag          (art::InputTag& Tag) { fShCollTag          = Tag; }
   void   SetStrawDigiCollTag   (art::InputTag& Tag) { fStrawDigiCollTag   = Tag; }
   void   SetStrawDigiMCCollTag (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }

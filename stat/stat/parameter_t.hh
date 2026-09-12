@@ -43,7 +43,7 @@ namespace stntuple {
     void            SetFixed(int    Value) { fFixed = Value; }
     void            SetMean (double Mean ) { fMean  = Mean;  }
     
-    virtual void    Print(const Option_t* Opt) const ;
+    virtual void    Print(const Option_t* Opt) const override;
 
     ClassDefOverride(stntuple::parameter_t,0)
     

@@ -64,7 +64,6 @@ public:
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive   (Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveXY (Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ (Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveVRZ(Int_t px, Int_t py);
@@ -72,9 +71,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void  Paint(Option_t* Opt = "");
-  virtual void  Clear(Option_t* Opt = "");
-  virtual void  Print(Option_t* Opt = "") const ; // **MENU**
+  virtual Int_t DistancetoPrimitive   (Int_t px, Int_t py) override;
+  virtual void  Paint(Option_t* Opt = "") override;
+  virtual void  Clear(Option_t* Opt = "") override;
+  virtual void  Print(Option_t* Opt = "") const override; // **MENU**
 
   ClassDefOverride(stntuple::TEvdTrack,0)
 };

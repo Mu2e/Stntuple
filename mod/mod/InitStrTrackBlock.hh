@@ -1,30 +1,30 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef __InitCalDigiBlock__
-#define __InitCalDigiBlock__
-
-#include <string.h>
+#ifndef __InitStrTrackBlock__
+#define __InitStrTrackBlock__
 
 #include "canvas/Utilities/InputTag.h"
 
 #include "Stntuple/obj/TStnInitDataBlock.hh"
-#include "Stntuple/obj/TCalDigiBlock.hh"
+#include "Stntuple/obj/TStrTrackBlock.hh"
 
-class StntupleInitCalDigiBlock : public TStnInitDataBlock {
+namespace stntuple {
+class InitStrTrackBlock : public TStnInitDataBlock {
 public:
-  art::InputTag   fCalDigiCollTag;
+  art::InputTag   fTrackCollTag;
+  art::InputTag   fTcCollTag;           // time cluster collection
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetCalDigiCollTag (art::InputTag& Tag) { fCalDigiCollTag = Tag; }
-  //   void   SetStrawDigiMCCollTag (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }
+  void   SetTrackCollTag (art::InputTag& Tag) { fTrackCollTag = Tag; }
+  void   SetTcCollTag    (art::InputTag& Tag) { fTcCollTag    = Tag; }
   
   virtual int InitDataBlock    (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks     (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
 
 };
-
+}
 #endif

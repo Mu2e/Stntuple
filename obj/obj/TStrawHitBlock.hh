@@ -14,18 +14,18 @@ class TStrawHitBlock: public TStnDataBlock {
   friend class stntuple::InitStrawHitBlock;
 
 public:
-  Int_t          fNHits;	        // number of hits in the straw tracker
-  int            fNWaveforms;		// added in V2
-  TClonesArray*  fListOfHits;		// list of hits
-  TClonesArray*  fListOfWaveforms;      // added in V2, list of waveforms, 
+  int            fNHits;                // number of hits in the straw tracker
+  int            fNWaveforms;           // added in V2
+  TClonesArray*  fListOfHits;           // list of hits
+  TClonesArray*  fListOfWaveforms;      // added in V2, list of waveforms,
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
 public:
-					// constructors and destructor
+                                        // constructors and destructor
   TStrawHitBlock();
   virtual ~TStrawHitBlock();
-					// accessors
+                                        // accessors
 
   int           NHits     () { return fNHits     ; }
   int           NWaveforms() { return fNWaveforms; }
@@ -49,13 +49,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt="");
-  void Print(Option_t* opt="") const;
+  virtual void Clear(Option_t* opt="") override;
+  virtual void Print(Option_t* opt="") const override;
 
-  ClassDefOverride(TStrawHitBlock,2)	// straw hit data block
+  ClassDefOverride(TStrawHitBlock,2)    // straw hit data block
 };
 
-
 #endif
-
-

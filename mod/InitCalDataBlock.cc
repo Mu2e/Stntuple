@@ -6,8 +6,6 @@
 #include "TFolder.h"
 #include "TLorentzVector.h"
 
-#include "Stntuple/obj/TCalDataBlock.hh"
-
 #include "art/Framework/Principal/Handle.h"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
@@ -17,58 +15,54 @@
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
+
+#include "Stntuple/obj/TCalDataBlock.hh"
+#include "Stntuple/mod/InitCalDataBlock.hh"
+
 //-----------------------------------------------------------------------------
-Int_t StntupleInitMu2eCalDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
-{
+namespace stntuple {
+
+//-----------------------------------------------------------------------------
+InitCalDataBlock::InitCalDataBlock() {
+}
+
+//-----------------------------------------------------------------------------
+int InitCalDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   // initialize CAL data block with the `event' data
 
-  static char   calo_module_label[100], calo_description[100];
-  int           ev_number, rn_number, nhits;
-
-  mu2e::CaloHitCollection* list_of_hits(nullptr);
-
-  ev_number = AnEvent->event();
-  rn_number = AnEvent->run();
+  int ev_number = AnEvent->event();
+  int rn_number = AnEvent->run();
 
   if (Block->Initialized(ev_number,rn_number)) return 0;
 
   TCalDataBlock* data = (TCalDataBlock*) Block;
   data->Clear();
 
-  data->GetModuleLabel("mu2e::CaloHitCollection",calo_module_label);
-  data->GetDescription("mu2e::CaloHitCollection",calo_description );
-
        // Get handles to calorimeter crystal hits
 
-  art::Handle<mu2e::CaloHitCollection> calo_hits_handle;
+  const mu2e::CaloHitCollection* list_of_hits(nullptr);
 
-  if (calo_module_label[0] != 0) {
-    if (calo_description[0] == 0) {
-      AnEvent->getByLabel(calo_module_label,calo_hits_handle);
+  if (not fCaloHitCollTag.empty()) {
+    art::Handle<mu2e::CaloHitCollection> chch;
+    bool ok = AnEvent->getByLabel(fCaloHitCollTag,chch);
+    if (ok) {
+      list_of_hits = chch.product();
     }
-    else {
-      AnEvent->getByLabel(calo_module_label,
-			  calo_description,
-			  calo_hits_handle);
-    }
-
-    if (calo_hits_handle.isValid()) list_of_hits  = (mu2e::CaloHitCollection*) calo_hits_handle.product();
   }
 
-  if (list_of_hits == NULL) {
-    printf(" >>> ERROR in StntupleInitMu2eCalDataBlock: no list_of_hits. BAIL OUT\n");
+  if (list_of_hits == nullptr) {
+    printf(" >>> ERROR in stntuple::InitCalDataBlock: no list_of_hits. BAIL OUT\n");
     return -1;
   }
 
-  nhits = list_of_hits->size();
+  int nhits = list_of_hits->size();
 
-  mu2e::CaloHit* calo_hit;
-  TCalHitData*          hit;
+  TCalHitData*   hit;
 
   // reminder: data->fNHits is set to 0 by TCalDataBlock::Clear(), should be this way
 
   for (int i=0; i<nhits; i++) {
-    calo_hit = &list_of_hits->at(i);
+    const mu2e::CaloHit* calo_hit = &list_of_hits->at(i);
     hit      = data->NewCalHitData();
 
     hit->Set(calo_hit->crystalID(),
@@ -111,9 +105,9 @@ Int_t StntupleInitMu2eCalDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+int InitCalDataBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode)  {
+  return 0;
+}
 
-
-
-
-
-
+}

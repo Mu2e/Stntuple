@@ -119,28 +119,28 @@ public:
   //  void  Set(Int_t Side, Int_t Wedge) ; // **MENU**
 
 
-  virtual int   InitEvent();
+  virtual int   InitEvent() override;
 
-  virtual void  PaintXY  (Option_t* option = "");
-  virtual void  PaintRZ  (Option_t* option = "");
-  virtual void  PaintTZ  (Option_t* option = "");
-  virtual void  PaintPhiZ(Option_t* option = "");
-  virtual void  PaintCal (Option_t* option = "");
-  virtual void  PaintCrv (Option_t* option = "");
-  virtual void  PaintVST (Option_t* option = "");
-  virtual void  PaintVRZ (Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "") override;
+  virtual void  PaintRZ  (Option_t* option = "") override;
+  virtual void  PaintTZ  (Option_t* option = "") override;
+  virtual void  PaintPhiZ(Option_t* option = "") override;
+  virtual void  PaintCal (Option_t* option = "") override;
+  virtual void  PaintCrv (Option_t* option = "") override;
+  virtual void  PaintVST (Option_t* option = "") override;
+  virtual void  PaintVRZ (Option_t* option = "") override;
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
   //  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveXY (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveRZ (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveCal(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveXY (Int_t px, Int_t py) override;
+  virtual Int_t DistancetoPrimitiveRZ (Int_t px, Int_t py) override;
+  virtual Int_t DistancetoPrimitiveCal(Int_t px, Int_t py) override;
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  virtual void   Clear(Option_t* Opt = "");
-  virtual void   Print(Option_t* Opt = "") const ; // **MENU**
+  virtual void   Clear(Option_t* Opt = "") override;
+  virtual void   Print(Option_t* Opt = "") const override; // **MENU**
 
   //  ClassDefOverride(TCalVisNode,0)
 };

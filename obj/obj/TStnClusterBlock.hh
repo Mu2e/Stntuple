@@ -11,8 +11,12 @@
 #include "Stntuple/obj/TStnCluster.hh"
 #include "TBuffer.h"
 
+namespace stntuple {
+  class InitCaloClusterBlock;
+}
+
 class TStnClusterBlock: public TStnDataBlock {
-  friend Int_t StntupleInitMu2eClusterBlockLinks(TStnDataBlock*, AbsEvent* , int);
+  friend class stntuple::InitCaloClusterBlock;
 public:
 //----------------------------------------------------------------------------
 //  data members
@@ -45,8 +49,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt="");
-  void Print(Option_t* opt="") const;
+  virtual void Clear(Option_t* opt="")       override;
+  virtual void Print(Option_t* opt="") const override;
 
   ClassDefOverride(TStnClusterBlock,1)
 };

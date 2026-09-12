@@ -123,9 +123,9 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void     Print (Option_t* opt = "") const;
-  virtual void     Clear (Option_t* Opt = "");
-  virtual void     Delete(Option_t* Opt = "");
+  virtual void     Print (Option_t* opt = "") const override;
+  virtual void     Clear (Option_t* Opt = "") override;
+  virtual void     Delete(Option_t* Opt = "") override;
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------

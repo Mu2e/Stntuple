@@ -39,7 +39,7 @@ public:
   void  SetFillColor(int Color) { fFillColor = Color; }
   void  SetFillStyle(int Style) { fFillStyle = Style; }
 
-  virtual void  Paint(Option_t* Opt="") = 0;
+  virtual void  Paint(Option_t* Opt="")  override = 0;
 
   ClassDefOverride(TStnShape,0)
 

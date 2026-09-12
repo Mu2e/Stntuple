@@ -16,14 +16,12 @@ public:
   TStnErrorLogger(const char* Name  = "StntupleErrorLogger",
 		  const char* Title = "Error Logger");
   virtual ~TStnErrorLogger();
-					// ****** overloaded methods of 
-					// TObject
+					// ****** overloaded methods of TObject
 
   void  Report(Int_t ErrorCode, const char* Message);  //*SIGNAL*
 
-  void  Clear(Option_t* opt="");
-
-  void  Print(Option_t* opt="") const ;
+  virtual void  Clear(Option_t* opt="")       override;
+  virtual void  Print(Option_t* opt="") const override;
 
   ClassDefOverride(TStnErrorLogger,0)
 

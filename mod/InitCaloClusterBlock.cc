@@ -2,16 +2,15 @@
 //  Apr 2013 P.Murat: initialization of the MU2E STNTUPLE cluster block
 //
 //-----------------------------------------------------------------------------
-#include <cstdio>
+#include <vector>
+#include <format>
+#include <iostream>
+
 #include "TROOT.h"
 #include "TFolder.h"
 #include "TLorentzVector.h"
-#include <vector>
 
-#include "Stntuple/obj/TStnDataBlock.hh"
-
-#include "Stntuple/obj/TStnCluster.hh"
-#include "Stntuple/obj/TStnClusterBlock.hh"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Event.h"
@@ -20,10 +19,6 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
-
-// #include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
-
-// #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 
 #include "Offline/MCDataProducts/inc/CaloClusterMC.hh"
 #include "Offline/MCDataProducts/inc/CaloEDepMC.hh"
@@ -37,77 +32,76 @@
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 
+#include "Stntuple/obj/TStnDataBlock.hh"
+#include "Stntuple/obj/TStnCluster.hh"
+#include "Stntuple/obj/TStnClusterBlock.hh"
+#include "Stntuple/mod/InitCaloClusterBlock.hh"
+
+namespace stntuple {
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 //-----------------------------------------------------------------------------
-int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
-
+int  InitCaloClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
+  const char* oname = "InitCaloClusterBlock::InitDataBlock";
+  
   constexpr int verbose(0);
 
-  //  const char*               oname = {"MuratInitClusterBlock"};
-
-//   int                           station, ntrk;
-//   KalRep                        *krep;
-//  double                        h1_fltlen, hn_fltlen, entlen, fitmom_err;
-//   TStnTrack*                    track;
-//   const mu2e::StepPointMC*      step;
-  const mu2e::CaloClusterCollection*  list_of_clusters = nullptr;
   const mu2e::CaloClusterMCCollection* list_of_mc_clusters = nullptr;
-  const mu2e::CaloClusterMCTruthAssn* mc_assns = nullptr;
+  const mu2e::CaloClusterMCTruthAssn*  mc_assns = nullptr;
 
   constexpr double kMinECrystal = 0.1; // count crystals above 100 KeV
-
-  static char                calo_module_label   [100], calo_description   [100];
-  static char                calo_mc_module_label[100], calo_mc_description[100];
-  static char                trcl_module_label   [100], trcl_description   [100];
 
   TStnClusterBlock*         cb = (TStnClusterBlock*) Block;
   TStnCluster*              cluster;
 
-  //  static int  first_entry(1);
-
   cb->Clear();
 
-  //
-  // "makeCaloCluster" would be the process name, "AlgoCLOSESTSeededByENERGY" - the description,
-  //
+  const mu2e::CaloClusterCollection*  list_of_clusters = nullptr;
 
-  cb->GetModuleLabel("mu2e::CaloClusterCollection",calo_module_label);
-  cb->GetDescription("mu2e::CaloClusterCollection",calo_description);
-
-  cb->GetModuleLabel("mu2e::CaloClusterMCCollection",calo_mc_module_label);
-  cb->GetDescription("mu2e::CaloClusterMCCollection",calo_mc_description);
-
-  cb->GetModuleLabel("mu2e::TrackClusterMatchCollection",trcl_module_label);
-  cb->GetDescription("mu2e::TrackClusterMatchCollection",trcl_description );
-
-  art::Handle<mu2e::CaloClusterCollection> calo_cluster_handle;
-  if (calo_description[0] == 0) Evt->getByLabel(calo_module_label,calo_cluster_handle);
-  else                          Evt->getByLabel(calo_module_label,calo_description,calo_cluster_handle);
-  list_of_clusters = (mu2e::CaloClusterCollection*) &(*calo_cluster_handle);
-
-  // Retrieve the MC information, if available
-  if(calo_mc_module_label[0] != '\0') { // non-empty string
-    art::Handle<mu2e::CaloClusterMCCollection> calo_mc_cluster_handle;
-    if (calo_mc_description[0] == '\0') Evt->getByLabel(calo_mc_module_label,calo_mc_cluster_handle);
-    else                                Evt->getByLabel(calo_mc_module_label,calo_mc_description,calo_mc_cluster_handle);
-    list_of_mc_clusters = (mu2e::CaloClusterMCCollection*) &(*calo_mc_cluster_handle);
-
-    art::Handle<mu2e::CaloClusterMCTruthAssn> mc_assns_handle; // assume this is produced by the same MC module
-    if (calo_mc_description[0] == '\0') Evt->getByLabel(calo_mc_module_label,mc_assns_handle);
-    else                                Evt->getByLabel(calo_mc_module_label,calo_mc_description,mc_assns_handle);
-    mc_assns = (mu2e::CaloClusterMCTruthAssn*) &(*mc_assns_handle);
-
-    if(!list_of_mc_clusters || !mc_assns)
-      printf("[InitClusterBlock::%s] No MC cluster collection or MC Assns\n", __func__);
+  int nclusters = 0;
+  if (not fCaloClusterCollTag.empty()) {
+    art::Handle<mu2e::CaloClusterCollection> ccch;
+    bool ok = Event->getByLabel(fCaloClusterCollTag,ccch);
+    if (ok) {
+      list_of_clusters = ccch.product();
+      nclusters = list_of_clusters->size();
+    }
     else {
+      // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
+      mf::LogWarning(oname) << std::format("ERROR: no CaloClusterCollection tag={} found. BAIL OUT",
+                                           fCaloClusterCollTag.encode().data());
+      return 0;
     }
   }
-  if(verbose > 0) printf("[InitClusterBlock::%s] Found %zu clusters, %zu MC clusters, and %zu Assns\n",
-                         __func__, list_of_clusters->size(),
-                         (list_of_mc_clusters) ? list_of_mc_clusters->size() : 0, (mc_assns) ? mc_assns->size() : 0);
 
-  // List sorted by cluster energy
+  // Retrieve the MC information, if available
+  if (not fCaloClusterMCCollTag.empty()) {
+    art::Handle<mu2e::CaloClusterMCCollection> mc_ccch;
+    bool ok = Event->getByLabel(fCaloClusterMCCollTag,mc_ccch);
+    if (ok) {
+      list_of_mc_clusters = (mu2e::CaloClusterMCCollection*) &(*mc_ccch);
+    }
+
+    art::Handle<mu2e::CaloClusterMCTruthAssn> mc_ah;        // assume this is produced by the same MC module
+    ok = Event->getByLabel(fCaloClusterMCCollTag,mc_ah);
+    if (ok) {
+      mc_assns = (mu2e::CaloClusterMCTruthAssn*) &(*mc_ah);
+    }
+
+    if (not list_of_mc_clusters || not mc_assns) {
+      printf("[InitClusterBlock::%s] No MC cluster collection or MC Assns\n", __func__);
+    }
+  }
+  
+  if (verbose > 0) {
+    printf("[InitClusterBlock::%s] Found %zu clusters, %zu MC clusters, and %zu Assns\n",
+           __func__, list_of_clusters->size(),
+           (list_of_mc_clusters) ? list_of_mc_clusters->size() : 0,
+           (mc_assns) ? mc_assns->size() : 0);
+  }
+//-----------------------------------------------------------------------------
+// sort calorimeter clusters by energy
+//-----------------------------------------------------------------------------
   std::vector<const mu2e::CaloCluster*> list_of_pcl;
   const mu2e::CaloCluster    *cl = nullptr;
   const mu2e::CaloClusterMC  *mc_cl = nullptr;
@@ -123,14 +117,9 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
   std::sort(list_of_pcl.begin(), list_of_pcl.end(),
 	    [](const mu2e::CaloCluster*& lhs, const mu2e::CaloCluster*& rhs)
 	      { return lhs->energyDep() > rhs->energyDep(); } );
-
-//   art::Handle<mu2e::TrackClusterLink>  trk_cal_map;
-//   if (trcl_module_label[0] != 0) {
-//     if (trcl_description[0] != 0) Evt->getByLabel(trcl_module_label,trcl_description,trk_cal_map);
-//     else                          Evt->getByLabel(trcl_module_label,trk_cal_map);
-//   }
-
-  // Retrieve the calo geometry
+//-----------------------------------------------------------------------------
+// Retrieve the calorimeter geometry
+//-----------------------------------------------------------------------------
   art::ServiceHandle<mu2e::GeometryService> geom;
 
   const mu2e::Calorimeter* cal(NULL);
@@ -139,10 +128,6 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
     mu2e::GeomHandle<mu2e::Calorimeter> cc;
     cal = cc.get();
   }
-  // else if (geom->hasElement<mu2e::VaneCalorimeter>() ) {
-  //   mu2e::GeomHandle<mu2e::VaneCalorimeter> vc;
-  //   cal = vc.get();
-  // }
   else if (geom->hasElement<mu2e::DiskCalorimeter>() ) {
     mu2e::GeomHandle<mu2e::DiskCalorimeter> dc;
     cal = dc.get();
@@ -172,7 +157,10 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
     const mu2e::CaloHitPtrVector& list_of_crystals = cluster->fCaloCluster->caloHitsPtrVector();
     int nh = list_of_crystals.size();
 
-    if(verbose > 1) printf("  Cluster %i: E = %.2f, T = %.1f, Disk = %i, N(crystals) = %i\n", i, cluster->fEnergy, cluster->fTime, cluster->fDiskID, nh);
+    if (verbose > 1) {
+      printf("  Cluster %i: E = %.2f, T = %.1f, Disk = %i, N(crystals) = %i\n",
+             i, cluster->fEnergy, cluster->fTime, cluster->fDiskID, nh);
+    }
 
     // If MC info is available, find the corresponding MC cluster
     if(list_of_mc_clusters && mc_assns) {
@@ -187,11 +175,12 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
           break;
         }
       }
-      if(!mc_cl) printf("[InitClusterBlock::%s] %i/%i/%i: No MC cluster found for cluster %i, N(clusters) = %i, N(MC clusters) = %zu\n",
-                        __func__, Evt->run(), Evt->subRun(), Evt->event(),
-                        i, ncl, list_of_mc_clusters->size());
+      if (!mc_cl) {
+        printf("[InitClusterBlock::%s] %i/%i/%i: No MC cluster found for cluster %i, N(clusters) = %i, N(MC clusters) = %zu\n",
+               __func__, Event->run(), Event->subRun(), Event->event(),
+               i, ncl, list_of_mc_clusters->size());
+      }
     }
-
 //-----------------------------------------------------------------------------
 // print individual crystals in local vane coordinate system
 // Y and Z
@@ -314,12 +303,6 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
 
     phi = 0.5*atan2(2*sigxy,sigxx-sigyy);
 
-//     if (sigxx < sigyy) {
-//       phi = phi + M_PI/2.;
-//       cluster->fSigXX = sigyy;
-//       cluster->fSigYY = sigxx;
-//     }
-
     cluster->fNx        = cos(phi);
     cluster->fNy        = sin(phi);
 
@@ -371,36 +354,29 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
       cluster->fMCSimMomIn = mom_in;
       cluster->fMCEDep    = total_edep;
       cluster->fMCTime    = total_time;
-      if(verbose > 1) printf("  --> Associated MC cluster found: E = %6.2f, E(G4) = %6.2f, T = %6.1f, N(MC hits) = %2zu, ID = %4i, PDG = %5i, E(sim) = %6.2f, Mom in = %6.2f\n",
-                             total_edep, mc_cl->totalEnergyDepG4(), total_time,
-                             mc_cl->caloHitMCs().size(), main_sim, pdg, edep, mom_in);
-    }
-
-//     unsigned int nm = (*trk_cal_map).size();
-//     for(size_t im=0; i<nm; im++) {
-//       //	KalRepPtr const& trkPtr = fTrkCalMap->at(i).first->trk();
-//       //	const KalRep *  const &trk = *trkPtr;
-
-//       cl = &(*(*trk_cal_map).at(im).second);
-
-//       if (cl == cluster->fCaloCluster) {
-// 	cluster->fClosestTrack = fTrackBlock->Track(im);
-// 	break;
-//       }
-//     }
+      if(verbose > 1) {
+        printf("  --> Associated MC cluster found: E = %6.2f, E(G4) = %6.2f, T = %6.1f, N(MC hits) = %2zu, ID = %4i, PDG = %5i, E(sim) = %6.2f, Mom in = %6.2f\n",
+               total_edep, mc_cl->totalEnergyDepG4(), total_time,
+               mc_cl->caloHitMCs().size(), main_sim, pdg, edep, mom_in);
+      }
+    }   
   }
+//-----------------------------------------------------------------------------
+// on return set event and run numbers to mark block as initialized
+//-----------------------------------------------------------------------------
+  cb->f_RunNumber    = Event->run();
+  cb->f_EventNumber  = Event->event();
+  cb->f_SubrunNumber = Event->subRun();
+  
   return 0;
 }
 
 //_____________________________________________________________________________
-Int_t StntupleInitMu2eClusterBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode)
-{
+int InitCaloClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   // Mu2e version, do nothing
 
-  Int_t  ev_number, rn_number;
-
-  ev_number = AnEvent->event();
-  rn_number = AnEvent->run();
+  int ev_number = AnEvent->event();
+  int rn_number = AnEvent->run();
 
   if (! Block->Initialized(ev_number,rn_number)) return -1;
 
@@ -416,4 +392,5 @@ Int_t StntupleInitMu2eClusterBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent,
   header->fLinksInitialized = 1;
 
   return 0;
+}
 }

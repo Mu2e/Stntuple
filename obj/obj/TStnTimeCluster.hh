@@ -15,13 +15,13 @@
 
 // C++ includes.
 #include <iostream>
+#include <format>
+#include <vector>
 
 #include "TString.h"
 #include "TFolder.h"
 #include "TFile.h"
 #include "TBuffer.h"
-
-//namespace murat {
 
 namespace mu2e {
   class TimeCluster;
@@ -30,11 +30,14 @@ namespace mu2e {
 class TStnTimeCluster : public TObject {
 
   enum {
-    kNFreeIntsV2   = 10,		// V2
-    kNFreeFloatsV2 = 10, 		// V2
+    kNFreeIntsV2   = 10,                // V2
+    kNFreeFloatsV2 = 10,                // V2
 
-    kNFreeIntsV3   =  7,		// V3
-    kNFreeFloatsV3 =  9 		// V3
+    kNFreeIntsV3   =  7,                // V3
+    kNFreeFloatsV3 =  9,                // V3
+    
+    kNFreeIntsV4   =  7,                // V4 : just added vector of hit indices
+    kNFreeFloatsV4 =  9                 // V4
   };
 
 public:
@@ -57,19 +60,20 @@ public:
   float                     fPosX;
   float                     fPosY;
   float                     fPosZ;
- 
+                                                // parameters of the calorimeter cluster ?
   float                     fClusterTime;   
-  float			    fClusterEnergy; 
-  float			    fClusterX;
-  float			    fClusterY;
-  float			    fClusterZ;
+  float                     fClusterEnergy; 
+  float                     fClusterX;
+  float                     fClusterY;
+  float                     fClusterZ;
 
   float                     fMcMom;                 // added in V3: MC truth
   float                     fFloat[kNFreeFloatsV3]; // added in V2: provision for future I/O expansion
+  //  std::vector<int>          fChIndex;               // added in V4: CH indices
 //-----------------------------------------------------------------------------
 // transients
 //-----------------------------------------------------------------------------
-  const mu2e::TimeCluster*    fTimeCluster;          //!
+  const mu2e::TimeCluster*  fOfflineTc;          //!
 //-----------------------------------------------------------------------------
 // methods
 //-----------------------------------------------------------------------------
@@ -78,8 +82,9 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  int     NHits         () { return  fNHits;  }
-  int     NComboHits    () { return  fNComboHits;  }
+  int     NHits         () { return  fNHits;      }
+  int     NStrawHits    () { return  fNHits;      }
+  int     NComboHits    () { return  fNComboHits; }
   int     HelixSeedIndex() { return  fHelixSeedIndex; }
 
   float   T0            () { return  fT0;     }
@@ -95,6 +100,7 @@ public:
   float   ClusterY      () { return fClusterY;     }
   float   ClusterZ      () { return fClusterZ;     }
 
+  const mu2e::TimeCluster* OfflineTc() { return fOfflineTc; }
 //----------------------------------------------------------------------------
 // setters
 //----------------------------------------------------------------------------
@@ -110,6 +116,7 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
   void ReadV2(TBuffer& R__b);
+  // void ReadV3(TBuffer& R__b);
 
   ClassDefOverride(TStnTimeCluster,3)
 };

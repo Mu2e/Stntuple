@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  2014-01-26 P.Murat TStrawHit
+// - what code is setting the MCFlag for MC hits ?
 ///////////////////////////////////////////////////////////////////////////////
 #include "TString.h"
 
@@ -24,7 +25,6 @@ void TStrawHit::ReadV2(TBuffer &R__b) {
     float   fEDep;			// energy deposition
     float   fMcMom;			// MC particle momentum
   } sh;
-
 
   int nw_data = &sh.fSimID-&sh.fStrawID;
   int nwi_mc  = ((int*) &fEDep) - &fSimID;
@@ -81,8 +81,6 @@ void TStrawHit::ReadV1(TBuffer &R__b) {
     fMcMom       = -1.;
   }
 }
-
-
 
 //_____________________________________________________________________________
 void TStrawHit::Streamer(TBuffer &R__b) {

@@ -37,7 +37,7 @@
 #include "Stntuple/obj/TStrawHitBlock.hh"
 
 #include "Stntuple/obj/TCalDataBlock.hh"
-#include "Stntuple/obj/TCalDigiBlock.hh"
+#include "Stntuple/obj/TCaloDigiBlock.hh"
 
 #include "Stntuple/obj/TGenpBlock.hh"
 #include "Stntuple/obj/TSimpBlock.hh"
@@ -50,7 +50,14 @@
 #include "Stntuple/mod/StntupleModule.hh"
 #include "Stntuple/mod/StntupleGlobals.hh"
 
-#include "Stntuple/mod/InitCalDigiBlock.hh"
+#include "Stntuple/mod/InitCaloDigiBlock.hh"
+#include "Stntuple/mod/InitCaloRecoDigiBlock.hh"
+#include "Stntuple/mod/InitCaloHitBlock.hh"
+#include "Stntuple/mod/InitCalDataBlock.hh"
+#include "Stntuple/mod/InitCaloClusterBlock.hh"
+
+#include "Stntuple/mod/InitComboHitBlock.hh"
+
 #include "Stntuple/mod/InitCrvDigiBlock.hh"
 #include "Stntuple/mod/InitCrvPulseBlock.hh"
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
@@ -62,7 +69,7 @@
 #include "Stntuple/mod/InitStrawHitBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
 #include "Stntuple/mod/InitTrackBlock.hh"
-#include "Stntuple/mod/InitTrackBlock_KK.hh"
+#include "Stntuple/mod/InitStrTrackBlock.hh"
 #include "Stntuple/mod/InitTrackSeedBlock.hh"
 #include "Stntuple/mod/InitTrackStrawHitBlock.hh"
 #include "Stntuple/mod/InitTriggerBlock.hh"
@@ -77,6 +84,8 @@
 // #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 #include "Offline/MCDataProducts/inc/GenId.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
+
+#include "Stntuple/mod/MFInterface.hh"
 
 using namespace std; 
 
@@ -96,25 +105,37 @@ protected:
 //-----------------------------------------------------------------------------
 // switches for individual branches
 //-----------------------------------------------------------------------------
-  int                      fMakeCalDigis;
-  int                      fMakeCalData;
-  int                      fMakeClusters;
+  int                      fMakeCalData;          // obsolete
+  int                      fMakeClusters;         // obsolete, keep for a while
+  int                      fMakeCaloDigis;
+  int                      fMakeCaloRecoDigis;
+  int                      fMakeCaloHits;
+  int                      fMakeCaloClusters;
+  
+  int                      fMakeComboHits;
+
+  int                      fMakeCrvDigis;
+  int                      fMakeCrvPulses;
+  int                      fMakeCrvClusters;
+  int                      fMakeCrvcLinks;
+
   int                      fMakeGenp;
   int                      fMakePid;
   int                      fMakeSimp;         // 0:dont store, 1:all;
   int                      fMakeStepPointMC;
+
   int                      fMakeStrawDigis;
   int                      fMakeStrawHits;
   int                      fMakeStrawWaveforms;
+
   int                      fMakeTracks;
+  int                      fMakeStraightTracks;
+  
   int                      fMakeTrackStrawHits;
   int                      fMakeTimeClusters;
   int                      fMakeHelices;
   int                      fMakeTrackSeeds;
   int                      fMakeTrigger;
-  int                      fMakeCrvDigis;
-  int                      fMakeCrvPulses;
-  int                      fMakeCrvClusters;
 //-----------------------------------------------------------------------------
 // module parameters
 //-----------------------------------------------------------------------------
@@ -126,20 +147,23 @@ protected:
   art::InputTag            fStrawDigiCollTag;               // force the same for digis and waveforms
   art::InputTag            fSdmcCollTag;
 
-  art::InputTag            fCalDigiCollTag;
-  art::InputTag            fCalHitCollTag;
+  art::InputTag            fCaloDigiCollTag;
+  art::InputTag            fCaloRecoDigiCollTag;
+  art::InputTag            fCaloHitCollTag;
+  art::InputTag            fCaloClusterCollTag;
+  art::InputTag            fCaloClusterMCCollTag;
 
   art::InputTag            fCrvDigiCollTag;                 //
   string                   fCrvRecoPulseCollTag;            //
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
   string                   fCrvCoincidenceClusterMCCollTag; //
-  int                      fCrvClustersStorePulses;
+  //  int                      fCrvClustersStorePulses;
 
   art::InputTag            fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
-  vector<string>           fTClBlockName;                   // time cluster block names
-  vector<string>           fTClCollTag;                     // time cluster coll tags
+  vector<string>           fTcBlockName;                   // time cluster block names
+  vector<art::InputTag>    fTcCollTag;                     // time cluster coll tags
 
   vector<string>           fHelixBlockName;
   vector<string>           fHelixSeedCollTag;
@@ -154,8 +178,8 @@ protected:
   vector<string>           fKsfCollTag;
 
   vector<string>           fTrackBlockName;
-  vector<string>           fTrackCollTag;
-  int                      fTrackFitType;
+  vector<art::InputTag>    fTrackCollTag;
+  //  int                      fTrackFitType;
 
   vector<string>           fTrackTsBlockName;  // for each track block, the tag  of the corresponding TrackSeed coll
   vector<string>           fTrackTsCollTag;    // for each track block, the name of the corresponding TrackSeed block
@@ -175,26 +199,32 @@ protected:
   vector<string>           fSpmcBlockName;
   vector<art::InputTag>    fSpmcCollTag;
   vector<string>           fStatusG4Tag;
-
-  string                   fCaloCrystalHitMaker;
-  string                   fCaloClusterMaker;
-  string                   fCaloClusterMCMaker;
 //-----------------------------------------------------------------------------
 // initialization of various data blocks
 //-----------------------------------------------------------------------------
-  StntupleInitCalDigiBlock*     fInitCalDigiBlock;
-  StntupleInitCrvDigiBlock*     fInitCrvDigiBlock;
-  StntupleInitCrvPulseBlock*    fInitCrvPulseBlock;
-  StntupleInitCrvClusterBlock*  fInitCrvClusterBlock;
+  StntupleInitCaloDigiBlock*       fInitCaloDigiBlock;
+  stntuple::InitCaloRecoDigiBlock* fInitCaloRecoDigiBlock;
+  stntuple::InitCaloHitBlock*      fInitCaloHitBlock;
+  stntuple::InitCalDataBlock*      fInitCalDataBlock; // obsolete TODO
+  stntuple::InitCaloClusterBlock*  fInitCaloClusterBlock;
+  
+  stntuple::InitComboHitBlock*    fInitComboHitBlock;
+  
+  StntupleInitCrvDigiBlock*     fInitCrvdBlock;
+  StntupleInitCrvPulseBlock*    fInitCrvpBlock;
+  StntupleInitCrvClusterBlock*  fInitCrvcBlock;
+  
   StntupleInitGenpBlock*        fInitGenpBlock;
   stntuple::InitHeaderBlock*    fInitHeaderBlock;
   StntupleInitSimpBlock*        fInitSimpBlock;
+  
   StntupleInitStrawDigiBlock*   fInitStrawDigiBlock;
   stntuple::InitStrawHitBlock*  fInitStrawHitBlock;
   StntupleInitTriggerBlock*     fInitTriggerBlock;
   TObjArray*                    fInitTrackStrawHitBlock;
   TObjArray*                    fInitHelixBlock;
   TObjArray*                    fInitTrackBlock;
+  stntuple::InitStrTrackBlock*  fInitStrTrackBlock;
   TObjArray*                    fInitTrackSeedBlock;
   TObjArray*                    fInitStepPointMCBlock;
   TObjArray*                    fInitTimeClusterBlock;
@@ -259,26 +289,34 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   StntupleModule   (PSet.get<fhicl::ParameterSet>("THistModule"),"StntupleMaker")
   , fProcessName             (PSet.get<string>        ("processName"         ))
 
-  , fMakeCalDigis            (PSet.get<int>           ("makeCalDigis"        ))
-  , fMakeCalData             (PSet.get<int>           ("makeCalData"         ))
-  , fMakeClusters            (PSet.get<int>           ("makeClusters"        ))
+  , fMakeCalData             (PSet.get<int>           ("makeCalData"         ))   // obsolete
+  , fMakeClusters            (PSet.get<int>           ("makeClusters"        ))   // obsolete
+  , fMakeCaloDigis           (PSet.get<int>           ("makeCaloDigis"       ))
+  , fMakeCaloRecoDigis       (PSet.get<int>           ("makeCaloRecoDigis"   ))
+  , fMakeCaloHits            (PSet.get<int>           ("makeCaloHits"        ))
+  , fMakeCaloClusters        (PSet.get<int>           ("makeCaloClusters"    ))
+
+  , fMakeComboHits           (PSet.get<int>           ("makeComboHits"       ))
+
+  , fMakeCrvDigis            (PSet.get<int>           ("makeCrvDigis"        ))
+  , fMakeCrvPulses           (PSet.get<int>           ("makeCrvPulses"       ))
+  , fMakeCrvClusters         (PSet.get<int>           ("makeCrvClusters"     ))
 
   , fMakeGenp                (PSet.get<int>           ("makeGenp"            ))
   , fMakePid                 (PSet.get<int>           ("makePid"             ))
   , fMakeSimp                (PSet.get<int>           ("makeSimp"            ))
   , fMakeStepPointMC         (PSet.get<int>           ("makeStepPointMC"     ))
   , fMakeStrawDigis          (PSet.get<int>           ("makeStrawDigis"      ))
+  
   , fMakeStrawHits           (PSet.get<int>           ("makeStrawHits"       ))
   , fMakeStrawWaveforms      (PSet.get<int>           ("makeStrawWaveforms"  ))
   , fMakeTracks              (PSet.get<int>           ("makeTracks"          ))
+  , fMakeStraightTracks      (PSet.get<int>           ("makeStraightTracks"  ))
   , fMakeTrackStrawHits      (PSet.get<int>           ("makeTrackStrawHits"  ))
   , fMakeTimeClusters        (PSet.get<int>           ("makeTimeClusters"    ))
   , fMakeHelices             (PSet.get<int>           ("makeHelices"         ))
   , fMakeTrackSeeds          (PSet.get<int>           ("makeTrackSeeds"      ))
   , fMakeTrigger             (PSet.get<int>           ("makeTrigger"         ))
-  , fMakeCrvDigis            (PSet.get<int>           ("makeCrvDigis"        ))
-  , fMakeCrvPulses           (PSet.get<int>           ("makeCrvPulses"       ))
-  , fMakeCrvClusters         (PSet.get<int>           ("makeCrvClusters"     ))
   
   , fGenpCollTag             (PSet.get<art::InputTag> ("genpCollTag"         ))
   , fSimpCollTag             (PSet.get<art::InputTag> ("simpCollTag"         ))
@@ -288,18 +326,21 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fStrawDigiCollTag        (PSet.get<art::InputTag> ("strawDigiCollTag"    ))
   , fSdmcCollTag             (PSet.get<art::InputTag> ("strawDigiMCCollTag"  ))
 
-  , fCalDigiCollTag          (PSet.get<art::InputTag> ("calDigiCollTag"      ))
-  , fCalHitCollTag           (PSet.get<art::InputTag> ("calHitCollTag"       ))
+  , fCaloDigiCollTag         (PSet.get<art::InputTag> ("caloDigiCollTag"      ))
+  , fCaloRecoDigiCollTag     (PSet.get<art::InputTag> ("caloRecoDigiCollTag"  ))
+  , fCaloHitCollTag          (PSet.get<art::InputTag> ("caloHitCollTag"       ))
+  , fCaloClusterCollTag      (PSet.get<art::InputTag> ("caloClusterCollTag"  ))
+  , fCaloClusterMCCollTag    (PSet.get<string>        ("caloClusterMCCollTag"))
+
 
   , fCrvDigiCollTag                (PSet.get<art::InputTag>("crvDigiCollTag"           ))
   , fCrvRecoPulseCollTag           (PSet.get<string>       ("crvRecoPulseCollTag"         ))
   , fCrvCoincidenceClusterCollTag  (PSet.get<string>       ("crvCoincidenceClusterCollTag"))
   , fCrvCoincidenceClusterMCCollTag(PSet.get<string>       ("crvCoincidenceClusterMCCollTag", ""))
-  , fCrvClustersStorePulses        (PSet.get<int>          ("crvClustersStorePulses", 1))
 
   , fVdhCollTag              (PSet.get<art::InputTag> ("vdHitsCollTag"       ))
-  , fTClBlockName            (PSet.get<vector<string>>("timeClusterBlockName"))
-  , fTClCollTag              (PSet.get<vector<string>>("timeClusterCollTag"  ))
+  , fTcBlockName             (PSet.get<vector<string>>("timeClusterBlockName"))
+  , fTcCollTag               (PSet.get<vector<art::InputTag>>("timeClusterCollTag"  ))
   , fHelixBlockName          (PSet.get<vector<string>>("helixBlockName"      ))
   , fHelixSeedCollTag        (PSet.get<vector<string>>("helixCollTag"        ))
   , fHelixKsCollTag          (PSet.get<vector<art::InputTag>>("helixKsCollTag"))
@@ -314,8 +355,8 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fKsfCollTag              (PSet.get<vector<string>>("trackSeedCollTag"    ))
 
   , fTrackBlockName          (PSet.get<vector<string>>("trackBlockName"      ))
-  , fTrackCollTag            (PSet.get<vector<string>>("trackCollTag"        ))
-  , fTrackFitType            (PSet.get<int>           ("trackFitType"        ))
+  , fTrackCollTag            (PSet.get<vector<art::InputTag>>("trackCollTag"        ))
+  //  , fTrackFitType            (PSet.get<int>           ("trackFitType"        ))
 
   , fTrackTsBlockName        (PSet.get<vector<string>>("trackTsBlockName"    ))
   , fTrackTsCollTag          (PSet.get<vector<string>>("trackTsCollTag"      ))
@@ -329,13 +370,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fPidCollTag              (PSet.get<vector<string>>("pidCollTag"          ))
   , fTrackSHBlockName        (PSet.get<vector<string>>("trackSHBlockName"    ))
   
-  , fSpmcBlockName           (PSet.get<vector<string>>       ("spmcBlockName"       ))
-  , fSpmcCollTag             (PSet.get<vector<art::InputTag>>("spmcCollTag"         ))
-  , fStatusG4Tag             (PSet.get<vector<string>>       ("statusG4Tag"         ))
-
-  , fCaloCrystalHitMaker     (PSet.get<string>        ("caloCrystalHitsMaker"))
-  , fCaloClusterMaker        (PSet.get<string>        ("caloClusterMaker"    ))
-  , fCaloClusterMCMaker      (PSet.get<string>        ("caloClusterMCMaker", ""))
+  , fSpmcBlockName           (PSet.get<vector<string>>       ("spmcBlockName"))
+  , fSpmcCollTag             (PSet.get<vector<art::InputTag>>("spmcCollTag"  ))
+  , fStatusG4Tag             (PSet.get<vector<string>>       ("statusG4Tag"  ))
 
   , fGenId((PSet.get<std::string>("genId","unknown") == "unknown") ? GenId::findByName (PSet.get<std::string>("genId")) : GenId::unknown)
   , fPdgId                   (PSet.get<int>           ("pdgId"               ))
@@ -358,15 +395,17 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fVersion      = new TNamed(ver,text);
   TModule::fFolder->Add(fVersion);
 
-  fInitCalDigiBlock     = nullptr;
+  fInitCaloDigiBlock    = nullptr;
+  fInitComboHitBlock    = nullptr;
   
-  fInitCrvDigiBlock     = nullptr;
-  fInitCrvPulseBlock    = nullptr;
-  fInitCrvClusterBlock  = nullptr;
+  fInitCrvdBlock        = nullptr;
+  fInitCrvpBlock        = nullptr;
+  fInitCrvcBlock        = nullptr;
 
   fInitGenpBlock        = nullptr;
   fInitHeaderBlock      = nullptr;
   fInitSimpBlock        = nullptr;
+  fInitStrawDigiBlock   = nullptr;
   fInitStrawHitBlock    = nullptr;
   fInitTriggerBlock     = nullptr;
 
@@ -418,8 +457,8 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   const size_t n_helix_blocks = fHelixBlockName.size();
   if(fHelixSeedCollTag.size() != n_helix_blocks)
     throw std::runtime_error("fHelixSeedCollTag list size doesn't match helix block list size");
-  if(fTClBlockName.size() != n_helix_blocks)
-    throw std::runtime_error("fTClBlockName list size doesn't match helix block list size");
+  if(fTcBlockName.size() != n_helix_blocks)
+    throw std::runtime_error("fTcBlockName list size doesn't match helix block list size");
   if(!fKsfBlockName.empty() && fKsfBlockName.size() != n_helix_blocks)
     throw std::runtime_error("fKsfBlockName list size doesn't match helix block list size");
   if(fKsfBlockName.size() != fHelixKsCollTag.size())
@@ -435,13 +474,18 @@ StntupleMaker::~StntupleMaker() {
   // delete fDarHandle;
   delete fVersion;
 
-  if (fInitCalDigiBlock   ) delete fInitCalDigiBlock;
-  if (fInitCrvDigiBlock   ) delete fInitCrvDigiBlock;
-  if (fInitCrvPulseBlock  ) delete fInitCrvPulseBlock;
-  if (fInitCrvClusterBlock) delete fInitCrvClusterBlock;
-  if (fInitSimpBlock      ) delete fInitSimpBlock;
+  if (fInitCaloDigiBlock    ) delete fInitCaloDigiBlock;
+  if (fInitCaloRecoDigiBlock) delete fInitCaloRecoDigiBlock;
+  if (fInitCaloHitBlock     ) delete fInitCaloHitBlock;
+  
+  if (fInitCrvdBlock        ) delete fInitCrvdBlock;
+  if (fInitCrvpBlock        ) delete fInitCrvpBlock;
+  if (fInitCrvcBlock        ) delete fInitCrvcBlock;
 
-  if (fInitStrawDigiBlock ) delete fInitStrawDigiBlock;
+  if (fInitComboHitBlock    ) delete fInitComboHitBlock;
+  if (fInitStrawDigiBlock   ) delete fInitStrawDigiBlock;
+
+  if (fInitSimpBlock        ) delete fInitSimpBlock;
 
   delete fInitStepPointMCBlock;
   delete fInitHelixBlock;
@@ -523,7 +567,7 @@ void StntupleMaker::beginJob() {
   fInitHeaderBlock->SetPbiTag(fPbiTag);
   fInitHeaderBlock->SetChCollTag(fChCollTag);
   fInitHeaderBlock->SetShCollTag(fShCollTag);
-  fInitHeaderBlock->SetCalHitCollTag(fCalHitCollTag);
+  fInitHeaderBlock->SetCaloHitCollTag(fCaloHitCollTag);
 
   AddDataBlock("HeaderBlock","TStnHeaderBlock",
 	       fInitHeaderBlock,
@@ -535,57 +579,114 @@ void StntupleMaker::beginJob() {
 //-----------------------------------------------------------------------------
 // calo digis
 //-----------------------------------------------------------------------------
-  if (fMakeCalDigis) {
-    fInitCalDigiBlock = new StntupleInitCalDigiBlock();
-    fInitCalDigiBlock->SetCalDigiCollTag(fCalDigiCollTag);
+  if (fMakeCaloDigis) {
+    fInitCaloDigiBlock = new StntupleInitCaloDigiBlock();
+    fInitCaloDigiBlock->SetCaloDigiCollTag(fCaloDigiCollTag);
 
-    AddDataBlock("CalDigiBlock","TCalDigiBlock",
-		 fInitCalDigiBlock,
+    AddDataBlock("CaloDigiBlock","TCaloDigiBlock",
+		 fInitCaloDigiBlock,
 		 buffer_size,
 		 split_mode,
 		 compression_level);
   }
-  
 //-----------------------------------------------------------------------------
-// calorimeter hit data
+// calo reco digis
+//-----------------------------------------------------------------------------
+  if (fMakeCaloRecoDigis) {
+    fInitCaloRecoDigiBlock = new stntuple::InitCaloRecoDigiBlock();
+    fInitCaloRecoDigiBlock->SetCaloRecoDigiCollTag(fCaloRecoDigiCollTag);
+
+    AddDataBlock("CalRecoDigiBlock","TCaloRecoDigiBlock",
+		 fInitCaloRecoDigiBlock,
+		 buffer_size,
+		 split_mode,
+		 compression_level);
+  }
+//-----------------------------------------------------------------------------
+// calorimeter hit data (caldata - OBSOLETE)
 //-----------------------------------------------------------------------------
   if (fMakeCalData) {
-    TStnDataBlock* cal_data;
+    fInitCalDataBlock = new stntuple::InitCalDataBlock();
+    fInitCalDataBlock->SetCaloHitCollTag(fCaloHitCollTag);
+    // TStnDataBlock* cal_data;
 
-    cal_data = AddDataBlock("CalDataBlock","TCalDataBlock",
-			    StntupleInitMu2eCalDataBlock,
-			    buffer_size,
-			    split_mode,
-			    compression_level);
-    if (cal_data) {
-      cal_data->AddCollName("mu2e::CaloHitCollection",fCaloCrystalHitMaker.data());
-    }
+    AddDataBlock("CalDataBlock","TCalDataBlock",
+                 fInitCalDataBlock,
+                 buffer_size,
+                 split_mode,
+                 compression_level);
+  }
+//-----------------------------------------------------------------------------
+// calorimeter hit data - current
+//-----------------------------------------------------------------------------
+  if (fMakeCaloHits) {
+    fInitCaloHitBlock = new stntuple::InitCaloHitBlock();
+    fInitCaloHitBlock->SetCaloHitCollTag(fCaloHitCollTag);
+
+    AddDataBlock("CaloHitBlock","TCaloHitBlock",
+                 fInitCaloHitBlock,
+                 buffer_size,
+                 split_mode,
+                 compression_level);
   }
 //-----------------------------------------------------------------------------
 // calorimeter clusters 
 //-----------------------------------------------------------------------------
+  if (fMakeCaloClusters) {
+    fInitCaloClusterBlock = new stntuple::InitCaloClusterBlock();
+    fInitCaloClusterBlock->SetCaloClusterCollTag  (fCaloClusterCollTag);
+    fInitCaloClusterBlock->SetCaloClusterMCCollTag(fCaloClusterMCCollTag);
+
+    AddDataBlock("CaloClusterBlock","TStnClusterBlock",
+                 fInitCaloClusterBlock,
+                 buffer_size,
+                 split_mode,
+                 compression_level);
+  }
+  
+  // obsolete, will go away soon
   if (fMakeClusters) {
-    TStnDataBlock* db = AddDataBlock("ClusterBlock",
-				     "TStnClusterBlock",
-				     StntupleInitMu2eClusterBlock,
-				     buffer_size,
-				     split_mode,
-				     compression_level);
-    if (db) {
-      db->AddCollName("mu2e::CaloClusterCollection",fCaloClusterMaker.data());
-      db->AddCollName("mu2e::CaloClusterMCCollection",fCaloClusterMCMaker.data());
-      SetResolveLinksMethod("ClusterBlock",StntupleInitMu2eClusterBlockLinks);
-    }
+    
+    stntuple::print_(nullptr,stntuple::e_WARNING,
+                     "\"makeClusters\" is obsolete, use \"makeCaloClusters\" instead");
+    
+    fInitCaloClusterBlock = new stntuple::InitCaloClusterBlock();
+    fInitCaloClusterBlock->SetCaloClusterCollTag  (fCaloClusterCollTag);
+    fInitCaloClusterBlock->SetCaloClusterMCCollTag(fCaloClusterMCCollTag);
+
+    AddDataBlock("ClusterBlock","TStnClusterBlock",
+                 fInitCaloClusterBlock,
+                 buffer_size,
+                 split_mode,
+                 compression_level);
+  }
+//-----------------------------------------------------------------------------
+// combo hits 
+//-----------------------------------------------------------------------------
+  if (fMakeComboHits) {
+    fInitComboHitBlock = new stntuple::InitComboHitBlock();
+    fInitComboHitBlock->SetChCollTag(fChCollTag);
+    fInitComboHitBlock->SetShCollTag(fShCollTag);
+    art::InputTag tc_coll_tag = fTcCollTag[0];
+    fInitComboHitBlock->SetTcCollTag(tc_coll_tag); // why do I need many ????
+    
+    //    TStnDataBlock* db = AddDataBlock("ComboHitBlock",
+    AddDataBlock("ComboHitBlock",
+                 "TComboHitBlock",
+                 fInitComboHitBlock,
+                 buffer_size,
+                 split_mode,
+                 compression_level);
   }
 //-----------------------------------------------------------------------------
 // CRV
 //-----------------------------------------------------------------------------
   if (fMakeCrvDigis) {
-    fInitCrvDigiBlock = new StntupleInitCrvDigiBlock();
-    fInitCrvDigiBlock->SetCrvDigiCollTag(fCrvDigiCollTag);
+    fInitCrvdBlock = new StntupleInitCrvDigiBlock();
+    fInitCrvdBlock->SetCrvDigiCollTag(fCrvDigiCollTag);
 
-    AddDataBlock("CrvDigiBlock","TCrvDigiBlock",
-		 fInitCrvDigiBlock,
+    AddDataBlock("CrvdBlock","TCrvDigiBlock",
+		 fInitCrvdBlock,
 		 buffer_size,
 		 split_mode,
 		 compression_level);
@@ -593,13 +694,13 @@ void StntupleMaker::beginJob() {
   
   if (fMakeCrvPulses) {
 
-    fInitCrvPulseBlock = new StntupleInitCrvPulseBlock();
-    fInitCrvPulseBlock->SetCrvRecoPulseCollTag(fCrvRecoPulseCollTag);
-    fInitCrvPulseBlock->SetCrvCoincidenceCollTag(fCrvCoincidenceCollTag);
-    fInitCrvPulseBlock->SetCrvCoincidenceClusterCollTag(fCrvCoincidenceClusterCollTag);
+    fInitCrvpBlock = new StntupleInitCrvPulseBlock();
+    fInitCrvpBlock->SetCrvRecoPulseCollTag(fCrvRecoPulseCollTag);
+    fInitCrvpBlock->SetCrvCoincidenceCollTag(fCrvCoincidenceCollTag);
+    fInitCrvpBlock->SetCrvCoincidenceClusterCollTag(fCrvCoincidenceClusterCollTag);
 
-    AddDataBlock("CrvPulseBlock","TCrvPulseBlock",
-		 fInitCrvPulseBlock,
+    AddDataBlock("CrvpBlock","TCrvPulseBlock",
+		 fInitCrvpBlock,
 		 buffer_size,
 		 split_mode,
 		 compression_level);
@@ -607,14 +708,14 @@ void StntupleMaker::beginJob() {
 
   if (fMakeCrvClusters) {
 
-    fInitCrvClusterBlock = new StntupleInitCrvClusterBlock();
-    fInitCrvClusterBlock->SetCrvRecoPulseCollTag(fCrvRecoPulseCollTag);
-    fInitCrvClusterBlock->SetCrvCoincidenceClusterCollTag(fCrvCoincidenceClusterCollTag);
-    fInitCrvClusterBlock->SetCrvCoincidenceClusterMCCollTag(fCrvCoincidenceClusterMCCollTag);
-    fInitCrvClusterBlock->SetStorePulses(fCrvClustersStorePulses);
+    fInitCrvcBlock = new StntupleInitCrvClusterBlock();
+    fInitCrvcBlock->SetCrvRecoPulseCollTag(fCrvRecoPulseCollTag);
+    fInitCrvcBlock->SetCrvCoincidenceClusterCollTag(fCrvCoincidenceClusterCollTag);
+    fInitCrvcBlock->SetCrvCoincidenceClusterMCCollTag(fCrvCoincidenceClusterMCCollTag);
+    // fInitCrvcBlock->SetStorePulses(fCrvClustersStorePulses);
 
-    AddDataBlock("CrvClusterBlock","TCrvClusterBlock",
-		 fInitCrvClusterBlock,
+    AddDataBlock("CrvcBlock","TCrvClusterBlock",
+		 fInitCrvcBlock,
 		 buffer_size,
 		 split_mode,
 		 compression_level);
@@ -631,7 +732,7 @@ void StntupleMaker::beginJob() {
     AddDataBlock("GenpBlock","TGenpBlock",fInitGenpBlock,buffer_size,split_mode,compression_level);
   }
 //--------------------------------------------------------------------------------
-// helix data
+// helices : handle multiple blocks
 //--------------------------------------------------------------------------------
   if (fMakeHelices) {
     int nblocks    = fHelixBlockName.size();
@@ -647,8 +748,8 @@ void StntupleMaker::beginJob() {
 
       init_block->SetHSeedCollTag(fHelixSeedCollTag[i]);
       init_block->SetSdmcCollTag (fSdmcCollTag );
-      init_block->SetTclBlockName(fTClBlockName   [i]);
-      init_block->SetTrackFitType(fTrackFitType);
+      init_block->SetTcBlockName (fTcBlockName   [i]);
+      //      init_block->SetTrackFitType(fTrackFitType);
 
       if (i < nks_blocks) {
         init_block->SetKsCollTag   (fHelixKsCollTag[i]);
@@ -753,23 +854,23 @@ void StntupleMaker::beginJob() {
     AddDataBlock("StrawHitBlock","TStrawHitBlock",fInitStrawHitBlock,buffer_size,split_mode,compression_level);
   }
 //--------------------------------------------------------------------------------
-// time clusters
+// time clusters - multiple data blocks allowed
 //--------------------------------------------------------------------------------
   if (fMakeTimeClusters) {
-    int nblocks = fTClBlockName.size();
+    int nblocks = fTcBlockName.size();
 
     for (int i=0; i<nblocks; i++) {
-      const char* block_name = fTClBlockName[i].data();
+      const char* block_name = fTcBlockName[i].data();
       if ((block_name[0] == 0) || (block_name[0] == ' ')) continue;
 
-      StntupleInitTimeClusterBlock* init_block = new StntupleInitTimeClusterBlock();
+      auto init_block = new stntuple::InitTimeClusterBlock();
       fInitTimeClusterBlock->Add(init_block);
 
-      init_block->SetTimeClusterCollTag(fTClCollTag[i]);
-
-      init_block->SetShCollTag   (fShCollTag);
-      init_block->SetChCollTag   (fChCollTag);
-      init_block->SetStrawDigiMCCollTag(fSdmcCollTag);
+      init_block->SetTcCollTag(fTcCollTag[i]);
+      init_block->SetShCollTag(fShCollTag);
+      init_block->SetChCollTag(fChCollTag);
+      
+      init_block->SetSdmcCollTag(fSdmcCollTag);
 
       AddDataBlock(block_name,"TStnTimeClusterBlock",init_block,buffer_size,split_mode,compression_level);
     }
@@ -783,7 +884,7 @@ void StntupleMaker::beginJob() {
 
     for (int i=0; i<nb; i++) {
       const char* block_name = fKsfBlockName[i].data();
-      StntupleInitTrackSeedBlock* init_block = new StntupleInitTrackSeedBlock();
+      auto init_block = new StntupleInitTrackSeedBlock();
       fInitTrackSeedBlock->Add(init_block);
 
       init_block->SetHsBlockName(fHelixBlockName[i]);
@@ -827,55 +928,59 @@ void StntupleMaker::beginJob() {
     for (int i=0; i<nblocks; i++) {
       const char* block_name = fTrackBlockName[i].data();
 
-      if      (fTrackFitType == 1) {
-        throw std::runtime_error("no more BTRK, use KK");
-        // init_block = new StntupleInitTrackBlock   ();
-      }
-      else if (fTrackFitType == 2) init_block = new StntupleInitTrackBlock_KK();
+      // if      (fTrackFitType == 1) {
+      //   throw std::runtime_error("no more BTRK, use KK");
+      //   // init_block = new StntupleInitTrackBlock   ();
+      // }
+      // else if (fTrackFitType == 2) init_block = new StntupleInitTrackBlock_KK();
+
+      init_block = new StntupleInitTrackBlock();
 
       fInitTrackBlock->Add(init_block);
 
       // init_block->SetCaloClusterCollTag (fCaloClusterMaker);
-      init_block->SetSsChCollTag        (fShCollTag       );
-      init_block->SetKFFCollTag         (fTrackCollTag[i] );  // tracks saved as lists of KalSeeds
-      init_block->SetPIDProductCollTag  (fPidCollTag[i]   );
-      init_block->SetVdhCollTag         (fVdhCollTag      );  // 
-      init_block->SetStrawDigiMCCollTag (fSdmcCollTag);
-      init_block->SetTciCollTag         (fTciCollTag[i]);
-      init_block->SetTcmCollTag         (fTcmCollTag[i]);
+      init_block->SetSsChCollTag        (fShCollTag        );
+      init_block->SetKFFCollTag         (fTrackCollTag[i]  );  // tracks saved as lists of KalSeeds
+      init_block->SetPIDProductCollTag  (fPidCollTag[i]    );
+      init_block->SetVdhCollTag         (fVdhCollTag       );  // 
+      init_block->SetStrawDigiMCCollTag (fSdmcCollTag      );
+      init_block->SetTciCollTag         (fTciCollTag[i]    );
+      init_block->SetTcmCollTag         (fTcmCollTag[i]    );
       init_block->SetTrkQualCollTag     (fTrkQualCollTag[i]);
 
       // init_block->SetDoubletAmbigResolver(fDar);
 
       init_block->fVerbose = fTrackVerbose;
 
-      TStnDataBlock* db = AddDataBlock(block_name,"TStnTrackBlock",init_block,
-				       buffer_size,split_mode,compression_level);
+      TStnDataBlock* block = AddDataBlock(block_name,"TStnTrackBlock",init_block,
+                                          buffer_size,split_mode,compression_level);
 //-----------------------------------------------------------------------------
 // each track points back to its seed
 // if nshortblocks != 0, for each track we store an index to that tracks's seed
 //-----------------------------------------------------------------------------
-      if (db) {
-        if (fTrackFitType == 1) {
-//-----------------------------------------------------------------------------
-// BTRK fits
-//-----------------------------------------------------------------------------
-          if (fTrackTsBlockName.size() > 0) {
-            init_block->SetTrackTsBlockName(fTrackTsBlockName[i].data());
-            init_block->SetTrackTsCollTag  (fTrackTsCollTag  [i]);
-          }
-        }
-        else if (fTrackFitType == 2) {
-//-----------------------------------------------------------------------------
-// KinKal fits
-//-----------------------------------------------------------------------------
-          init_block->SetTrackHsBlockName(fTrackHsBlockName[i].data());
-        }
+      if (block != nullptr) {
+        // correlate tracks in the track block with their helix seeds
+        init_block->SetTrackHsBlockName(fTrackHsBlockName[i].data());
       }
     }
   }
 //-----------------------------------------------------------------------------
-// CRV
+// straight tracks (no B-field) - trcks could be either straight or curved,
+// never the two together
+//-----------------------------------------------------------------------------
+  if (fMakeStraightTracks) {
+    fInitStrTrackBlock = new stntuple::InitStrTrackBlock();
+    fInitStrTrackBlock->SetTrackCollTag(fTrackCollTag[0]);
+    fInitStrTrackBlock->SetTcCollTag   (fTcCollTag   [0]);
+
+    AddDataBlock("TrackBlock","TStrTrackBlock",
+		 fInitStrTrackBlock,
+		 buffer_size,
+		 split_mode,
+		 compression_level);
+  }
+//-----------------------------------------------------------------------------
+// TRIGGER
 //-----------------------------------------------------------------------------
   if (fMakeTrigger) {
     fInitTriggerBlock = new StntupleInitTriggerBlock();

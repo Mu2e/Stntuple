@@ -83,12 +83,12 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  virtual void  Paint               (Option_t* option = "");
-  virtual Int_t DistancetoPrimitive (Int_t px, Int_t py);
-  virtual void  ExecuteEvent        (Int_t event, Int_t px, Int_t py);
-  virtual char* GetObjectInfo       (Int_t Px, Int_t Py) const ;
+  virtual void  Paint               (Option_t* option = "") override;
+  virtual Int_t DistancetoPrimitive (Int_t px, Int_t py) override;
+  virtual void  ExecuteEvent        (Int_t event, Int_t px, Int_t py) override;
+  virtual char* GetObjectInfo       (Int_t Px, Int_t Py) const override;
 
-  virtual void  Print               (Option_t* option = "") const ;  // *MENU* 
+  virtual void  Print               (Option_t* option = "") const override;  // *MENU* 
 
   ClassDefOverride(TStnView,0)
 };

@@ -38,42 +38,45 @@
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+
+namespace stntuple {
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 // ComboHitCollection and StrawHitCollection are of the same time, the first one 
 // contains real combo hits (one combo hit could be made out of more than one straw hit),
 // the other one has a combo hit per straw digi
 //-----------------------------------------------------------------------------
-int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
+int  InitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
   const char* oname = {"StntupleInitTimeClusterBlock::InitDataBlock"};
 
-  TStnTimeClusterBlock*         cb = (TStnTimeClusterBlock*) Block;
+  int ev_number, rn_number, mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
 
-  cb->Clear();
+  ev_number = Event->event();
+  rn_number = Event->run();
+  if (rn_number < 100000) mc_flag = 1;
 
-  const mu2e::TimeClusterCollection*        list_of_tclusters(nullptr);
+  TStnTimeClusterBlock* tcb = (TStnTimeClusterBlock*) Block;
+  tcb->Clear();
 
-  art::Handle<mu2e::TimeClusterCollection>  tccH;
-  int                                       ntc(0);
+  const mu2e::TimeClusterCollection* tcc(nullptr);
+  int                                ntc(0);
 
-  if (! fTimeClusterCollTag.empty()) {
-    bool ok = Evt->getByLabel(fTimeClusterCollTag,tccH);
+  if (! fTcCollTag.empty()) {
+    art::Handle<mu2e::TimeClusterCollection> tccH;
+    bool ok = Event->getByLabel(fTcCollTag,tccH);
     if (ok) {
-      list_of_tclusters = tccH.product();
-      ntc               = list_of_tclusters->size();
+      tcc = tccH.product();
+      ntc               = tcc->size();
     }
   }
 
   art::Handle<mu2e::ComboHitCollection>    chcH;
   const mu2e::ComboHitCollection*          chc(nullptr);
-
-  // art::Handle<mu2e::ComboHitCollection>    sschcH;
-  //  const mu2e::ComboHitCollection*          sschc(nullptr);
 //-----------------------------------------------------------------------------
-// combohits are only needed for MC-specific purpose
+// combohits are mostly needed for debugging and MC-specific purpose
 //-----------------------------------------------------------------------------
   if (! fChCollTag.empty()) {
-    bool ok = Evt->getByLabel(fChCollTag,chcH);
+    bool ok = Event->getByLabel(fChCollTag,chcH);
     if (ok) {
       chc          = chcH.product();
     }
@@ -87,7 +90,7 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
 // single straw hit collection (also ComboHit's
 //-----------------------------------------------------------------------------
   // if (! fShCollTag.empty()) {
-  //   bool ok = Evt->getByLabel(fShCollTag,sschcH);
+  //   bool ok = Event->getByLabel(fShCollTag,sschcH);
   //   if (ok) {
   //     sschc          = sschcH.product();
   //   }
@@ -96,22 +99,19 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
   const mu2e::StrawDigiMCCollection*       mcdigis(nullptr);
 
-  if (! fStrawDigiMCCollTag.empty()) {
-    bool ok = Evt->getByLabel(fStrawDigiMCCollTag,sdmccH);
+  if (! fSdmcCollTag.empty()) {
+    bool ok = Event->getByLabel(fSdmcCollTag,sdmccH);
     if (ok) {
       mcdigis = sdmccH.product();
     }
   }
 
   const mu2e::CaloCluster     *cluster(0);
-  const mu2e::TimeCluster     *tmpTCl(0);
- 
-  if (list_of_tclusters) ntc = list_of_tclusters->size();
   
   for (int i=0; i<ntc; i++) {
-    TStnTimeCluster* tc = cb->NewTimeCluster();
-    tmpTCl              = &list_of_tclusters->at(i);
-    cluster             = tmpTCl->caloCluster().get();
+    TStnTimeCluster* tc = tcb->NewTimeCluster();
+    const mu2e::TimeCluster* otc = &tcc->at(i);
+    cluster             = otc->caloCluster().get();
     if (cluster != 0) {
       mu2e::GeomHandle<mu2e::Calorimeter> ch;
       const mu2e::Calorimeter* _calorimeter = ch.get();      
@@ -125,14 +125,14 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
       tc->fClusterZ       = tpos.z();
     }
 
-    tc->fTimeCluster  = tmpTCl;
-    tc->fNComboHits   = tmpTCl->hits().size();
-    tc->fNHits        = tmpTCl->nStrawHits();
-    tc->fT0           = tmpTCl->t0()._t0;
-    tc->fT0Err        = tmpTCl->t0()._t0err;     
-    tc->fPosX         = tmpTCl->position().x();     
-    tc->fPosY         = tmpTCl->position().y();     
-    tc->fPosZ         = tmpTCl->position().z();
+    tc->fOfflineTc    = otc;
+    tc->fNComboHits   = otc->hits().size();
+    tc->fNHits        = otc->nStrawHits();
+    tc->fT0           = otc->t0()._t0;
+    tc->fT0Err        = otc->t0()._t0err;     
+    tc->fPosX         = otc->position().x();     
+    tc->fPosY         = otc->position().y();     
+    tc->fPosZ         = otc->position().z();
 //-----------------------------------------------------------------------------
 // loop over combo hits to determine the matching MC particle
 //-----------------------------------------------------------------------------
@@ -146,7 +146,7 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
 
     if (mcdigis and chc) {
       for (int ih=0; ih<tc->fNComboHits; ih++) {
-        StrawHitIndex hit_index   = tmpTCl->hits().at(ih);
+        StrawHitIndex hit_index   = otc->hits().at(ih);
         const mu2e::ComboHit* hit = &chc->at(hit_index);
 //-----------------------------------------------------------------------------
 // loop over straw hits of one combo hit
@@ -210,12 +210,14 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
     }
   }
 
+  tcb->f_RunNumber   = rn_number;
+  tcb->f_EventNumber = ev_number;
+
   return 0;
 }
 
-//_____________________________________________________________________________
-Int_t StntupleInitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
-{
+//-----------------------------------------------------------------------------
+Int_t InitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   // Mu2e version, do nothing
 
   Int_t  ev_number, rn_number;
@@ -228,60 +230,42 @@ Int_t StntupleInitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent*
 					// do not do initialize links 2nd time
 
   if (Block->LinksInitialized()) return 0;
+//-----------------------------------------------------------------------------
+// determine the helix corresponding to this time cluster
+// what if there is more than one ? and what if several helix finders used
+// the same list of time clusters as input ?
+// - this makes having only one helix index a very questionable proposition
+// - disable that
+// instead build a list of links to the combohits
+//-----------------------------------------------------------------------------
+//  TStnHelix*                 helixseed;
 
-  TStnEvent*                 ev;
-  TStnTimeClusterBlock*      hb;
+  // const mu2e::TimeCluster*   ktcluster, *fktcluster;
+  // const mu2e::HelixSeed*     kseed;
 
-  TStnHelixBlock*            tsb;
-  TStnHelix*                 helixseed;
+  // char                       short_tc_block_name[100];
 
-  const mu2e::TimeCluster*   ktcluster, *fktcluster;
-  const mu2e::HelixSeed*     kseed;
+  //  TStnEvent* ev = Block->GetEvent();
+  auto tc_block = (TStnTimeClusterBlock*) Block;
 
-  char                       short_tcluster_block_name[100];
+  int ntc = tc_block->NTimeClusters();
 
-  ev     = Block->GetEvent();
-  hb     = (TStnTimeClusterBlock*) Block;
-  
-  hb->GetModuleLabel("mu2e::TimeClusterCollection"  , short_tcluster_block_name);
-
-  tsb    = (TStnHelixBlock*) ev->GetDataBlock(short_tcluster_block_name);
-  
-  int    ntc(0);
-  if (hb!=nullptr){
-    ntc = hb ->NTimeClusters();
-  }
-  int    nhelixseed(0);
-  if (tsb !=nullptr){
-    nhelixseed = tsb->NHelices();
-  }
-
-  for (int i=0; i<ntc; ++i){
-    TStnTimeCluster* tc = hb->TimeCluster(i);
-    ktcluster = tc->fTimeCluster;
-    int      helixseedIndex(-1);
-    for (int j=0; j<nhelixseed; ++j){
-      helixseed   = tsb->Helix(j);
-      kseed       = helixseed->fHelix;
-      fktcluster  = kseed->timeCluster().get();
-      if (fktcluster == ktcluster) {
-	helixseedIndex = j;
-	break;
-      }
+  for (int i=0; i<ntc; i++) {
+    TStnTimeCluster* tc = tc_block->TimeCluster(i);
+    const mu2e::TimeCluster* otc = tc->OfflineTc();
+    int nch = otc->hits().size();
+    for (int j=0; j<nch; j++) {
+      uint16_t ind = otc->hits().at(j);
+      tc_block->ListOfChLinks()->Add(i,ind);
     }
-    
-    if (helixseedIndex < 0) {
-      printf(">>> ERROR: TimeClusterFinder timeCluster %i -> no HelixSeed associated\n", i);//FIXME!
-	  continue;
-    }
-    
-    tc->SetHelixSeedIndex(helixseedIndex);
   }
+  
 //-----------------------------------------------------------------------------
 // mark links as initialized
 //-----------------------------------------------------------------------------
-  hb->fLinksInitialized = 1;
+  tc_block->fLinksInitialized = 1;
 
   return 0;
 }
 
+}

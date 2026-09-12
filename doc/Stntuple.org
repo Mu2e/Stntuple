@@ -44,15 +44,21 @@
     https://app.slack.com/client/T314VMYV8/C013P69F9GR                              
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * [[file:how-to-make-first-stntuple.org][how to make first Stntuple]] 
-* [[file:stnana.org][stnana]] - STNTUPLE analysis framework                                       
+* [[file:stnana.org][stnana]] - STNTUPLE analysis framework
+* handling MC truth                                                          
+- for now , it is assumed that run numbers < 100,000 correspond to MC
+  and run numbers >= 100,000 correspond to the real data
+- when [[file:../mod/InitStrawHitBlock.cc::/rn_number < 100000/][InitStrawHitBlock]] is storing TStrawHit's, to save space,
+  for real data the MC truth is not written into the ntuple
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
 * STNTUPLE [[file:how-tos.org][how-to's]]    
-* [[file:event_display.org][STNTUPLE event display]]  
+* [[file:event_display.org][STNTUPLE event display]]
 * STNTUPLE art modules and their parameters                                  
 - any Stntuple art module inherits from StntupleModule --> THistModule --> TModule classes
 - those provide layers of additional functionality
-** TModule
-*** debugBits : one can set up to 100 individual debug bits per module. Syntax:
+** TModule                                                                   
+*** debugBits : one can set up to 100 individual debug bits per module.      
+- Syntax:
 #+begin_src
     debugBits : { 
 	bit0:1  
@@ -61,7 +67,8 @@
     }
 #+end_src
 example: file:../fcl/prolog.fcl::/debugBits/
-** InitStntuple
+** InitStntuple: initializations, fills all data blocks                      
+- Stntuple data blocks are filled from [[file:../mod/InitStntuple_module.cc::/Event()->Init/]]
 ** StntupleMaker                                                             
   - defines absolute majority of the configuration parameters
   - *triggerResultsTag*  : defines the tag of the TriggerResults object      
@@ -74,7 +81,8 @@ example: file:../fcl/prolog.fcl::/debugBits/
     - still don't know what the PrimaryParticle is, ask Dave
   - *helixCollTag* :                                                         
     - list of ntupled helix collction tags (art sequence, in square brackets)
-** FillStntuple
+** FillStntuple: end of event processing, resolves the cross-block links     
+- [[file:../mod/FillStntuple_module.cc::/block->ResolveLinks]]
 * copying and filtering: file:copying_and_filtering.org                      
 ** EventFilter                                                               
    - given an event list, filters events from the list 

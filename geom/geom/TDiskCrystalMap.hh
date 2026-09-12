@@ -32,7 +32,7 @@ public:
   TDiskCrystalMap();
   TDiskCrystalMap(double Size, double RMin, double RMax);
 
-  ~TDiskCrystalMap();
+  virtual ~TDiskCrystalMap();
 
   virtual int GetRing(int I) = 0;
   virtual int GetRing(TDiskIndex* Index) = 0;

@@ -6,5 +6,5 @@
 #pragma link C++  nestedclasses;
 #pragma link C++  nestedtypedefs;
 #
-#pragma link C++  class  TCalDigi-;
+#pragma link C++  class  TCaloRecoDigi-;
 #endif

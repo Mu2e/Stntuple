@@ -80,11 +80,11 @@ public:
     return (TStnNode*) fListOfNodes->FindObject(name);
   }
 
-  virtual TObject*   FindObject(const char* name) const { 
+  virtual TObject*   FindObject(const char* name) const override{ 
     return fListOfObjects->FindObject(name);
   }
 
-  virtual TObject*   FindObject(const TObject* obj) const { 
+  virtual TObject*   FindObject(const TObject* obj) const override { 
     return fListOfObjects->FindObject(obj);
   }
 
@@ -107,9 +107,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void  Clear(Option_t* opt="");
-
-  void  Print(Option_t* opt="") const ;
+  virtual void  Clear(Option_t* opt="") override;
+  virtual void  Print(Option_t* opt="") const override;
 
   ClassDefOverride(TStnEvent,50)
 };

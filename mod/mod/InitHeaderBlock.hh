@@ -17,16 +17,16 @@ namespace stntuple {
     art::InputTag   fPbiTag;
     art::InputTag   fShCollTag;
     art::InputTag   fChCollTag;
-    art::InputTag   fCalHitCollTag;
+    art::InputTag   fCaloHitCollTag;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
   public:
 
-    void   SetChCollTag    (art::InputTag& Tag ) { fChCollTag      = Tag; }
-    void   SetShCollTag    (art::InputTag& Tag ) { fShCollTag      = Tag; }
-    void   SetCalHitCollTag(art::InputTag& Tag ) { fCalHitCollTag  = Tag; }
-    void   SetPbiTag       (art::InputTag& Tag ) { fPbiTag         = Tag; }
+    void   SetChCollTag     (art::InputTag& Tag ) { fChCollTag      = Tag; }
+    void   SetShCollTag     (art::InputTag& Tag ) { fShCollTag      = Tag; }
+    void   SetCaloHitCollTag(art::InputTag& Tag ) { fCaloHitCollTag = Tag; }
+    void   SetPbiTag        (art::InputTag& Tag ) { fPbiTag         = Tag; }
 
     virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
     // virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

@@ -68,12 +68,19 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # define branches to be filled by default, in alphabetical order
 # set all reconstruction defaults to zero, to force the settings explicit in the top-level FCL
 #------------------------------------------------------------------------------    
-    makeCalDigis         : 0
-    makeCalData          : 0
-    makeClusters         : 0
-    
+    makeCalData          : 0   ## obsolete
+    makeClusters         : 0   ## obsolete
+
+    makeCaloDigis        : 0
+    makeCaloRecoDigis    : 0
+    makeCaloHits         : 0
+    makeCaloClusters     : 0
+
+    makeComboHits        : 0
+
+    makeCrvDigis         : 0
     makeCrvPulses        : 0
-    makeCrvClusters      : 0
+    makeCrvClusters      : 0 ## if pulses are stored, cluter-to-pulse links are also stored
     
     makeGenp             : 0
     makeHelices          : 0
@@ -83,6 +90,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     makeStrawDigis       : 0
     makeStrawHits        : 0
     makeStrawWaveforms   : 0
+    makeStraightTracks   : 0  ## straight tracks, for now keep them separate from curved ones
     makeTracks           : 0
     makeTrackStrawHits   : 0
     makeTrackSeeds       : 0
@@ -94,10 +102,11 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
 # calorimeter
 #------------------------------------------------------------------------------
-    calDigiCollTag               : "CaloDigiMaker"
-    calHitCollTag                : "CaloHitMaker"
-    caloCrystalHitsMaker         : "CaloHitMaker"
-    caloClusterMaker             : "CaloClusterMaker"
+    caloDigiCollTag              : "CaloDigiMaker"
+    caloRecoDigiCollTag          : "CaloRecoDigiMaker"
+    caloHitCollTag               : "CaloHitMaker"
+    caloClusterCollTag           : "CaloClusterMaker"
+    caloClusterMCCollTag         : ""
 #------------------------------------------------------------------------------
 # default tags for CRV reco collections
 #------------------------------------------------------------------------------
@@ -165,7 +174,8 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
     trackBlockName       : [ "TrackBlock"   ]
     trackCollTag         : [ "KFFDeM"       ]
-    trackFitType         : 2                         ## 1:BTRK(KFF) 2:KinKal(KK)
+# no more BTRK
+##    trackFitType         : 2                         ## 1:BTRK(KFF) 2:KinKal(KK)
 
     trackTsBlockName     : [ "KSFBlock"     ]
     trackTsCollTag       : [ "KSFDeM"       ]        ## has to be defined for BTRK   fits

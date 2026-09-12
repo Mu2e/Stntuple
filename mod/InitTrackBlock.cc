@@ -1293,11 +1293,83 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   return 0;
 }
 
+// //-----------------------------------------------------------------------------
+// // 2015-04-02: this routine is not finished yet
+// //-----------------------------------------------------------------------------
+// Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode)
+// {
+//   int    ev_number, rn_number;
+
+//   ev_number = AnEvent->event();
+//   rn_number = AnEvent->run();
+
+//   if (! Block->Initialized(ev_number,rn_number)) return -1;
+// //-----------------------------------------------------------------------------
+// // do not do initialize links for 2nd time
+// //-----------------------------------------------------------------------------
+//   if (Block->LinksInitialized()) return 0;
+
+//   TStnTrackBlock* tb = (TStnTrackBlock*) Block;
+
+//   art::Handle<mu2e::CaloClusterCollection> cch;
+//   if (not fCaloClusterCollTag.empty()) {
+//     AnEvent->getByLabel(fCaloClusterCollTag,cch);
+//   }
+// //-----------------------------------------------------------------------------
+// // TStnTrackBlock is already initialized
+// //-----------------------------------------------------------------------------
+//   TStnEvent* ev = Block->GetEvent();
+
+//   if (not fTrackTsCollTag.empty()) {
+// //-----------------------------------------------------------------------------
+// // seeds are stored, fill links part: 'TrackTs' collection stores, for each track,
+// // its KalSeed
+// //-----------------------------------------------------------------------------
+//     art::Handle<mu2e::KalSeedCollection>  ksch;
+//     mu2e::KalSeedCollection*              list_of_kalSeeds;
+
+//     AnEvent->getByLabel(fTrackTsCollTag,ksch);
+//     list_of_kalSeeds = (mu2e::KalSeedCollection*) ksch.product();
+
+//     TStnTrackSeedBlock* tsb = (TStnTrackSeedBlock*) ev->GetDataBlock(fTrackTsBlockName.Data());
+
+//     int    ntrk = tb->NTracks();
+//     int    nts  = tsb->NTrackSeeds();
+
+//     for (int i=0; i<ntrk; i++) {
+//       TStnTrack* trk = tb->Track(i);
+//       const mu2e::KalSeed *ts = &list_of_kalSeeds->at(i); // seed corresponding to track # i
+//       int  loc(-1);
+//       for (int j=0; j<nts; ++j) {
+// 	const mu2e::KalSeed* tss = tsb->TrackSeed(j)->fTrackSeed;
+// 	if (ts == tss) {
+// 	  loc = j;
+// 	  break;
+// 	}
+//       }
+
+//       if (loc < 0) {
+// 	printf(">>> ERROR: %s track %i -> no TrackSeed associated\n",
+//                fKFFCollTag.encode().data(), i);
+// 	continue;
+//       }
+
+//       trk->SetTrackSeedIndex(loc);
+//     }
+//   }
+// //-----------------------------------------------------------------------------
+// // mark links as initialized
+// //-----------------------------------------------------------------------------
+//   Block->SetLinksInitialized();
+
+//   return 0;
+// }
 //-----------------------------------------------------------------------------
-// 2015-04-02: this routine is not finished yet
+// 2023-06-29: links directly to helices
 //-----------------------------------------------------------------------------
-Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode)
+Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
 {
+  const char* oname = {"stntuple::InitTrackBlock_KK::ResolveLinks"};
   int    ev_number, rn_number;
 
   ev_number = AnEvent->event();
@@ -1309,53 +1381,76 @@ Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 //-----------------------------------------------------------------------------
   if (Block->LinksInitialized()) return 0;
 
-  TStnTrackBlock* tb = (TStnTrackBlock*) Block;
-
-  art::Handle<mu2e::CaloClusterCollection> cch;
-  if (not fCaloClusterCollTag.empty()) {
-    AnEvent->getByLabel(fCaloClusterCollTag,cch);
+  art::Handle<mu2e::KalHelixAssns> ksfhaH;
+  const mu2e::KalHelixAssns* ksfha;
+  AnEvent->getByLabel(fKFFCollTag, ksfhaH);
+  if (ksfhaH.isValid()) {ksfha = ksfhaH.product();}
+  else {
+    // Online trigger paths typically don't have this, so ignore this in normal running
+    if(fVerbose > 0) printf(" WARNING in InitTrackBlock_KK::%s: KalHelixAssns %s not found!\n", __func__, fKFFCollTag.encode().c_str());
+    ksfha = nullptr;
   }
+
+  TStnTrackBlock* tb = (TStnTrackBlock*) Block;
+  TStnEvent*      ev = Block->GetEvent();
+  TStnHelixBlock* hb = (TStnHelixBlock*) ev->GetDataBlock(fTrackHsBlockName.Data());
+  if(!hb) {
+    printf(" WARNING in InitTrackBlock_KK::%s: Helix block %s not found!\n", __func__, fTrackHsBlockName.Data());
+  }
+
+  int nt = (tb) ? tb->NTracks() : 0;
+  int nh = (hb) ? hb->NHelices() : 0;
+  
+  for (int i=0; i<nt; i++) {
+    TStnTrack* trk = tb->Track(i);
 //-----------------------------------------------------------------------------
-// TStnTrackBlock is already initialized
+// this is just legacy - out of 4 elements, only the first one is used
 //-----------------------------------------------------------------------------
-  TStnEvent* ev = Block->GetEvent();
-
-  if (not fTrackTsCollTag.empty()) {
+    const mu2e::KalSeed* ksf = trk->fKalRep[0];
 //-----------------------------------------------------------------------------
-// seeds are stored, fill links part: 'TrackTs' collection stores, for each track,
-// its KalSeed
+// looking for the seed in associations
 //-----------------------------------------------------------------------------
-    art::Handle<mu2e::KalSeedCollection>  ksch;
-    mu2e::KalSeedCollection*              list_of_kalSeeds;
-
-    AnEvent->getByLabel(fTrackTsCollTag,ksch);
-    list_of_kalSeeds = (mu2e::KalSeedCollection*) ksch.product();
-
-    TStnTrackSeedBlock* tsb = (TStnTrackSeedBlock*) ev->GetDataBlock(fTrackTsBlockName.Data());
-
-    int    ntrk = tb->NTracks();
-    int    nts  = tsb->NTrackSeeds();
-
-    for (int i=0; i<ntrk; i++) {
-      TStnTrack* trk = tb->Track(i);
-      const mu2e::KalSeed *ts = &list_of_kalSeeds->at(i); // seed corresponding to track # i
-      int  loc(-1);
-      for (int j=0; j<nts; ++j) {
-	const mu2e::KalSeed* tss = tsb->TrackSeed(j)->fTrackSeed;
-	if (ts == tss) {
-	  loc = j;
-	  break;
-	}
+    const mu2e::HelixSeed* hs(nullptr);
+    if (ksfha) {
+      for (auto ass: *ksfha) {
+        const mu2e::KalSeed* qsf = ass.first.get();
+        if (qsf == ksf) {
+          if(fVerbose > 1) printf("%s::%s: KalSeedCollection %s track %2i: Associated helix found\n",
+                            typeid(*this).name(), __func__, fKFFCollTag.encode().c_str(), i);
+          hs = ass.second.get();
+          break;
+        }
       }
-
-      if (loc < 0) {
-	printf(">>> ERROR: %s track %i -> no TrackSeed associated\n",
-               fKFFCollTag.encode().data(), i);
-	continue;
-      }
-
-      trk->SetTrackSeedIndex(loc);
     }
+
+    int  hindex(-1);
+
+    if (hs == nullptr && ksfha) {
+      mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__
+                            << ": kseed->helix() is gone."
+                            << " len(assn) = " << ksfha->size() << " --> FIXIT" ;
+    }
+    else if(ksfha) {
+//-----------------------------------------------------------------------------
+// search for the helix in the helix block
+//-----------------------------------------------------------------------------
+      const mu2e::HelixSeed* hs2(nullptr);
+      for (int j=0; j<nh; ++j){
+        TStnHelix* hel  = hb->Helix(j);
+        hs2 = hel->fHelix;
+        if (hs2 == hs){
+          hindex = j;
+          break;
+        }    
+      }
+    }
+    
+    if (hindex < 0 && ksfha) {
+      mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
+                            << ": tracjseed " << fKFFCollTag.encode().data() 
+                            << ":" << i << " has no HelixSeed associated" ;
+    }
+    trk->SetHelixIndex(hindex);
   }
 //-----------------------------------------------------------------------------
 // mark links as initialized
@@ -1364,3 +1459,4 @@ Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 
   return 0;
 }
+

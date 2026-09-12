@@ -72,7 +72,7 @@ mu2e.GdmlGeometry              /projects/murat/figures/mu2e/gdml/mu2e_geometry_v
 #------------------------------------------------------------------------------
 # stnana configuration: add your analysis packages as needed
 #------------------------------------------------------------------------------
-Stnana.TestReleaseDir          $(PWD)
+Stnana.TestReleaseDir          $(PWD)/v001
 Stnana.Package                 Stntuple
 # +Stnana.Package               murat
 # +Stnana.Package               zzx

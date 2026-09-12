@@ -26,6 +26,7 @@
 #pragma link C++ class TSetRunMaps;
 #pragma link C++ class TStnArrayF-;
 #pragma link C++ class TStnArrayI-;
+#pragma link C++ class TStnBookHist;
 #pragma link C++ class TStnDataset;
 #pragma link C++ class TStnFileset;
 #pragma link C++ class TStnHexagon;

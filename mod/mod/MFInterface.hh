@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //  Aug 2026 P.Murat: interface to message facility
 //-----------------------------------------------------------------------------
-#ifndef StntupleUtilities_hh
-#define StntupleUtilities_hh
+#ifndef __Stntuple_mod_MFInterface_hh__
+#define __Stntuple_mod_MFInterface_hh__
 
 #include <string>
 #include <source_location>

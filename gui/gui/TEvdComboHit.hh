@@ -137,7 +137,7 @@ public:
 
   virtual void   PrintHeader()                 const ;  // *MENU*
   virtual void   PrintMe()                     const ;  // *MENU*
-  virtual void   Print  (const char* Opt = "") const ;  // *MENU*
+  virtual void   Print  (const char* Opt = "") const override;  // *MENU*
 
   ClassDefOverride(stntuple::TEvdComboHit,0)
 };

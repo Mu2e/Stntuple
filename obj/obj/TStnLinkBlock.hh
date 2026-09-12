@@ -52,10 +52,11 @@ public:
   }
 					// ****** setters
   Int_t  Add(Int_t i, Int_t match);
-					// ****** overloaded functions of 
-					// TObject
-  void Print(Option_t* option = "") const;
-  void Clear(Option_t* option = "");
+					// ****** overloaded functions of TObject
+  
+  virtual void Clear(Option_t* option = "") override;
+  virtual void Print(Option_t* option = "") const override;
+  
 					// ****** schema evolution
 					// nothing has changed I/O-wise between
 					// versions 1 and 2, just a member 

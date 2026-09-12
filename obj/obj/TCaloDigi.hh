@@ -1,11 +1,11 @@
-#ifndef __daqana_obj_TCalDigi_hh__
-#define __daqana_obj_TCalDigi_hh__
+#ifndef __daqana_obj_TCaloDigi_hh__
+#define __daqana_obj_TCaloDigi_hh__
 
 #include <vector>
 #include "TClonesArray.h"
 #include "TObject.h"
 
-class TCalDigi : public TObject {
+class TCaloDigi : public TObject {
 public:
   int    fNs;
   int    fSipmID;
@@ -15,9 +15,9 @@ public:
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
-  TCalDigi();
-  TCalDigi(int ns);
-  virtual ~TCalDigi();
+  TCaloDigi();
+  TCaloDigi(int ns);
+  virtual ~TCaloDigi();
 
   int     Ns() { return fNs; } // return adc.size(); }
   int     Init(int Ns);
@@ -28,7 +28,7 @@ public:
 
   virtual void Clear(const char* Opt) override ;
 
-  ClassDefOverride(TCalDigi,1);
+  ClassDefOverride(TCaloDigi,1);
 };
 
 #endif

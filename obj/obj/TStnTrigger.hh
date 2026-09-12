@@ -45,9 +45,9 @@ public:
 
   // ****** overloaded methods of TObject
 
-  const char* GetName () const { return (const char*) fName.Data(); }
+  virtual const char* GetName () const override { return (const char*) fName.Data(); }
 
-  void  Print  (Option_t* Option = "") const;
+  virtual void  Print  (Option_t* Option = "") const override;
   
   ClassDefOverride(TStnTrigger,1)
 

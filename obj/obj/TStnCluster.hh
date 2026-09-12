@@ -48,7 +48,7 @@ public:
 // integers
 //-----------------------------------------------------------------------------
   int                       fNumber;          // index in the list of reconstructed clusters
-  int                       fDiskID;	      //
+  int                       fDiskID;	      // 0 or 1
   int                       fNCrystals;       //
   int                       fNCr1     ;       // N crystals above 1 MeV
   int                       fTrackNumber;     // closest track in TStnTrackBlock
@@ -155,8 +155,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void Clear(Option_t* Opt = "") ;
-  virtual void Print(Option_t* Opt = "") const ;
+  virtual void Clear(Option_t* Opt = "") override;
+  virtual void Print(Option_t* Opt = "") const override;
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------

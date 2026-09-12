@@ -5,6 +5,10 @@
 #include "TArrayI.h"
 #include "TVector3.h"
 
+namespace mu2e {
+  class CrvCoincidenceCluster;
+};
+
 class TCrvCoincidenceCluster: public TObject {
 public:
   enum {
@@ -15,10 +19,10 @@ public:
   int          fIndex;                   // index in the list
   int          fSectorType;
   int          fNPulses;
-  int          fNPe;
   int          fSimID; //most likely SIM particle
   int          fMCNPulses;
   int          fFreeInts[kNFreeInts];
+  float        fPes;
   float        fStartTime;
   float        fEndTime;
   float        fMCEnergyDep;
@@ -28,6 +32,7 @@ public:
   TVector3     fPosition;
   TVector3     fMCAvgPosition;
 
+  const mu2e::CrvCoincidenceCluster* fOfflineCrvc; //! for links
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -39,7 +44,7 @@ public:
 
   int     Index           () const { return fIndex;          }
   int     SectorType      () const { return fSectorType;      }
-  int     NPe             () const { return fNPe;             }
+  float   Pes             () const { return fPes;             }
   int     NPulses         () const { return fNPulses;         }
 
   float   StartTime       () const { return fStartTime;       }
@@ -47,13 +52,18 @@ public:
   float   Slope           () const { return fSlope;           }
 
   const TVector3* Position() const { return &fPosition;       }
+
+  const mu2e::CrvCoincidenceCluster* OfflineCrvc() const { return fOfflineCrvc; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void Set(int Index, int SectorType, int Np, int NPe, 
+  void Set(int Index, int SectorType, int Np, float Pes, 
 	   float X, float Y, float Z, float T1, float T2, float Slope);
+  
   void SetMC(int SimID, int Np, float EnergyDep, float AvgTime,
-	   float X, float Y, float Z);
+             float X, float Y, float Z);
+  
+  void SetOfflineCrvc(const mu2e::CrvCoincidenceCluster* Crvc) { fOfflineCrvc = Crvc; }
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

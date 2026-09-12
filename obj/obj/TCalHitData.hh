@@ -7,37 +7,43 @@
 #include "TObject.h"
 #include "TBuffer.h"
 
+namespace mu2e {
+  class CalHit;
+}
 
 class TCalHitData : public TObject {
 public:
-
-protected: 
-  int        fID;         // hit ID, cods disk,  x1, x2
-  int        fNChannels;  // number of readout channels, 1 or 2 (kludge)
-  float      fTime; 
-  float      fEnergy;
+  int            fCid;                  // crystal ID
+  int            fNSipms;               // number of R/O channels used, 1 or 2
+  float          fTime;                 // 
+  float          fEDep;                 //
+  float          fSigT;                 // uncertainty on T
+  float          fSigE;                 // uncertainty on E
+  
+  mu2e::CalHit* fOfflineCalHit;       //! transient
 //-----------------------------------------------------------------------------
 public:
 					// ****** constructors and destructor
   TCalHitData();
   virtual ~TCalHitData();
 					// ****** initialization
-  //  static void InitStaticVariables();
-//-----------------------------------------------------------------------------
-// static methods
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  int     ID    () { return fID;     }
-  int     NChannels() { return fNChannels; }
-  float   Time  () { return fTime;   }
-  float   Energy() { return fEnergy; }
+  int     Cid      () { return fCid;       }
+  int     ID       () { return fCid;       }   // obsolete
+  int     NChannels() { return fNSipms;    }   // obsolete
+  int     NSipms   () { return fNSipms;    }
+  float   Time     () { return fTime;      }
+  float   Energy   () { return fEDep;      }   // obsolete
+  float   EDep     () { return fEDep;      }
+  float   SigT     () { return fSigT;      }
+  float   SigE     () { return fSigE;      }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void Set(int ID, int NChannels, float Time,  float Energy) {
-    fID = ID; fNChannels = NChannels; fTime = Time; fEnergy = Energy;
+  void Set(int ID, int NSipms, float Time,  float EDep) {
+    fCid = ID; fNSipms = NSipms; fTime = Time; fEDep = EDep;
   }
 //-----------------------------------------------------------------------------
 // schema evolution
@@ -46,10 +52,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt = "");
-  void Print(Option_t* opt = "") const;
+  virtual void Clear(Option_t* opt = "")       override;
+  virtual void Print(Option_t* opt = "") const override;
 
-  ClassDefOverride(TCalHitData,1)
+  ClassDefOverride(TCalHitData,2)
 };
 
 #endif

@@ -88,7 +88,7 @@ public:
   void   SetAlgorithmIDCollTag      (std::string& Tag) { fAlgorithmIDCollTag   = art::InputTag(Tag); }
   void   SetCaloClusterCollTag      (std::string& Tag) { fCaloClusterCollTag   = art::InputTag(Tag); }
   void   SetSsChCollTag             (art::InputTag& Tag) { fSsChCollTag        = Tag; }
-  void   SetKFFCollTag              (std::string& Tag) { fKFFCollTag           = art::InputTag(Tag); }
+  void   SetKFFCollTag              (art::InputTag& Tag) { fKFFCollTag         = Tag; }
   void   SetPIDProductCollTag       (std::string& Tag) { fPIDProductCollTag    = art::InputTag(Tag); }
   void   SetVdhCollTag              (art::InputTag& Tag) { fVdhCollTag         = Tag; }
   void   SetStrawDigiMCCollTag      (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }
@@ -116,8 +116,8 @@ public:
                          const mu2e::Tracker* tracker);
   void    RetrieveData  (AbsEvent* AnEvent);
   
-  virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
-  virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
+  virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) override;
+  virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode) override;
 
 };
 

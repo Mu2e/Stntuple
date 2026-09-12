@@ -36,17 +36,17 @@ public:
 //-----------------------------------------------------------------------------
   TBeltLH(const char* Name, double CL = -1);
 
-  virtual int   init_poisson_dist(double MuB, double MuS, int NObs = -1);
+  virtual int   init_poisson_dist(double MuB, double MuS, int NObs = -1) override;
 
  // in presence of background, mu = mus+mub
   
-  virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
-  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr);
+  virtual int  construct_interval(double MuB, double MuS, int NObs = -1) override;
+  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr) override;
 
-  virtual int  make_prob_hist();
-  virtual void make_belt_hist();
+  virtual int  make_prob_hist() override;
+  virtual void make_belt_hist() override;
 
-  virtual int  test_coverage(double MuB, double SMin, double SMax, int NPoints);
+  virtual int  test_coverage(double MuB, double SMin, double SMax, int NPoints) override;
 
   ClassDefOverride(TBeltLH,0)
 };

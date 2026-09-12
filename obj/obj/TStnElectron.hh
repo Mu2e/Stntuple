@@ -46,7 +46,7 @@ public:
   
   Int_t  GetMomentum  (TLorentzVector* Momentum);
   
-  virtual void Print (Option_t* Opt = "") const ;
+  virtual void Print (Option_t* Opt = "") const override;
 
   ClassDefOverride(TStnElectron,0)
     

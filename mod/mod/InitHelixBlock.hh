@@ -36,8 +36,8 @@ public:
   art::InputTag   fSdmcCollTag;
   art::InputTag   fHSeedCollTag;        // helix seed  coll tag
   art::InputTag   fKsCollTag;           // helix KSF coll tag, to find assns
-  TString         fKsfBlockName;        // KalSeedFit  block name for BTRK
-  TString         fTclBlockName;        // TimeCluster block name
+  std::string     fKsfBlockName;        // KalSeedFit  block name for BTRK - obsolete ? TODO
+  std::string     fTcBlockName;         // TimeCluster block name
   int             fTrackFitType;        // for KinKal
 
   int             fVerbose;             // for debug printout
@@ -55,7 +55,7 @@ public:
   void   SetSdmcCollTag    (art::InputTag& Tag) { fSdmcCollTag  = Tag;                }
   void   SetKsCollTag      (art::InputTag& Tag) { fKsCollTag    = Tag;                }
   void   SetKsfBlockName   (std::string&  Name) { fKsfBlockName = Name.data();        }
-  void   SetTclBlockName   (std::string&  Name) { fTclBlockName = Name.data();        }
+  void   SetTcBlockName    (std::string&  Name) { fTcBlockName  = Name.data();        }
   void   SetTrackFitType   (int           Type) { fTrackFitType = Type;               }
 
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);

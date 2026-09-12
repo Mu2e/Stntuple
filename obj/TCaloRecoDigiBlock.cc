@@ -1,20 +1,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Dec 07 2001 P.Murat: start putting in some comments
 //  ---------------------------------------------------
-// TCalDigiBlock: ROOT-parseable description of TCalData to be stored in 
+// TCaloRecoDigiBlock: ROOT-parseable description of TCalData to be stored in 
 //                STNTUPLE
 ///////////////////////////////////////////////////////////////////////////////
 #include <format>
 #include "TVector2.h"
 
-#include "Stntuple/obj/TCalDigiBlock.hh"
+#include "Stntuple/obj/TCaloRecoDigiBlock.hh"
 
-ClassImp(TCalDigiBlock)
+ClassImp(TCaloRecoDigiBlock)
 
 // //_____________________________________________________________________________
-// void TCalDigiBlock::ReadV1(TBuffer &R__b) {
+// void TCaloRecoDigiBlock::ReadV1(TBuffer &R__b) {
 
-//   struct TCalDigiBlockV1_t {
+//   struct TCaloRecoDigiBlockV1_t {
 //     int            fNHits;		// number of hit crystals
 //     int            fNDisks;             // 
 //     int            fNCrystals  [4];	// 
@@ -24,19 +24,19 @@ ClassImp(TCalDigiBlock)
 //     float          fCrystalSize;
 //     float          fMinFraction;        // min fr of the included crystal area
 
-//     TClonesArray*  fListOfCalDigis;	// list of crystal hit data 
+//     TClonesArray*  fListOfCaloRecoDigis;	// list of crystal hit data 
 //   };
 
-//   TCalDigiBlockV1_t data; 
+//   TCaloRecoDigiBlockV1_t data; 
 
 //   int nwi = ((int*  ) data.fRMin       ) - &data.fNHits;
-//   int nwf = ((float*) &data.fListOfCalDigis) - data.fRMin;
+//   int nwf = ((float*) &data.fListOfCaloRecoDigis) - data.fRMin;
 
 //   R__b.ReadFastArray(&fNHits,nwi);
 //   R__b.ReadFastArray(fRMin  ,nwf);
 
 //   if (fNHits > 0) {
-//     fListOfCalDigis->Streamer(R__b);
+//     fListOfCaloRecoDigis->Streamer(R__b);
 //   }
 // 				// initialize V2 variables 
 //   fWrapperThickness = 0.065;    // 65 microns
@@ -46,11 +46,11 @@ ClassImp(TCalDigiBlock)
 
 
 //______________________________________________________________________________
-void TCalDigiBlock::Streamer(TBuffer &R__b) {
-  // Stream an object of class TCalDigiBlock.
+void TCaloRecoDigiBlock::Streamer(TBuffer &R__b) {
+  // Stream an object of class TCaloRecoDigiBlock.
 
-  // int nwi = ((int*  ) &fListOfCalDigis) - &fNDigis;
-  // int nwf = 0; // ((float*) &fListOfCalDigis) - fRMin;
+  // int nwi = ((int*  ) &fListOfCaloRecoDigis) - &fNDigis;
+  // int nwf = 0; // ((float*) &fListOfCaloRecoDigis) - fRMin;
 
   if (R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion(); 
@@ -58,43 +58,43 @@ void TCalDigiBlock::Streamer(TBuffer &R__b) {
                                         // else if (R__v == 2) ReadV2(R__b);
       R__b >> fNDigis;
       if (fNDigis > 0) {
-        fListOfCalDigis->Streamer(R__b);
+        fListOfCaloRecoDigis->Streamer(R__b);
       }
     }
     else {
 //-----------------------------------------------------------------------------
 // read version > 1 ???
 //-----------------------------------------------------------------------------
-      std::cout << std::format(">>> ERROR: TCalDigiBlock::Streamer read version:{}\n",R__v);
+      std::cout << std::format(">>> ERROR: TCaloRecoDigiBlock::Streamer read version:{}\n",R__v);
     } 
   }
   else {
-    R__b.WriteVersion(TCalDigiBlock::IsA());
+    R__b.WriteVersion(TCaloRecoDigiBlock::IsA());
     R__b << fNDigis;
 
     if (fNDigis > 0) {
-      fListOfCalDigis->Streamer(R__b);
+      fListOfCaloRecoDigis->Streamer(R__b);
     }
   }
 }
 
 //_____________________________________________________________________________
-TCalDigiBlock::TCalDigiBlock() {
+TCaloRecoDigiBlock::TCaloRecoDigiBlock() {
 
-  fListOfCalDigis    = new TClonesArray("TCalDigi",100);
-  fListOfCalDigis->BypassStreamer(kFALSE);
+  fListOfCaloRecoDigis = new TClonesArray("TCaloRecoDigi",100);
+  fListOfCaloRecoDigis->BypassStreamer(kFALSE);
   Clear();
 }
 
 //_____________________________________________________________________________
-TCalDigiBlock::~TCalDigiBlock() {
-  fListOfCalDigis->Delete();
-  delete fListOfCalDigis;
+TCaloRecoDigiBlock::~TCaloRecoDigiBlock() {
+  fListOfCaloRecoDigis->Delete();
+  delete fListOfCaloRecoDigis;
 }
 
 //_____________________________________________________________________________
-void TCalDigiBlock::Clear(Option_t* opt) {
-  fListOfCalDigis->Clear();
+void TCaloRecoDigiBlock::Clear(Option_t* opt) {
+  fListOfCaloRecoDigis->Clear();
   fNDigis             = 0;
 
   f_EventNumber       = -1;
@@ -104,12 +104,12 @@ void TCalDigiBlock::Clear(Option_t* opt) {
 }
 
 //_____________________________________________________________________________
-void TCalDigiBlock::Print(Option_t* opt) const {
+void TCaloRecoDigiBlock::Print(Option_t* opt) const {
   // print all the towers in the list
   if (fNDigis > 0) {
-    fListOfCalDigis->At(0)->Print("banner");
+    fListOfCaloRecoDigis->At(0)->Print("banner");
     for (int i=0; i<fNDigis; i++) {
-      fListOfCalDigis->At(i)->Print();
+      fListOfCaloRecoDigis->At(i)->Print();
     }
   }
 }

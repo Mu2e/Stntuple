@@ -19,6 +19,7 @@ int load_stnana_scripts_Stntuple() {
     "catalog.C"      , "PWD",
     "crv.C"          , "PWD",		     // CRV
     "debug.C"        , "PWD",
+    "det.C"          , "PWD",		     // CRV
     "genp.C"         , "PWD",
     "event_display.C", "PWD",
     "helix.C"        , "PWD",

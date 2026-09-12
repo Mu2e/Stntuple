@@ -100,15 +100,10 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
   int   pdg_id, mother_pdg_id, sim_id, gen_id;
   float mc_mom;
 
-  if (rn_number < 100000) mc_flag = 1;
-
   if (nhits > 0) {
 
-    // const mu2e::ComboHit* ch0 = &chc->at(0);
- 
     for (int i=0; i<nhits; i++) {
       const mu2e::StrawHit* sh = &shc->at(i);
-      // const mu2e::ComboHit* ch = &chc->at(i);
 
       int sd_flag = 0;
       if (sdc) sd_flag = *((int*) &sdc->at(i).digiFlag());
@@ -145,10 +140,10 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 	sim_id        = -1;
 	mc_mom        = -1.;
       }
-
+      // define hit MC flag
       int sid = sh->strawId().asUint16() | (mc_flag << 16);
 
-      // straw hit time is an integer (in ns)
+      // straw hit time is a float
 
       float time [2], tot[2];
 

@@ -296,7 +296,7 @@ int TStnCatalog::InitDataset(TStnDataset* Dataset            ,
 //_____________________________________________________________________________
 TStnCatalogServer* TStnCatalog::GetCatalogServer(const char* Book   , 
 						 const char* Dataset) {
-  // for Book="file" return the 1st available
+  // for Book="file" return the 1st available, however need at least one defined
 
   TStnCatalogServer* server;
   TIter it(fListOfCatalogServers);

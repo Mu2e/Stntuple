@@ -45,11 +45,11 @@ public:
 
   virtual ~TStnOutputModule();
 
-  virtual int BeginJob      ();
-  virtual int BeginRun      ();
-  virtual int Event         (Int_t i);
-  virtual int EndRun        ();
-  virtual int EndJob        ();
+  virtual int BeginJob      () override;
+  virtual int BeginRun      () override;
+  virtual int Event         (Int_t i) override;
+  virtual int EndRun        () override;
+  virtual int EndJob        () override;
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------

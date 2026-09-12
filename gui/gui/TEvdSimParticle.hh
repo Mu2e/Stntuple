@@ -43,11 +43,11 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  TSimParticle*       SimParticle() { return fSimp; }
+  TSimParticle* SimParticle() { return fSimp; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  virtual int DistancetoPrimitive    (int px, int py);
+  virtual int DistancetoPrimitive    (int px, int py) override;
   virtual int DistancetoPrimitiveXY  (int px, int py);
   virtual int DistancetoPrimitiveRZ  (int px, int py);
   virtual int DistancetoPrimitiveTZ  (int px, int py);
@@ -64,9 +64,9 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void  Paint(Option_t* Opt = "");
-  virtual void  Clear(Option_t* Opt = "");
-  virtual void  Print(Option_t* Opt = "") const ; // **MENU**
+  virtual void  Paint(Option_t* Opt = "") override;
+  virtual void  Clear(Option_t* Opt = "") override;
+  virtual void  Print(Option_t* Opt = "") const override; // **MENU**
 
   ClassDefOverride(stntuple::TEvdSimParticle,0)
 };

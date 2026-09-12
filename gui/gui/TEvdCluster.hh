@@ -42,7 +42,7 @@ public:
   TEvdCluster() {}
   TEvdCluster(const mu2e::CaloCluster* fCluster); 
 
-  virtual ~TEvdCluster();
+  virtual ~TEvdCluster() override;
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
@@ -55,18 +55,18 @@ public:
 //-----------------------------------------------------------------------------
   void    AddCrystal(TEvdCrystal* Crystal) { fListOfCrystals->Add(Crystal); }
 
-  virtual void  Paint   (Option_t* Option = "");
+  virtual void  Paint   (Option_t* Option = "") override;
   virtual void  PaintXY (Option_t* Option = "");
   virtual void  PaintCal(Option_t* Option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py) override;
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 
-  virtual void  Clear(const char* Opt = "");
-  virtual void  Print(const char* Opt = "") const ; // **MENU**
+  virtual void  Clear(const char* Opt = "") override;
+  virtual void  Print(const char* Opt = "") const override; // **MENU**
 
   ClassDefOverride(TEvdCluster,0)
 };

@@ -18,17 +18,17 @@
 #include "Stntuple/obj/TStnEvent.hh"
 
 #include "Offline/RecoDataProducts/inc/CaloDigi.hh"
-#include "Stntuple/mod/InitCalDigiBlock.hh"
+#include "Stntuple/mod/InitCaloDigiBlock.hh"
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 // ComboHitCollection and StrawHitCollection are of the same time, the first one 
 // contains real combo hits (one combo hit could be made out of more than one straw hit),
 // the other one has a combo hit per straw digi
 //-----------------------------------------------------------------------------
-int  StntupleInitCalDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
-  const char* oname = {"StntupleInitCalDigiBlock::InitDataBlock"};
+int  StntupleInitCaloDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
+  const char* oname = {"StntupleInitCaloDigiBlock::InitDataBlock"};
 
-  TCalDigiBlock* block = (TCalDigiBlock*) Block;
+  TCaloDigiBlock* block = (TCaloDigiBlock*) Block;
   
   block->Clear();
   
@@ -37,8 +37,8 @@ int  StntupleInitCalDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt
   art::Handle<mu2e::CaloDigiCollection>  cdch;
   int                                    ndigis(0);
   
-  if (! fCalDigiCollTag.empty()) {
-    bool ok = Evt->getByLabel(fCalDigiCollTag,cdch);
+  if (! fCaloDigiCollTag.empty()) {
+    bool ok = Evt->getByLabel(fCaloDigiCollTag,cdch);
     if (ok) {
       cdc   = cdch.product();
       ndigis = cdc->size();
@@ -46,14 +46,14 @@ int  StntupleInitCalDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt
     else {
       // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
       mf::LogWarning(oname) << std::format("ERROR: no CaloDigiCollection tag={} found. BAIL OUT",
-                                           fCalDigiCollTag.encode().data());
+                                           fCaloDigiCollTag.encode().data());
       return 0;
     }
   }
   
   for (int i=0; i<ndigis; i++) {
     const mu2e::CaloDigi* cd = &cdc->at(i);
-    TCalDigi* tcd            = block->NewCalDigi();
+    TCaloDigi* tcd            = block->NewCaloDigi();
     
     tcd->Set(cd->SiPMID(),cd->t0(),cd->peakpos(),&cd->waveform());
   }
@@ -62,7 +62,7 @@ int  StntupleInitCalDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt
 }
 
 //_____________________________________________________________________________
-Int_t StntupleInitCalDigiBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
+Int_t StntupleInitCaloDigiBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   // Mu2e version, do nothing
 
 //   Int_t  ev_number, rn_number;

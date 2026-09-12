@@ -16,7 +16,7 @@ public:
   TEvdMainFrame(const TGWindow* p, UInt_t w, UInt_t h, Int_t options);
   virtual ~TEvdMainFrame() {};
 
-  virtual Bool_t ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2);
+  virtual Bool_t ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) override;
 
   TStnVisManager* vm;
 

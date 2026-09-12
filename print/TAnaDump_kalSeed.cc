@@ -48,8 +48,12 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
     
     for (const mu2e::KalSegment& kalSeg : KalSeed->segments()) {
 
-      KinKal::VEC3 pos   = kalSeg.kinematicLine().pos0();
-      KinKal::VEC3 dir   = kalSeg.kinematicLine().direction();
+      KinKal::VEC3 pos   = kalSeg.position3(); // kalSeg.kinematicLine().pos0();
+      KinKal::VEC3 m3    = kalSeg.momentum3(); // kalSeg.kinematicLine().direction();
+      double mom         = kalSeg.mom();
+      
+      KinKal::VEC3 dir(m3.x()/mom,m3.y()/mom,m3.z()/mom);
+      
       double tmin        = kalSeg.tmin();
       double tmax        = kalSeg.tmax();
       double fmin        = kalSeg.fmin();
@@ -60,7 +64,7 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
       // if (cluster != 0) clusterEnergy = cluster->energyDep();
       printf("%5i %16p %3i %8.3f %8.3f %8.5f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %8.2f %8.2f %8.2f %8.2f\n",
 	     -1,
-	     static_cast<const void*>(KalSeed),
+	     (void*) KalSeed,
 	     nhits,chi2,
              t0, t0err, pos.x(),pos.y(),pos.z(), dir.x(),dir.y(),dir.z(),
              tmin,tmax,fmin, fmax);

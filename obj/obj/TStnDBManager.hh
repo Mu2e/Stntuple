@@ -54,9 +54,9 @@ public:
   TObject*  GetTable  (const char* Name);
 
 					// ****** overloaded methods of TObject
-  Int_t Read (const char* Name);
-  Int_t Write(const char* Name=0, Int_t option=0, Int_t bufsize=0);
-  Int_t Write(const char* Name=0, Int_t option=0, Int_t bufsize=0) const ;
+  virtual int Read (const char* Name) override;
+  virtual int Write(const char* Name=0, Int_t option=0, Int_t bufsize=0) override;
+  virtual int Write(const char* Name=0, Int_t option=0, Int_t bufsize=0) const override;
   //  void  MakeAvgBeamline();
 
   ClassDefOverride(TStnDBManager,2)

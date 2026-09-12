@@ -106,10 +106,10 @@ protected:
   TEventDisplayModule(const char* Name = "Stntuple_EventDisplay", const char* Title = "Stntuple_EventDisplay");
   ~TEventDisplayModule();
 
-  virtual int  BeginJob()           ;
-  virtual int  BeginRun()           ;
-  virtual int  EndJob  ()           ;
-  virtual int  Event   (int IEntry) ;
+  virtual int  BeginJob() override           ;
+  virtual int  BeginRun() override           ;
+  virtual int  EndJob  () override           ;
+  virtual int  Event   (int IEntry) override ;
   
   void MakeNavPanel();
   

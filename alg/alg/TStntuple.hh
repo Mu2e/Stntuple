@@ -87,7 +87,7 @@ public:
   // static int  PrintElectron(TStnElectron*       Ele,
   // 			    TStnElectronBlock*  ElectronBlock,
   // 			    TCalDataBlock*      CalDataBlock);
-  ClassDefOverride(TStntuple,0)
+  //  ClassDefOverride(TStntuple,0)
 };
 
 #endif

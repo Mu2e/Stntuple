@@ -12,10 +12,7 @@
 #include "TBuffer.h"
 
 class TStnHelixBlock: public TStnDataBlock {
-
   friend class StntupleInitHelixBlock; 
-  // friend Int_t StntupleInitMu2eHelixBlock     (TStnDataBlock*, AbsEvent* , int);
-  // friend Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock*, AbsEvent* , int);
 public:
 //----------------------------------------------------------------------------
 //  data members
@@ -48,8 +45,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt="");
-  void Print(Option_t* opt="") const;
+  virtual void Clear(Option_t* opt="") override;
+  virtual void Print(Option_t* opt="") const override;
 
   ClassDefOverride(TStnHelixBlock,1)
 };

@@ -33,7 +33,7 @@ public:
   TCalibRunLists();
   ~TCalibRunLists();
 
-  void  Print(const char* Opt = "") const ;
+  virtual void  Print(const char* Opt = "") const override;
 
   ClassDefOverride(TCalibRunLists,1)
 };

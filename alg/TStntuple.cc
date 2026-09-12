@@ -28,7 +28,7 @@
 #include "Stntuple/obj/TStnDBManager.hh"
 
 
-ClassImp(TStntuple)
+// ClassImp(TStntuple)
 
 
 TStntuple*        TStntuple::fgInstance  = 0;

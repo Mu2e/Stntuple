@@ -144,7 +144,7 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
 
   char line[100];
 
-  int rc, run_section;
+  int rc, subrun;
 
   THistModule::beforeEvent(anEvent);
 
@@ -189,11 +189,11 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
 // if we need to close a file and to write a new one, make such a decision here
 // fgOpenNextFile will be reset by FillStntuple after it writes the file
 //-----------------------------------------------------------------------------
-  run_section = anEvent.subRun();
+  subrun = anEvent.subRun();
 
   int mbytes_written = (int) (fgFile->GetBytesWritten()/1000000);
   if (mbytes_written >= fgMaxFileSize) {
-    if (run_section != old_rs) {
+    if (subrun != old_rs) {
       THistModule::fgOpenNextFile = 1;
     }
   }
@@ -260,17 +260,18 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
     }
 					// close the old file
     old_file->Write();
-    delete old_file;
-					// redefine the static variables
+    delete old_file;                    // TFile destructor also closes the file
+                                        // rename if needed
+    // TODO : renaming
+					// redefine static variables
     THistModule::fgTree = tree;
 
     THistModule::fgOpenNextFile = 0;
   }
 					// and finally fill the tree
-					// this is the first entry in the 
-					// new file
+					// this is the first entry in the new file
   fgTree->Fill();
-  old_rs = run_section;
+  old_rs = subrun;
 
   THistModule::afterEvent(anEvent);
 

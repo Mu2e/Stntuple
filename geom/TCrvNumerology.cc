@@ -26,7 +26,7 @@ TCrvNumerology::TCrvNumerology() {
     // return -2;
   }
 
-  int     sector, iwy, iwx, iwz ;
+  int     sector, type, iwy, iwx, iwz ;
   float   dy, dx, dz;
   char    name[100];
   int done = 0;
@@ -41,10 +41,12 @@ TCrvNumerology::TCrvNumerology() {
                                         // parse line
       fscanf(f,"%i" ,&sector       );
       fscanf(f,"%s" ,name          );
+      fscanf(f,"%i" ,&type         );
 
       SectorData_t* sec = &fSector[sector];
       sec->fNumber = sector;
       sec->fName   = name;
+      sec->fType   = type;
 
       fscanf(f,"%i" ,&sec->fNModules);
       fscanf(f,"%i" ,&sec->fNLayers );

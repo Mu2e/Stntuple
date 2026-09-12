@@ -88,14 +88,14 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void  Paint(Option_t* Opt = "");
-  virtual void  Clear(Option_t* Opt = "");
+  virtual void  Paint(Option_t* Opt = "") override;
+  virtual void  Clear(Option_t* Opt = "") override;
 
   virtual void  PrintMe() const ; // **MENU**
-  virtual void  Print  (Option_t* Opt = "") const ; // **MENU**
+  virtual void  Print  (Option_t* Opt = "") const override; // **MENU**
 
-  virtual int   DistancetoPrimitive(Int_t px, Int_t py);
-  virtual void  ExecuteEvent       (int Event, int Px, int Py);	
+  virtual int   DistancetoPrimitive(Int_t px, Int_t py) override;
+  virtual void  ExecuteEvent       (int Event, int Px, int Py) override;	
 
 
   ClassDefOverride(stntuple::TEvdTimeCluster,0)

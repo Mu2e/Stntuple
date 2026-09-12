@@ -22,7 +22,7 @@ public:
   int     fMotherPdgID;	                // mother PDG ID
 	  				// ----------------------------- floats
   float   fTime[2];			// 
-  float   fTOT[2];                      // 
+  float   fTOT [2];                     // 
   float   fEDep;			// energy deposition for the hit
   float   fMcMom;			// MC particle momentum
 
@@ -67,8 +67,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt = "");
-  void Print(Option_t* opt = "") const;
+  void Clear(Option_t* opt = "") override;
+  void Print(Option_t* opt = "") const override;
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------

@@ -11,25 +11,28 @@
 #include "Stntuple/obj/TStnInitDataBlock.hh"
 #include "Stntuple/obj/TStnTimeClusterBlock.hh"
 
-class StntupleInitTimeClusterBlock : public TStnInitDataBlock {
+namespace stntuple {
+  
+class InitTimeClusterBlock : public TStnInitDataBlock {
 public:
-  art::InputTag   fTimeClusterCollTag;
+  art::InputTag   fTcCollTag;
   art::InputTag   fShCollTag;
   art::InputTag   fChCollTag;
-  art::InputTag   fStrawDigiMCCollTag;
+  art::InputTag   fSdmcCollTag;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetTimeClusterCollTag (std::string& Tag) { fTimeClusterCollTag = art::InputTag(Tag); }
-  void   SetChCollTag          (art::InputTag& Tag) { fChCollTag    = Tag; }
-  void   SetShCollTag          (art::InputTag& Tag) { fShCollTag    = Tag; }
-  void   SetStrawDigiMCCollTag (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }
+  void   SetTcCollTag  (art::InputTag& Tag) { fTcCollTag   = Tag; }
+  void   SetChCollTag  (art::InputTag& Tag) { fChCollTag   = Tag; }
+  void   SetShCollTag  (art::InputTag& Tag) { fShCollTag   = Tag; }
+  void   SetSdmcCollTag(art::InputTag& Tag) { fSdmcCollTag = Tag; }
   
   virtual int InitDataBlock    (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks     (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
 
 };
-
+  
+}
 #endif

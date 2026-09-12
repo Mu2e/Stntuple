@@ -1,3 +1,4 @@
+#+startup:fold -*- buffer-read-only:t -*- 
 # use <TAB> to expand and collapse the menus
 * ------------------------------------------------------------------------------
 * STNANA: Stntuple interactive analysis framework                            
@@ -175,6 +176,14 @@ root[10] g.x->Continue(1);
 root[11] m_ele->fTrackBlock->Print() 
 #+end_src
 
+* updates
+** <2026-09-09 Wed> updates:                                                 
+- TCalHitDataBlock/TCalHitData go away replaced by TCalHitBlock/TCalHit
+- TCalDigi , TCalRecoDigi added
+- TCrvDigi added, TCrvRecoPulse, TCrvCoincidenceCluster reworked
+- THistBook added - start moving histogramming from TStnModule
+- Stntuple/ana/TCrvTimeAnaModule.cc - example of running on the data
+- Stntuple/test/make_crv.fcl - job configuration for running on the data
 * ------------------------------------------------------------------------------
 * back to [[file:./Stntuple.org][Stntuple.org]]
 * ------------------------------------------------------------------------------

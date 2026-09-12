@@ -9,6 +9,9 @@
 #pragma link C++ class stntuple::TClusterAnaModule;
 
 #pragma link C++ class stntuple::TCrvAnaModule;
+#pragma link C++ class stntuple::TCrvTimeAnaModule;
+
+#pragma link C++ class stntuple::TDetTimeAnaModule;
 
 #pragma link C++ class stntuple::TEventDisplayModule;
 

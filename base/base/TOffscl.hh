@@ -22,7 +22,7 @@ public:
   TOffscl();
   ~TOffscl();
 
-  void  Print(const char* Opt = "") const ;
+  virtual void  Print(const char* Opt = "") const override;
 
   ClassDefOverride(TOffscl,1)
 };

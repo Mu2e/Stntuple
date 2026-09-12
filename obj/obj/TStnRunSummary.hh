@@ -208,9 +208,9 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  const char* GetName() const { return fObjName.Data(); }
-  void        Clear(Option_t* option = "");
-  void        Print(Option_t* option = "") const;   // *MENU* 
+  virtual const char* GetName() const  override{ return fObjName.Data(); }
+  virtual void        Clear(Option_t* option = "") override;
+  virtual void        Print(Option_t* option = "") const override;   // *MENU* 
 //-----------------------------------------------------------------------------
 // schema evolution
 // v6: adds low and high runsections

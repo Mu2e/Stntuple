@@ -416,8 +416,8 @@ Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 //-----------------------------------------------------------------------------
   int ntseeds(0), ntpeaks(0);
 
-  TStnTrackSeedBlock*   tsb = (TStnTrackSeedBlock*  ) ev->GetDataBlock(fKsfBlockName.Data());
-  TStnTimeClusterBlock* tcb = (TStnTimeClusterBlock*) ev->GetDataBlock(fTclBlockName.Data());
+  auto tsb = (TStnTrackSeedBlock*  ) ev->GetDataBlock(fKsfBlockName.data());
+  auto tcb = (TStnTimeClusterBlock*) ev->GetDataBlock(fTcBlockName.data());
 
   if (tsb) ntseeds = tsb->NTrackSeeds();
   if (tcb) ntpeaks = tcb->NTimeClusters();
@@ -470,8 +470,8 @@ Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 
     int      tclIndex(-1);
     for (int j=0; j<ntpeaks;++j){
-      TStnTimeCluster* tp = tcb->TimeCluster(j);
-      const mu2e::TimeCluster* fktimepeak = tp->fTimeCluster;
+      TStnTimeCluster* tc = tcb->TimeCluster(j);
+      const mu2e::TimeCluster* fktimepeak = tc->OfflineTc();
       if (fktimepeak == ktimepeak){
         tclIndex = j;
         break;

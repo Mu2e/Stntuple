@@ -12,16 +12,19 @@ include_directories(
 # link_directories($ENV{ROOTSYS}/lib)
 
 set (include_files
-  TCalDigiBlock.hh TCalDigi.hh
-  TCalDataBlock.hh TCalHitData.hh TCrvClusterBlock.hh TCrvCoincidenceCluster.hh
-  # TCrvCoincidence.hh 
-  TCrvDigi.hh TCrvDigiBlock.hh TCrvPulseBlock.hh TCrvRecoPulse.hh TGenParticle.hh TGenpBlock.hh TSimParticle.hh TSimpBlock.hh 
+  TCaloDigiBlock.hh TCaloDigi.hh TCaloRecoDigi.hh TCaloRecoDigiBlock.hh TCaloHitBlock.hh TCaloHit.hh
+  TCalDataBlock.hh TCalHitData.hh
+  TCrvClusterBlock.hh TCrvCoincidenceCluster.hh
+  TCrvDigi.hh TCrvDigiBlock.hh TCrvPulseBlock.hh TCrvRecoPulse.hh
+  TComboHit.hh TComboHitBlock.hh
+  TGenParticle.hh TGenpBlock.hh TSimParticle.hh TSimpBlock.hh 
   TStepPointMCBlock.hh TStepPointMC.hh TStnClusterBlock.hh TStnCluster.hh TStnDataBlock.hh
   TStnDBManager.hh TStnElectron.hh TStnErrorLogger.hh TStnEvent.hh TStnGoodRunList.hh 
   TStnHeaderBlock.hh TStnHelixBlock.hh TStnHelix.hh TStnLinkBlock.hh TStnNode.hh TStnPidBlock.hh 
-  TStnPid.hh TStnRunSummary.hh TStnTimeClusterBlock.hh TStnTimeCluster.hh TStnTrackBlock.hh 
-  TStnTrack.hh TStnTrackSeedBlock.hh TStnTrackSeed.hh TStnTriggerBlock.hh TStnTrigger.hh 
-  TStnTriggerTable.hh
+  TStnPid.hh TStnRunSummary.hh TStnTimeClusterBlock.hh TStnTimeCluster.hh
+  TStnTrackBlock.hh TStnTrack.hh TStrTrack.hh TStrTrackBlock.hh
+  TStnTrackSeedBlock.hh TStnTrackSeed.hh
+  TStnTriggerBlock.hh TStnTrigger.hh TStnTriggerTable.hh
   TStrawDigiBlock.hh TStrawDigi.hh
   TStrawHitBlock.hh TStrawHit.hh TStrWaveform.hh TTrackStrawHitBlock.hh 
   TTrackStrawHit.hh TVDetDataBlock.hh TVDetHitData.hh 
@@ -32,15 +35,17 @@ ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 set (source_files
-  TCalDigiBlock.cc TCalDigi.cc
-  TCalDataBlock.cc TCalHitData.cc TCrvClusterBlock.cc
-  # TCrvCoincidence.cc
-  TCrvCoincidenceCluster.cc
-  TCrvDigi.cc TCrvDigiBlock.cc TCrvPulseBlock.cc TCrvRecoPulse.cc TGenParticle.cc TGenpBlock.cc TSimParticle.cc TSimpBlock.cc
+  TCaloDigiBlock.cc TCaloDigi.cc TCaloRecoDigi.cc TCaloRecoDigiBlock.cc TCaloHitBlock.cc  TCaloHit.cc
+  TCalDataBlock.cc TCalHitData.cc
+  TCrvClusterBlock.cc TCrvCoincidenceCluster.cc
+  TCrvDigi.cc TCrvDigiBlock.cc TCrvPulseBlock.cc TCrvRecoPulse.cc
+  TComboHit.cc TComboHitBlock.cc
+  TGenParticle.cc TGenpBlock.cc TSimParticle.cc TSimpBlock.cc
   TStepPointMCBlock.cc TStepPointMC.cc TStnClusterBlock.cc TStnCluster.cc TStnDataBlock.cc
   TStnDBManager.cc TStnElectron.cc TStnErrorLogger.cc TStnEvent.cc TStnGoodRunList.cc TStnHeaderBlock.cc
   TStnHelixBlock.cc TStnHelix.cc TStnInitDataBlock.cc TStnLinkBlock.cc TStnNode.cc TStnPidBlock.cc
-  TStnPid.cc TStnRunSummary.cc TStnTimeClusterBlock.cc TStnTimeCluster.cc TStnTrackBlock.cc TStnTrack.cc
+  TStnPid.cc TStnRunSummary.cc TStnTimeClusterBlock.cc TStnTimeCluster.cc
+  TStnTrackBlock.cc TStnTrack.cc TStrTrack.cc TStrTrackBlock.cc
   TStnTrackSeedBlock.cc TStnTrackSeed.cc TStnTriggerBlock.cc TStnTrigger.cc TStnTriggerTable.cc
   TStrawDigiBlock.cc TStrawDigi.cc
   TStrawHitBlock.cc TStrawHit.cc TStrWaveform.cc 

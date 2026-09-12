@@ -11,7 +11,7 @@ ClassImp(TCrvCoincidenceCluster)
 //_____________________________________________________________________________
 void TCrvCoincidenceCluster::Streamer(TBuffer &R__b) {
 
-  int nwi = ((int*) &fStartTime) - &fIndex;
+  int nwi = ((int*)   &fPes     ) - &fIndex;
   int nwf = ((float*) &fPosition) - &fStartTime;
   if (R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion();
@@ -22,8 +22,8 @@ void TCrvCoincidenceCluster::Streamer(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // curent version: V3
 //-----------------------------------------------------------------------------
-    R__b.ReadFastArray(&fIndex    ,nwi);
-    R__b.ReadFastArray(&fStartTime,nwf);
+    R__b.ReadFastArray(&fIndex,nwi);
+    R__b.ReadFastArray(&fPes  ,nwf);
     fPosition.Streamer(R__b);
     if(R__v > 1) fMCAvgPosition.Streamer(R__b);
     if(R__v < 3) {
@@ -49,13 +49,13 @@ TCrvCoincidenceCluster::~TCrvCoincidenceCluster() {
 }
 
 //_____________________________________________________________________________
-void TCrvCoincidenceCluster::Set(int Index, int SectorType, int NPulses, int NPe,
+void TCrvCoincidenceCluster::Set(int Index, int SectorType, int NPulses, float Pes,
 				 float X, float Y, float Z, float T1, float T2, float Slope)
 {
   fIndex      = Index;
   fSectorType = SectorType;
   fNPulses    = NPulses;
-  fNPe        = NPe;
+  fPes        = Pes;
   fPosition.SetXYZ(X,Y,Z);
   fStartTime  = T1;
   fEndTime    = T2;
@@ -78,7 +78,7 @@ void TCrvCoincidenceCluster::Clear(Option_t* opt) {
   fIndex = -1;
   fSectorType = -1;
   fNPulses = -1;
-  fNPe = -1;
+  fPes   = -1;
   fSimID = -1;
   fMCNPulses = -1;
   for(int i = 0; i < kNFreeInts; ++i) fFreeInts[i] = 0;
@@ -108,17 +108,17 @@ void TCrvCoincidenceCluster::Print(Option_t* Option) const {
 
   if (opt == "banner") return;
   
-  printf(" %3i ",fIndex);
-  printf(" %5i ",fSectorType);
-  printf(" %5i ",fNPulses);
-  printf(" %5i ",fNPe);
+  printf(" %3i "  ,fIndex);
+  printf(" %5i "  ,fSectorType);
+  printf(" %5i "  ,fNPulses);
+  printf(" %6.1f ",fPes);
   printf(" %8.2f ",fSlope);
   printf(" %8.2f ",fStartTime);
   printf(" %8.2f ",fEndTime);
   printf(" %8.2f ",fPosition.X());
   printf(" %8.2f ",fPosition.Y());
   printf(" %8.2f ",fPosition.Z());
-  printf(" %5i ",fSimID);
+  printf(" %5i "   ,fSimID);
   printf("\n");
 
 }

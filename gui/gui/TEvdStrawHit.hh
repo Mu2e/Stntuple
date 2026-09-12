@@ -101,7 +101,7 @@ public:
 
   //  virtual void  Draw    (Option_t* option = "");
 
-  virtual void  Paint      (Option_t* option = "");
+  virtual void  Paint      (Option_t* option = "") override;
   virtual void  PaintXY    (Option_t* option = "");
   virtual void  PaintRZ    (Option_t* option = "");
   virtual void  PaintCal   (Option_t* option = "");
@@ -112,7 +112,7 @@ public:
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 
-  virtual void  Print  (const char* Opt = "") const ;               // *MENU*
+  virtual void  Print  (const char* Opt = "") const override;       // *MENU*
   virtual void  PrintMe()                     const ;               // *MENU*
 
   ClassDefOverride(stntuple::TEvdStrawHit,0)

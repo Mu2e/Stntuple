@@ -15,7 +15,12 @@ int TSsqCrystalMap::fgStep[12] = {
 };
 
 //-----------------------------------------------------------------------------
-TSsqCrystalMap::TSsqCrystalMap(): TDiskCrystalMap() {
+TSsqCrystalMap::TSsqCrystalMap():TDiskCrystalMap() {
+}
+
+
+//-----------------------------------------------------------------------------
+TSsqCrystalMap::~TSsqCrystalMap() {
 }
 
 

@@ -25,22 +25,22 @@ public:
 
   virtual ~THttpCatalogServer();
 
-  int            InitChain(TChain*     Chain  ,
+  virtual int    InitChain(TChain*     Chain  ,
 			   const char* Book   ,
 			   const char* Dataset, 
 			   const char* Fileset,
 			   const char* File   ,
 			   Int_t       MinRun ,
-			   Int_t       MaxRun );
+			   Int_t       MaxRun ) override;
 
-  Int_t          InitDataset(TStnDataset* Dataset            ,
+  virtual int    InitDataset(TStnDataset* Dataset            ,
 			     const char*  Book    = ""       ,
 			     const char*  Name    = ""       ,
 			     const char*  Fileset = ""       ,
 			     const char*  File    = ""       ,
 			     Int_t        MinRun  = 1        ,
 			     Int_t        MaxRun  = 100000000,
-			     const char*  Type    = "STNTUPLE");
+			     const char*  Type    = "STNTUPLE") override;
 
   int            InitListOfFilesets(TStnDataset* Dataset, 
 				    const char*  Fileset,
@@ -54,7 +54,7 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  virtual int    FindDataset (const char* Book, const char* Dataset);
+  virtual int    FindDataset (const char* Book, const char* Dataset) override;
 
   // read the AAA_FILEs.html file, which replaces sam db calls
   int            LoadSamDBFromHtml(const char* Book, const char* Dataset);
@@ -67,19 +67,19 @@ public:
   virtual Int_t  GetNEvents  (const char* Book, 
 			      const char* Dataset, 
 			      const char* Fileset = 0,
-			      const char* File    = 0);
+			      const char* File    = 0) override;
 
   virtual Int_t  GetNFiles   (const char* Book       , 
 			      const char* Dataset    ,
-			      const char* Fileset = 0);
+			      const char* Fileset = 0) override;
   
-  virtual Int_t  GetNFilesets(const char* Book, const char* Dataset);
+  virtual Int_t  GetNFilesets(const char* Book, const char* Dataset) override;
 
   virtual Int_t  GetRemoteServer(const char* Book,
 				 const char* Dataset, 
 				 const char* Fileset,
 				 char*       Server,
-				 char*       RemoteDir);
+				 char*       RemoteDir) override;
 //-----------------------------------------------------------------------------
 // commands
 //-----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ public:
 			      const char* Dataset, 
 			      const char* Fileset,
 			      Int_t       Run1   ,
-			      Int_t       Run2   );
+			      Int_t       Run2   ) override;
 
   // contents of AAA_FILES.html
   TObjArray fAAAFilesHtml;

@@ -14,6 +14,8 @@ class TStnLumiMonModule;
 namespace stntuple {
 
   class TCrvAnaModule;
+  class TCrvTimeAnaModule;
+  class TDetTimeAnaModule;
   class TEventDisplayModule;
   class TGenAnaModule;
   class THelixAnaModule;
@@ -25,6 +27,8 @@ namespace stntuple {
 
   TClusterAnaModule*          m_cls   = nullptr;
   TCrvAnaModule*              m_crv   = nullptr;
+  TCrvTimeAnaModule*          m_crvt  = nullptr;
+  TDetTimeAnaModule*          m_det   = nullptr;
   TEventDisplayModule*        m_evd   = nullptr;
   TGenAnaModule*              m_gen   = nullptr;
   THelixAnaModule*            m_hel   = nullptr;

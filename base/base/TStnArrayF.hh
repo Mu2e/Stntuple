@@ -49,8 +49,8 @@ public:
   // may truncate logical size
   Int_t         SetPhysicalSize(Int_t n);
 
-  void          Clear(Option_t* opt = "") { fNDataWords = 0; }
-  void          Print(Option_t* opt = "") const ;
+  virtual void  Clear(Option_t* opt = "") override { fNDataWords = 0; }
+  virtual void  Print(Option_t* opt = "") const override;
 
   ClassDefOverride(TStnArrayF,2)		// an intelligent array of integers
 };

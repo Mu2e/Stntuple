@@ -105,8 +105,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  virtual void   Clear(Option_t* Opt = "");
-  virtual void   Print(Option_t* Opt = "") const;
+  virtual void   Clear(Option_t* Opt = "") override;
+  virtual void   Print(Option_t* Opt = "") const override;
 
   ClassDefOverride(TStnGoodRunList,1)
 

@@ -1,12 +1,12 @@
 //
 
 #include "TBuffer.h"
-#include "Stntuple/obj/TCalDigi.hh"
+#include "Stntuple/obj/TCaloDigi.hh"
 
-ClassImp(TCalDigi)
+ClassImp(TCaloDigi)
 
 //-----------------------------------------------------------------------------
-void TCalDigi::Streamer(TBuffer& R__b) {
+void TCaloDigi::Streamer(TBuffer& R__b) {
   
   int nwi = ((int*) &fWf   ) - &fNs;
 
@@ -27,7 +27,7 @@ void TCalDigi::Streamer(TBuffer& R__b) {
     }
   }
   else {
-    R__b.WriteVersion(TCalDigi::IsA());
+    R__b.WriteVersion(TCaloDigi::IsA());
 
     R__b.WriteFastArray(&fNs,nwi);
     if (fNs != 0) {
@@ -37,16 +37,16 @@ void TCalDigi::Streamer(TBuffer& R__b) {
 }
 
 //-----------------------------------------------------------------------------
-TCalDigi::TCalDigi() : TObject() {
+TCaloDigi::TCaloDigi() : TObject() {
   fNs = 0;
 }
 
 //-----------------------------------------------------------------------------
-TCalDigi::~TCalDigi() {
+TCaloDigi::~TCaloDigi() {
 }
 
 //-----------------------------------------------------------------------------
-void TCalDigi::Set(int SipmID, float T0, float PeakPos, const std::vector<int>* Wf) {
+void TCaloDigi::Set(int SipmID, float T0, float PeakPos, const std::vector<int>* Wf) {
   
   fSipmID = SipmID;
   fT0     = T0;
@@ -61,7 +61,7 @@ void TCalDigi::Set(int SipmID, float T0, float PeakPos, const std::vector<int>* 
 }
 
 //-----------------------------------------------------------------------------
-int TCalDigi::Init(int Ns) {
+int TCaloDigi::Init(int Ns) {
   int rc(0);
   if (fNs != Ns) {
     fNs = Ns;
@@ -71,5 +71,5 @@ int TCalDigi::Init(int Ns) {
 }
 
 //-----------------------------------------------------------------------------
-void TCalDigi::Clear(const char* Opt) {
+void TCaloDigi::Clear(const char* Opt) {
 }

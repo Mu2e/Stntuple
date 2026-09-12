@@ -22,6 +22,10 @@ THexCrystalMap::THexCrystalMap() {
 }
 
 
+//-----------------------------------------------------------------------------
+THexCrystalMap::~THexCrystalMap() {
+}
+
 
 //-----------------------------------------------------------------------------
 THexCrystalMap::THexCrystalMap(double Size, double RMin, double RMax): 
@@ -53,12 +57,6 @@ THexCrystalMap::THexCrystalMap(double Size, double RMin, double RMax):
   }
 
 }
-
-
-//-----------------------------------------------------------------------------
-THexCrystalMap::~THexCrystalMap() {
-}
-
 
 
 //-----------------------------------------------------------------------------

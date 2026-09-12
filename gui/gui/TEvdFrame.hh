@@ -78,14 +78,14 @@ public:
 
   void HandleButtons(Int_t id = -1);
   void EditorBar();
-  virtual Bool_t ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2);
+  virtual Bool_t ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) override;
 
-  void  ShowStatusBar(Bool_t show);
-  void  SetStatusText(const char* txt = 0, Int_t partidx = 0);
+  virtual void  ShowStatusBar(Bool_t show) override;
+  virtual void  SetStatusText(const char* txt = 0, Int_t partidx = 0) override;
 
   TCanvas*  GetCanvas() { return fEmbeddedCanvas->GetCanvas(); }
 
-  virtual void CloseWindow();
+  virtual void CloseWindow() override;
 
   void OpenLegendPopup();
   void OpenLegendCalView();

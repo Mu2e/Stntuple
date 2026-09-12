@@ -94,8 +94,8 @@ TStnLinkBlock::~TStnLinkBlock() {
 //_____________________________________________________________________________
 Int_t TStnLinkBlock::InitLinks(Int_t i) {
   // force initialization of links for object `i' (otherwise the last one 
-  // may get lost), assume that this routine is never called in non-sequential
-  // order
+  // may get lost)
+  // assume that this routine is never called in non-sequential order
 
   int loc;
 

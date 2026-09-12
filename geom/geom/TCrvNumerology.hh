@@ -14,6 +14,7 @@ public:
   struct SectorData_t {
     int     fNumber;
     TString fName;
+    int     fType;
     int     fNModules;
     int     fNLayers;
     int     fNBarsPerLayer;
@@ -22,17 +23,14 @@ public:
   };
 
   struct BarData_t {
-    int     fBarIndex;
-    int     fSector;
-    int     fSectorType;
+    int      fBarIndex;
+    int      fSector;
+    int      fSectorType;
     TVector3 fBarPos;
-    int     fBarU;
-    int     fBarV;
-    int     fBarK;
-    // float   fBarX;
-    // float   fBarY;
-    // float   fBarZ;
-    // float   fWidthDir;
+    int      fBarU;
+    int      fBarV;
+    int      fBarK;
+
     float   localX() {
       float dir(1);
       if((fSector >= 0) && (fSector <= 4))
@@ -45,7 +43,7 @@ public:
   enum { kNSectors = 22, kNBars = 5504 } ;
 
   SectorData_t fSector[kNSectors];
-  BarData_t    fBar[kNBars];
+  BarData_t    fBar   [kNBars];
 
   static  TCrvNumerology* fgInstance;
 
@@ -65,6 +63,7 @@ public:
 //-----------------------------------------------------------------------------
   int         NSectors          () { return kNSectors;                 }
   const char* Name         (int I) { return fSector[I].fName.Data();   }
+  int         Type         (int I) { return fSector[I].fType;          }
   int         NModules     (int I) { return fSector[I].fNModules;      }
   int         NBarsPerLayer(int I) { return fSector[I].fNBarsPerLayer; }
   int         FirstIndex   (int I) { return fSector[I].fFirstIndex;    }
@@ -80,8 +79,8 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void    Clear(Option_t* Opt = "") ;
-  void    Print(Option_t* Opt = "") const ;
+  virtual void  Clear(Option_t* Opt = "") override;
+  virtual void  Print(Option_t* Opt = "") const override;
 
   ClassDefOverride(TCrvNumerology,0)
 

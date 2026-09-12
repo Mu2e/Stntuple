@@ -28,8 +28,8 @@ public:
   TMu2eBField();
   ~TMu2eBField();
   
-  virtual Float_t    GetMaxFieldMag() const { return 5. ; }
-  virtual TEveVector GetField(float X, float Y, float Z) const ;
+  virtual Float_t    GetMaxFieldMag() const override { return 5. ; }
+  virtual TEveVector GetField(float X, float Y, float Z) const override;
 
   ClassDefOverride(TMu2eBField, 0);
 };

@@ -15,13 +15,11 @@
 
 #include "Stntuple/obj/TStnHeaderBlock.hh"
 #include "Stntuple/mod/InitHeaderBlock.hh"
-// #include <Stntuple/mod/StntupleUtilities.hh>
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 
-// #include "Stntuple/mod/THistModule.hh"
 #include "Offline/MCDataProducts/inc/ProtonBunchIntensity.hh"
 #include "Offline/MCDataProducts/inc/EventWeight.hh"
 
@@ -58,7 +56,7 @@ int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
   AnEvent->getByLabel("PBISim", pbiHandle);
 
   if (!pbiHandle.isValid()) {
-    mf::LogWarning(oname) << " WARNING: no ProtonBunchIntensity objects found\n";
+    mf::LogWarning(oname) << " WARNING: no ProtonBunchIntensity objects found";
   }
   else {
 //-----------------------------------------------------------------------------
@@ -105,15 +103,15 @@ int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
 //-----------------------------------------------------------------------------
 // number of calo hits
 //-----------------------------------------------------------------------------
-  art::Handle< mu2e::CaloHitCollection> calHitsH;
-  const mu2e::CaloHitCollection*        calHits(nullptr);
+  art::Handle< mu2e::CaloHitCollection> caloHitsH;
+  const mu2e::CaloHitCollection*        caloHits(nullptr);
 
-  if (! fCalHitCollTag.empty()) {
-    AnEvent->getByLabel(fCalHitCollTag,calHitsH);
+  if (! fCaloHitCollTag.empty()) {
+    AnEvent->getByLabel(fCaloHitCollTag,caloHitsH);
 
-    if (calHitsH.isValid()) {
-      calHits = calHitsH.product();
-      data->fNCaloHits = calHits->size();
+    if (caloHitsH.isValid()) {
+      caloHits = caloHitsH.product();
+      data->fNCaloHits = caloHits->size();
     }
   }
 //-----------------------------------------------------------------------------

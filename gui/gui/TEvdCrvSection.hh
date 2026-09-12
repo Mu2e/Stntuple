@@ -61,7 +61,7 @@ public:
 
   //  virtual void  Draw    (Option_t* option = "");
 
-  virtual void  Paint(Option_t* option = "");
+  virtual void  Paint(Option_t* option = "") override;
   //virtual void  PaintXY(Option_t* Option = "");
   //virtual void  PaintRZ(Option_t* Option = "");
   //virtual void  PaintCal(Option_t* Option = "");
@@ -71,7 +71,7 @@ public:
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py) override;
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 

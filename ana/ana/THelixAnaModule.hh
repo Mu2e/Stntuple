@@ -188,10 +188,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnModule
 //-----------------------------------------------------------------------------
-  int     BeginJob();
-  int     BeginRun();
-  int     Event   (int ientry);
-  int     EndJob  ();
+  int     BeginJob() override;
+  int     BeginRun() override;
+  int     Event   (int ientry) override;
+  int     EndJob  () override;
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------

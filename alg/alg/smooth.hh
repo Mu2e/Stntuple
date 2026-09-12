@@ -30,8 +30,7 @@ public:
 
   static  double func(double* X, double* P);
 
-  ClassDef(smooth,0)
-
+  // ClassDef(smooth,0)
 };
 
 #endif

@@ -2,7 +2,7 @@
 // Description:
 // -----------
 // Class StntupleModule : base class for STNTUPLE modules
-// It inherits from RootHistModule and adds static pointer to TStnEvent
+// It inherits from THistModule and adds static pointer to TStnEvent
 // plus `AddDataBlock' method
 //
 // Nov 23 2000 P.Murat
@@ -79,9 +79,11 @@ void StntupleModule::LogError(char* Message)
 }
 
 //_____________________________________________________________________________
+// InitDataBlock: function initializing the data block
+//-----------------------------------------------------------------------------
 TStnDataBlock* StntupleModule::AddDataBlock(const char* branch_name,
 					    const char* class_name,
-					    Int_t       (*f)(TStnDataBlock*,AbsEvent*,Int_t),
+					    Int_t       (*InitDataBlock)(TStnDataBlock*,AbsEvent*,Int_t),
 					    Int_t       buffer_size,
 					    Int_t       split,
 					    Int_t       compression) 
@@ -106,7 +108,7 @@ TStnDataBlock* StntupleModule::AddDataBlock(const char* branch_name,
 			    split);
     branch->SetCompressionLevel(compression);
     block = node->GetDataBlock();
-    block->SetExternalInit(f);
+    block->SetExternalInit(InitDataBlock);
     block->SetNode(node);
   }
   else if (rc > 0) {
