@@ -49,11 +49,11 @@ namespace stntuple {
 int  InitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
   const char* oname = {"StntupleInitTimeClusterBlock::InitDataBlock"};
 
-  int ev_number, rn_number, mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
+  int ev_number, rn_number; // , mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
 
   ev_number = Event->event();
   rn_number = Event->run();
-  if (rn_number < 100000) mc_flag = 1;
+  //  if (rn_number < 100000) mc_flag = 1;
 
   TStnTimeClusterBlock* tcb = (TStnTimeClusterBlock*) Block;
   tcb->Clear();
@@ -73,7 +73,7 @@ int  InitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, 
   art::Handle<mu2e::ComboHitCollection>    chcH;
   const mu2e::ComboHitCollection*          chc(nullptr);
 //-----------------------------------------------------------------------------
-// combohits are mostly needed for debugging and MC-specific purpose
+// combohits in ntuples are mostly needed for debugging and MC-specific purpose
 //-----------------------------------------------------------------------------
   if (! fChCollTag.empty()) {
     bool ok = Event->getByLabel(fChCollTag,chcH);

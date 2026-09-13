@@ -26,7 +26,7 @@ InitCaloHitBlock::InitCaloHitBlock() : TStnInitDataBlock() {
 int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
   std::string oname("InitCaloHitBlock::InitDataBlock");
 
-  int ev_number, rn_number, mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
+  int ev_number, rn_number; // , mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
 
   ev_number = Event->event();
   rn_number = Event->run();
@@ -39,7 +39,7 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
   chb->f_RunNumber   = rn_number;
   chb->f_EventNumber = ev_number;
 
-  if (rn_number < 100000) mc_flag = 1; 
+  // if (rn_number < 100000) mc_flag = 1; 
 
   if (fLastRun != rn_number) {
     fLastRun  = rn_number;

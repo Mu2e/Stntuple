@@ -47,11 +47,11 @@ bool InitComboHitBlock::CloseEnough(float Time) {
 int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
   std::string oname("InitComboHitBlock::InitDataBlock");
 
-  int ev_number, rn_number, mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
+  int ev_number, rn_number; // , mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
 
   ev_number = Event->event();
   rn_number = Event->run();
-  if (rn_number < 100000) mc_flag = 1; 
+  //  if (rn_number < 100000) mc_flag = 1; 
 
   if (Block->Initialized(ev_number,rn_number)) return 0;
 

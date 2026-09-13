@@ -137,7 +137,7 @@ int  InitCaloClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, 
 //-----------------------------------------------------------------------------
   const mu2e::CaloHit           *hit;
   const CLHEP::Hep3Vector       *pos;
-  int                           id, ncl;
+  int                           id;
 
   constexpr double ROuterRing = 600.; // outer ring where cosmics deposit more energy
 
@@ -145,8 +145,8 @@ int  InitCaloClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, 
   double                        e, e1(-1.), e2, emean, e2mean, trms, e9, e25, out_ring_e;
   double                        x_0, y_0, r, max_r;
 
-  ncl = list_of_clusters->size();
-  for (int i=0; i<ncl; i++) {
+  //  ncl = list_of_clusters->size();
+  for (int i=0; i<nclusters; i++) {
     cluster               = cb->NewCluster();
     cl                    = list_of_pcl.at(i);
     cluster->fCaloCluster = cl;
@@ -178,7 +178,7 @@ int  InitCaloClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, 
       if (!mc_cl) {
         printf("[InitClusterBlock::%s] %i/%i/%i: No MC cluster found for cluster %i, N(clusters) = %i, N(MC clusters) = %zu\n",
                __func__, Event->run(), Event->subRun(), Event->event(),
-               i, ncl, list_of_mc_clusters->size());
+               i, nclusters, list_of_mc_clusters->size());
       }
     }
 //-----------------------------------------------------------------------------
