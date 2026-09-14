@@ -5,8 +5,7 @@
 //  0  : all events
 //  1  : passed events
 //  2  : rejected events
-//  3  : N(CalHelixFinder helices hel>0) > 0
-//  4  : N(CalHelixFinder helices hel<0) > 0
+//  3  : N(Calc  disk 0 ) > 0 and N(calc disk1 > 0)
 // 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
@@ -530,6 +529,22 @@ int TDetTimeAnaModule::CalculateMissingTrkParameters() {
 // as the calibration used time clusters, look at the time cluster T0
 //-----------------------------------------------------------------------------
     float crv_time_offset = 0.; // 21; // today
+
+    double crv_off[3] = {    0., -145.0, 0.0 };
+      
+    double trk_pos[3] = {-3904., 0., 24171.0 }; // nominal
+    //    double trk_off[3] = {    0., 0., -1171.0 }; // offset to be added
+    double trk_off[3] = {    0., 0., -1235.0 }; // offset to be added
+
+    double calo_pos[2][3] = {           // nominal
+      -3904., 0., 23000.0+2383.-64.,        // 25842;
+      -3904., 0., 23000.0+3517.-64.
+    };
+    
+    double calo_off[2][3] = {           // offset to be added
+      0.    , 0.,     0.,
+      0.    , 0.,     0.
+    };
     
     for (int i2=0; i2<fNCrvc; i2++) {
       TCrvCoincidenceCluster* crvc = fCrvcBlock->Cluster(i2);
@@ -544,18 +559,24 @@ int TDetTimeAnaModule::CalculateMissingTrkParameters() {
       if (fabs(tp->dtmin_crvc) <  30) {
         tp->intime_crvc = 1;
       }
-    
-      float ycrv  = tp->crvc->Position()->Y() - 145.; // -80.;//-4280; // for kicks
-      float dy    = ycrv-trk->fY0;
+//-----------------------------------------------------------------------------
+// transform track coordinates to global coordinate system
+// constants from Offline/Mu2eG4/geom/geom_common_extracted_v04.txt
+//-----------------------------------------------------------------------------
+      float y_crvc = tp->crvc->Position()->Y() + crv_off[1];  // -80.;//-4280; // for kicks
+      float dy     = y_crvc-trk->fY0;
+
+      tp->xcrv     = trk->fX0+(trk->fNx/trk->fNy)*dy; // track coordinates at Y_CRVC
+      tp->zcrv     = trk->fZ0+(trk->fNz/trk->fNy)*dy;
       
-      tp->xcrv    = trk->fX0+(trk->fNx/trk->fNy)*dy;
-      tp->zcrv    = trk->fZ0+(trk->fNz/trk->fNy)*dy;
-      
-      // X(CRVC) is defined in the global coordinate system
-      float x_crvc = tp->crvc->Position()->X() + 3904.;
-      tp->dx_crvc = tp->xcrv-x_crvc;
-      
-      tp->dz_crvc = tp->zcrv-(tp->crvc->Position()->Z()-23000.);  // approx
+      // X(CRVC) is defined in the global coordinate system, transform that
+      // to the local reference frame of the tracker
+
+      float x_crvc = tp->crvc->Position()->X()-(trk_pos[0]+trk_off[0]);
+      tp->dx_crvc  = tp->xcrv-x_crvc;
+
+      float z_crvc = tp->crvc->Position()->Z()-(trk_pos[2]+trk_off[2]);
+      tp->dz_crvc  = tp->zcrv-z_crvc;
     }
 //------------------------------;-----------------------------------------------
 // determine the closest calorimeter cluster
@@ -573,15 +594,21 @@ int TDetTimeAnaModule::CalculateMissingTrkParameters() {
 // extrapolate track to the closest cluster
 //-----------------------------------------------------------------------------
     if (tp->calc) {
-      double zc = 2383.; // 3560.; // guesswork for the disk0 position , not sure it is correct
-      if (tp->calc->DiskID() == 1) {
-        zc = 3517;
-      }
-      float dz    = zc-trk->fZ0;
-      float tx    = trk->fX0+trk->fNx/trk->fNz*dz;
-      float ty    = trk->fY0+trk->fNy/trk->fNz*dz;
-      tp->dx_calc = tx-tp->calc->fX;
-      tp->dy_calc = ty-tp->calc->fY;
+      // double zc = 2383.; // 3560.; // guesswork for the disk0 position , not sure it is correct
+      // if (tp->calc->DiskID() == 1) {
+      //   zc = 3517;
+      // }
+      int disk = tp->calc->DiskID();
+      
+      float dz    = calo_pos[disk][2]+calo_off[disk][2]-(trk->fZ0+trk_pos[2]+trk_off[2]);
+      
+      float x_trk = trk->fX0     + (trk_pos [0]+trk_off [0]) + trk->fNx/trk->fNz*dz;
+      float y_trk = trk->fY0     + (trk_pos [1]+trk_off [1]) + trk->fNy/trk->fNz*dz;
+      float x_cal = tp->calc->fX + (calo_pos[disk][0]+calo_off[disk][0]);
+      float y_cal = tp->calc->fY + (calo_pos[disk][1]+calo_off[disk][1]);
+      
+      tp->dx_calc = x_trk-x_cal;
+      tp->dy_calc = y_trk-y_cal;
     }
 
     if (fabs(tp->dtmin_calc) <  30) {
@@ -625,8 +652,12 @@ int TDetTimeAnaModule::CalculateMissingParameters() {
 //-----------------------------------------------------------------------------
 // extra parameters of the calorimeter clusters
 //-----------------------------------------------------------------------------
+  fNCcDisk[0] = 0;
+  fNCcDisk[1] = 0;
+  
   for (int i1=0; i1<fNCaloClusters; i1++) {
     TStnCluster*  calc = fCaloClusterBlock->Cluster(i1);
+    fNCcDisk[calc->DiskID()] += 1;
 
     calc_param_t& cp = fListOfCalcParam[i1];
 //-----------------------------------------------------------------------------
@@ -690,7 +721,7 @@ int TDetTimeAnaModule::BeginJob() {
 //-----------------------------------------------------------------------------
   RegisterDataBlock("CaloHitBlock"     ,"TCaloHitBlock"       ,&fCaloHitBlock     );
   RegisterDataBlock("CaloRecoDigiBlock","TCaloRecoDigiBlock"  ,&fCaloRecoDigiBlock);
-  RegisterDataBlock("ClusterBlock"     ,"TStnClusterBlock"    ,&fCaloClusterBlock );
+  RegisterDataBlock("CaloClusterBlock" ,"TStnClusterBlock"    ,&fCaloClusterBlock );
   RegisterDataBlock("CrvcBlock"        ,"TCrvClusterBlock"    ,&fCrvcBlock        );
   RegisterDataBlock("CrvpBlock"        ,"TCrvPulseBlock"      ,&fCrvpBlock        );
   RegisterDataBlock("TimeClusterBlock" ,"TStnTimeClusterBlock",&fTcBlock          );
@@ -759,9 +790,11 @@ int TDetTimeAnaModule::Event(int IEntry) {
 void TDetTimeAnaModule::Debug() {
 
   if (GetDebugBit(3) == 1) {
-    // if (fNHelPos[1] > 0) {
-    //   GetHeaderBlock()->Print(Form("N(CalHelixFinder helices hel > 0) = %2i",fNHelPos[1]));
-    // }
+    if ((fNCcDisk[0] > 0) and (fNCcDisk[1] > 0)) {
+      GetHeaderBlock()->Print(Form("NCcDisk[0]:%2i fNCcDisk[1]:%2i",
+                                   fNCcDisk[0],fNCcDisk[1]));
+      fCaloClusterBlock->Print();
+    }
   }
 
   if (GetDebugBit(4) == 1) {

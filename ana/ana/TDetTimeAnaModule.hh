@@ -201,6 +201,8 @@ public:
   int                       fNCrvp;
   int                       fNCrvd;
 
+  int                       fNCcDisk[2];
+
   std::vector<calc_param_t> fListOfCalcParam;
   std::vector<trk_param_t>  fListOfTrkParam;
 
