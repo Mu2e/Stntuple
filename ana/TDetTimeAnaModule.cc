@@ -6,6 +6,7 @@
 //  1  : passed events
 //  2  : rejected events
 //  3  : N(Calc  disk 0 ) > 0 and N(calc disk1 > 0)
+//  4  : N(Calc  disk 0 ) > 0 and N(calc disk1 > 0) and a track with N>=20 hits
 // 
 ///////////////////////////////////////////////////////////////////////////////
 #include <iostream>
@@ -798,9 +799,16 @@ void TDetTimeAnaModule::Debug() {
   }
 
   if (GetDebugBit(4) == 1) {
-    // if (fNHelNeg[1] > 0) {
-    //   GetHeaderBlock()->Print(Form("N(CalHelixFinder helices hel < 0) = %2i",fNHelNeg[1]));
-    // }
+    if ((fNCcDisk[0] > 0) and (fNCcDisk[1] > 0)) {
+      if (fNTrk >= 1) {
+        int nh = fTrackBlock->Track(0)->NHits();
+        if (nh >= 20) {
+          GetHeaderBlock()->Print(Form("NCcDisk[0]:%2i fNCcDisk[1]:%2i N_trk_hits = %3d",
+                                       fNCcDisk[0],fNCcDisk[1],nh));
+        }
+        fCaloClusterBlock->Print();
+      }
+    }
   }
 }
 

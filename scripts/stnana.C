@@ -109,7 +109,7 @@ void stnana (TString     Book   ,
 
     if (! gInterpreter->IsLoaded(macro)) {
       gInterpreter->LoadMacro(macro);
-      sprintf(load_script,"load_stnana_scripts_%s();",pkg);
+      sprintf(load_script,"load_stnana_scripts_%s(%d);",pkg,g.Debug);
       if (g.Debug != 0) printf("[stnana.C:%03i] executing: %s\n",__LINE__,load_script);
       gInterpreter->ProcessLine(load_script);
     }

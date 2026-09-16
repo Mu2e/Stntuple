@@ -46,5 +46,8 @@
 #pragma link C++ class TStrawHitVisNode;
 #pragma link C++ class TTrkVisNode;
 
+#pragma link C++ class    Counter;
+#pragma link C++ function draw_crv_geometry;
+
 #endif
 
