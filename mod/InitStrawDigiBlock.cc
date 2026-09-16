@@ -102,17 +102,21 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   const mu2e::StrawDigiCollection*        sdc(nullptr);
   
   art::Handle<mu2e::StrawDigiCollection>  sdch;
-  int                                     ndigis(0);
+  int                                     ndigis(0), mc_flag(0);
   
   art::Handle<mu2e::StrawDigiADCWaveformCollection> sdawfch;
   const mu2e::StrawDigiADCWaveformCollection*       sdawfc(nullptr);
   
   art::EventID evt_id = Evt->id();
+
+  int rn = Evt->run();
+  // Mu2e convention: MC run numbers < 100,000 , data run numebes > 100,000
+  if (rn < 100000) mc_flag = 1;
   
-  if (fLastRun != (int) Evt->run()) {
+  if (fLastRun != rn) {
     
     fTrkPanelMap = &fTpm_h.get(evt_id);
-    fLastRun    = Evt->run();
+    fLastRun     = rn;
   }
 
   if (! fStrawDigiCollTag.empty()) {
@@ -195,13 +199,13 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 
     // straw digi PMP is not a pulse-minus-pedestal, but the event window tag % 1024
     // stored there for debugging purposes
-    // those shoudl be the same for all DTCs
+    // those should be the same for all DTCs
     tsd->fPmp          = sd->PMP();
     // tracker dtc_id runs from 1 to 36
     if (block->fEwTag1024[dtc_id-1] == -1) {
       block->fEwTag1024[dtc_id-1] = tsd->fPmp;
     }
-    else if (block->fEwTag1024[dtc_id-1] !=  tsd->fPmp) {
+    else if ((mc_flag == 0) and (block->fEwTag1024[dtc_id-1] !=  tsd->fPmp)) {
       stntuple::print_(&evt_id,
                        stntuple::e_ERROR,
                        std::format("dtc_id:{} block->pmp[dtc_id]:{} hit_pmp{}",dtc_id,
@@ -212,7 +216,6 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     tsd->fBl = wp.bl;
     tsd->fPh = wp.ph;
   }
-
 
   block->fNDigis = idigi;
 

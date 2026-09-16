@@ -395,8 +395,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fVersion      = new TNamed(ver,text);
   TModule::fFolder->Add(fVersion);
 
-  fInitCaloDigiBlock    = nullptr;
-  fInitComboHitBlock    = nullptr;
+  fInitCaloDigiBlock     = nullptr;
+  fInitCaloRecoDigiBlock = nullptr;
+  fInitComboHitBlock     = nullptr;
   
   fInitCrvdBlock        = nullptr;
   fInitCrvpBlock        = nullptr;
