@@ -76,7 +76,7 @@ void TCaloHitBlock::Print(Option_t* opt) const {
   if (fNHits > 0) {
     fListOfCaloHits->At(0)->Print("banner");
     for (int i=0; i<fNHits; i++) {
-      fListOfCaloHits->At(i)->Print();
+      fListOfCaloHits->At(i)->Print("data");
     }
   }
 }

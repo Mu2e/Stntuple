@@ -59,6 +59,7 @@ physics : {
         }
 
         CaloHitMaker      : { @table::CaloReco.CaloHitMaker
+            time4Merge : 30.0   ## ns (default: 6)
         }
         
         CaloProtoClusterMaker : { @table::CaloCluster.CaloProtoClusterMaker

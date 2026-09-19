@@ -16,10 +16,12 @@
 namespace stntuple {
 class InitCaloHitBlock : public TStnInitDataBlock {
 public:
-  art::InputTag                    fCaloHitCollTag;
-  const mu2e::CaloHitCollection*   fCaloHitColl;
+  art::InputTag                       fCaloHitCollTag;
+  const mu2e::CaloHitCollection*      fCaloHitColl;
+  art::InputTag                       fCaloRecoDigiCollTag;
+  const mu2e::CaloRecoDigiCollection* fCaloRecoDigiColl;
 
-  int                              fLastRun;
+  int                                 fLastRun;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -27,7 +29,8 @@ public:
 
   InitCaloHitBlock();
   
-  void        SetCaloHitCollTag(art::InputTag& Tag) { fCaloHitCollTag = Tag; }
+  void SetCaloHitCollTag     (art::InputTag& Tag) { fCaloHitCollTag      = Tag; }
+  void SetCaloRecoDigiCollTag(art::InputTag& Tag) { fCaloRecoDigiCollTag = Tag; }
 
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) override;
   virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode) override;

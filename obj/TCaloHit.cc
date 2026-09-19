@@ -11,40 +11,48 @@ ClassImp(TCaloHit)
 //-----------------------------------------------------------------------------
 // frst version of the I/O with the schema evolution
 //-----------------------------------------------------------------------------
-// void TCaloHit::ReadV1(TBuffer &R__b) {
+void TCaloHit::ReadV1(TBuffer &R__b) {
 
-//   struct TCaloHit_t_V1 {
-//     int        fID;         // hit ID, cods disk,  x1, x2
-//     int        fNChannels;  // number of readout channels, 1 or 2 (kludge)
-//     float      fTime; 
-//     float      fEnergy;
-//     void*      fDummy;      // !
-//   } data;
+  struct TCaloHit_t_V1 {
+    int            fCid;                  // crystal ID
+    int            fNSipms;               // (number of R/O channels used, 1 or 2) || (n)digis) << 8
+    float          fTime;                 // 
+    float          fEDep;                 //
+    float          fSigT;                 // uncertainty on T.
+    float          fSigE;                 // uncertainty on E
   
-//   int nwi = ((int*  ) &data.fTime ) - &data.fID;
-//   int nwf = ((float*) &data.fDummy) - &data.fTime  ;
-  
-//   R__b.ReadFastArray(&data.fID  ,nwi);
-//   R__b.ReadFastArray(&data.fTime,nwf);
+    mu2e::CaloHit* fOfflineCaloHit;       //! transient
+  } data;
 
-//   fCid    = data.fID;
-//   fNSipms = data.fNChannels;
-//   fTime   = data.fTime;
-//   fEDep   = data.fEnergy;
-//   fSigT   = -1;
-//   fSigE   = -1;
-// }
+  int nwi = ((int*  ) &data.fTime          ) - &data.fCid;
+  int nwf = ((float*) &data.fOfflineCaloHit) - &data.fTime  ;
+
+  R__b.ReadFastArray(&data.fCid ,nwi);
+  R__b.ReadFastArray(&data.fTime,nwf);
+
+  fCid         = data.fCid;
+  fNSipms      = data.fNSipms;
+  fCrdIndex[0] = -1;                    // == added in V2 ==
+  fCrdIndex[1] = -1;                    // == added in V2 ==
+  fTime        = data.fTime;
+  fEDep        = data.fEDep;
+  fSigT        = data.fSigT;
+  fSigE        = data.fSigE;
+}
 
 //_____________________________________________________________________________
 void TCaloHit::Streamer(TBuffer &R__b) {
-  int nwi = ((int*) &fTime)             - &fCid;
+  int nwi = ((int*  ) &fTime          ) - &fCid;
   int nwf = ((float*) &fOfflineCaloHit) - &fTime;
   
   if(R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion();
-    if (R__v == 1) { // ReadV1(R__b);
+    if (R__v == 1) {
+      ReadV1(R__b);
+    }
+    else {
 //-----------------------------------------------------------------------------
-// current version 1
+// current version 2
 //-----------------------------------------------------------------------------
       TObject::Streamer(R__b);
       R__b.ReadFastArray(&fCid ,nwi);
@@ -84,7 +92,21 @@ void TCaloHit::Clear(Option_t* opt) {
   fSigE      = -1.;
 }
 
-//_____________________________________________________________________________
-void TCaloHit::Print(Option_t* opt) const {
-  std::cout << std::format("WARNING: TCaloHit::Print not implemented yet\n");
+//-----------------------------------------------------------------------------
+// Options: "banner", "data"
+//-----------------------------------------------------------------------------
+void TCaloHit::Print(Option_t* Option) const {
+  TString opt = Option;
+  opt.ToLower();
+
+  if ((opt == "") || (opt.Index("banner") >= 0)) {
+    printf("-----------------------------------------------------\n");
+    printf("   ID  CID NSipms   Time        EDep     SigT    SigE\n");
+    printf("-----------------------------------------------------\n");
+  }
+
+  if (opt.Index("data") < 0) return;
+
+  std::cout << std::format("{:5d} {:5d} {:4d} {:10.2f} {:10.3f} {:7.3f} {:7.3f}\n",
+                           GetUniqueID(),fCid,fNSipms,fTime,fEDep,fSigT,fSigE);  
 }

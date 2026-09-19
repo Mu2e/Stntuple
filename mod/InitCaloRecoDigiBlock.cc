@@ -66,6 +66,7 @@ int  InitCaloRecoDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, i
   const mu2e::CaloRecoDigi* crd0 =  &crdc->at(0);
   for (int i=0; i<ndigis; i++) {
     const mu2e::CaloRecoDigi* crd = &crdc->at(i);
+    // index in the original list of CaloRecoDigis
     int ind = crd-crd0;
     TCaloRecoDigi* tcrd  = tcrdb->NewCaloRecoDigi(ind);
     tcrd->fSipmID   = crd->SiPMID();
@@ -77,7 +78,7 @@ int  InitCaloRecoDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, i
     tcrd->fSigE     = crd->energyDepErr();
     tcrd->fChi2     = crd->chi2();
   }
-  // at this point tcrd->fNDigis is defined
+  // at this point tcrdb->fNDigis is defined
   return 0;
 }
 

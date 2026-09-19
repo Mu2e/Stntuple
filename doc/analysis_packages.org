@@ -49,9 +49,16 @@ Stnana.Package                Stntuple
 
  - *$pkg/ana/scripts* directory should contain a script named *load_stnana_scripts_$pkg.C*, 
    which at startup loads in ​​analysis job configuration scripts. See an example 
-   in [[file:../ana/scripts/load_stnana_scripts_Stntuple.C][Stntuple/ana/scripts/load_stnana_scripts_Stntuple.C]], make your own loader script, 
-   following the template
-
+   in [[file:../ana/scripts/load_stnana_scripts_Stntuple.C][Stntuple/ana/scripts/load_stnana_scripts_Stntuple.C]].
+   Make your own loader script, following the template
+#+begin_src
+  int load_stnana_scripts_Stntuple(int Debug) {
+  ....
+    return 0;
+  }
+#+end_src
+ - the _Debug_ parameter is intended to be used for troubleshooting 
+   
  - each loaded script defines one or several job configurations, for example:
    - [[file:../ana/scripts/validation.C][Stntuple/ana/scripts/validation.C]] defines one job (stn_val)
    - file:../ana/scripts/trk.C         also defines one

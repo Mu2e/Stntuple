@@ -597,7 +597,7 @@ void StntupleMaker::beginJob() {
     fInitCaloRecoDigiBlock = new stntuple::InitCaloRecoDigiBlock();
     fInitCaloRecoDigiBlock->SetCaloRecoDigiCollTag(fCaloRecoDigiCollTag);
 
-    AddDataBlock("CalRecoDigiBlock","TCaloRecoDigiBlock",
+    AddDataBlock("CaloRecoDigiBlock","TCaloRecoDigiBlock",
 		 fInitCaloRecoDigiBlock,
 		 buffer_size,
 		 split_mode,
@@ -622,7 +622,8 @@ void StntupleMaker::beginJob() {
 //-----------------------------------------------------------------------------
   if (fMakeCaloHits) {
     fInitCaloHitBlock = new stntuple::InitCaloHitBlock();
-    fInitCaloHitBlock->SetCaloHitCollTag(fCaloHitCollTag);
+    fInitCaloHitBlock->SetCaloHitCollTag     (fCaloHitCollTag     );
+    fInitCaloHitBlock->SetCaloRecoDigiCollTag(fCaloRecoDigiCollTag);
 
     AddDataBlock("CaloHitBlock","TCaloHitBlock",
                  fInitCaloHitBlock,
@@ -635,7 +636,7 @@ void StntupleMaker::beginJob() {
 //-----------------------------------------------------------------------------
   if (fMakeCaloClusters) {
     fInitCaloClusterBlock = new stntuple::InitCaloClusterBlock();
-    fInitCaloClusterBlock->SetCaloClusterCollTag  (fCaloClusterCollTag);
+    fInitCaloClusterBlock->SetCaloClusterCollTag  (fCaloClusterCollTag  );
     fInitCaloClusterBlock->SetCaloClusterMCCollTag(fCaloClusterMCCollTag);
 
     AddDataBlock("CaloClusterBlock","TStnClusterBlock",

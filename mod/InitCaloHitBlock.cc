@@ -21,7 +21,7 @@ namespace stntuple {
 InitCaloHitBlock::InitCaloHitBlock() : TStnInitDataBlock() {
   fLastRun     = -1;
 }
-  
+
 //-----------------------------------------------------------------------------
 int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
   std::string oname("InitCaloHitBlock::InitDataBlock");
@@ -54,7 +54,7 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
     bool ok = Event->getByLabel(fCaloHitCollTag,chch);
     if (ok) { 
       fCaloHitColl = chch.product();
-      nhits       = fCaloHitColl->size();
+      nhits        = fCaloHitColl->size();
     }
     else {
       mf::LogWarning(oname) << " ERROR:" << __LINE__ 
@@ -62,6 +62,25 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
                             << fCaloHitCollTag.encode().data() 
                             << " not found.";
       return -1;
+    }
+  }
+
+  if (nhits == 0) return 0;
+
+  int ncrdtot(0);
+  fCaloRecoDigiColl = nullptr;
+  if (! fCaloRecoDigiCollTag.empty() != 0) {
+    art::Handle<mu2e::CaloRecoDigiCollection> crdch;
+    bool ok = Event->getByLabel(fCaloRecoDigiCollTag,crdch);
+    if (ok) { 
+      fCaloRecoDigiColl = crdch.product();
+      ncrdtot           = fCaloRecoDigiColl->size();
+    }
+    else {
+      mf::LogWarning(oname) << " WARNING:" << __LINE__ 
+                            << " : mu2e::CaloHitCollection " 
+                            << fCaloRecoDigiCollTag.encode().data() 
+                            << " not found.";
     }
   }
 
@@ -86,9 +105,25 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
     // const mu2e::TrkPanelMap::Row* tpmd = fTpm->panel_map_by_offline_ind(pln,pnl);
     
     // ind is a hit index in the original Mu2e hit collection
-    TCaloHit* tch    = chb->NewCaloHit(ind);
+    TCaloHit* tch   = chb->NewCaloHit(ind);
     tch->fCid       = ch->crystalID();
-    tch->fNSipms    = ch->nSiPMs();
+    int ncrd        = ch->recoCaloDigis().size();
+    tch->fNSipms    = (ch->nSiPMs() & 0xff) | ((ncrd & 0xff) << 8) ;
+    if (fCaloRecoDigiColl != nullptr) {
+      auto crd0 = &fCaloRecoDigiColl->at(0);
+      for (int icrd=0; icrd<ncrd; ++icrd) {
+        const mu2e::CaloRecoDigi* crd = ch->recoCaloDigis().at(icrd).get();
+        int index = crd-crd0;
+        if (icrd < 2) {
+          tch->fCrdIndex[icrd] = index;
+        }
+        else {
+          mf::LogWarning(oname) << " ERROR:" << __LINE__ 
+                                << " : calo hit number " << i 
+                                << " is made from " << ncrd << "CaloRecoDidis.";
+        }
+      }
+    }
     tch->fTime      = ch->time();
     tch->fSigT      = ch->timeErr();
     tch->fEDep      = ch->energyDep();
