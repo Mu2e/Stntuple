@@ -67,14 +67,14 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
 
   if (nhits == 0) return 0;
 
-  int ncrdtot(0);
+  //  int ncrdtot(0);
   fCaloRecoDigiColl = nullptr;
   if (! fCaloRecoDigiCollTag.empty() != 0) {
     art::Handle<mu2e::CaloRecoDigiCollection> crdch;
     bool ok = Event->getByLabel(fCaloRecoDigiCollTag,crdch);
     if (ok) { 
       fCaloRecoDigiColl = crdch.product();
-      ncrdtot           = fCaloRecoDigiColl->size();
+      // ncrdtot           = fCaloRecoDigiColl->size();
     }
     else {
       mf::LogWarning(oname) << " WARNING:" << __LINE__ 
