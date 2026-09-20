@@ -4,6 +4,7 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "Stntuple/mod/InitCaloHitBlock.hh"
+#include "Stntuple/mod/MFInterface.hh"
 
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 
@@ -30,6 +31,8 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
 
   ev_number = Event->event();
   rn_number = Event->run();
+  
+  art::EventID eid = Event->id();
 
   if (Block->Initialized(ev_number,rn_number)) return 0;
 
@@ -57,10 +60,12 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
       nhits        = fCaloHitColl->size();
     }
     else {
-      mf::LogWarning(oname) << " ERROR:" << __LINE__ 
-                            << " : mu2e::CaloHitCollection " 
-                            << fCaloHitCollTag.encode().data() 
-                            << " not found.";
+      // mf::LogWarning(oname) << " ERROR:" << __LINE__ 
+      //                       << " : mu2e::CaloHitCollection " 
+      //                       << fCaloHitCollTag.encode().data() 
+      //                       << " not found.";
+      std::string msg = std::format("mu2e::CaloHitCollection {} not found\n",fCaloHitCollTag.encode().data());
+      stntuple::print_(&eid,e_ERROR,msg);
       return -1;
     }
   }
@@ -113,14 +118,28 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
       auto crd0 = &fCaloRecoDigiColl->at(0);
       for (int icrd=0; icrd<ncrd; ++icrd) {
         const mu2e::CaloRecoDigi* crd = ch->recoCaloDigis().at(icrd).get();
+        int sipmid = crd->SiPMID();
+        int cid    = sipmid / 2;
+        int sipm   = sipmid % 2;
+        if (cid != tch->fCid) {
+          // mf::LogWarning(oname) << " ERROR:" << __LINE__ 
+          //                       << " : CaloHit cid:" << tch->fCid  
+          //                       << " used CaloRecoDigi from cid:" << cid << ". SKIP";
+          std::string msg = std::format("CaloHit cid:{} made out of CaloRecoDigi cid:{}. SKIP\n",tch->fCid,cid);
+          stntuple::print_(&eid,e_ERROR,msg);
+          continue;
+        }
+        // CaloRecoDigi index in the original reco list, store first two
         int index = crd-crd0;
         if (icrd < 2) {
-          tch->fCrdIndex[icrd] = index;
+          tch->fCrdIndex[sipm] = index;
         }
         else {
-          mf::LogWarning(oname) << " ERROR:" << __LINE__ 
-                                << " : calo hit number " << i 
-                                << " is made from " << ncrd << "CaloRecoDidis.";
+          // mf::LogWarning(oname) << " ERROR:" << __LINE__ 
+          //                       << " : calo hit number " << i 
+          //                       << " is made from " << ncrd << "CaloRecoDidis.";
+          std::string msg = std::format("CaloHit number:{} is made out of {} CaloRecoDigis\n",i,ncrd);
+          stntuple::print_(&eid,e_ERROR,msg);
         }
       }
     }

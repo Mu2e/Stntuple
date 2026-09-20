@@ -149,16 +149,33 @@ physics : {
         
     trigger_paths : [ "t0" ]
     
-    output        : [ ]                   # [defaultOutput]/[]
+    output        : [ defaultOutput ] ## []
 
-    end_paths     : [ "p0" ]  ## defined in Stntuple/fcl/stntuple_tables.fcl
+    end_paths     : [ "p0" , output ]  ## defined in Stntuple/fcl/stntuple_tables.fcl
  
 }
 
+outputs.defaultOutput.outputCommands :  [
+                                         "drop *_*_*_*",
+                                         @sequence::Reconstruction.GeneralProducts,
+                                         @sequence::Reconstruction.HighRecoProducts,
+                                         @sequence::Reconstruction.MidRecoProducts,
+                                         "keep mu2e::TimeClusters_*_*_*",
+                                         "keep *_makeSH_*_*",
+                                         "keep *_DummyLumiInfo_*_*",
+                                         "keep *_TriggerResults_*_*",
+                                         "keep mu2e::CrvRecoPulses_*_*_*",
+                                         "keep mu2e::CrvDigis_*_*_*",
+                                         "keep mu2e::CrvDAQerrors_*_*_*",
+                                         "keep *_eventHeaderFromCFOFragment_*_*",
+                                         "keep mu2e::CrvCoincidenceClusters_*_*_*",
+                                         "keep mu2e::CrvStatus_*_*_*",
+                                         "drop artdaq::*_*_*_*" ,
+                                         "drop mu2e::CrvDigis_*_NZS_*"
+                                        ]
+
 services.TFileService.fileName              : "/dev/null" ##
 physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.vst00s00r00n004.make_crv.%06r_%06s.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
-
-# outputs.detectorOutput.fileName           : "sim._USER_.read_reco.xxx.000001.art"
 
 physics.producers.KKLine.KKFitSettings.UseCaloCluster : false
 physics.analyzers.InitStntuple.SelectEvents: [ "t0" ]     ## keep only events that passed t0
