@@ -4,6 +4,8 @@
 #include "TLorentzVector.h"
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
+
+#include <format>
 #include <vector>
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
@@ -15,6 +17,7 @@
 
 #include "Stntuple/obj/TStnHeaderBlock.hh"
 #include "Stntuple/mod/InitHeaderBlock.hh"
+#include "Stntuple/mod/MFInterface.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
@@ -31,7 +34,7 @@ void stntuple_get_version(char* ver, char* test);
 namespace stntuple {
 
 int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
-  const char oname []  = {"stntuple::InitHeaderBlock::InitDataBlock"};
+  // const char oname []  = {"stntuple::InitHeaderBlock::InitDataBlock"};
   const int verbose(0);
 
   TStnHeaderBlock* data = (TStnHeaderBlock*) Block;
@@ -56,7 +59,9 @@ int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
   AnEvent->getByLabel("PBISim", pbiHandle);
 
   if (!pbiHandle.isValid()) {
-    mf::LogWarning(oname) << " WARNING: no ProtonBunchIntensity objects found";
+    art::EventID eid = AnEvent->id();
+    std::string msg = std::format("no ProtonBunchIntensity objects found");
+    stntuple::print_(eid,e_WARNING,msg);
   }
   else {
 //-----------------------------------------------------------------------------

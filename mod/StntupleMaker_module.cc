@@ -648,8 +648,8 @@ void StntupleMaker::beginJob() {
   
   // obsolete, will go away soon
   if (fMakeClusters) {
-    
-    stntuple::print_(nullptr,stntuple::e_WARNING,
+    art::EventID eid(0,0,0);
+    stntuple::print_(eid,stntuple::e_WARNING,
                      "\"makeClusters\" is obsolete, use \"makeCaloClusters\" instead");
     
     fInitCaloClusterBlock = new stntuple::InitCaloClusterBlock();

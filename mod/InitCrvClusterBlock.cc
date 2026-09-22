@@ -2,7 +2,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include <format>
-#include "messagefacility/MessageLogger/MessageLogger.h"
+// #include "messagefacility/MessageLogger/MessageLogger.h"
+#include "Stntuple/mod/MFInterface.hh"
 
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
 #include "Stntuple/obj/TCrvPulseBlock.hh"
@@ -16,8 +17,9 @@
 // in this case AbsEvent is just not used
 //-----------------------------------------------------------------------------
 int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
-  const char oname []  = {"stntuple::InitCrvClusterBlock::InitDataBlock"};
+  // const char oname []  = {"stntuple::InitCrvClusterBlock::InitDataBlock"};
 
+  art::EventID eid = Event->id();
   const int ev = Event->event();
   const int rn = Event->run();
   const int sr = Event->subRun();
@@ -38,9 +40,11 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 
   if (!fCrvRecoPulseCollTag.empty()) {
     if (not Event->getByLabel(fCrvRecoPulseCollTag,crpch)) {
-      mf::LogWarning(oname) << std::format("WARNING: InitCrvClusterBlock::{} No CRV pulse collection (%s) found",
-                                           __func__, fCrvRecoPulseCollTag.encode().c_str());
-    }
+      // mf::LogWarning(oname) << std::format("WARNING: InitCrvClusterBlock::{} No CRV pulse collection (%s) found",
+      //                                      __func__, fCrvRecoPulseCollTag.encode().c_str());
+      std::string msg = std::format("No CRV pulse collection (%s) found",fCrvRecoPulseCollTag.encode().c_str());
+      stntuple::print_(eid,stntuple::e_WARNING,msg);
+     }
   }
 //-----------------------------------------------------------------------------
 // store CrvCoincidenceCluster's
@@ -55,8 +59,11 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       nccc = cccc->size();
     }
     else {
-      mf::LogWarning(oname) << std::format("WARNING: No CRV coincidence cluster collection (%s) found",
-                                           fCrvCoincidenceClusterCollTag.encode().c_str());
+      // mf::LogWarning(oname) << std::format("WARNING: No CRV coincidence cluster collection (%s) found",
+      //                                      fCrvCoincidenceClusterCollTag.encode().c_str());
+      std::string msg = std::format("No CRV coincidence cluster collection {} found",
+                                    fCrvCoincidenceClusterCollTag.encode().c_str());
+      stntuple::print_(eid,stntuple::e_WARNING,msg);
     }
   }
 
@@ -66,15 +73,20 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   if (!fCrvCoincidenceClusterMCCollTag.empty()) {
     if (Event->getByLabel(fCrvCoincidenceClusterMCCollTag,mc_ccc_assnsH)) mc_ccc_assns = mc_ccc_assnsH.product();
     else {
-      mf::LogWarning(oname) << std::format("WARNING: No MC <--> Reco CRV coincidence cluster associations (%s) found",
-                                           fCrvCoincidenceClusterMCCollTag.encode().c_str());
+      // mf::LogWarning(oname) << std::format("WARNING: No MC <--> Reco CRV coincidence cluster associations (%s) found",
+      //                                      fCrvCoincidenceClusterMCCollTag.encode().c_str());
+      std::string msg = std::format("No MC <--> Reco CRV coincidence cluster MC coll {} found",
+                                    fCrvCoincidenceClusterMCCollTag.encode().c_str());
+      stntuple::print_(eid,stntuple::e_WARNING,msg);    
     }
   }
   
   const int nmc_ccc_assns = (mc_ccc_assns) ? mc_ccc_assns->size() : 0;
   if(mc_ccc_assns && nmc_ccc_assns != nccc) {
-    mf::LogWarning(oname) << std::format("WARNING: MC cluster associations (%i) and Reco clusters (%i) don't match",
-                                         nmc_ccc_assns, nccc);
+    // mf::LogWarning(oname) << std::format("WARNING: MC cluster associations (%i) and Reco clusters (%i) don't match",
+    //                                      nmc_ccc_assns, nccc);
+    std::string msg = std::format("MC cluster associations {} and Reco clusters {} don't match",nmc_ccc_assns, nccc);
+    stntuple::print_(eid,stntuple::e_WARNING,msg);    
   }
 //-----------------------------------------------------------------------------
 // Loop over the CRV CC
@@ -83,7 +95,7 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     if (verbose > 0) {
       printf("InitCrvClusterBlock::%s: Processing cluster %i\n", __func__, iccc);
     }
-    const mu2e::CrvCoincidenceCluster* cluster = &cccc->at(iccc);
+    const mu2e::CrvCoincidenceCluster*   cluster    = &cccc->at(iccc);
     const mu2e::CrvCoincidenceClusterMC* mc_cluster = nullptr;
     if (!cluster) {
       printf("InitCrvClusterBlock::%s: Cluster %i is not defined!\n", __func__, iccc);

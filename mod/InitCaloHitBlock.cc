@@ -65,7 +65,7 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
       //                       << fCaloHitCollTag.encode().data() 
       //                       << " not found.";
       std::string msg = std::format("mu2e::CaloHitCollection {} not found\n",fCaloHitCollTag.encode().data());
-      stntuple::print_(&eid,e_ERROR,msg);
+      stntuple::print_(eid,e_ERROR,msg);
       return -1;
     }
   }
@@ -126,7 +126,7 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
           //                       << " : CaloHit cid:" << tch->fCid  
           //                       << " used CaloRecoDigi from cid:" << cid << ". SKIP";
           std::string msg = std::format("CaloHit cid:{} made out of CaloRecoDigi cid:{}. SKIP\n",tch->fCid,cid);
-          stntuple::print_(&eid,e_ERROR,msg);
+          stntuple::print_(eid,e_ERROR,msg);
           continue;
         }
         // CaloRecoDigi index in the original reco list, store first two
@@ -139,7 +139,7 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
           //                       << " : calo hit number " << i 
           //                       << " is made from " << ncrd << "CaloRecoDidis.";
           std::string msg = std::format("CaloHit number:{} is made out of {} CaloRecoDigis\n",i,ncrd);
-          stntuple::print_(&eid,e_ERROR,msg);
+          stntuple::print_(eid,e_ERROR,msg);
         }
       }
     }

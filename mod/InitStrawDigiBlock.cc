@@ -127,7 +127,7 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     }
     else {
       // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
-      stntuple::print_(&evt_id,
+      stntuple::print_(evt_id,
                        stntuple::e_WARNING,std::format("ERROR: no StrawDigiCollection tag={} found. BAIL OUT",
                                                        fStrawDigiCollTag.encode().data()));
       return 0;
@@ -138,7 +138,7 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       sdawfc = sdawfch.product();
     }
     else {
-      stntuple::print_(&evt_id,
+      stntuple::print_(evt_id,
                        stntuple::e_WARNING,
                        std::format("WARNING: StrawDigiADCWaveformCollection:{:s} is not available. Bail out\n",
                                    fStrawDigiCollTag.encode().data()));
@@ -206,7 +206,7 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       block->fEwTag1024[dtc_id-1] = tsd->fPmp;
     }
     else if ((mc_flag == 0) and (block->fEwTag1024[dtc_id-1] !=  tsd->fPmp)) {
-      stntuple::print_(&evt_id,
+      stntuple::print_(evt_id,
                        stntuple::e_ERROR,
                        std::format("dtc_id:{} block->pmp[dtc_id]:{} hit_pmp{}",dtc_id,
                                    block->fEwTag1024[dtc_id-1],tsd->fPmp));

@@ -23,7 +23,7 @@ namespace stntuple {
   
   // if EventID == nullptr, dont print the run:subrun:event
   
-  void print_(art::EventID* EventID, int Level, const std::string& Message,
+  void print_(art::EventID& EventID, int Level, const std::string& Message,
               const std::source_location& location  = std::source_location::current());
 
 }
