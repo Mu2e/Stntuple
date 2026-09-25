@@ -101,12 +101,12 @@ void TCaloHit::Print(Option_t* Option) const {
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("-----------------------------------------------------\n");
-    printf("   ID  CID NSipms   Time        EDep     SigT    SigE\n");
+    printf("   ID  CID NSipms NRDigis Time        EDep     SigT    SigE\n");
     printf("-----------------------------------------------------\n");
   }
 
   if (opt.Index("data") < 0) return;
 
-  std::cout << std::format("{:5d} {:5d} {:4d} {:10.2f} {:10.3f} {:7.3f} {:7.3f}\n",
-                           GetUniqueID(),fCid,fNSipms,fTime,fEDep,fSigT,fSigE);  
+  std::cout << std::format("{:5d} {:5d} {:4d} {:6d} {:10.2f} {:10.3f} {:7.3f} {:7.3f}\n",
+                           GetUniqueID(),fCid,NSipms(),NRecoDigis(),fTime,fEDep,fSigT,fSigE);  
 }

@@ -15,8 +15,7 @@ ClassImp(TStnGeoManager)
 
 //-----------------------------------------------------------------------------
 // different ways of constructing the geometry
-// if Fn = nullptr, init from GDML file
-// otherwise use to access detectors
+// if Fn != nullptr, assume Fn is the name of a GDML file, use that for initialization
 //-----------------------------------------------------------------------------
 TStnGeoManager::TStnGeoManager(const char* Name, const char* Fn, int UseOriginalColors) : TNamed(Name,Name) {
 

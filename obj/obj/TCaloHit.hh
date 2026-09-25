@@ -31,15 +31,15 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  int     Cid       () { return fCid;       }
-  int     NSipms    () { return (fNSipms     ) & 0xff; }
-  int     NRecoDigis() { return (fNSipms >> 8) & 0xff; }
-  float   Time      () { return fTime;      }
-  float   EDep      () { return fEDep;      }
-  float   SigT      () { return fSigT;      }
-  float   SigE      () { return fSigE;      }
+  int     Cid       () const { return fCid;       }
+  int     NSipms    () const { return (fNSipms     ) & 0xff; }
+  int     NRecoDigis() const { return (fNSipms >> 8) & 0xff; }
+  float   Time      () const { return fTime;      }
+  float   EDep      () const { return fEDep;      }
+  float   SigT      () const { return fSigT;      }
+  float   SigE      () const { return fSigE;      }
   
-  int     Disk      () { return (fCid / 674); }
+  int     Disk      () const { return (fCid / 674); }
       
 //-----------------------------------------------------------------------------
 // schema evolution

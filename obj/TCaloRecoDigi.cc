@@ -63,5 +63,17 @@ void TCaloRecoDigi::Clear(const char* Opt) {
 
 //-----------------------------------------------------------------------------
 void TCaloRecoDigi::Print(const char* Opt) const {
-  std::cout << std::format("TCaloRecoDigi::Print not implemented yet\n");
+  TString opt = Opt;
+  opt.ToLower();
+
+  if ((opt == "") || (opt.Index("banner") >= 0)) {
+    printf("------------------------------------------------------------------\n");
+    printf("   ID SipmID    Time        EDep     SigT    SigE ndf  chi2 Pileup\n");
+    printf("------------------------------------------------------------------\n");
+  }
+
+  if (opt.Index("data") < 0) return;
+
+  std::cout << std::format("{:5d} {:5d} {:10.2f} {:10.3f} {:7.3f} {:7.3f} {:3} {:5.1f} {:4}\n",
+                           GetUniqueID(),fSipmID, fTime,fEDep,fSigT,fSigE,fNdf,fChi2,fPileup );  
 }

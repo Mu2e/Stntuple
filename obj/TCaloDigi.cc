@@ -1,4 +1,6 @@
 //
+#include <iostream>
+#include <format>
 
 #include "TBuffer.h"
 #include "Stntuple/obj/TCaloDigi.hh"
@@ -72,4 +74,41 @@ int TCaloDigi::Init(int Ns) {
 
 //-----------------------------------------------------------------------------
 void TCaloDigi::Clear(const char* Opt) {
+}
+
+//-----------------------------------------------------------------------------
+void TCaloDigi::Print(const char* Opt) const {
+  TString opt = Opt;
+  opt.ToLower();
+  
+  if ((opt == "") || (opt.Index("banner") >= 0)) {
+    printf("------------------------------------------------------------------\n");
+    printf("   ID SipmID    T0     N s  PPos                  Wf              \n");
+    printf("------------------------------------------------------------------\n");
+  }
+  
+  if ((opt == "") || (opt.Index("data") >= 0)) {
+
+    std::cout << std::format("{:5d} {:5d} {:6d} {:6d} {:6d} *** ",
+                             GetUniqueID(),fSipmID,fT0,fNs,fPpos);
+    int ns = fWf.size();
+    if (ns == fNs) {
+      int pos = 0;
+      for (int i=0; i<ns; i++) {
+        printf("%5d",fWf[i]);
+        pos++;
+        if (pos == 40) {
+          printf("\n%37s","");
+          pos = 0;
+        }
+      }
+      if (pos != 0) {
+        printf("\n");
+      }
+    }
+    else {
+      std::cout << std::format("ERROR: ns:{} not equal to fNs:{}. BAIL OUT\n",
+                               ns,fNs);
+    }
+  }
 }

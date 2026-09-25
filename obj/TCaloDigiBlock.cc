@@ -109,7 +109,7 @@ void TCaloDigiBlock::Print(Option_t* opt) const {
   if (fNDigis > 0) {
     fListOfCaloDigis->At(0)->Print("banner");
     for (int i=0; i<fNDigis; i++) {
-      fListOfCaloDigis->At(i)->Print();
+      fListOfCaloDigis->At(i)->Print("data");
     }
   }
 }

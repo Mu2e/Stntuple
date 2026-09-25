@@ -26,7 +26,8 @@ public:
 
   std::vector<uint16_t>& Wf() { return fWf; }
 
-  virtual void Clear(const char* Opt) override ;
+  virtual void Clear(const char* Opt = "") override ;
+  virtual void Print(const char* Opt = "") const override ;
 
   ClassDefOverride(TCaloDigi,1);
 };
