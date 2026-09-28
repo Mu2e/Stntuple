@@ -53,7 +53,7 @@ int  StntupleInitCaloDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
   
   for (int i=0; i<ndigis; i++) {
     const mu2e::CaloDigi* cd = &cdc->at(i);
-    TCaloDigi* tcd            = block->NewCaloDigi();
+    TCaloDigi* tcd            = block->NewCaloDigi(i);
     
     tcd->Set(cd->SiPMID(),cd->t0(),cd->peakpos(),&cd->waveform());
   }

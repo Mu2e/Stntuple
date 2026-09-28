@@ -5,22 +5,47 @@
 #include "obj/TStnCluster.hh"
 
 ClassImp(TStnClusterBlock)
+//_____________________________________________________________________________
+void TStnClusterBlock::ReadV1(TBuffer &R__b) {
+
+  R__b >> fNClusters;
+  fListOfClusters->Streamer(R__b);
+
+  for (int i=0; i<fNClusters; i++) {
+    Cluster(i)->SetNumber(i);
+  }
+  
+  fListOfHitLinks->Clear();
+}
+
 //______________________________________________________________________________
 void TStnClusterBlock::Streamer(TBuffer &R__b) {
   // Stream an object of class TStnClusterBlock.
 
   if (R__b.IsReading()) {
-    Version_t R__v = R__b.ReadVersion(); if (R__v) { }
-    R__b >> fNClusters;
-    fListOfClusters->Streamer(R__b);
-    for (int i=0; i<fNClusters; i++) {
-      Cluster(i)->SetNumber(i);
+    Version_t R__v = R__b.ReadVersion();
+    if (R__v == 1) {
+      ReadV1(R__b);
     }
-  } 
+    else {
+      // current version : V2
+      R__b >> fNClusters;
+      if (fNClusters > 0) {
+        fListOfClusters->Streamer(R__b);
+        for (int i=0; i<fNClusters; i++) {
+          Cluster(i)->SetNumber(i);
+        }
+        fListOfHitLinks->Streamer(R__b);    // added in V2
+      }
+    }
+  }
   else {
     R__b.WriteVersion(TStnClusterBlock::IsA());
     R__b << fNClusters;
-    fListOfClusters->Streamer(R__b);
+    if (fNClusters > 0) {
+      fListOfClusters->Streamer(R__b);
+      fListOfHitLinks->Streamer(R__b);  // added in V2
+    }
   }
 }
 
@@ -29,6 +54,7 @@ TStnClusterBlock::TStnClusterBlock() {
   fNClusters   = 0;
   fListOfClusters = new TClonesArray("TStnCluster",100);
   fListOfClusters->BypassStreamer(kFALSE);
+  fListOfHitLinks = new TStnLinkBlock();
   fCollName  = "default";
 }
 
@@ -37,6 +63,7 @@ TStnClusterBlock::TStnClusterBlock() {
 TStnClusterBlock::~TStnClusterBlock() {
   fListOfClusters->Delete();
   delete fListOfClusters;
+  delete fListOfHitLinks;
 }
 
 
@@ -44,6 +71,7 @@ TStnClusterBlock::~TStnClusterBlock() {
 void TStnClusterBlock::Clear(Option_t* opt) {
   fNClusters = 0;
   fListOfClusters->Clear(opt);
+  fListOfHitLinks->Clear(opt);
 
   f_EventNumber       = -1;
   f_RunNumber         = -1;

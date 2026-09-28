@@ -9,6 +9,7 @@
 
 #include "Stntuple/obj/TStnDataBlock.hh"
 #include "Stntuple/obj/TStnCluster.hh"
+#include "Stntuple/obj/TStnLinkBlock.hh"
 #include "TBuffer.h"
 
 namespace stntuple {
@@ -23,6 +24,7 @@ public:
 //-----------------------------------------------------------------------------
   Int_t          fNClusters;
   TClonesArray*  fListOfClusters;
+  TStnLinkBlock* fListOfHitLinks;             // == added in V2 ==
 //----------------------------------------------------------------------------
 //  functions
 //----------------------------------------------------------------------------
@@ -42,17 +44,22 @@ public:
   Int_t           NClusters     () { return fNClusters;   }
   TClonesArray*   ListOfClusters() { return fListOfClusters; }
 
-  TStnCluster*   Cluster(int I) {
+  TStnCluster*    Cluster(int I) {
     return (TStnCluster*) fListOfClusters->UncheckedAt(I); 
   }
 
+  TStnLinkBlock*  ListOfHitLinks() { return fListOfHitLinks;     }
+//-----------------------------------------------------------------------------
+// schema evolution
+//-----------------------------------------------------------------------------
+  void     ReadV1(TBuffer &R__b);
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
   virtual void Clear(Option_t* opt="")       override;
   virtual void Print(Option_t* opt="") const override;
 
-  ClassDefOverride(TStnClusterBlock,1)
+  ClassDefOverride(TStnClusterBlock,2)
 };
 
 #endif

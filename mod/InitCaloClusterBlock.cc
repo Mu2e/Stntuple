@@ -312,15 +312,16 @@ int  InitCaloClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, 
     cluster->fE25       = e25;
     cluster->fOutRingE  = out_ring_e;
 
-    if(verbose > 1) printf("  T(RMS) = %5.3f, Max R = %5.1f, E9 = %5.1f, E25 = %5.1f, Out Ring E = %5.1f, R = %5.1f\n",
-                           cluster->fTimeRMS, cluster->fMaxR,
-                           cluster->fE9, cluster->fE25, cluster->fOutRingE,
-                           std::sqrt(std::pow(cluster->fX, 2) + std::pow(cluster->fY, 2)));
-
+    if(verbose > 1) {
+      printf("  T(RMS) = %5.3f, Max R = %5.1f, E9 = %5.1f, E25 = %5.1f, Out Ring E = %5.1f, R = %5.1f\n",
+             cluster->fTimeRMS, cluster->fMaxR,
+             cluster->fE9, cluster->fE25, cluster->fOutRingE,
+             std::sqrt(std::pow(cluster->fX, 2) + std::pow(cluster->fY, 2)));
+    } 
 //-----------------------------------------------------------------------------
 // MC information
 //_____________________________________________________________________________
-    if(mc_cl) {
+    if (mc_cl) {
       // Map sim --> energy deposited
       std::map<art::Ptr<mu2e::SimParticle>, float> sim_edep;
       std::map<art::Ptr<mu2e::SimParticle>, float> sim_mom_in;
@@ -372,24 +373,61 @@ int  InitCaloClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, 
 }
 
 //_____________________________________________________________________________
-int InitCaloClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
-  // Mu2e version, do nothing
+int InitCaloClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
+  // Mu2e version
+  const char* oname("InitCaloClusterBlock::ResolveLinks");
 
-  int ev_number = AnEvent->event();
-  int rn_number = AnEvent->run();
+  int evn = Event->event();
+  int rn  = Event->run();
+  int srn = Event->subRun();
 
-  if (! Block->Initialized(ev_number,rn_number)) return -1;
-
-					// do not do initialize links 2nd time
-
+  if (! Block->Initialized(evn,rn,srn)) return -1;
   if (Block->LinksInitialized()) return 0;
 
-  TStnClusterBlock* header = (TStnClusterBlock*) Block;
-  //  TStnEvent* ev   = header->GetEvent();
+  TStnClusterBlock* cb = (TStnClusterBlock*) Block;
+
+  int   nhits(0);
+  const mu2e::CaloHitCollection* list_of_hits;
+  
+  if (not fCaloHitCollTag.empty()) {
+    art::Handle<mu2e::CaloHitCollection> chch;
+    bool ok = Event->getByLabel(fCaloHitCollTag,chch);
+    if (ok) {
+      list_of_hits = chch.product();
+      nhits = list_of_hits->size();
+    }
+    else {
+      // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
+      mf::LogWarning(oname) << std::format("ERROR: no mu2e::CaloHitCollection tag={} found. BAIL OUT",
+                                           fCaloHitCollTag.encode().data());
+    }
+  }
+
+  if (nhits > 0) {
+    
+    int ncl = cb->NClusters();
+
+    const mu2e::CaloHit* h_0 = &list_of_hits->at(0);               // pointer to the first pulse
+     
+    for (int i=0; i<ncl; i++) {
+      TStnCluster* cl = cb->Cluster(i);
+      // 'cl' has a list of pointers to calo hits 
+      const mu2e::CaloCluster* o_cl = cl->OfflineCluster();
+      auto chpv = &o_cl->caloHitsPtrVector();  // offline list of associated pulses
+      // number of cluster hits (hopefully, crystals ?)
+      int  nh       = chpv->size();
+      for (int j=0; j<nh; j++) {
+        const mu2e::CaloHit* h_j = chpv->at(j).get();
+        // relying on vector of things
+        int  index = h_j-h_0;
+        cb->ListOfHitLinks()->Add(i,index);
+      }
+    }
+  }
 //-----------------------------------------------------------------------------
 // mark links as initialized
 //-----------------------------------------------------------------------------
-  header->fLinksInitialized = 1;
+  Block->SetLinksInitialized();
 
   return 0;
 }

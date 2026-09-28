@@ -34,19 +34,6 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   block->f_RunNumber    = rn;
   block->f_SubrunNumber = sr;
 //-----------------------------------------------------------------------------
-// initialize pointer to the pulse collection
-//-----------------------------------------------------------------------------
-  art::Handle<mu2e::CrvRecoPulseCollection> crpch;
-
-  if (!fCrvRecoPulseCollTag.empty()) {
-    if (not Event->getByLabel(fCrvRecoPulseCollTag,crpch)) {
-      // mf::LogWarning(oname) << std::format("WARNING: InitCrvClusterBlock::{} No CRV pulse collection (%s) found",
-      //                                      __func__, fCrvRecoPulseCollTag.encode().c_str());
-      std::string msg = std::format("No CRV pulse collection (%s) found",fCrvRecoPulseCollTag.encode().c_str());
-      stntuple::print_(eid,stntuple::e_WARNING,msg);
-     }
-  }
-//-----------------------------------------------------------------------------
 // store CrvCoincidenceCluster's
 //-----------------------------------------------------------------------------
   art::Handle<mu2e::CrvCoincidenceClusterCollection> cccch;
@@ -228,31 +215,54 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 //-----------------------------------------------------------------------------
 int StntupleInitCrvClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
 
-  const int evn = Event->event();
-  const int rn  = Event->run();
-  const int srn = Event->subRun();
+  int evn = Event->event();
+  int rn  = Event->run();
+  int srn = Event->subRun();
+
+  art::EventID eid = Event->id();
 
   if (! Block->Initialized(evn,rn,srn)) return -1;
   if (  Block->LinksInitialized()     ) return  0;
   
   TCrvClusterBlock* crvc_block = (TCrvClusterBlock*) Block;
+//-----------------------------------------------------------------------------
+// initialize pointer to the pulse collection
+//-----------------------------------------------------------------------------
+  const mu2e::CrvRecoPulseCollection* crpc(nullptr);
+  int ncrvp_tot(0);        // total number of the CRV RecoPulses
 
-  // TStnEvent* ev   = crvc_block->GetEvent();
-  //  auto crvp_block = (TCrvPulseBlock*) ev->GetDataBlock("CrvpBlock");
+  if (!fCrvRecoPulseCollTag.empty()) {
+    art::Handle<mu2e::CrvRecoPulseCollection> crpch;
+    if (not Event->getByLabel(fCrvRecoPulseCollTag,crpch)) {
+      // mf::LogWarning(oname) << std::format("WARNING: InitCrvClusterBlock::{} No CRV pulse collection (%s) found",
+      //                                      __func__, fCrvRecoPulseCollTag.encode().c_str());
+      std::string msg = std::format("No CRV pulse collection (%s) found",fCrvRecoPulseCollTag.encode().c_str());
+      stntuple::print_(eid,stntuple::e_WARNING,msg);
+    }
+    else {
+      crpc      = crpch.product();
+      ncrvp_tot = crpc->size();
+    }
+  }
 
-  int ncrvc = crvc_block->NClusters();
-  for (int i=0; i<ncrvc; i++) {
-    auto crvc = crvc_block->Cluster(i);
-    // this one has a list of pointers to crv reco pulses
-    // rely on that the Mu2e o_crvc_c is a vector of things
-    const mu2e::CrvCoincidenceCluster* o_crvc = crvc->OfflineCrvc();
-    auto o_crvp_coll = &o_crvc->GetCrvRecoPulses();  // offline list of associated pulses
-    auto crvp_0      = &o_crvp_coll->at(0);               // pointer to the first pulse
-    int ncrvp        = o_crvp_coll->size();
-    for (int j=0; j<ncrvp; j++) {
-      auto crvp_j = &o_crvp_coll->at(j);
-      int  pulse_index = crvp_j-crvp_0;
-      crvc_block->ClusterToPulseLinks()->Add(i,pulse_index);
+  if (ncrvp_tot > 0) {
+    const mu2e::CrvRecoPulse* crvp_0 = &crpc->at(0);               // pointer to the first pulse
+    
+    int ncrvc = crvc_block->NClusters();
+    for (int i=0; i<ncrvc; i++) {
+      auto crvc = crvc_block->Cluster(i);
+      
+      // this one has a list of pointers to crv reco pulsesv
+      // rely on that the Mu2e o_crvc_c is a vector of things
+      
+      const mu2e::CrvCoincidenceCluster* o_crvc = crvc->OfflineCrvc();
+      auto crvp_list = &o_crvc->GetCrvRecoPulses();       // offline list of associated pulses
+      int  ncrvp     = crvp_list->size();
+      for (int j=0; j<ncrvp; j++) {
+        const mu2e::CrvRecoPulse* crvp_j = crvp_list->at(j).get();
+        int  index  = crvp_j-crvp_0;
+        crvc_block->ClusterToPulseLinks()->Add(i,index);
+      }
     }
   }
 //-----------------------------------------------------------------------------

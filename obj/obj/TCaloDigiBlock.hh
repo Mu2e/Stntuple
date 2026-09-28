@@ -23,7 +23,7 @@ public:
   virtual ~TCaloDigiBlock();
 					// ****** accessors
 
-  Int_t         NDigis         () { return fNDigis; }
+  int         NDigis  () { return fNDigis; }
 
   TCaloDigi*  CaloDigi(int I) { 
     return (TCaloDigi*) fListOfCaloDigis->UncheckedAt(I);
@@ -33,8 +33,8 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  TCaloDigi*  NewCaloDigi() { 
-    return new ((*fListOfCaloDigis)[fNDigis++]) TCaloDigi();
+  TCaloDigi*  NewCaloDigi(int I) { 
+    return new ((*fListOfCaloDigis)[fNDigis++]) TCaloDigi(I);
   }
 //-----------------------------------------------------------------------------
 // schema evolution

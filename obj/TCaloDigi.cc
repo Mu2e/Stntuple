@@ -8,6 +8,37 @@
 ClassImp(TCaloDigi)
 
 //-----------------------------------------------------------------------------
+// first version of the I/O with the schema evolution
+// doesn't read the TObject back
+//-----------------------------------------------------------------------------
+void TCaloDigi::ReadV1(TBuffer &R__b) {
+
+  struct TCaloDigi_V1 {
+    int                   fNs;
+    int                   fSipmID;
+    int                   fT0;
+    int                   fPPos;          // peak position
+    std::vector<uint16_t> fWf;
+  } data;
+
+  int nwi = ((int*) &fWf   ) - &fNs;
+  R__b.ReadFastArray(&data.fNs,nwi);
+
+  fNs     = data.fNs;
+  fSipmID = data.fSipmID;
+  fT0     = data.fT0;
+  fPPos   = data.fPPos;
+  
+  if (fNs != (int) fWf.size()) {
+    fWf.resize(fNs);
+  }
+  if (fNs != 0) {
+    R__b.ReadFastArray(fWf.data(),fNs);
+  }
+
+}
+
+//-----------------------------------------------------------------------------
 void TCaloDigi::Streamer(TBuffer& R__b) {
   
   int nwi = ((int*) &fWf   ) - &fNs;
@@ -15,10 +46,12 @@ void TCaloDigi::Streamer(TBuffer& R__b) {
   if (R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion();  // not used but want to look at 
     
-    if      (R__v == 1) { // ReadV1(R__b);
-    // else if (R__v == 2) ReadV2(R__b);
-    // else {
-                                        // current version: V1
+    if      (R__v == 1) {
+      ReadV1(R__b);
+    }
+    else if (R__v == 2) {
+                                        // current version: V2 - adds TObject part
+      TObject::Streamer(R__b);
       R__b.ReadFastArray(&fNs, nwi);
       if (fNs != (int) fWf.size()) {
         fWf.resize(fNs);
@@ -30,7 +63,7 @@ void TCaloDigi::Streamer(TBuffer& R__b) {
   }
   else {
     R__b.WriteVersion(TCaloDigi::IsA());
-
+    TObject::Streamer(R__b);
     R__b.WriteFastArray(&fNs,nwi);
     if (fNs != 0) {
       R__b.WriteFastArray(fWf.data(),fNs);
@@ -40,7 +73,19 @@ void TCaloDigi::Streamer(TBuffer& R__b) {
 
 //-----------------------------------------------------------------------------
 TCaloDigi::TCaloDigi() : TObject() {
-  fNs = 0;
+  fNs     =  0;
+  fSipmID = -1;
+  fT0     = -1;
+  fPPos   = -1;
+}
+
+//-----------------------------------------------------------------------------
+TCaloDigi::TCaloDigi(int ID) : TObject() {
+  SetUniqueID(ID);
+  fNs     = 0;
+  fSipmID = -1;
+  fT0     = -1;
+  fPPos   = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -52,7 +97,7 @@ void TCaloDigi::Set(int SipmID, float T0, float PeakPos, const std::vector<int>*
   
   fSipmID = SipmID;
   fT0     = T0;
-  fPpos = PeakPos;
+  fPPos = PeakPos;
   fNs      = Wf->size();
   if (fNs != (int) fWf.size()) {
     fWf.resize(fNs);
@@ -83,23 +128,25 @@ void TCaloDigi::Print(const char* Opt) const {
   
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("------------------------------------------------------------------\n");
-    printf("   ID SipmID    T0     N s  PPos                  Wf              \n");
+    printf("   ID SipmID   Mask   T0     N s  PPos                  Wf              \n");
     printf("------------------------------------------------------------------\n");
   }
   
   if ((opt == "") || (opt.Index("data") >= 0)) {
 
-    std::cout << std::format("{:5d} {:5d} {:6d} {:6d} {:6d} *** ",
-                             GetUniqueID(),fSipmID,fT0,fNs,fPpos);
+    std::cout << std::format("{:5d} {:5d} 0x{:04x} {:6d} {:6d} {:6d} *** ",
+                             GetUniqueID(),SipmID(),Mask(),fT0,fNs,fPPos);
     int ns = fWf.size();
     if (ns == fNs) {
       int pos = 0;
       for (int i=0; i<ns; i++) {
         printf("%5d",fWf[i]);
         pos++;
-        if (pos == 40) {
-          printf("\n%37s","");
+        if (pos == 20) {
+          printf("\n");
           pos = 0;
+          if (i == ns-1) break;
+          printf("%43s","");
         }
       }
       if (pos != 0) {

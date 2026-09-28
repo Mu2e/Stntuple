@@ -15,12 +15,14 @@ class InitCaloClusterBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fCaloClusterCollTag;
   art::InputTag   fCaloClusterMCCollTag;
+  art::InputTag   fCaloHitCollTag;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
 public:
 
   void   SetCaloClusterCollTag      (art::InputTag& Tag) { fCaloClusterCollTag   = Tag; }
+  void   SetCaloHitCollTag          (art::InputTag& Tag) { fCaloHitCollTag       = Tag; }
   void   SetCaloClusterMCCollTag    (art::InputTag& Tag) { fCaloClusterMCCollTag = Tag; }
 
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode);

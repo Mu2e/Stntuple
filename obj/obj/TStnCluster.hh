@@ -149,7 +149,8 @@ public:
   float   R           () const { return std::sqrt(fX*fX + fY*fY); }
 
   // linked track
-  TStnTrack* ClosestTrack() { return fClosestTrack; }
+  TStnTrack*               ClosestTrack  () { return fClosestTrack; }
+  const mu2e::CaloCluster* OfflineCluster() { return fCaloCluster;  }
 
   void    SetNumber(int I) { fNumber = I; } //
 

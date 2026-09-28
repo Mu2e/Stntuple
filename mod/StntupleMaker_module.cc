@@ -637,6 +637,7 @@ void StntupleMaker::beginJob() {
   if (fMakeCaloClusters) {
     fInitCaloClusterBlock = new stntuple::InitCaloClusterBlock();
     fInitCaloClusterBlock->SetCaloClusterCollTag  (fCaloClusterCollTag  );
+    fInitCaloClusterBlock->SetCaloHitCollTag      (fCaloHitCollTag      );
     fInitCaloClusterBlock->SetCaloClusterMCCollTag(fCaloClusterMCCollTag);
 
     AddDataBlock("CaloClusterBlock","TStnClusterBlock",
