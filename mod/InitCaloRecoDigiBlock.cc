@@ -15,6 +15,7 @@
 
 #include "Stntuple/obj/TStnDataBlock.hh"
 #include "Stntuple/obj/TStnEvent.hh"
+#include "Stntuple/obj/TCaloDigi.hh"
 
 #include "Offline/RecoDataProducts/inc/CaloRecoDigi.hh"
 #include "Stntuple/mod/InitCaloRecoDigiBlock.hh"
@@ -45,13 +46,13 @@ int  InitCaloRecoDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, i
   
   const mu2e::CaloRecoDigiCollection*  crdc(nullptr);
 
-  int ndigis(0); // tcrdb->fNDigis is incremented in the constructor
+  int n_reco_digis(0); // tcrdb->fNDigis is incremented in the constructor
   if (! fCaloRecoDigiCollTag.empty()) {
     art::Handle<mu2e::CaloRecoDigiCollection> crdch;
     bool ok = Evt->getByLabel(fCaloRecoDigiCollTag,crdch);
     if (ok) {
-      crdc   = crdch.product();
-      ndigis = crdc->size();
+      crdc         = crdch.product();
+      n_reco_digis = crdc->size();
     }
     else {
       // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
@@ -61,10 +62,29 @@ int  InitCaloRecoDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, i
     }
   }
 
-  if (ndigis == 0)  return 0;
+  if (n_reco_digis == 0)  return 0;
+
+  // locate CaloDigi collection
+  const mu2e::CaloDigiCollection*  cdc(nullptr);
+  int n_digis(0);
+  
+  if (! fCaloDigiCollTag.empty()) {
+    art::Handle<mu2e::CaloDigiCollection> cdch;
+    bool ok = Evt->getByLabel(fCaloDigiCollTag,cdch);
+    if (ok) {
+      cdc     = cdch.product();
+      n_digis = cdc->size();
+    }
+    else {
+      // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
+      mf::LogWarning(oname) << std::format("WARNING: no CaloDigiCollection tag={} found. BAIL OUT",
+                                           fCaloDigiCollTag.encode().data());
+      return 0;
+    }
+  }
   
   const mu2e::CaloRecoDigi* crd0 =  &crdc->at(0);
-  for (int i=0; i<ndigis; i++) {
+  for (int i=0; i<n_reco_digis; i++) {
     const mu2e::CaloRecoDigi* crd = &crdc->at(i);
     // index in the original list of CaloRecoDigis
     int ind = crd-crd0;
@@ -77,21 +97,38 @@ int  InitCaloRecoDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, i
     tcrd->fEDep     = crd->energyDep();
     tcrd->fSigE     = crd->energyDepErr();
     tcrd->fChi2     = crd->chi2();
+    //
+    if (cdc != nullptr) {
+      const mu2e::CaloDigi* cd_0 = &cdc->at(0);
+      const mu2e::CaloDigi* cd_i = crd->caloDigiPtr().get();
+      tcrd->fCdIndex = cd_i-cd_0; // -1 upon construction
+      int wf_max = cd_i->waveform().at(cd_i->peakpos());
+      if (wf_max == 4096) {
+        // set an overflow bit
+        tcrd->SetMask(TCaloDigi::kOverflowBit);
+      }
+    }
+    else {
+      tcrd->fCdIndex = -1; // is that needed ?
+    }
   }
   // at this point tcrdb->fNDigis is defined
   return 0;
 }
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
+// set flags
+//-----------------------------------------------------------------------------
 Int_t InitCaloRecoDigiBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
-  // Mu2e version, do nothing
+  // Mu2e version
 
 //   Int_t  ev_number, rn_number;
 
-//   ev_number = AnEvent->event();
-//   rn_number = AnEvent->run();
+  // int evn = AnEvent->event();
+  // int run = AnEvent->run();
+  // int srn = AnEvent->subRun();
 
-//   if (! Block->Initialized(ev_number,rn_number)) return -1;
+  // if (! Block->Initialized(ev_number,rn_number)) return -1;
 
 // 					// do not do initialize links 2nd time
 

@@ -90,7 +90,7 @@ void TCaloRecoDigi::Clear(const char* Opt) {
   fSipmID  =  0;
   fNdf     = -1;
   fPileup  = -1;
-  fCdIndex = 0;
+  fCdIndex =  0;
   fEDep    = -1;
   fSigE    = -1;
   fTime    = -1;

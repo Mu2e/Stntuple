@@ -109,6 +109,7 @@ public:
   TObjArray*  MessageList       () { return fMessageList;        }
   Int_t       EventNumber       () { return f_EventNumber;       }
   Int_t       RunNumber         () { return f_RunNumber;         }
+  Int_t       SubrunNumber      () { return f_SubrunNumber;      }
 
   void GetCollTag    (const char* CollectionClassName, char* CollTag    );
   void GetModuleLabel(const char* CollectionClassName, char* ModuleLabel);

@@ -12,13 +12,15 @@
 namespace stntuple {
 class InitCaloRecoDigiBlock : public TStnInitDataBlock {
 public:
+  art::InputTag   fCaloDigiCollTag;
   art::InputTag   fCaloRecoDigiCollTag;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetCaloRecoDigiCollTag (art::InputTag& Tag) { fCaloRecoDigiCollTag = Tag; }
+  void   SetCaloDigiCollTag    (art::InputTag& Tag) { fCaloDigiCollTag     = Tag; }
+  void   SetCaloRecoDigiCollTag(art::InputTag& Tag) { fCaloRecoDigiCollTag = Tag; }
   
   virtual int InitDataBlock    (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks     (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
