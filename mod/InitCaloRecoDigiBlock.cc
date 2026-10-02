@@ -66,20 +66,20 @@ int  InitCaloRecoDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, i
 
   // locate CaloDigi collection
   const mu2e::CaloDigiCollection*  cdc(nullptr);
-  int n_digis(0);
+  //  int n_digis(0);
   
   if (! fCaloDigiCollTag.empty()) {
     art::Handle<mu2e::CaloDigiCollection> cdch;
     bool ok = Evt->getByLabel(fCaloDigiCollTag,cdch);
     if (ok) {
       cdc     = cdch.product();
-      n_digis = cdc->size();
+      //  n_digis = cdc->size();
     }
     else {
       // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
       mf::LogWarning(oname) << std::format("WARNING: no CaloDigiCollection tag={} found. BAIL OUT",
                                            fCaloDigiCollTag.encode().data());
-      return 0;
+      // return 0;
     }
   }
   
@@ -103,9 +103,9 @@ int  InitCaloRecoDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, i
       const mu2e::CaloDigi* cd_i = crd->caloDigiPtr().get();
       tcrd->fCdIndex = cd_i-cd_0; // -1 upon construction
       int wf_max = cd_i->waveform().at(cd_i->peakpos());
-      if (wf_max == 4096) {
+      if (wf_max == 4095) {
         // set an overflow bit
-        tcrd->SetMask(TCaloDigi::kOverflowBit);
+        tcrd->SetMask(TCaloDigi::kOverflowFlag);
       }
     }
     else {

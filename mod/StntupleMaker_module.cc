@@ -595,6 +595,7 @@ void StntupleMaker::beginJob() {
 //-----------------------------------------------------------------------------
   if (fMakeCaloRecoDigis) {
     fInitCaloRecoDigiBlock = new stntuple::InitCaloRecoDigiBlock();
+    fInitCaloRecoDigiBlock->SetCaloDigiCollTag    (fCaloDigiCollTag    );
     fInitCaloRecoDigiBlock->SetCaloRecoDigiCollTag(fCaloRecoDigiCollTag);
 
     AddDataBlock("CaloRecoDigiBlock","TCaloRecoDigiBlock",

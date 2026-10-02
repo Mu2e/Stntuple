@@ -9,7 +9,7 @@ class TCaloDigi : public TObject {
 public:
                                         // digi mask occupies high 16 bits of the fSipmID
   enum {
-    kOverflowBit = 0,
+    kOverflowFlag = 0x0001,
   };
   
   int                   fNs;
@@ -34,8 +34,8 @@ public:
 
   void    Set(int SipmID, float T0, float PeakPos, const std::vector<int>* Wf);
 
-  void    SetMask(int AddedBits) {
-    int new_mask = Mask() | (AddedBits & 0xffff);
+  void    SetMask(int AddedFlags) {
+    int new_mask = Mask() | (AddedFlags & 0xffff);
     fSipmID      = (fSipmID & 0xffff) | (new_mask << 16);
   }
 

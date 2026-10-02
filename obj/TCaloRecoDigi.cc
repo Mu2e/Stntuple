@@ -105,12 +105,13 @@ void TCaloRecoDigi::Print(const char* Opt) const {
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("---------------------------------------------------------000000---------\n");
-    printf("   ID SipmID CdIndex   Time        EDep    SigT    SigE ndf  chi2 Pileup\n");
+    printf("   ID SipmID  Mask  CdIndex   Time        EDep    SigT    SigE ndf  chi2 Pileup\n");
     printf("------------------------------------------------------------------------\n");
   }
 
   if (opt.Index("data") < 0) return;
 
-  std::cout << std::format("{:5d} {:5d} {:5d} {:10.2f} {:10.3f} {:7.3f} {:7.3f} {:3} {:5.1f} {:4}\n",
-                           GetUniqueID(),SipmID(), CdIndex(), fTime,fEDep,fSigT,fSigE,fNdf,fChi2,fPileup );  
+  std::cout << std::format("{:5d} {:5d} 0x:{:04x} {:5d} {:10.2f} {:10.3f} {:7.3f} {:7.3f} {:3} {:5.1f} {:4}\n",
+                           GetUniqueID(),SipmID(), Mask(),
+                           CdIndex(), fTime,fEDep,fSigT,fSigE,fNdf,fChi2,fPileup );  
 }

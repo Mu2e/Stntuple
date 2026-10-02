@@ -58,9 +58,9 @@ int  StntupleInitCaloDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
     tcd->Set(cd->SiPMID(),cd->t0(),cd->peakpos(),&cd->waveform());
     // check overflows, it is a 12-bit ADC
     int wf_max = cd->waveform().at(cd->peakpos());
-    if (wf_max == 4096) {
+    if (wf_max == 4095) {
       // set an overflow bit
-      tcd->SetMask(TCaloDigi::kOverflowBit);
+      tcd->SetMask(TCaloDigi::kOverflowFlag);
     }
   }
 
