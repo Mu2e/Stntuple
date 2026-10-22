@@ -89,13 +89,14 @@ void TComboHit::Print(Option_t* Option) const {
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("------------------------------------------------------------------------------------\n");
-    printf("   ID   SID  MnID Nsh zface    Time     DrTime  EDep(keV)     X        Y         Z  \n");
-    printf("------------------------------------------------------------------------------------\n");
+    printf("-------------------------------------------------------------------------------------------\n");
+    printf("   ID   SID  Pln Pnl MnID Nsh zface    Time     DrTime  EDep(keV)     X        Y         Z \n");
+    printf("-------------------------------------------------------------------------------------------\n");
   }
 
   if (opt.Index("data") < 0) return;
 
-  std::cout << std::format("{:5} {:5} MN{:03d} {:2d} {:5d} {:10.2f} {:8.2f} {:8.2f} {:9.3f} {:9.3f} {:9.3f}\n",
-                           GetUniqueID(),fStrawID,fMnid,fNsh,fZface, fTime,fDrTime,fEDep*1e3,fX,fY,fZ);  
+  std::cout << std::format("{:5} 0x{:4x} {:2} {:2} MN{:03d} {:2d} {:5d} {:10.2f} {:8.2f} {:8.2f} {:9.3f} {:9.3f} {:9.3f}\n",
+                           GetUniqueID(),fStrawID,Sid().plane(),Sid().panel(),
+                           fMnid,fNsh,fZface, fTime,fDrTime,fEDep*1e3,fX,fY,fZ);  
 }
