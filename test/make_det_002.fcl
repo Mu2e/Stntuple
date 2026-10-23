@@ -22,7 +22,7 @@ END_PROLOG
 # services.DbService and services.ProditionsService
 #------------------------------------------------------------------------------
 ## #include "daqana/rundb/124000/124155/calibration_set_v103.fcl"
-#include "rundb/125000/latest/calibration_set_125000_v104.fcl"
+#include "rundb/latest/calibration_set_v104.fcl"
 
 process_name : @local::PROCESS_NAME
 
@@ -48,8 +48,8 @@ physics : {
         TimeCluster : { @table::CosmicReco.SimpleTimeCluster
             minNStrawHits : 4
             minNPanels    : 1
-            TimeWindow    : 160 ## assume running with correct calibrations ## 400
-            TimeStep      : 50
+            TimeWindow    : 500 ##  160 ## assume running with correct calibrations ## 400
+            TimeStep      : 100 ## 50
 #            minEDep       : 0.5e-3
 #            minNGoodHits  : 2
         }
