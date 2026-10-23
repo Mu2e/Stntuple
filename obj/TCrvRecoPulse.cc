@@ -89,9 +89,9 @@ void TCrvRecoPulse::Print(Option_t* Option) const {
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("-----------------------------------------------------------------------------------------\n");
-    printf(" Sbid  Sipm  Roc  Feb FebCh  Time    Pes         PesPh     Beta     Chi2   LeTime    Ped \n");
-    printf("-----------------------------------------------------------------------------------------\n");
+    printf("----------------------------------------------------------------------------------------\n");
+    printf(" Sbid  Sipm  Roc  Feb FebCh  Time       Pes     PesPh     Beta     Chi2   LeTime    Ped \n");
+    printf("----------------------------------------------------------------------------------------\n");
   }
  
   if ((opt == "") || (opt.Index("data") >= 0)) {

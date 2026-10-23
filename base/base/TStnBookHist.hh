@@ -69,6 +69,18 @@ public:
     AddHistogram(Hist,Folder);
   }
 
+//-----------------------------------------------------------------------------
+  void HBook1F(TH1F*& Hist, const std::string& Name, const std::string& Title,
+               Int_t Nx, Double_t XMin, Double_t XMax,
+               TFolder* Folder)
+  {
+    // book 2D histogram, add it to the module's list of histograms and
+    // return pointer to it to the user
+
+    Hist = new TH1F(Name.data(),Title.data(),Nx,XMin,XMax);
+    AddHistogram(Hist,Folder);
+  }
+
 //_____________________________________________________________________________
   void HBook2F(TH2F*& Hist, const char* Name, const char* Title,
                Int_t Nx, Double_t XMin, Double_t XMax,
@@ -84,6 +96,20 @@ public:
 
 
 //_____________________________________________________________________________
+  void HBook2F(TH2F*& Hist, const std::string& Name, const std::string& Title,
+               Int_t Nx, Double_t XMin, Double_t XMax,
+               Int_t Ny, Double_t YMin, Double_t YMax,
+               TFolder* Folder)
+  {
+    // book 2D histogram, add it to the module's list of histograms and
+    // return pointer to it to the user
+    
+    Hist = new TH2F(Name.data(),Title.data(),Nx,XMin,XMax,Ny,YMin,YMax);
+    AddHistogram(Hist,Folder);
+  }
+
+
+//_____________________________________________________________________________
   void HProf(TProfile*& Hist, const char* Name, const char* Title,
                          Int_t Nx, Double_t XMin, Double_t XMax,
                          Double_t YMin, Double_t YMax,
@@ -93,6 +119,19 @@ public:
     // return pointer to it to the user
 
     Hist = new TProfile(Name,Title,Nx,XMin,XMax,YMin,YMax);
+    AddHistogram(Hist,Folder);
+  }
+
+//_____________________________________________________________________________
+  void HProf(TProfile*& Hist, const std::string& Name, const std::string& Title,
+                         Int_t Nx, Double_t XMin, Double_t XMax,
+                         Double_t YMin, Double_t YMax,
+                         TFolder* Folder)
+  {
+    // book 2D histogram, add it to the module's list of histograms and
+    // return pointer to it to the user
+
+    Hist = new TProfile(Name.data(),Title.data(),Nx,XMin,XMax,YMin,YMax);
     AddHistogram(Hist,Folder);
   }
 

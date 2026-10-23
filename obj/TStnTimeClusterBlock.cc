@@ -86,6 +86,9 @@ void TStnTimeClusterBlock::Print(Option_t* opt) const {
     int nch = fListOfChLinks->NLinks(i);
     int ip = 0;
     for (int l=0; l<nch; l++) {
+      if (ip == 0) {
+        std::cout << std::format("{:30}","");
+      }
       std::cout << std::format("{:6}",fListOfChLinks->Index(i,l));
       ip++;
       if (ip == 20) {
