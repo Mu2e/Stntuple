@@ -102,7 +102,7 @@ void TCrvCoincidenceCluster::Print(Option_t* Option) const {
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("---------------------------------------------------------------------------------------------\n");
-    printf("Index  SType   NPulses N(PE)  Slope  StartTime  EndTime      X         Y         Z     SimID \n");
+    printf("Index SectorType NPulses Pes Slope  StartTime  EndTime      X         Y         Z     SimID \n");
     printf("---------------------------------------------------------------------------------------------\n");
   }
 
