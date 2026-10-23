@@ -125,7 +125,7 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
           // mf::LogWarning(oname) << " ERROR:" << __LINE__ 
           //                       << " : CaloHit cid:" << tch->fCid  
           //                       << " used CaloRecoDigi from cid:" << cid << ". SKIP";
-          std::string msg = std::format("CaloHit cid:{} made out of CaloRecoDigi cid:{}. SKIP\n",tch->fCid,cid);
+          std::string msg = std::format("CaloHit cid:{} made out of CaloRecoDigi cid:{}. SKIP",tch->fCid,cid);
           stntuple::print_(eid,e_ERROR,msg);
           continue;
         }
@@ -138,7 +138,7 @@ int InitCaloHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int M
           // mf::LogWarning(oname) << " ERROR:" << __LINE__ 
           //                       << " : calo hit number " << i 
           //                       << " is made from " << ncrd << "CaloRecoDidis.";
-          std::string msg = std::format("CaloHit number:{} is made out of {} CaloRecoDigis\n",i,ncrd);
+          std::string msg = std::format("CaloHit number:{} is made out of {} CaloRecoDigis",i,ncrd);
           stntuple::print_(eid,e_ERROR,msg);
         }
       }

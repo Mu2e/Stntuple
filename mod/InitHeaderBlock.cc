@@ -55,21 +55,23 @@ int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int 
   data->fInstLum       = -1.;
   data->fMeanLum       = -1.;
 
-  art::Handle<mu2e::ProtonBunchIntensity> pbiHandle;
-  AnEvent->getByLabel("PBISim", pbiHandle);
+  if (data->fMcFlag != 0) {
+    art::Handle<mu2e::ProtonBunchIntensity> pbiHandle;
+    AnEvent->getByLabel("PBISim", pbiHandle);
 
-  if (!pbiHandle.isValid()) {
-    art::EventID eid = AnEvent->id();
-    std::string msg = std::format("no ProtonBunchIntensity objects found");
-    stntuple::print_(eid,e_WARNING,msg);
-  }
-  else {
+    if (!pbiHandle.isValid()) {
+      art::EventID eid = AnEvent->id();
+      std::string msg = std::format("no ProtonBunchIntensity objects found");
+      stntuple::print_(eid,e_WARNING,msg);
+    }
+    else {
 //-----------------------------------------------------------------------------
 // Loop over ProtonBunchIntensity objects
 //-----------------------------------------------------------------------------
-    const mu2e::ProtonBunchIntensity* pbi= pbiHandle.product();
-    data->fInstLum = pbi->intensity();
-    data->fMeanLum = -1. ;
+      const mu2e::ProtonBunchIntensity* pbi= pbiHandle.product();
+      data->fInstLum = pbi->intensity();
+      data->fMeanLum = -1. ;
+    }
   }
 //-----------------------------------------------------------------------------
 //  STNTUPLE version
