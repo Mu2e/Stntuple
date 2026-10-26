@@ -25,6 +25,7 @@ public:
   TCrvDigi(int Ns);
   virtual ~TCrvDigi();
 
+  int     Chid() { return 4*fSbid+fSipm; }
   int     Sbid() { return fSbid; }
   int     Sipm() { return fSipm; }
   int     Roc () { return fRoc;  }
