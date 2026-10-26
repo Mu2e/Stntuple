@@ -121,8 +121,7 @@ public:
     float        fIntDepth;             // ** added in V6 :assumed interaction depth
     float        fDr;                   // ** added in V10: DR(cluster-track), signed
     float        fSInt;                 // ** added in V10: interaction length, calculated
-    const mu2e::CaloCluster*       fCluster;
-    // const mu2e::TrkToCaloExtrapol* fExtrk;
+    const mu2e::CaloCluster* fCluster;
   };
     
   TLorentzVector            fMomentum;        // this assumes DEM fit hypothesis
@@ -136,7 +135,6 @@ public:
   int                       fIDWord;	      // now - for selection "C"
 
   int                       fNActive;	      // NWrong << 16 + NActive
-  //  int                       fVaneID;	      // (Nmat ) + (nmatactive << 16) 
   int                       fNMatSites;	      // (Nmat ) + (nmatactive << 16) 
   int                       fDiskID;	      // 
   int                       fPdgCode;         // PDG code of the particle produced most hits
@@ -197,14 +195,15 @@ public:
   float                     fFloat[kNFreeFloats]; // provision for future I/O expansion
 
   InterData_t               fDisk [kNDisks];      // track intersections with disks
-
-  // new floats added in v15
-  float fPSTFront; // momentum at the front of the stopping target
-  float fPSTBack; // at back
-  float fPTrackerEntrance; // momentum at tracker entrance (i.e. entering to stopping target)
-  float fPTrackerMiddle; // at middle
-  float fPTrackerExit; // at exit (i.e. exiting towards calorimeter)
-  float fFloat2[kNFreeFloats2]; // for future I/O expansion for versions > 15
+//-----------------------------------------------------------------------------
+// new floats added in v15
+//-----------------------------------------------------------------------------
+  float fPSTFront;                                // momentum at the front of the stopping target
+  float fPSTBack;                                 // at back
+  float fPTrackerEntrance;                        // momentum at tracker entrance (i.e. entering to stopping target)
+  float fPTrackerMiddle;                          // at middle
+  float fPTrackerExit;                            // at exit (i.e. exiting towards calorimeter)
+  float fFloat2[kNFreeFloats2];                   // for future I/O expansion for versions > 15
 
   // floats added 
   
@@ -212,7 +211,7 @@ public:
 //-----------------------------------------------------------------------------
 //  transient data members, all persistent ones should go above
 //-----------------------------------------------------------------------------
-  // const mu2e::TrkToCaloExtrapol* fExtrk;              //!
+  // const mu2e::TrkToCaloExtrapol* fExtrk;           //!
   const mu2e::CaloCluster*       fClosestCaloCluster; //!
 
   InterData_t*                   fVMinS;	      //! intersection with min S

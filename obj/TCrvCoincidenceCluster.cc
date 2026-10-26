@@ -12,7 +12,7 @@ ClassImp(TCrvCoincidenceCluster)
 void TCrvCoincidenceCluster::Streamer(TBuffer &R__b) {
 
   int nwi = ((int*)   &fPes     ) - &fIndex;
-  int nwf = ((float*) &fPosition) - &fStartTime;
+  int nwf = ((float*) &fPosition) - &fPes;
   if (R__b.IsReading()) {
     Version_t R__v = R__b.ReadVersion();
     if(R__v == 1) { //for backwards compatibility with version 1 before development room was added
@@ -32,8 +32,8 @@ void TCrvCoincidenceCluster::Streamer(TBuffer &R__b) {
   }
   else {
     R__b.WriteVersion(TCrvCoincidenceCluster::IsA());
-    R__b.WriteFastArray(&fIndex    ,nwi);
-    R__b.WriteFastArray(&fStartTime,nwf);
+    R__b.WriteFastArray(&fIndex,nwi);
+    R__b.WriteFastArray(&fPes,nwf);
     fPosition.Streamer(R__b);
     fMCAvgPosition.Streamer(R__b);
   }
@@ -102,7 +102,7 @@ void TCrvCoincidenceCluster::Print(Option_t* Option) const {
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("---------------------------------------------------------------------------------------------\n");
-    printf("Index SectorType NPulses Pes Slope  StartTime  EndTime      X         Y         Z     SimID \n");
+    printf("Index SecType NPulses Pes Slope  StartTime  EndTime      X         Y         Z     SimID \n");
     printf("---------------------------------------------------------------------------------------------\n");
   }
 
