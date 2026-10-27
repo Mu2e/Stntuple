@@ -38,12 +38,11 @@ public:
 //-----------------------------------------------------------------------------
   int   Sbid     () { return fSbid; }
   int   Sipm     () { return fSipm; }
+  int   Chid     () { return 4*fSbid+fSipm; }
   int   Roc      () { return fRoc;  }
   int   Feb      () { return fFeb;  }
   int   FebCh    () { return fFebCh;}
   
-  int   OfflineChID() { return fSbid*4+fSipm; }
-
   float Time  ()   { return fTime; }
   float Pes   ()   { return fPes; }
   float PesPh ()   { return fPesPh; }

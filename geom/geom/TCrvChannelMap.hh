@@ -18,16 +18,17 @@ public:
   };
   
   struct Data_t {
-    int  och;                           // offline channel
-    int  sbid;
-    int  sector;
-    int  module;
-    int  layer;
-    int  counter;                       // counter within the layer
-    int  side;
-    int  roc;
-    int  feb;
-    int  fch;                           // FEB channel
+    int  chid   {-1};                           // offline channel
+    int  sbid   {-1};
+    int  sipm   {-1};
+    int  sector {-1};
+    int  module {-1};
+    int  layer  {-1};
+    int  counter{-1};                       // counter within the layer
+    int  side   {-1};
+    int  roc    {-1};
+    int  feb    {-1};
+    int  fch    {-1};                          // FEB channel
   };
 
   static TCrvChannelMap* fgInstance;
@@ -42,14 +43,16 @@ public:
   Data_t* _ch_data_by_online    [kNRocs][kNFebs][kNChannelsFeb];  //
 
 private:
-  TCrvChannelMap(int RunNumber);
+  TCrvChannelMap();
   ~TCrvChannelMap();
 
 public:
-  static TCrvChannelMap* Instance(int RunNumber);
+  static TCrvChannelMap* Instance();
+
+  int Init(int RunNumber);
 
   Data_t* ch_data_by_online (int roc, int feb, int fch) { return _ch_data_by_online [roc][feb][fch]; }
-  Data_t* ch_data_by_offline(int och)                   { return _ch_data_by_offline[och]; }
+  Data_t* ch_data_by_offline(int Chid)                  { return _ch_data_by_offline[Chid]; }
 
 };
 

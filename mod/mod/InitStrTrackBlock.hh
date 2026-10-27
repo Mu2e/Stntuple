@@ -14,13 +14,15 @@ class InitStrTrackBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fTrackCollTag;
   art::InputTag   fTcCollTag;           // time cluster collection
+  int             fTrackFormat; 
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetTrackCollTag (art::InputTag& Tag) { fTrackCollTag = Tag; }
-  void   SetTcCollTag    (art::InputTag& Tag) { fTcCollTag    = Tag; }
+  void        SetTrackCollTag (art::InputTag& Tag) { fTrackCollTag = Tag; }
+  void        SetTcCollTag    (art::InputTag& Tag) { fTcCollTag    = Tag; }
+  void        SetTrackFormat  (int            Fmt) { fTrackFormat  = Fmt; }
   
   virtual int InitDataBlock    (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks     (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

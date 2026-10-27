@@ -21,6 +21,7 @@ using namespace std;
 #include "TFitResult.h"
 
 #include "Stntuple/base/TStnBookHist.hh"
+#include "Stntuple/obj/TStnHeaderBlock.hh"
 
 #include "Stntuple/obj/TStnEvent.hh"
 #include "Stntuple/obj/TStnGoodRunList.hh"
@@ -409,6 +410,7 @@ void TStnModule::Delete(const char* Opt) {
 
 //_____________________________________________________________________________
 void TStnModule::Print(const char* Opt) const {
+  GetHeaderBlock()->Print(Form("%s:%s",GetName(),Opt));
 }
 
 

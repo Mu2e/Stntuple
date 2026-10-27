@@ -40,7 +40,7 @@ physics : {
             debugMode        : 0 ## 1
             debugBits        : ["bit0:1"]
             saveWaveforms    : true
-            keyOnMnid        : true ## true    ## default:false
+            # keyOnMnid        : true ## true    ## default:false
         }
 
         makeSH: { @table::TrkHitReco.producers.makeSH }
@@ -133,10 +133,11 @@ physics : {
 
             makeCrvDigis       : 1
             makeCrvPulses      : 1
-	    makeCrvClusters    : 1  ## default: 0
+	    makeCrvClusters    : 1               ## default: 0
 
             makeTimeClusters   : 1
             makeStraightTracks : 1
+            trackFormat        : 7               ## save everything
             trackCollTag       : [ "KKLine" ]
 
             timeClusterCollTag   : [ "TimeCluster"      ]
@@ -151,7 +152,7 @@ physics : {
     t0       : [ # EventIDFilter,
                 EWMProducer
                 , makeSD, makeSH, TimeCluster                           ## tracker
-                # , CaloDigiMaker, CaloRecoDigiMaker, CaloHitMaker        ## calorimeter
+                , CaloDigiMaker, CaloRecoDigiMaker, CaloHitMaker        ## calorimeter
                 # , CaloProtoClusterMaker, CaloClusterMaker
                 , CrvDigi, CrvRecoPulses, CrvCoincidenceClusterFinder   ## CRV
                 , LineFinder, KKLine                                    ## track reco
@@ -183,3 +184,4 @@ services.GeometryService.inputFile : "Stntuple/fcl/geom_common_extracted_data.tx
 #----------------------------------------------------------------------
 #  overrides by submit_mu2e_job.py
 #----------------------------------------------------------------------
+source.fileNames : [ "/projects/mu2e/data/projects/vst/datasets/kpp00s001r104n000/raw.mu2e.kpp00s001r104n000.filter_trk_crv.125470_000001.art" ]

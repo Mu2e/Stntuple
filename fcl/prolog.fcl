@@ -177,8 +177,6 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
     trackBlockName       : [ "TrackBlock"   ]
     trackCollTag         : [ "KFFDeM"       ]
-# no more BTRK
-##    trackFitType         : 2                         ## 1:BTRK(KFF) 2:KinKal(KK)
 
     trackTsBlockName     : [ "KSFBlock"     ]
     trackTsCollTag       : [ "KSFDeM"       ]        ## has to be defined for BTRK   fits
@@ -208,6 +206,8 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
     minNHelices          : 0
     cutHelixSeedCollTag  : "undefined"
+#------------------------------------------------------------------------------
+    trackFormat          : 1       ## 0x2:hitseeds  0x4:straws
 }
 
 #------------------------------------------------------------------------------

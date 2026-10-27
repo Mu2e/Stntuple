@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <format>
 
+#include "Offline/RecoDataProducts/inc/TrkStrawHitSeed.hh"
 #include "TROOT.h"
 #include "TFolder.h"
 #include "TLorentzVector.h"
@@ -63,6 +64,7 @@ int  InitStrTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int M
     int ind         = ks-ks0;
     TStrTrack* tst  = tb->NewTrack(ind);
     tst->fNHits     = ks->nHits();
+    tst->fFormat    = fTrackFormat;
     tst->fChi2      = ks->chisquared();
     tst->fT0        = ks->t0().t0();
     tst->fNDof      = ks->nDOF();
@@ -73,6 +75,10 @@ int  InitStrTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int M
     tst->fNx        = seg->momentum3().x()/tmom;
     tst->fNy        = seg->momentum3().y()/tmom;
     tst->fNz        = seg->momentum3().z()/tmom;
+
+    tst->fHitSeeds  = (std::vector<mu2e::TrkStrawHitSeed>*) &ks->_hits;
+    tst->fStraws    = (std::vector<mu2e::TrkStraw>*) &ks->_straws;
+
     tst->fOfflineKs = ks;
   }
 

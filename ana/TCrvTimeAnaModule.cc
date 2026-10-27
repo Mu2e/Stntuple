@@ -413,7 +413,7 @@ void TCrvTimeAnaModule::FillHistograms() {
     FebHist_t* fhr = rhr->feb[crvp->fFeb];
     fhr->h_sbid->Fill(crvp->fSbid);
                                         // this is a global histogram
-    int och = crvp->OfflineChID();
+    int och = crvp->Chid();
     ehr->h_och->Fill(och);
 //-----------------------------------------------------------------------------
 // CRVP[0] : all pulses

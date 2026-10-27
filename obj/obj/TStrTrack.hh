@@ -27,10 +27,12 @@ public:
 //-----------------------------------------------------------------------------
 // added in V2
 //-----------------------------------------------------------------------------
-  std::vector<mu2e::TrkStrawHitSeed>*  fTrkStrawHitSeed; // written if fFormat & 0x2
-  std::vector<mu2e::TrkStraw>*         fTrkStraw;        // written if fFormat & 0x4
-
-const mu2e::KalSeed*  fOfflineKs; //!
+  std::vector<mu2e::TrkStrawHitSeed>* fHitSeeds;  // written if fFormat & 0x2 ==NOT OWNED==
+  std::vector<mu2e::TrkStraw>*        fStraws;    // written if fFormat & 0x4 ==NOT OWNED==
+//-----------------------------------------------------------------------------
+// transients
+//-----------------------------------------------------------------------------
+  const mu2e::KalSeed*                fOfflineKs; //!
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -52,7 +54,7 @@ const mu2e::KalSeed*  fOfflineKs; //!
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
 
-  ClassDefOverride(TStrTrack,1);
+  ClassDefOverride(TStrTrack,2);
 };
 
 #endif

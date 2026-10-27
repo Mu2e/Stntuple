@@ -1,8 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Class StntupleMaker : fills Stntuple (P.Murat)
 // ------------------------------------------
-// order of the data blocks is essential - they are filled according to the
-// order in which they are declared...
+// the data blocks are filled according to the order in which they are declared...
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -248,10 +247,11 @@ protected:
 //-----------------------------------------------------------------------------
 // debug parameters
 //-----------------------------------------------------------------------------
-  int                      fTrackVerbose; // verbosity by data block
+  int                      fTrackVerbose;        // verbosity by data block
   int                      fHelixVerbose;
 
   TNamed*                  fVersion;
+  int                      fTrackFormat;
 
   // DoubletAmbigResolver*    fDar;
 
@@ -392,6 +392,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fTrackVerbose            (PSet.get<int>           ("trackVerbose", 0     ))
   , fHelixVerbose            (PSet.get<int>           ("helixVerbose", 0     ))
+  , fTrackFormat             (PSet.get<int>           ("trackFormat"    ))
 {
 
   char  ver[20], text[200];
@@ -988,6 +989,7 @@ void StntupleMaker::beginJob() {
     fInitStrTrackBlock = new stntuple::InitStrTrackBlock();
     fInitStrTrackBlock->SetTrackCollTag(fTrackCollTag[0]);
     fInitStrTrackBlock->SetTcCollTag   (fTcCollTag   [0]);
+    fInitStrTrackBlock->SetTrackFormat (fTrackFormat);
 
     AddDataBlock("TrackBlock","TStrTrackBlock",
 		 fInitStrTrackBlock,
