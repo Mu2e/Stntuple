@@ -48,10 +48,10 @@ physics : {
         TimeCluster : { @table::CosmicReco.SimpleTimeCluster
             minNStrawHits : 4
             minNPanels    : 1
-            TimeWindow    : 300 ## assume running with correct calibrations ## 400
+            TimeWindow    : 300               ## assume running with correct calibrations ## 400
             TimeStep      : 50
-            minEDep       : 0.5e-3
-            minNGoodHits  : 2
+            minEDep       : 0.5e-3            ## addition
+            minNGoodHits  : 2                 ## addition
         }
 
         CaloDigiMaker : { module_type:  CaloDigisFromDTCEvents
@@ -61,7 +61,7 @@ physics : {
         }
 
         CaloRecoDigiMaker : { @table::CaloReco.CaloRecoDigiMaker
-            globalDt : 1572.     ##
+            ## globalDt : 1572.     ##
         }
 
         CaloHitMaker      : { @table::CaloReco.CaloHitMaker
@@ -83,7 +83,7 @@ physics : {
 
         CrvRecoPulses : { @table::CrvRecoPackage.producers.CrvRecoPulses
             # globalDt : 486.  ## run XXX <T(CRV)-T(tracker)>
-            globalDt : 551.    ## run "1236801: (TRK+CAL+CRV)  <T(CRV)-T(tracker)>
+            # globalDt : 0. ## 551.    ## run "1236801: (TRK+CAL+CRV)  <T(CRV)-T(tracker)>
         }
 
         CrvCoincidenceClusterFinder: @local::CrvCoincidenceClusterFinder
@@ -167,7 +167,7 @@ physics : {
 }
 
 services.TFileService.fileName              : "/dev/null" ##
-physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.vst00s000r104n013.make_det_003.125000_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
+physics.analyzers.InitStntuple.THistModule.histFileName : "a.stn" ## "nts.mu2e.vst00s000r104n013.make_det_003.125000_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
 
 # outputs.detectorOutput.fileName           : "sim._USER_.read_reco.xxx.000001.art"
 
