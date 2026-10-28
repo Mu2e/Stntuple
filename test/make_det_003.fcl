@@ -61,7 +61,6 @@ physics : {
         }
 
         CaloRecoDigiMaker : { @table::CaloReco.CaloRecoDigiMaker
-            ## globalDt : 1572.     ##
         }
 
         CaloHitMaker      : { @table::CaloReco.CaloHitMaker
@@ -82,8 +81,6 @@ physics : {
         }
 
         CrvRecoPulses : { @table::CrvRecoPackage.producers.CrvRecoPulses
-            # globalDt : 486.  ## run XXX <T(CRV)-T(tracker)>
-            # globalDt : 0. ## 551.    ## run "1236801: (TRK+CAL+CRV)  <T(CRV)-T(tracker)>
         }
 
         CrvCoincidenceClusterFinder: @local::CrvCoincidenceClusterFinder
@@ -126,7 +123,7 @@ physics : {
             minStrawHitEDep    : 0.0005          ## 0.5 keV
             minStrawHitDt      : 80              ## ns
 
-            # makeCaloClusters   : 1
+            makeCaloClusters   : 1
             makeCaloHits       : 1
             makeCaloDigis      : 1
             makeCaloRecoDigis  : 1
@@ -153,7 +150,7 @@ physics : {
                 EWMProducer
                 , makeSD, makeSH, TimeCluster                           ## tracker
                 , CaloDigiMaker, CaloRecoDigiMaker, CaloHitMaker        ## calorimeter
-                # , CaloProtoClusterMaker, CaloClusterMaker
+                , CaloProtoClusterMaker, CaloClusterMaker
                 , CrvDigi, CrvRecoPulses, CrvCoincidenceClusterFinder   ## CRV
                 , LineFinder, KKLine                                    ## track reco
                ]
@@ -167,7 +164,7 @@ physics : {
 }
 
 services.TFileService.fileName              : "/dev/null" ##
-physics.analyzers.InitStntuple.THistModule.histFileName : "a.stn" ## "nts.mu2e.vst00s000r104n013.make_det_003.125000_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.kpp00s000r104n013.make_det_003.125000_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
 
 # outputs.detectorOutput.fileName           : "sim._USER_.read_reco.xxx.000001.art"
 
