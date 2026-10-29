@@ -21,8 +21,7 @@ END_PROLOG
 #------------------------------------------------------------------------------
 # services.DbService and services.ProditionsService
 #------------------------------------------------------------------------------
-## #include "daqana/rundb/124000/124155/calibration_set_v103.fcl"
-#include "rundb/latest/calibration_set_v104.fcl"
+#include "rundb/latest/calibration_set_v106.fcl"
 
 process_name : @local::PROCESS_NAME
 
@@ -164,7 +163,7 @@ physics : {
 }
 
 services.TFileService.fileName              : "/dev/null" ##
-physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.kpp00s000r104n013.make_det_003.125000_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.kpp00s002r106n013.make_det_003.125470_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
 
 # outputs.detectorOutput.fileName           : "sim._USER_.read_reco.xxx.000001.art"
 
@@ -181,4 +180,4 @@ services.GeometryService.inputFile : "Stntuple/fcl/geom_common_extracted_data.tx
 #----------------------------------------------------------------------
 #  overrides by submit_mu2e_job.py
 #----------------------------------------------------------------------
-source.fileNames : [ "/projects/mu2e/data/projects/vst/datasets/kpp00s001r104n000/raw.mu2e.kpp00s001r104n000.filter_trk_crv.125470_000001.art" ]
+source.fileNames : [ "/projects/mu2e/data/projects/vst/datasets/kpp00s002r104n000/raw.mu2e.kpp00s000r105n000.filter_tc_calc.125470_000001.art" ]
