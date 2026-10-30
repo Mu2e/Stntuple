@@ -410,7 +410,8 @@ void TStnModule::Delete(const char* Opt) {
 
 //_____________________________________________________________________________
 void TStnModule::Print(const char* Opt) const {
-  GetHeaderBlock()->Print(Form("%s:%s",GetName(),Opt));
+  auto* mod = (TStnModule*) this;
+  mod->GetHeaderBlock()->Print(Form("%s:%s",GetName(),Opt));
 }
 
 
