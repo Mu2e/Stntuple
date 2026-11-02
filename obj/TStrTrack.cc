@@ -187,6 +187,18 @@ void TStrTrack::Clear(const char* Opt) {
 }
 
 //-----------------------------------------------------------------------------
+// for now, assume the speed of light
+//-----------------------------------------------------------------------------
+void TStrTrack::GetPosAtT(float Time, float* Pos) const {
+  float c_mm_per_ns(2.99792e2);       // mm/ns, at time is in ns
+
+  float path = (Time-fT0)*c_mm_per_ns;
+  Pos[0] = fX0+fNx*path;
+  Pos[1] = fY0+fNy*path;
+  Pos[2] = fZ0+fNz*path;
+};
+
+//-----------------------------------------------------------------------------
 void TStrTrack::Print(const char* Opt) const {
   TString opt(Opt);
 
@@ -210,24 +222,20 @@ void TStrTrack::Print(const char* Opt) const {
     printf("%8.2f %9.2f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f",fChi2/fNDof,fT0,fX0,fY0,fZ0,fNx,fNy,fNz);
     printf("\n");
 
-    if (fFormat & 0x2) {
-      // print hits
-      int nh = fHitSeeds->size();
-      for (int i=0; i<nh; i++) {
-        mu2e::TrkStrawHitSeed* shs = &(*fHitSeeds)[i];
-        std::cout << std::format("{:3d} {:4d} {:#04x} {} {:9.3f}\n",
-                                 i,shs->index(),shs->_sid.asUint16(),shs->ambig(),shs->time());
-      }
-    }
-
     if (fFormat & 0x4) {
       // print hits
-      std::cout << std::format(" I   SID   DOCA    X     Y    Z\n");
+      std::cout << std::format("--------------------------------------------------------------------------------\n");
+      std::cout << std::format("  i   SID  pln pnl str     time     ambig     DOCA    poca.X    poca.Y    poca.Z\n");
+      std::cout << std::format("--------------------------------------------------------------------------------\n");
       int ns = fStraws->size();
       for (int i=0; i<ns; i++) {
-        mu2e::TrkStraw* ts = &(*fStraws)[i];
-        std::cout << std::format("{:3d} {:#04x} {:9.3f} {:9.3f} {:9.3f} {:9.3f}\n",
-                                 i,ts->_straw.asUint16(),
+        mu2e::TrkStrawHitSeed* shs = &(*fHitSeeds)[i];
+        mu2e::TrkStraw*        ts  = &(*fStraws)[i];
+
+        std::cout << std::format("{:3d} {:#04x}  {:2}  {:2}  {:2}  {:9.3f} 0x{:08x} {:9.3f} {:9.3f} {:9.3f} {:9.3f}\n",
+                                 i,
+                                 ts->_straw.asUint16(),ts->_straw.plane(),ts->_straw.panel(),ts->_straw.straw(),
+                                 shs->time(),shs->ambig(),
                                  ts->_doca,
                                  ts->_poca.X(),ts->_poca.Y(),ts->_poca.Z());
       }

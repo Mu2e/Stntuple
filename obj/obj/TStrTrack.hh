@@ -2,6 +2,7 @@
 #define __daqana_obj_TStrTrack_hh__
 
 #include "TObject.h"
+#include "TVector3.h"
 #include "Offline/RecoDataProducts/inc/TrkStrawHitSeed.hh"
 #include "Offline/RecoDataProducts/inc/TrkStraw.hh"
 
@@ -32,7 +33,7 @@ public:
 //-----------------------------------------------------------------------------
 // transients
 //-----------------------------------------------------------------------------
-  const mu2e::KalSeed*                fOfflineKs; //!
+  const mu2e::KalSeed*                fOfflineKs; //! defined only during ntuple making
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -40,8 +41,20 @@ public:
   TStrTrack(int ID, int Format = 1);
   virtual ~TStrTrack();
 
-  int     NDof () { return fNDof;  }
-  int     NHits() { return fNHits; }
+  int     NDof () const { return fNDof;  }
+  int     NHits() const { return fNHits; }
+
+  float   Nx   () const { return fNx; }
+  float   Ny   () const { return fNy; }
+  float   Nz   () const { return fNz; }
+
+  float   T0   () const { return fT0; }
+
+  float   X0   () const { return fX0; }
+  float   Y0   () const { return fY0; }
+  float   Z0   () const { return fZ0; }
+
+  void    GetPosAtT(float T, float* Pos) const ;
 
   const mu2e::KalSeed* OfflineKs() { return fOfflineKs; }
 //-----------------------------------------------------------------------------

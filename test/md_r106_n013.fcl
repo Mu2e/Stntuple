@@ -163,7 +163,7 @@ physics : {
 }
 
 services.TFileService.fileName              : "/dev/null" ##
-physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.kpp00s002r106n013.md_r106_n013.125470_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.kpp00s002r104n000.md_r106_n013.125470_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
 
 # outputs.detectorOutput.fileName           : "sim._USER_.read_reco.xxx.000001.art"
 
