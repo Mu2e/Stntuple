@@ -208,7 +208,7 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     else if ((mc_flag == 0) and (block->fEwTag1024[dtc_id-1] !=  tsd->fPmp)) {
       stntuple::print_(evt_id,
                        stntuple::e_ERROR,
-                       std::format("dtc_id:{} block->pmp[dtc_id]:{} hit_pmp{}",dtc_id,
+                       std::format("dtc_id:{} block->pmp[dtc_id]:{} hit_pmp:{}",dtc_id,
                                    block->fEwTag1024[dtc_id-1],tsd->fPmp));
     }
     

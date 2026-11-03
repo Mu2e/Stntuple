@@ -84,12 +84,14 @@ TCaloHit::~TCaloHit() {
 
 //_____________________________________________________________________________
 void TCaloHit::Clear(Option_t* opt) {
-  fCid       = -1;
-  fNSipms    = -1;
-  fTime      = -1.;
-  fEDep      = -1.;
-  fSigT      = -1.;
-  fSigE      = -1.;
+  fCid         = -1;
+  fNSipms      = -1;
+  fTime        = -1.;
+  fEDep        = -1.;
+  fSigT        = -1.;
+  fSigE        = -1.;
+  fCrdIndex[0] = -1;
+  fCrdIndex[1] = -1;
 }
 
 //-----------------------------------------------------------------------------
