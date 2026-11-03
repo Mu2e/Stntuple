@@ -21,7 +21,7 @@ namespace stntuple {
 
 //-----------------------------------------------------------------------------
 InitComboHitBlock::InitComboHitBlock() : TStnInitDataBlock() {
-  fSaveShLinks = 0;
+  fSaveShLinks =  1;
   fMinDt       = -1;     // if < 0, save all hits
   fMinEDep     = 0.5e-3; // 0.5 keV
   fLastRun     = -1;
@@ -31,20 +31,22 @@ InitComboHitBlock::InitComboHitBlock() : TStnInitDataBlock() {
 int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
   std::string oname("InitComboHitBlock::InitDataBlock");
 
-  int ev_number, rn_number; // , mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
+  int evn, run, srn; // , mc_flag(0); /*,n_combo_hits(0), n_straw_hits(0)*/
 
-  ev_number = Event->event();
-  rn_number = Event->run();
+  evn = Event->event();
+  run = Event->run();
+  srn = Event->subRun();
+
   //  if (rn_number < 100000) mc_flag = 1; 
 
-  if (Block->Initialized(ev_number,rn_number)) return 0;
+  if (Block->Initialized(evn,run,srn)) return 0;
 
   TComboHitBlock* data = (TComboHitBlock*) Block;
   data->Clear();
   
-  if (fLastRun != rn_number) {
+  if (fLastRun != run) {
     fTpm      = &fTpmh.get(Event->id());
-    fLastRun  = rn_number;
+    fLastRun  = run;
   }
 //-----------------------------------------------------------------------------
 // straw hit information
@@ -158,6 +160,8 @@ int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       nt_ch->fVres       = ch->vRes();
       nt_ch->fEDep       = ch->energyDep();
 
+      nt_ch->fOfflineCh  = ch;
+
       // if (_debugMode  > 0) {
       //   if (_debugBit[1] != 0) {
       //     // printf("%8i %5i %3i %3i %3i %12.4f %12.4f %6.1f %6.1f %7.4f\n",
@@ -170,8 +174,9 @@ int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       // }
     }
   }
-  data->f_RunNumber   = rn_number;
-  data->f_EventNumber = ev_number;
+  data->f_RunNumber    = run;
+  data->f_EventNumber  = evn;
+  data->f_SubrunNumber = srn;
   
   return 0;
 }
@@ -195,7 +200,7 @@ int InitComboHitBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* Event, int M
   for (int i=0; i<nch; i++) {
     auto ch = ch_block->Hit(i);
     // this one has a list of pointers to straw hits
-    // rely on that the Mu2e collectiosn being vectors of things
+    // rely on that the Mu2e collections being vectors of things
     const mu2e::ComboHit* o_ch = ch->OfflineCh();
     int nsh = o_ch->nStrawHits();
     for (int j=0; j<nsh; j++) {

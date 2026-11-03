@@ -13,7 +13,7 @@ class TCaloDigiBlock : public TStnDataBlock {
 public:
                                         // this is version v1
   int            fNDigis;		//
-  TClonesArray*  fListOfCaloDigis;	//
+  TClonesArray*  fListOfDigis;          //
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -25,16 +25,16 @@ public:
 
   int         NDigis  () { return fNDigis; }
 
-  TCaloDigi*  CaloDigi(int I) { 
-    return (TCaloDigi*) fListOfCaloDigis->UncheckedAt(I);
+  TCaloDigi*  Digi(int I) { 
+    return (TCaloDigi*) fListOfDigis->UncheckedAt(I);
   }
 
-  TClonesArray* GetListOfCaloDigis () { return fListOfCaloDigis ; } 
+  TClonesArray* GetListOfDigis () { return fListOfDigis ; } 
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  TCaloDigi*  NewCaloDigi(int I) { 
-    return new ((*fListOfCaloDigis)[fNDigis++]) TCaloDigi(I);
+  TCaloDigi*  NewDigi(int I) { 
+    return new ((*fListOfDigis)[fNDigis++]) TCaloDigi(I);
   }
 //-----------------------------------------------------------------------------
 // schema evolution

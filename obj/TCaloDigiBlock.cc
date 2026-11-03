@@ -58,7 +58,7 @@ void TCaloDigiBlock::Streamer(TBuffer &R__b) {
                                         // else if (R__v == 2) ReadV2(R__b);
       R__b >> fNDigis;
       if (fNDigis > 0) {
-        fListOfCaloDigis->Streamer(R__b);
+        fListOfDigis->Streamer(R__b);
       }
     }
     else {
@@ -73,7 +73,7 @@ void TCaloDigiBlock::Streamer(TBuffer &R__b) {
     R__b << fNDigis;
 
     if (fNDigis > 0) {
-      fListOfCaloDigis->Streamer(R__b);
+      fListOfDigis->Streamer(R__b);
     }
   }
 }
@@ -81,20 +81,20 @@ void TCaloDigiBlock::Streamer(TBuffer &R__b) {
 //_____________________________________________________________________________
 TCaloDigiBlock::TCaloDigiBlock() {
 
-  fListOfCaloDigis    = new TClonesArray("TCaloDigi",100);
-  fListOfCaloDigis->BypassStreamer(kFALSE);
+  fListOfDigis    = new TClonesArray("TCaloDigi",100);
+  fListOfDigis->BypassStreamer(kFALSE);
   Clear();
 }
 
 //_____________________________________________________________________________
 TCaloDigiBlock::~TCaloDigiBlock() {
-  fListOfCaloDigis->Delete();
-  delete fListOfCaloDigis;
+  fListOfDigis->Delete();
+  delete fListOfDigis;
 }
 
 //_____________________________________________________________________________
 void TCaloDigiBlock::Clear(Option_t* opt) {
-  fListOfCaloDigis->Clear();
+  fListOfDigis->Clear();
   fNDigis             = 0;
 
   f_EventNumber       = -1;
@@ -107,9 +107,9 @@ void TCaloDigiBlock::Clear(Option_t* opt) {
 void TCaloDigiBlock::Print(Option_t* opt) const {
   // print all the towers in the list
   if (fNDigis > 0) {
-    fListOfCaloDigis->At(0)->Print("banner");
+    fListOfDigis->At(0)->Print("banner");
     for (int i=0; i<fNDigis; i++) {
-      fListOfCaloDigis->At(i)->Print("data");
+      fListOfDigis->At(i)->Print("data");
     }
   }
 }

@@ -1,6 +1,6 @@
 # -*- mode:tcl -*-
 #------------------------------------------------------------------------------
-# make_det_003: COMPRESSED TRACKER HITS, NO TRACKS
+# md_rxxx_n007: ntuple everything, plus track hits
 #
 # p0 : ntupling only, assumes input being the reconstruction output
 # p1 : default reconstruction path
@@ -116,6 +116,7 @@ physics : {
 # comment out the hit section if don't need hits... by default, store close hits only
 #------------------------------------------------------------------------------
             makeStrawHits      : 1
+            makeStrawDigis     : 1
             makeComboHits      : 1
             storeCloseHitsOnly : true
             minStrawHitEDep    : 0.0005          ## 0.5 keV

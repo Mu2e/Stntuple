@@ -8,21 +8,25 @@
 
 ClassImp(TComboHitBlock)
 
-// //-----------------------------------------------------------------------------
-// void TComboHitBlock::ReadV1(TBuffer& R__b) {
-//   R__b >> fNHits;
-//   fListOfHits->Streamer(R__b);
-// }
+//-----------------------------------------------------------------------------
+void TComboHitBlock::ReadV1(TBuffer& R__b) {
+  R__b >> fNHits;
+  fListOfHits->Streamer(R__b);
+  fListOfShIndices->Clear();
+}
 
 //-----------------------------------------------------------------------------
 // R_v is so far unused
 //-----------------------------------------------------------------------------
   void TComboHitBlock::Streamer(TBuffer &R__b) {
   if(R__b.IsReading()) {
-    // Version_t R__v = R__b.ReadVersion();
-    R__b.ReadVersion();
-    R__b >> fNHits;
-    fListOfHits->Streamer(R__b);
+    Version_t R__v = R__b.ReadVersion();
+    if (R__v == 1) ReadV1(R__b);
+    else {
+      R__b >> fNHits;
+      fListOfHits->Streamer(R__b);
+      fListOfShIndices->Streamer(R__b);
+    }
   }
   else {
 //-----------------------------------------------------------------------------
@@ -31,6 +35,7 @@ ClassImp(TComboHitBlock)
     R__b.WriteVersion(TComboHitBlock::IsA());
     R__b << fNHits;
     fListOfHits->Streamer(R__b);
+    fListOfShIndices->Streamer(R__b);
   }
 }
 
@@ -38,6 +43,7 @@ ClassImp(TComboHitBlock)
 TComboHitBlock::TComboHitBlock() {
   fListOfHits = new TClonesArray("TComboHit",10000);
   fListOfHits->BypassStreamer(kFALSE);
+  fListOfShIndices = new TStnLinkBlock();
   Clear();
 }
 
@@ -45,6 +51,20 @@ TComboHitBlock::TComboHitBlock() {
 TComboHitBlock::~TComboHitBlock() {
   fListOfHits->Delete();
   delete fListOfHits;
+  delete fListOfShIndices;
+}
+
+//-----------------------------------------------------------------------------
+int TComboHitBlock::FindHitIndex(TComboHit* Ch) {
+  int found(-1);
+  for (int i=0; i<fNHits; i++) {
+    TComboHit* hit = Hit(i);
+    if (hit == Ch) {
+      found = i;
+      break;
+    }
+  }
+  return found;
 }
 
 //-----------------------------------------------------------------------------

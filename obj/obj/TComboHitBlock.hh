@@ -30,7 +30,9 @@ public:
 
   TComboHit*     Hit      (int I) { return (TComboHit*   ) fListOfHits->UncheckedAt     (I); }
   TComboHit*     GetHitByID(int ID);
-  
+
+  int            FindHitIndex   (TComboHit* Ch);
+
   TClonesArray*  ListOfHits     () { return fListOfHits     ; }
   TStnLinkBlock* ListOfShIndices() { return fListOfShIndices; }
 //-----------------------------------------------------------------------------
@@ -42,14 +44,14 @@ public:
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
-//  void ReadV1(TBuffer& R__b);
+  void ReadV1(TBuffer& R__b);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
   virtual void Clear(Option_t* opt="") override;
   virtual void Print(Option_t* opt="") const override;
 
-  ClassDefOverride(TComboHitBlock,1)    // combo hit data block
+  ClassDefOverride(TComboHitBlock,2)    // combo hit data block
 };
 
 #endif

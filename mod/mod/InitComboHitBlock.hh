@@ -53,7 +53,8 @@ public:
   void   SetChCollTag          (art::InputTag& Tag) { fChCollTag  = Tag; }
   void   SetShCollTag          (art::InputTag& Tag) { fShCollTag  = Tag; }
   void   SetTcCollTag          (art::InputTag& Tag) { fTcCollTag  = Tag; }
-  
+
+  void   SetShLinks            (int   Save) { fSaveShLinks        = Save; }
   void   SetStoreCloseHitsOnly (bool  Flag) { fStoreCloseHitsOnly = Flag; }
   void   SetMinDt              (float Dt  ) { fMinDt              = Dt  ; }
   void   SetMinEDep            (float EDep) { fMinEDep            = EDep; }
