@@ -259,10 +259,8 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
       ProcessNewRun(anEvent.run());
     }
 					// close the old file
-    old_file->Write();
-    delete old_file;                    // TFile destructor also closes the file
-                                        // rename if needed
-    // TODO : renaming
+    CloseAndStubFile(old_file);     // closes the file and sets the run_subrun stub of its name
+    ResetFileRange();
 					// redefine static variables
     THistModule::fgTree = tree;
 
@@ -270,6 +268,7 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
   }
 					// and finally fill the tree
 					// this is the first entry in the new file
+  AddToFileRange(anEvent.run(),anEvent.subRun());
   fgTree->Fill();
   old_rs = subrun;
 

@@ -11,11 +11,16 @@
 //------------------------------------------------------------------------
 
 #include <assert.h>
+#include <climits>
+#include <cstdio>
+#include <regex>
 #include <string>
 
 #include "TInterpreter.h"
 #include "TH1.h"
 #include "TFolder.h"
+#include "TSystem.h"
+#include "TError.h"
 
 #include "Stntuple/obj/AbsEvent.hh"
 #include "Stntuple/mod/THistModule.hh"
@@ -35,6 +40,8 @@ TObjArray* THistModule::fgModuleList   = 0;
 TFile*     THistModule::fgFile         = 0;
 TTree*     THistModule::fgTree         = 0;
 int        THistModule::fgMakeSubdirs  = 1;
+int        THistModule::fgRunMin       = INT_MAX;
+int        THistModule::fgSubrunMin    = INT_MAX;
 
 //-----------------------------------------------------------------------------
 THistModule::THistModule() : TModule() {
@@ -114,8 +121,7 @@ THistModule::~THistModule() {
 //-----------------------------------------------------------------------------
 
   if (fgFile) {
-    fgFile->Write();
-    delete fgFile;
+    CloseAndStubFile(fgFile);
     fgFile = 0;
   }
   if (fHistogramList) {
@@ -129,6 +135,56 @@ THistModule::~THistModule() {
   }
 }
 
+
+//______________________________________________________________________________
+void THistModule::ResetFileRange() {
+  fgRunMin    = INT_MAX;
+  fgSubrunMin = INT_MAX;
+}
+
+//______________________________________________________________________________
+// lowest (run, subrun) pair of the events written into the current file
+void THistModule::AddToFileRange(int Run, int Subrun) {
+  if ((Run < fgRunMin) or ((Run == fgRunMin) and (Subrun < fgSubrunMin))) {
+    fgRunMin    = Run;
+    fgSubrunMin = Subrun;
+  }
+}
+
+//______________________________________________________________________________
+// close the file and rename it: the <run>_<subrun> field of the configured name
+// (e.g. nts.mu2e.<dsid>.<cfg>.<run>_<subrun>.stn) is replaced with the lowest run
+// and subrun of the events written into this file; the file counter suffix is kept
+void THistModule::CloseAndStubFile(TFile* File) {
+  if (File == nullptr) return;
+
+  TString openName = File->GetName();
+  File->Write();
+  delete File;                                   // the TFile destructor also closes the file
+
+  if (fgRunMin == INT_MAX) return;               // no events written into this file
+
+  std::string base = fgFileName.Data();
+  std::regex  stub("\\.[0-9]{6}_[0-9]{6}\\.");
+  if (not std::regex_search(base, stub)) {
+    ::Error("CloseAndStubFile","no <run>_<subrun> field in %s, file name not changed",fgFileName.Data());
+    return;
+  }
+
+  char repl[32];
+  snprintf(repl,sizeof(repl),".%06d_%06d.",fgRunMin,fgSubrunMin);
+  TString newName = std::regex_replace(base, stub, repl, std::regex_constants::format_first_only).c_str();
+
+  TString suffix = openName;                     // file counter suffix, e.g. "_2", empty for the first file
+  suffix.Remove(0,fgFileName.Length());
+  newName += suffix;
+
+  if (newName != openName) {
+    if (gSystem->Rename(openName.Data(),newName.Data()) != 0) {
+      ::Error("CloseAndStubFile","failed to rename %s to %s",openName.Data(),newName.Data());
+    }
+  }
+}
 
 //______________________________________________________________________________
 int THistModule::OpenNewFile(const char* Filename) {

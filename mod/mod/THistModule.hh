@@ -56,6 +56,15 @@ protected:
   static int        fgSplitLevel;
   static int        fgBufferSize;
   static int        fgCompressionLevel;
+  static int        fgRunMin;           // lowest run of the events written into the current file
+  static int        fgSubrunMin;        // lowest subrun of the events in fgRunMin
+//------------------------------------------------------------------------------
+// file naming: the run_subrun field of the file name is set to the lowest run
+// and subrun of the events written into the file
+//------------------------------------------------------------------------------
+  static void       ResetFileRange     ();
+  static void       AddToFileRange     (int Run, int Subrun);
+  static void       CloseAndStubFile   (TFile* File);
 //------------------------------------------------------------------------------
 //  data members of the module
 //------------------------------------------------------------------------------
