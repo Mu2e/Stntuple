@@ -34,7 +34,7 @@ public:
   float   fVres;
   float   fEDep;
 
-  mu2e::ComboHit* fOfflineCh;           //! backward pointer
+  const mu2e::ComboHit* fOfflineCh;     //! backward pointer
 
 public:
                                         // constructors and destructors
@@ -59,7 +59,7 @@ public:
   float Ures       () const { return fUres; }
   float Vres       () const { return fVres; }
 
-  mu2e::ComboHit* OfflineCh() { return fOfflineCh; }
+  const mu2e::ComboHit* OfflineCh() { return fOfflineCh; }
 //-----------------------------------------------------------------------------
 // modifiers, assume TOT = tot[0] | (tot[1] << 16
 //-----------------------------------------------------------------------------
