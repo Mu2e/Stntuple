@@ -93,6 +93,19 @@ TStrawDigiBlock::~TStrawDigiBlock() {
   delete fListOfDigis;
 }
 
+//-----------------------------------------------------------------------------
+TStrawDigi* TStrawDigiBlock::GetDigiByID(int ID) {
+  TStrawDigi* found(nullptr);
+  for (int i=0; i<fNDigis; i++) {
+    TStrawDigi* digi = StrawDigi(i);
+    if (digi->GetUniqueID() == (uint32_t) ID) {
+      found = digi;
+      break;
+    }
+  }
+  return found;
+}
+
 //_____________________________________________________________________________
 void TStrawDigiBlock::Clear(Option_t* opt) {
   fListOfDigis->Clear();
@@ -113,7 +126,7 @@ void TStrawDigiBlock::Print(Option_t* opt) const {
   if (fNDigis > 0) {
     fListOfDigis->At(0)->Print("banner");
     for (int i=0; i<fNDigis; i++) {
-      fListOfDigis->At(i)->Print();
+      fListOfDigis->At(i)->Print("data");
     }
   }
 }

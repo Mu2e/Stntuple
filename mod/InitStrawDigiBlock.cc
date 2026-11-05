@@ -13,10 +13,14 @@
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Event.h"
 
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
 #include "Stntuple/obj/TStrawDigiBlock.hh"
 #include "Stntuple/obj/TStnEvent.hh"
+#include "Stntuple/mod/StntupleUtilities.hh"
 
 #include "Stntuple/mod/InitStrawDigiBlock.hh"
 #include "Stntuple/mod/MFInterface.hh"
@@ -105,7 +109,10 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   int                                     ndigis(0), mc_flag(0);
   
   art::Handle<mu2e::StrawDigiADCWaveformCollection> sdawfch;
-  const mu2e::StrawDigiADCWaveformCollection*       sdawfc(nullptr);
+  const mu2e::StrawDigiADCWaveformCollection*       sdawfc{nullptr};
+  const mu2e::TimeClusterCollection*                tcc   {nullptr};
+  const mu2e::StrawHitCollection*                   shc   {nullptr};
+  const mu2e::ComboHitCollection*                   chc   {nullptr};
   
   art::EventID evt_id = Evt->id();
 
@@ -119,8 +126,8 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     fLastRun     = rn;
   }
 
-  if (! fStrawDigiCollTag.empty()) {
-    bool ok = Evt->getByLabel(fStrawDigiCollTag,sdch);
+  if (! fSdCollTag.empty()) {
+    bool ok = Evt->getByLabel(fSdCollTag,sdch);
     if (ok) {
       sdc   = sdch.product();
       ndigis = sdc->size();
@@ -129,11 +136,11 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       // no cal digi collection: print diagnostics but do nothing else, just leave the data block empty
       stntuple::print_(evt_id,
                        stntuple::e_WARNING,std::format("ERROR: no StrawDigiCollection tag={} found. BAIL OUT",
-                                                       fStrawDigiCollTag.encode().data()));
+                                                       fSdCollTag.encode().data()));
       return 0;
     }
     
-    ok =  Evt->getByLabel(fStrawDigiCollTag,sdawfch);
+    ok =  Evt->getByLabel(fSdCollTag,sdawfch);
     if (ok) { 
       sdawfc = sdawfch.product();
     }
@@ -141,15 +148,103 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       stntuple::print_(evt_id,
                        stntuple::e_WARNING,
                        std::format("WARNING: StrawDigiADCWaveformCollection:{:s} is not available. Bail out\n",
-                                   fStrawDigiCollTag.encode().data()));
+                                   fSdCollTag.encode().data()));
       return 0;
     }
   }
   
-  int idigi=0;
-  for (int i=0; i<ndigis; i++) {
-    const mu2e::StrawDigi*            sd    = &sdc->at(i);
-    const mu2e::StrawDigiADCWaveform* sdawf = &sdawfc->at(i);
+  
+  int nsaved=0;
+  for (int idigi=0; idigi<ndigis; idigi++) {
+
+    if (fStoreCloseHitsOnly) {
+//-----------------------------------------------------------------------------
+// in this case need TC, SH, and CH collections
+//-----------------------------------------------------------------------------
+      if (not fTcCollTag.empty()) {
+        art::Handle<mu2e::TimeClusterCollection> tcch;
+        bool ok = Evt->getByLabel(fTcCollTag,tcch);
+        if (ok) {
+          tcc = tcch.product();
+        }
+        else {
+          stntuple::print_(evt_id,
+                           stntuple::e_ERROR,
+                           std::format("TC collection:{:s} is not available. BAIL OUT\n",
+                                       fTcCollTag.encode().data()));
+          return 0;
+        }
+      }
+      if (not fShCollTag.empty()) {
+        art::Handle<mu2e::StrawHitCollection> shch;
+        bool ok = Evt->getByLabel(fShCollTag,shch);
+        if (ok) {
+          shc = shch.product();
+        }
+        else {
+          stntuple::print_(evt_id,
+                           stntuple::e_ERROR,
+                           std::format("SH collection:{:s} is not available. BAIL OUT\n",
+                                       fShCollTag.encode().data()));
+          return 0;
+        }
+      }
+      if (not fChCollTag.empty()) {
+        art::Handle<mu2e::ComboHitCollection> chch;
+        bool ok = Evt->getByLabel(fChCollTag,chch);
+        if (ok) {
+          chc = chch.product();
+        }
+        else {
+          stntuple::print_(evt_id,
+                           stntuple::e_ERROR,
+                           std::format("CH collection:{:s} is not available. BAIL OUT\n",
+                                       fChCollTag.encode().data()));
+          return 0;
+        }
+      }
+    }
+//-----------------------------------------------------------------------------
+// ok, all collections are present
+//-----------------------------------------------------------------------------
+    const mu2e::StrawHit* sh = &shc->at(idigi);
+    if (sh->energyDep() < fMinEDep) {
+      // bool close_enough = stntuple::CloseEnough(sh->time()-20.,tcc,fMinDt);
+      bool close_enough = stntuple::CloseEnough(sh->time()-20,tcc,fMinDt);
+      if (not close_enough) {
+        // accidentally, the time clustering window may be large enough
+        // so hits included into the time cluster are outside the checked window
+        // make sure the hit is not in the list explicitly
+        int ntc = tcc->size();
+        for (int itc=0; itc<ntc; itc++) {
+          const mu2e::TimeCluster* tc = &tcc->at(itc);
+          // look at the TC combo hits
+          int nch = tc->hits().size();
+          for (int j=0; j<nch; j++) {
+            uint16_t ch_ind = tc->hits().at(j);
+            const mu2e::ComboHit* ch = &chc->at(ch_ind); // assuming CHC is there
+            // a combo hit has a list of straw hit indices
+            int ch_nsh = ch->nStrawHits();
+            for (int ish=0; ish<ch_nsh; ish++) {
+              if (idigi == ch->index(ish)) {
+                close_enough = true;
+                break;
+              }
+            }
+            if (close_enough) break;
+          }
+          if (close_enough) break;
+        }
+        
+        if (not close_enough) continue;
+      }
+    }
+//-----------------------------------------------------------------------------
+// hit is 'close' to some time cluster, store the digi
+//-----------------------------------------------------------------------------
+    const mu2e::StrawDigi*            sd    = &sdc->at(idigi);
+    const mu2e::StrawDigiADCWaveform* sdawf = &sdawfc->at(idigi);
+
     int ns = sdawf->samples().size();
     // expect the same number of samples for all straw digi waveforms
     if (fNAdcSamples == -1) fNAdcSamples = ns;
@@ -166,10 +261,14 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 //-----------------------------------------------------------------------------
 // for calibrations, write out a special small size ntuple with the cut on the SD pulse height
 // by default, _minSdPulseHeight is -1.
+// if store only close hits, ignore the pulse height logic
 //-----------------------------------------------------------------------------
-    if (wp.ph < fMinSDPHToSave)                             continue;
-    TStrawDigi* tsd           = block->NewDigi();
-    idigi++;
+    if (not fStoreCloseHitsOnly) {
+      if (wp.ph < fMinSDPHToSave)                             continue;
+    }
+
+    TStrawDigi* tsd           = block->NewDigi(idigi);
+    nsaved++;
 
     tsd->Init(fNAdcSamples);
     
@@ -217,7 +316,7 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     tsd->fPh = wp.ph;
   }
 
-  block->fNDigis = idigi;
+  block->fNDigis = nsaved;
 
   return 0;
 }

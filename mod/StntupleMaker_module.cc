@@ -847,7 +847,15 @@ void StntupleMaker::beginJob() {
   if (fMakeStrawDigis) {
     fInitStrawDigiBlock = new StntupleInitStrawDigiBlock();
 
-    fInitStrawDigiBlock->SetStrawDigiCollTag(fStrawDigiCollTag);
+    fInitStrawDigiBlock->SetSdCollTag(fStrawDigiCollTag);
+    fInitStrawDigiBlock->SetShCollTag(fShCollTag);
+    fInitStrawDigiBlock->SetChCollTag(fChCollTag);
+    art::InputTag tc_coll_tag = fTcCollTag[0];              // why would I need many - for comparison between algorithms ?
+    fInitStrawDigiBlock->SetTcCollTag(tc_coll_tag);
+
+    fInitStrawDigiBlock->SetStoreCloseHitsOnly(fStoreCloseHitsOnly);
+    fInitStrawDigiBlock->SetMinEDep           (fMinStrawHitEDep);
+    fInitStrawDigiBlock->SetMinDt             (fMinStrawHitDt);
 
     AddDataBlock("StrawDigiBlock","TStrawDigiBlock",fInitStrawDigiBlock,buffer_size,split_mode,compression_level);
   }
@@ -861,9 +869,10 @@ void StntupleMaker::beginJob() {
     fInitStrawHitBlock->SetStrawDigiMCCollTag(fSdmcCollTag);
     art::InputTag tc_coll_tag = fTcCollTag[0]; // why would I need many - for comparison between algorithms ?
     fInitStrawHitBlock->SetTimeClusterCollTag(tc_coll_tag);
+
     fInitStrawHitBlock->SetStoreCloseHitsOnly(fStoreCloseHitsOnly);
-    fInitStrawHitBlock->SetMinEDep   (fMinStrawHitEDep);
-    fInitStrawHitBlock->SetMinDt     (fMinStrawHitDt);
+    fInitStrawHitBlock->SetMinEDep           (fMinStrawHitEDep);
+    fInitStrawHitBlock->SetMinDt             (fMinStrawHitDt);
 
     if (fMakeStrawWaveforms) { 
       fInitStrawHitBlock->SetWriteSdwf(1);

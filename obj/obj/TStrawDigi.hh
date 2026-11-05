@@ -2,8 +2,9 @@
 #define __daqana_obj_TStrawDigi_hh__
 
 #include <vector>
-#include "TClonesArray.h"
+
 #include "TObject.h"
+#include "TBuffer.h"
 
 class TStrawDigi : public TObject {
 public:
@@ -24,7 +25,7 @@ public:
 // functions
 //-----------------------------------------------------------------------------
   TStrawDigi();
-  TStrawDigi(int ns);
+  TStrawDigi(UInt_t ID);
   virtual ~TStrawDigi();
 
   int     Ns() { return fNs; } // return adc.size(); }
@@ -32,9 +33,14 @@ public:
 
   std::vector<uint16_t>& Adc() { return fAdc; }
 
-  virtual void Clear(const char* Opt) override ;
+  virtual void Clear(const char* Opt)       override ;
+  virtual void Print(const char* Opt) const override ;
+//-----------------------------------------------------------------------------
+// schema evolution
+//-----------------------------------------------------------------------------
+  void ReadV1(TBuffer& R__b);
 
-  ClassDefOverride(TStrawDigi,1);
+  ClassDefOverride(TStrawDigi,2);
 };
 
 #endif

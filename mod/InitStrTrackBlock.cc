@@ -66,11 +66,15 @@ int  InitStrTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int M
     tst->fNHits     = ks->nHits();
     tst->fFormat    = fTrackFormat;
     tst->fChi2      = ks->chisquared();
-    tst->fT0        = ks->t0().t0();
+//-----------------------------------------------------------------------------
+// tref() is the time at position3() ;
+// t0Val() is claimed to be defined at Z=0
+//-----------------------------------------------------------------------------
     tst->fNDof      = ks->nDOF();
     tst->fX0        = seg->position3().x();
     tst->fY0        = seg->position3().y();
     tst->fZ0        = seg->position3().z();
+    tst->fT0        = seg->tref();
     double tmom     = seg->mom();
     tst->fNx        = seg->momentum3().x()/tmom;
     tst->fNy        = seg->momentum3().y()/tmom;

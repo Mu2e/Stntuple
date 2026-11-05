@@ -9,7 +9,7 @@
 #include "TBuffer.h"
 
 class TStrawDigiBlock : public TStnDataBlock {
-  friend Int_t StntupleInitMu2eStrawDigiBlock(TStnDataBlock*, AbsEvent*, int);
+  friend class StntupleInitStrawDigiBlock;
 public:
                                         // this is version v1
   int            fNDigis;		//
@@ -35,12 +35,14 @@ public:
     return (TStrawDigi*) fListOfDigis->UncheckedAt(I);
   }
 
+  TStrawDigi*   GetDigiByID(int ID);
+
   TClonesArray* GetListOfDigis () { return fListOfDigis ; } 
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  TStrawDigi*  NewDigi() { 
-    return new ((*fListOfDigis)[fNDigis++]) TStrawDigi();
+  TStrawDigi*  NewDigi(int I) { 
+    return new ((*fListOfDigis)[fNDigis++]) TStrawDigi(I);
   }
 //-----------------------------------------------------------------------------
 // schema evolution
