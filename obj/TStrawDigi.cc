@@ -32,7 +32,7 @@ void TStrawDigi::ReadV1(TBuffer &R__b) {
   SetUniqueID(kMaxUInt);     // such index should not exist
   R__b.ReadFastArray(&fNs, nwi);
   R__b.ReadFastArray(&fBl, nwf);
-  if (dat.fNs != (int) fAdc.size()) {
+  if (fNs != (int) fAdc.size()) {
     fAdc.resize(fNs);
   }
   if (fNs != 0) {
