@@ -120,7 +120,7 @@ physics : {
             makeComboHits      : 1
             storeCloseHitsOnly : true
             minStrawHitEDep    : 0.0005          ## 0.5 keV
-            minStrawHitDt      : 80              ## ns
+            minStrawHitDt      : 60              ## ns
 
             makeCaloClusters   : 1
             makeCaloHits       : 1

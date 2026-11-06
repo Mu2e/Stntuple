@@ -203,40 +203,40 @@ int  StntupleInitStrawDigiBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
           return 0;
         }
       }
-    }
 //-----------------------------------------------------------------------------
 // ok, all collections are present
 //-----------------------------------------------------------------------------
-    const mu2e::StrawHit* sh = &shc->at(idigi);
-    if (sh->energyDep() < fMinEDep) {
-      // bool close_enough = stntuple::CloseEnough(sh->time()-20.,tcc,fMinDt);
-      bool close_enough = stntuple::CloseEnough(sh->time()-20,tcc,fMinDt);
-      if (not close_enough) {
-        // accidentally, the time clustering window may be large enough
-        // so hits included into the time cluster are outside the checked window
-        // make sure the hit is not in the list explicitly
-        int ntc = tcc->size();
-        for (int itc=0; itc<ntc; itc++) {
-          const mu2e::TimeCluster* tc = &tcc->at(itc);
-          // look at the TC combo hits
-          int nch = tc->hits().size();
-          for (int j=0; j<nch; j++) {
-            uint16_t ch_ind = tc->hits().at(j);
-            const mu2e::ComboHit* ch = &chc->at(ch_ind); // assuming CHC is there
-            // a combo hit has a list of straw hit indices
-            int ch_nsh = ch->nStrawHits();
-            for (int ish=0; ish<ch_nsh; ish++) {
-              if (idigi == ch->index(ish)) {
-                close_enough = true;
-                break;
+      const mu2e::StrawHit* sh = &shc->at(idigi);
+      if (sh->energyDep() < fMinEDep) {
+        // bool close_enough = stntuple::CloseEnough(sh->time()-20.,tcc,fMinDt);
+        bool close_enough = stntuple::CloseEnough(sh->time()-20,tcc,fMinDt);
+        if (not close_enough) {
+          // accidentally, the time clustering window may be large enough
+          // so hits included into the time cluster are outside the checked window
+          // make sure the hit is not in the list explicitly
+          int ntc = tcc->size();
+          for (int itc=0; itc<ntc; itc++) {
+            const mu2e::TimeCluster* tc = &tcc->at(itc);
+            // look at the TC combo hits
+            int nch = tc->hits().size();
+            for (int j=0; j<nch; j++) {
+              uint16_t ch_ind = tc->hits().at(j);
+              const mu2e::ComboHit* ch = &chc->at(ch_ind); // assuming CHC is there
+              // a combo hit has a list of straw hit indices
+              int ch_nsh = ch->nStrawHits();
+              for (int ish=0; ish<ch_nsh; ish++) {
+                if (idigi == ch->index(ish)) {
+                  close_enough = true;
+                  break;
+                }
               }
+              if (close_enough) break;
             }
             if (close_enough) break;
           }
-          if (close_enough) break;
-        }
         
-        if (not close_enough) continue;
+          if (not close_enough) continue;
+        }
       }
     }
 //-----------------------------------------------------------------------------
