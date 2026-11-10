@@ -22,6 +22,9 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // Mu2e includes.
+#include "canvas/Persistency/Provenance/ProductID.h"
+#include "art/Framework/Principal/Provenance.h"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
 // ROOT includes
 #include "TApplication.h"
@@ -36,14 +39,20 @@ using CLHEP::Hep3Vector;
 namespace mu2e {
 
   class StntupleEventDump : public TModule {
+  struct Config {
+    using Name = fhicl::Name;
+    using Comment = fhicl::Comment;
+    fhicl::Atom<int> printKalSeeds   {Name("printKalSeeds"   ), Comment("print KalSeeds")};
+    fhicl::Atom<int> printKalSeedHits{Name("printKalSeedHits"), Comment("print KalSeed hits")};
+    fhicl::DelegatedParameter TModule{Name("TModule"), Comment("TModule parameters")};
+  };
+  using Parameters = art::EDAnalyzer::Table<Config>;
   private:
 //-----------------------------------------------------------------------------
 // Input parameters: Module labels 
 //-----------------------------------------------------------------------------
-    std::string        _moduleLabel;	             // this module label
-    std::string        _processName;
-
-    std::string        _producerName;
+    int                _printKalSeeds;        // print KalSeed collections
+    int                _printKalSeedHits;     // if >0, also print hits
 //-----------------------------------------------------------------------------
 // end of input parameters
 // Options to control the display
@@ -53,7 +62,7 @@ namespace mu2e {
 
   public:
 
-    explicit StntupleEventDump(fhicl::ParameterSet const& pset);
+    explicit StntupleEventDump(const Parameters& config);
     virtual ~StntupleEventDump();
 
     int      getData(const art::Event* Evt);
@@ -68,17 +77,18 @@ namespace mu2e {
 
 
 //-----------------------------------------------------------------------------
-  StntupleEventDump::StntupleEventDump(fhicl::ParameterSet const& pset) :
-    TModule(pset,pset.get<fhicl::ParameterSet>("TModule"), "StntupleEventDump")
+  StntupleEventDump::StntupleEventDump(const Parameters& config) :
+    TModule(config.get_PSet(), config().TModule.get<fhicl::ParameterSet>(), "StntupleEventDump"),
+    _printKalSeeds(config().printKalSeeds()),
+    _printKalSeedHits(config().printKalSeedHits())
   {
-    fApplication = 0;
+    fApplication      = 0;
   }
 
 //-----------------------------------------------------------------------------
   StntupleEventDump::~StntupleEventDump() {
     if (fApplication) delete fApplication;
   }
-
 
 //-----------------------------------------------------------------------------
   void StntupleEventDump::beginJob() {
@@ -109,8 +119,31 @@ namespace mu2e {
 //-----------------------------------------------------------------------------
 // go into interactive mode, till '.q' is pressed
 //-----------------------------------------------------------------------------
-    TModule::analyze(Evt);
-  } 
+    TAnaDump* ad = TAnaDump::Instance();
+    ad->SetEvent(&Evt);
+
+//   TModule::analyze(Evt);
+    if (_printKalSeeds) {
+//-----------------------------------------------------------------------------
+// print all KalSeed collections (any instance name) found in the event;
+// TAnaDump::printKalSeedCollection expects tag = label:instance:process
+//-----------------------------------------------------------------------------
+      auto vcoll = Evt.getMany<mu2e::KalSeedCollection>();
+
+      for (auto const& handle : vcoll) {
+        if (! handle.isValid()) continue;
+        const art::Provenance* prov = handle.provenance();
+
+        printf("moduleLabel: %-20s, productInstanceName: %-20s, processName:= %-30s\n",
+               prov->moduleLabel().data(),
+               prov->productInstanceName().data(),
+               prov->processName().data());
+
+        std::string tag = prov->moduleLabel()+":"+prov->productInstanceName()+":"+prov->processName();
+        ad->printKalSeedCollection(tag.data(),_printKalSeedHits);
+      }
+    }
+  }
 }
 
 using mu2e::StntupleEventDump;

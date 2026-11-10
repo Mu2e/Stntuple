@@ -12,8 +12,62 @@
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/TrkStrawHitSeed.hh"
+#include "Offline/RecoDataProducts/inc/TrkStraw.hh"
+#include "Offline/RecoDataProducts/inc/KalIntersection.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/RecoDataProducts/inc/TrkFitFlag.hh"
+
+#include <cmath>
+
+namespace {
+// Print the persistent KalSeed payload independently of the external hit collections.
+void printKalSeedPayload(const mu2e::KalSeed* seed) {
+  const auto& intersections = seed->intersections();
+  printf("  KalIntersection entries: %zu\n", intersections.size());
+  if (!intersections.empty()) {
+    printf("   i Surface       Idx       time       x         y         z        px        py        pz   inBounds      gap       dP\n");
+    for (size_t i = 0; i < intersections.size(); ++i) {
+      const auto& inter = intersections[i];
+      const auto pos = inter.position3();
+      const auto mom = inter.momentum3();
+      printf(" %3zu %-12s %4d %9.3f %9.2f %9.2f %9.2f %9.2f %9.2f %9.2f %9d %9.3f %12.4g\n",
+             i, inter.surfaceId().name().c_str(), inter.surfaceId().index(), inter.time(),
+             pos.x(), pos.y(), pos.z(), mom.x(), mom.y(), mom.z(),
+             int(inter.inBounds()), inter.gap(), inter.dMom());
+    }
+  }
+
+  const auto& hits = seed->hits();
+  printf("  TrkStrawHitSeed entries: %zu\n", hits.size());
+  if (!hits.empty()) {
+    printf("   i  hitIdx StrawID pln pnl str   time    particleTOCA sensorTOCA  refDOCA   fitDOCA  driftR\n");
+    for (size_t i = 0; i < hits.size(); ++i) {
+      const auto& hit = hits[i];
+      const auto& sid = hit.strawId();
+      printf(" %3zu %6u %7u %3u %3u %4u %9.3f %12.3f %10.3f %7.3f %9.3f %8.3f\n",
+             i, unsigned(hit.index()), unsigned(sid.asUint16()), unsigned(sid.getPlane()),
+             unsigned(sid.getPanel()), unsigned(sid.getStraw()), hit.time(),
+             hit.particleToca(), hit.sensorToca(), hit.refDOCA(), hit.fitDOCA(), hit.driftRadius());
+    }
+  }
+
+  const auto& straws = seed->straws();
+  printf("  TrkStraw entries: %zu\n", straws.size());
+  if (!straws.empty()) {
+    printf("   i StrawID pln pnl str active hit activeHit driftHit      DOCA  DOCAerr      TOCA    poca.x    poca.y    poca.z  dirDot   gasPath  wallPath wirePath\n");
+    for (size_t i = 0; i < straws.size(); ++i) {
+      const auto& straw = straws[i];
+      const auto& sid = straw._straw;
+      printf(" %3zu %7u %3u %3u %3u %6d %3d %9d %8d %9.3f %9.3f %9.3f %9.2f %9.2f %9.2f %7.3f %9.3f %9.3f %8.3f\n",
+             i, unsigned(sid.asUint16()), unsigned(sid.getPlane()), unsigned(sid.getPanel()),
+             unsigned(sid.getStraw()), int(straw.active()), int(straw.hasHit()),
+             int(straw.activeHit()), int(straw.driftHit()), straw._doca, sqrt(straw._docavar),
+             straw._toca, straw._poca.X(), straw._poca.Y(), straw._poca.Z(), straw._dirdot,
+             straw._gaspath, straw._wallpath, straw._wirepath);
+    }
+  }
+}
+}
 
 using namespace std;
 
@@ -28,17 +82,11 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
 
   if (not KalSeed->status().hasAnyProperty(mu2e::TrkFitFlag::KKLine)) return;
   
-  if ((opt == "") || (opt == "banner")) {
-    printf("--------------------------------------------------------------------------------");
-    printf("----------------------------------------------------------------------------\n");
-    printf("  TrkID       Address    N  chi2/ndof    T0      T0err       X           Y         Z       ");
-    printf("    Nx         Ny        Nz     tmin     tmax    fmin      fmax\n");
-    printf("--------------------------------------------------------------------------------");
-    printf("----------------------------------------------------------------------------\n");
-  }
-
+  int banner_printed(0);
+  
   int    nhits   = KalSeed->hits().size();
   if ((opt == "") || (opt.Index("data") >= 0)) {
+    printKalSeedPayload(KalSeed);
     
     double t0     = KalSeed->t0()._t0;
     double t0err  = KalSeed->t0()._t0err;
@@ -46,11 +94,19 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
     // auto status   = KalSeed->status();
     float chi2    = KalSeed->chisquared()/(ndof+1.e-12);
     
+    printf("--------------------------------------------------------------------------------");
+    printf("----------------------------------------------------------------------------\n");
+    printf("  TrkID       Address    N    chi2d    T0        T0err    Tref         X           Y         Z       ");
+    printf("    Nx      Ny     Nz    POCAx     POCAy     POCAz    tmin     tmax    fmin      fmax\n");
+    printf("--------------------------------------------------------------------------------");
+    printf("----------------------------------------------------------------------------\n");
+    
     for (const mu2e::KalSegment& kalSeg : KalSeed->segments()) {
 
       KinKal::VEC3 pos   = kalSeg.position3(); // kalSeg.kinematicLine().pos0();
       KinKal::VEC3 m3    = kalSeg.momentum3(); // kalSeg.kinematicLine().direction();
       double mom         = kalSeg.mom();
+      KinKal::VEC3 poca  = kalSeg.kinematicLine().pos0();
       
       KinKal::VEC3 dir(m3.x()/mom,m3.y()/mom,m3.z()/mom);
       
@@ -58,15 +114,19 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
       double tmax        = kalSeg.tmax();
       double fmin        = kalSeg.fmin();
       double fmax        = kalSeg.fmax();
+      double tref        = kalSeg.tref();
 
       // const mu2e::CaloCluster*cluster = KalSeed->caloCluster().get();
       // double clusterEnergy(-1);
       // if (cluster != 0) clusterEnergy = cluster->energyDep();
-      printf("%5i %16p %3i %8.3f %8.3f %8.5f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %8.2f %8.2f %8.2f %8.2f\n",
+      printf("%5i %16p %3i %8.3f %8.3f %8.5f %8.3f %10.3f %10.3f %10.3f %7.4f %7.4f %7.4f %9.3f %9.3f %9.3f %8.2f %8.2f %8.2f %8.2f\n",
 	     -1,
 	     (void*) KalSeed,
 	     nhits,chi2,
-             t0, t0err, pos.x(),pos.y(),pos.z(), dir.x(),dir.y(),dir.z(),
+             t0, t0err, tref,
+             pos.x(),pos.y(),pos.z(),
+             dir.x(),dir.y(),dir.z(),
+             poca.x(),poca.y(),poca.z(),
              tmin,tmax,fmin, fmax);
     }
   }
@@ -177,13 +237,14 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed      ,
   if ((opt == "") || (opt == "banner")) {
     printf("------------------------------------------------------------------------------------");
     printf("----------------------------------------------------------------------------\n");
-    printf("  TrkID       Address    N  Q       P      pT        T0      T0err      fmin      fmax");
+    printf("  TrkID       Address    N  Q       P      pT        T0      T0err       fmin      fmax");
     printf("       D0        Z0   Phi0   TanDip    radius      Ecl      chi2   FitCon  \n");
     printf("------------------------------------------------------------------------------------");
     printf("----------------------------------------------------------------------------\n");
   }
 
   if ((opt == "") || (opt.Index("data") >= 0)) {
+    printKalSeedPayload(KalSeed);
     int    nhits   = KalSeed->hits().size();
     
     double t0     = KalSeed->t0()._t0;
@@ -313,7 +374,7 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed      ,
 // coll tag format: ModuleLabel[:CollName[:ProcessName]]
 //-----------------------------------------------------------------------------
 void TAnaDump::printKalSeedCollection(const char* KalSeedCollTag    ,
-				      int         hitOpt            ,
+				      int         PrintHits         ,
 				      const char* ShCollTag   ,
 				      const char* SdmcCollTag) {
 
@@ -357,7 +418,7 @@ void TAnaDump::printKalSeedCollection(const char* KalSeedCollTag    ,
       banner_printed = 1;
     }
     printKalSeed(ks,"data");
-    if (hitOpt > 0) printKalSeed(ks,"hits",ShCollTag,SdmcCollTag);
+    if (PrintHits > 0) printKalSeed(ks,"hits",ShCollTag,SdmcCollTag);
 
   }
 }

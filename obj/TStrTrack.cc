@@ -224,15 +224,15 @@ void TStrTrack::Print(const char* Opt) const {
 
     if (fFormat & 0x4) {
       // print hits
-      std::cout << std::format("--------------------------------------------------------------------------------\n");
-      std::cout << std::format("  i   SID  pln pnl str     time     ambig     DOCA    poca.X    poca.Y    poca.Z\n");
-      std::cout << std::format("--------------------------------------------------------------------------------\n");
+      std::cout << std::format("----------------------------------------------------------------------------------\n");
+      std::cout << std::format("  i   SID  pln pnl str     time     ambig       DOCA    poca.X    poca.Y    poca.Z\n");
+      std::cout << std::format("----------------------------------------------------------------------------------\n");
       int ns = fStraws->size();
       for (int i=0; i<ns; i++) {
         mu2e::TrkStrawHitSeed* shs = &(*fHitSeeds)[i];
         mu2e::TrkStraw*        ts  = &(*fStraws)[i];
 
-        std::cout << std::format("{:3d} {:#04x}  {:2}  {:2}  {:2}  {:9.3f} 0x{:08x} {:9.3f} {:9.3f} {:9.3f} {:9.3f}\n",
+        std::cout << std::format("{:3d} {:#04x}  {:2}  {:2}  {:2}  {:9.3f} 0x{:08x} {:7.3f} {:9.3f} {:9.3f} {:9.3f}\n",
                                  i,
                                  ts->_straw.asUint16(),ts->_straw.plane(),ts->_straw.panel(),ts->_straw.straw(),
                                  shs->time(),shs->ambig(),

@@ -317,6 +317,8 @@ Stntuple: {
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
+            printKalSeeds    : 1
+            printKalSeedHits : 1
             TModule: { @table::StntupleTHistModule.TModule
                 interactiveMode  : 1                          ## 1:stop  after each event 2: stop at end-of-job;
                 module_label: "StntupleEventDump"

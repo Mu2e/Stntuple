@@ -200,7 +200,7 @@ def process_logfile(r, logfile, pid):
                 loevt = to_int(field(p, 7))
                 hirun = to_int(field(p, 8))
                 hievt = to_int(field(p, 9))
-                fc.write('%06d %s %10.3f  %s %s %6d %7d %9d %7d %9d\n' % (
+                fc.write('%06d %s %10.3f  %s %s %8d %7d %9d %7d %9d\n' % (
                     fs, field(p, 1) or '', to_float(field(p, 2)),
                     field(p, 3) or '', field(p, 4) or '', nev, lorun, loevt, hirun, hievt))
 
@@ -259,14 +259,14 @@ def write_fileset_catalog(r, filesets, pid):
         fc.write(' ' * max(ldir - 16, 0) + ' nevents\n')
         fc.write(comment_line + '\n')
         for i, fs in enumerate(filesets, start=1):
-            fc.write('%06d  %-20s  %-45s %6d %7d %9d %7d %9d\n' % (
+            fc.write('%06d  %-20s  %-45s %8d %7d %9d %7d %9d\n' % (
                 i, host, directory, fs.nevents, fs.lorun, fs.loevt, fs.hirun, fs.hievt))
 
         width = ldir + 20
         fc.write(comment_line + '\n')
         fc.write(f'# :NTOTAL:          {nev_total:>{width}}\n')
         fc.write(f'# :NGENERATED:      {"":>{width}}\n')
-        fc.write(f'# :MC_FLAG:         {1:>{width}}\n')
+        fc.write(f'# :MC_FLAG:         {0:>{width}}\n')
         fc.write(f'# :PROCESS_CODE:    {"":>{width}}\n')
         fc.write(f'# :PDG_CODE:        {"":>{width}}\n')
         fc.write(f'# :OFFLINE_VERSION: {r["offline_version"]:>{width}}\n')
