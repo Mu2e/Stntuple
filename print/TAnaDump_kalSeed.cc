@@ -30,7 +30,7 @@ void printKalSeedPayload(const mu2e::KalSeed* seed) {
       const auto& inter = intersections[i];
       const auto pos = inter.position3();
       const auto mom = inter.momentum3();
-      printf(" %3zu %-12s %4d %9.3f %9.2f %9.2f %9.2f %9.2f %9.2f %9.2f %9d %9.3f %12.4g\n",
+      printf(" %3zu %-12s %4d %9.3f %9.2f %9.2f %9.2f %9.2f %9.2f %9.2f %9d %d %12.4g\n",
              i, inter.surfaceId().name().c_str(), inter.surfaceId().index(), inter.time(),
              pos.x(), pos.y(), pos.z(), mom.x(), mom.y(), mom.z(),
              int(inter.inBounds()), inter.gap(), inter.dMom());
@@ -82,7 +82,7 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
 
   if (not KalSeed->status().hasAnyProperty(mu2e::TrkFitFlag::KKLine)) return;
   
-  int banner_printed(0);
+  // int banner_printed(0);
   
   int    nhits   = KalSeed->hits().size();
   if ((opt == "") || (opt.Index("data") >= 0)) {
