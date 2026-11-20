@@ -1,0 +1,21 @@
+#------------------------------------------------------------------------------
+#
+#------------------------------------------------------------------------------
+outputs.defaultOutput.outputCommands  : [
+                                         "drop *_*_*_*",
+                                         @sequence::Reconstruction.GeneralProducts,
+                                         @sequence::Reconstruction.HighRecoProducts,
+                                         @sequence::Reconstruction.MidRecoProducts,
+                                         "keep mu2e::TimeClusters_*_*_*",
+                                         "keep *_makeSH_*_*",
+                                         "keep *_DummyLumiInfo_*_*",
+                                         "keep *_TriggerResults_*_*",
+                                         "keep mu2e::CrvRecoPulses_*_*_*",
+                                         "keep mu2e::CrvDigis_*_*_*",
+                                         "keep mu2e::CrvDAQerrors_*_*_*",
+                                         "keep *_eventHeaderFromCFOFragment_*_*",
+                                         "keep mu2e::CrvCoincidenceClusters_*_*_*",
+                                         "keep mu2e::CrvStatus_*_*_*",
+                                         "drop artdaq::*_*_*_*" ,
+                                         "drop mu2e::CrvDigis_*_NZS_*"
+                                        ]
